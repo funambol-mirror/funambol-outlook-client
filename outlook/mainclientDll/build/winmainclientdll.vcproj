@@ -49,7 +49,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src/include;&quot;../../../../client-api/native/src/include/windows&quot;;&quot;../../../../client-api/native/src/include/common&quot;"
+				AdditionalIncludeDirectories="../src/include;&quot;../../cpp-sdk/src/include/windows&quot;;&quot;../../cpp-sdk/src/include/common&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;WINMAINCLIENTDLL_EXPORTS;UNICODE;DEBUG;_CRT_SECURE_NO_DEPRECATE;_WIN32_DCOM;ENABLE_NAMESPACE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -150,7 +150,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="../src/include;&quot;../../../../client-api/native/src/include/windows&quot;;&quot;../../../../client-api/native/src/include/common&quot;"
+				AdditionalIncludeDirectories="../src/include;&quot;../../cpp-sdk/src/include/windows&quot;;&quot;../../cpp-sdk/src/include/common&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;WINMAINCLIENTDLL_EXPORTS;UNICODE;_CRT_SECURE_NO_DEPRECATE;_WIN32_DCOM;ENABLE_NAMESPACE"
 				StringPooling="true"
 				BasicRuntimeChecks="0"
