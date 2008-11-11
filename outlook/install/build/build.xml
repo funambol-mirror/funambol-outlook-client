@@ -137,8 +137,8 @@ Forge file for Funambol Outlook Plug-in
     	<property name="dir.mainclientdll"  value="${dir.outlook}/mainclientDll"/>	
     	<property name="dir.outlookaddin"   value="${dir.outlook}/Addin"/>
     	<property name="dir.design"         value="${dir.outlook}/docs"/>
-    	<property name="dir.native_api"     value="${dir.outlook}/../../client-api/native"/>
-    	<property name="dir.zlib"           value="${dir.outlook}/../../tools/zlib"/>
+    	<property name="dir.native_api"     value="${dir.outlook}/cpp-sdk"/>
+    	<property name="dir.zlib"           value="${dir.native_api}/tools/zlib"/>
 	
     	<!-- Log files -->
     	<property name="log.SVN"            value="${dir.output}/SVN_export.log"/>
@@ -181,9 +181,9 @@ Forge file for Funambol Outlook Plug-in
 	<!-- Output dirs for src files -->
 	<property name="dir.output_src"               value="${dir.output}/${dir.src}${release.major}.${release.minor}.${build.number}"/>
 	<property name="dir.output_src.home"          value="${dir.output_src}/Funambol/Outlook Plug-in"/>
-	<property name="dir.output_src.outlook"       value="${dir.output_src.home}/clients/outlook"/>
-	<property name="dir.output_src.native_api"    value="${dir.output_src.home}/client-api/native"/>
-	<property name="dir.output_src.zlib"          value="${dir.output_src.home}/tools/zlib"/>
+	<property name="dir.output_src.outlook"       value="${dir.output_src.home}"/>
+	<property name="dir.output_src.native_api"    value="${dir.output_src.home}/cpp-sdk"/>
+	<property name="dir.output_src.zlib"          value="${dir.output_src.native_api}/tools/zlib"/>
 	<property name="dir.output_src.UI"            value="${dir.output_src.outlook}/UI"/>
 	<property name="dir.output_src.mainclientdll" value="${dir.output_src.outlook}/mainclientdll"/>
 	<property name="dir.output_src.outlookaddin"  value="${dir.output_src.outlook}/Addin"/>
@@ -213,12 +213,6 @@ Forge file for Funambol Outlook Plug-in
         <exec dir="${dir.export.SVN}" executable="svn" failonerror="true" output="${log.SVN}" >
              <arg line="export --username guest --force ${svn.url}/${module.src.tag} ${dir.export.SVN}"/>
         </exec>
-    
-        <!-- ZLIB library: checkout from HEAD -->
-        <echo message="svn export --username guest --force ${svn.url.head}/${zlib.modulename} ${dir.export.SVN}/${zlib.modulename}"/>
-        <exec dir="${dir.export.SVN}" executable="svn" failonerror="true" output="${log.SVN}" append="true" >
-             <arg line="export --username guest --force ${svn.url.head}/${zlib.modulename} ${dir.export.SVN}/${zlib.modulename}"/>
-        </exec>
 
     </target>
 
@@ -247,24 +241,15 @@ Forge file for Funambol Outlook Plug-in
     -->
     <target name="forge-src" depends="init,build,checkout-src">
     
-        <mkdir dir="${dir.output_src}"/>
+        <mkdir dir="${dir.output.src.home}"/>
 
-        <!-- 
-        Move source files to generate the correct directory structure under 'funambol' 
-        -->
-        <copy todir="${dir.output_src.zlib}" >
-            <fileset dir="${dir.export.SVN}/tools/zlib"/>
-        </copy>
-        <copy todir="${dir.output_src.home}">
-            <fileset dir="${dir.export.SVN}/funambol" />
+        <!-- Copy source files under 'funambol-outlook-sync-client-src-x.y.z' and zip them -->
+        <copy todir="${dir.output.src.home}" >
+            <fileset dir="${dir.export.SVN}"/>
         </copy>
 
-        <!-- <delete dir="${dir.export.CVS}" quiet="true"/> -->
-
-
-        <!-- ZIP files -->
-        <zip destfile="${dir.output_src}.zip">
-            <fileset dir="${dir.output_src}"/>
+        <zip destfile="${dir.output.src}.zip">
+            <fileset dir="${dir.output.src}"/>
         </zip>
         
     </target>
