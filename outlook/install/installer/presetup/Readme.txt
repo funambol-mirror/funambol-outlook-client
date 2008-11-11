@@ -1,7 +1,7 @@
 Funambol Outlook Plug-in
 
-Version: 7.1.2
-Release date: October 29, 2008
+Version: 7.1.3
+Release date: November 11, 2008
 
 Funambol offers commercial support for this software.
 See http://www.funambol.com/support.
