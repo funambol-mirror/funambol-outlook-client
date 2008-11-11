@@ -944,11 +944,11 @@ bool OutlookConfig::checkToUpgrade() {
 void OutlookConfig::upgradeConfig() {
 
     // Backup old Swv.
-    oldSwv = getBuildNumberFromVersion(deviceConfig.getSwv());
+    oldSwv = getBuildNumberFromVersion(getDeviceConfig().getSwv());
 
     // Set the new Swv.
     const char* newSwv = readCurrentSwv();
-    deviceConfig.setSwv(newSwv);
+    getDeviceConfig().setSwv(newSwv);
 
     // Set the new User Agent = "Funambol Outlook Plug-In v. x.y.z"
     char* userAgent = new char[strlen(PROGRAM_NAME) + strlen(newSwv) + 5];
