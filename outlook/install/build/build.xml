@@ -241,15 +241,14 @@ Forge file for Funambol Outlook Plug-in
     -->
     <target name="forge-src" depends="init,build,checkout-src">
     
-        <mkdir dir="${dir.output.src.home}"/>
-
         <!-- Copy source files under 'funambol-outlook-sync-client-src-x.y.z' and zip them -->
-        <copy todir="${dir.output.src.home}" >
+        <mkdir dir="${dir.output_src.home}"/>
+        <copy todir="${dir.output_src.home}" >
             <fileset dir="${dir.export.SVN}"/>
         </copy>
 
-        <zip destfile="${dir.output.src}.zip">
-            <fileset dir="${dir.output.src}"/>
+        <zip destfile="${dir.output_src}.zip">
+            <fileset dir="${dir.output_src}"/>
         </zip>
         
     </target>
@@ -581,11 +580,11 @@ Forge file for Funambol Outlook Plug-in
         
         <mkdir dir="${dir.output}"/>
         <property name="doxyfile"      value="${dir.distribution}/doxygen/Doxyfile"/>
-        <property name="olplugin.root" value="output/export/${olplugin.modulename}"/>
-        <property name="cppapi.root"   value="output/export/${cppapi.modulename}"  />
+        <property name="olplugin.root" value="output/export"/>
+        <property name="cppapi.root"   value="output/export/cpp-sdk"  />
 
         <echo message="Creating documentation with doxygen..." />
-	<exec dir="output/export/${olplugin.modulename}/docs" executable="doxygen" output="${log.doxygen}" >
+	<exec dir="output/export/docs" executable="doxygen" output="${log.doxygen}" >
             <arg line="${doxyfile}" />
             <env key="FUNAMBOL_OLPLUGIN_ROOT" path="${olplugin.root}"/>			<!-- root of OLPlugin project      -->
             <env key="FUNAMBOL_NATIVE_ROOT"   path="${cppapi.root}"/>			<!-- root of Native API project    -->
