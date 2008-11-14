@@ -39,12 +39,12 @@
 
 <!-- $Id: build.xml,v 1.28 2008-07-02 16:16:05 magi Exp $
 ===================================================================================================
-Forge file for Funambol Outlook Plug-in
+Forge file for Funambol Outlook Sync Client
 
 ====================================================================================================
 -->
 
-<project basedir=".." default="all" name="FunambolOutlookPlugin">
+<project basedir=".." default="all" name="FunambolOutlookSyncClient">
 
 
     <!--
@@ -52,65 +52,46 @@ Forge file for Funambol Outlook Plug-in
       ALL
     ========================================================================
     -->
-    <target name="all">            
+    <target name="all">
+        <antcall target="usage"/>
+    </target>
+    
+    <target name="usage">            
        <echo message="Usage: ant [options]"/>      
        <echo message=""/> 
        <echo message="where options is"/> 
-       <echo message="release           : to regdll + checkout + build + forge + generate docs. Both for comed and cared"/>      
-       <echo message="release-nodocs    : to regdll + checkout + build + forge. Both for comed and cared"/>  
-       <echo message="forge-docs        : to checkout + forge + generate docs"/> 
+       <echo message="release         : to regdll + checkout + build + forge + generate docs. Both for comed and cared"/>      
+       <echo message="release-nodocs  : to regdll + checkout + build + forge. Both for comed and cared"/>  
+       <echo message="docs            : to checkout + forge + generate docs"/> 
        <echo message=""/> 
-       <echo message="installer-all        : clean, build the installer, no checkout (build from dev working dirs). Both for comed and cared"/> 
-       <echo message="installer-dev        : no clean, build the installer, no checkout (build from dev working dirs). Comed"/> 
-       <echo message="installer-cared-dev  : no clean, build the installer, no checkout (build from dev working dirs). Cared"/> 
-       <echo message="docs-dev             : clean, to only generate doxygen docs, no checkout (build from dev working dirs)"/> 
+       <echo message="work-all        : clean, build the installer, no checkout (build from dev working dirs). Both for comed and cared"/> 
+       <echo message="work-dev        : no clean, build the installer, no checkout (build from dev working dirs). Comed"/> 
+       <echo message="work-cared-dev  : no clean, build the installer, no checkout (build from dev working dirs). Cared"/> 
+       <echo message="docs-dev        : clean, to only generate doxygen docs, no checkout (build from dev working dirs)"/> 
     </target>
-
+    
     <!--target name="release"         depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, build-install-sp"/-->
     <!--target name="release"         depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, 
                                                                                         set-portal-password-key,
-                                                                                        compile-outlook-plugin,
-                                                                                        move-mainclientdll-sp,
+                                                                                        compile-outlook-client,
                                                                                         restore-empty-password-key,
                                                                                         build-install-sp"/-->
     
-     <target name="release"         depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install,                                                                                         
-                                                                                        compile-outlook-plugin,
-                                                                                        move-mainclientdll-sp,                                                                                        
-                                                                                        build-install-cared"/>
-                                                                                                                                                                            
-    <target name="release-nodocs"  depends="init, clean, build, register-dll, checkout-src, forge-src, compile, forge, build-install, 
-                                                                                        compile-outlook-plugin,
-                                                                                        move-mainclientdll-sp,
-                                                                                        build-install-sp"/>
+    <target name="release"        depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, build-install-cared"/>                                                                                                                                                                     
+    <target name="release-nodocs" depends="init, clean, build, register-dll, checkout-src, forge-src, compile, forge, build-install, build-install-sp"/> 
+    <target name="docs "          depends="init, clean, build, checkout-src, create-docs, forge-src"/>
     
-    <target name="forge-docs"      depends="init, clean, build, checkout-src, create-docs, forge-src"/>
     
-    <!--target name="installer-all">
+    <!-- These execute on working dir (for dev purpose) -->  
+    <target name="work-all">
         <antcall target="clean"/>
-        <antcall target="installer-dev"/>
-        <antcall target="installer-sp-dev"/>
-    </target-->
-
-    <target name="installer-all">
-        <antcall target="clean"/>
-        <antcall target="installer-dev"/>
-        <antcall target="installer-cared-dev"/>
+        <antcall target="work-dev"/>
+        <antcall target="work-cared-dev"/>
     </target>
-    
-    <!-- These execute on working dir (for dev purpose) -->    
-    <target name="installer-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install"/>    
-    <target name="installer-sp-dev" depends="init, build, register-dll,
-                                                          set-portal-password-key-dev,
-                                                          forge-no-checkout,
-                                                          restore-empty-password-key-dev,                                                                                                                   
-                                                          build-install-sp"/>   
-    <target name="installer-cared-dev" depends="init, build, register-dll,                                                       
-                                                       compile-no-checkout, 
-                                                       forge-no-checkout,                                                        
-                                                       build-install-cared"/>    
-                                                                                                                 
-    <target name="docs-dev"      depends="init, clean, build, create-docs-no-checkout"/>
+    <target name="work-dev"       depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install"/>    
+    <target name="work-sp-dev"    depends="init, build, register-dll, set-portal-password-key-dev, forge-no-checkout, restore-empty-password-key-dev, build-install-sp"/>   
+    <target name="work-cared-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install-cared"/>    
+    <target name="docs-dev"       depends="init, clean, build, create-docs-no-checkout"/>
                                                               
     
     <!--
@@ -131,7 +112,7 @@ Forge file for Funambol Outlook Plug-in
         <property name="dir.redemptionLibRedist"  value="${dir.distribution}/installer/Redemption_Lib/enterprise"/>
         
         <!-- Dirs to read src from (no-checkout build) -->
-        <property name="dir.src"            value="funambol-outlook-plugin-src-"/>
+        <property name="dir.src"            value="funambol-outlook-sync-client-src-"/>
         <property name="dir.outlook"        value="${dir.distribution}/.."/>
     	<property name="dir.ui"             value="${dir.outlook}/UI"/>
     	<property name="dir.mainclientdll"  value="${dir.outlook}/mainclientDll"/>	
@@ -139,21 +120,25 @@ Forge file for Funambol Outlook Plug-in
     	<property name="dir.design"         value="${dir.outlook}/docs"/>
     	<property name="dir.native_api"     value="${dir.outlook}/cpp-sdk"/>
     	<property name="dir.zlib"           value="${dir.native_api}/tools/zlib"/>
+    	<property name="dir.presetup"       value="${dir.outlook}/install/installer/presetup"/>
 	
     	<!-- Log files -->
     	<property name="log.SVN"            value="${dir.output}/SVN_export.log"/>
-    	<property name="log.plugin"         value="${dir.output}/build_plugin.log"/>
-        <property name="log.addin"          value="${dir.output}/build_addin.log"/>
+    	<property name="log.client"         value="${dir.output}/build_client.log"/>
         <property name="log.NSIS"           value="${dir.output}/build_NSIS.log"/>
         <property name="log.NSIS_sp"        value="${dir.output}/build_NSIS_SP.log"/>
         <property name="log.doxygen"        value="${dir.output}/build_doxygen.log"/>
 	
- 	<property file="${user.home}/funambol-outlook-plugin-forge.properties"/>
-	<property file="build/funambol-outlook-plugin-forge.properties"/>
+	<property file="build/funambol-outlook-client-forge.properties"/>
+	<property file="build/extra.properties"/>
 	
-	<property file="build/extra.properties"/>    
-    <!-- it defaults the wm.pass.key if not defines in other parts -->
-    <property name="wm.pass.key"        value="NULL"/>
+	<!-- Property TODAY contains the formatted date, like "14 November 2008" -->
+	<tstamp>
+	    <format property="TODAY" pattern="d MMMM yyyy" locale="en,UK"/>
+	</tstamp>
+        
+        <!-- it defaults the wm.pass.key if not defines in other parts -->
+        <property name="wm.pass.key" value="NULL"/>
 
     </target>
 
@@ -166,9 +151,8 @@ Forge file for Funambol Outlook Plug-in
     <target name="build" depends="init">
     
         <!-- Update the build date automatically, build number is manually set -->
-        <propertyfile file  = "${dir.distribution}/build/release.properties" comment = "Funambol Outlook Plug-in" >
-            <entry key="build.date"   type="date" value="now" pattern="yyyyMMdd"/>
-            <!--entry key="build.number" type="int"  operation = "+" default="1"/-->
+        <propertyfile file  = "${dir.distribution}/build/release.properties" comment = "Funambol Outlook Sync Client" >
+            <entry key="build.date" type="date" value="now" pattern="yyyyMMdd"/>
         </propertyfile>
 
         <!-- Load release.propeties -->
@@ -180,7 +164,7 @@ Forge file for Funambol Outlook Plug-in
         
 	<!-- Output dirs for src files -->
 	<property name="dir.output_src"               value="${dir.output}/${dir.src}${release.major}.${release.minor}.${build.number}"/>
-	<property name="dir.output_src.home"          value="${dir.output_src}/Funambol/Outlook Plug-in"/>
+	<property name="dir.output_src.home"          value="${dir.output_src}/Funambol/Outlook Sync Client"/>
 	<property name="dir.output_src.outlook"       value="${dir.output_src.home}"/>
 	<property name="dir.output_src.native_api"    value="${dir.output_src.home}/cpp-sdk"/>
 	<property name="dir.output_src.zlib"          value="${dir.output_src.native_api}/tools/zlib"/>
@@ -261,33 +245,18 @@ Forge file for Funambol Outlook Plug-in
       COMPILE
     ========================================================================
     -->
-    
-     <target name="compile-outlook-plugin" depends="init,build">         
-        <echo message="Compiling OutlookPlugin..."/>
-        <exec dir="${dir.output_src.UI}/build" executable="${vs2005.devenv}/devenv" failonerror="true">
-            <arg line="OutlookPlugin.sln /Out ${log.plugin} /Build ${plugin.targetbuild}"/>
-        </exec>              
-    </target>
-    
     <target name="compile" depends="init,checkout-src"> 
         <mkdir dir="${dir.output}"/>
                 
-        <echo message="Compiling OutlookPlugin..."/>
-        <exec dir="${dir.output_src.UI}/build" executable="${vs2005.devenv}/devenv" failonerror="true">
-            <arg line="OutlookPlugin.sln /Out ${log.plugin} /Build ${plugin.targetbuild}"/>
+        <echo message="Compiling Outlook Client..."/>
+        <exec dir="${dir.output_src.outlook}" executable="${vs2005.devenv}/devenv" failonerror="true">
+            <arg line="OutlookClient.sln /Out ${log.client} /Build ${client.targetbuild}"/>
         </exec>
 
-        <echo message="Compiling FunambolAddin..."/>
-        <exec dir="${dir.output_src.outlookaddin}" executable="${vs2005.devenv}/devenv" failonerror="true">        
-            <arg line="FunambolAddin.sln /Out ${log.addin} /Build ${addin.targetbuild}"/>
-        </exec>
         
-        <!-- Open logs and continue -->
+        <!-- Open log and continue -->
         <exec dir="${dir.output}" executable="notepad" spawn="true">
-            <arg line="${log.plugin}"/>
-        </exec>
-        <exec executable="notepad" spawn="true">
-            <arg line="${log.addin}" />
+            <arg line="${log.client}"/>
         </exec>
       
     </target>
@@ -298,28 +267,19 @@ Forge file for Funambol Outlook Plug-in
       COMPILE-NO-CHECKOUT
     ========================================================================
     -->
-    
     <target name="compile-no-checkout" depends="init">
         <mkdir dir="${dir.output}"/>
     
         <!-- Note: compile from dev working dirs -->
         
-        <echo message="Compiling OutlookPlugin..."/>
-        <exec dir="${dir.ui}/build" executable="${vs2005.devenv}/devenv" failonerror="true">
-            <arg line="OutlookPlugin.sln /Out ${log.plugin} /Build ${plugin.targetbuild}"/>
-        </exec>
-
-        <echo message="Compiling FunambolAddin..."/>
-        <exec dir="${dir.outlookaddin}" executable="${vs2005.devenv}/devenv" failonerror="true">        
-            <arg line="FunambolAddin.sln /Out ${log.addin} /Build ${addin.targetbuild}"/>
+        <echo message="Compiling Outlook Client..."/>
+        <exec dir="${dir.outlook}" executable="${vs2005.devenv}/devenv" failonerror="true">
+            <arg line="OutlookClient.sln /Out ${log.client} /Build ${client.targetbuild}"/>
         </exec>
         
-        <!-- Open logs and continue -->
+        <!-- Open log and continue -->
         <exec executable="notepad" spawn="true">
-            <arg line="${log.plugin}"/>
-        </exec>
-        <exec executable="notepad" spawn="true">
-            <arg line="${log.addin}" />
+            <arg line="${log.client}"/>
         </exec>
       
     </target>
@@ -330,12 +290,6 @@ Forge file for Funambol Outlook Plug-in
       FORGE
     ========================================================================
     -->
-    <target name="move-mainclientdll-sp" depends="init,build,forge-src,compile">
-        <copy todir="${dir.fileset}" overwrite="TRUE">
-            <fileset dir="${dir.output_src.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
-        </copy>
-	</target>
-	
     <target name="forge" depends="init,build,forge-src,compile">
 
         <echo message="Forge files from ${dir.output_src}..." />
@@ -352,6 +306,10 @@ Forge file for Funambol Outlook Plug-in
         <copy todir="${dir.fileset}" >
             <fileset dir="${dir.output_src.install}/installer/presetup"/>
         </copy>
+        
+        <!-- Update the Readme.txt file automatically: version and release date -->
+        <replace file="${dir.fileset}/Readme.txt" token="Version:" value="Version: ${release.major}.${release.minor}.${build.number}"/>
+        <replace file="${dir.fileset}/Readme.txt" token="Release date:" value="Release date: ${TODAY}" />
 
 
         <!-- 'release.properties' is copied from this working dir -->
@@ -403,6 +361,10 @@ Forge file for Funambol Outlook Plug-in
         <copy todir="${dir.fileset}" >
             <fileset dir="${dir.presetup}" excludes="**/*.bak, **/*.my, **/.#*, **/.svn/" />
         </copy>
+        
+        <!-- Update the Readme.txt file automatically: version and release date -->
+	<replace file="${dir.fileset}/Readme.txt" token="Version:" value="Version: ${release.major}.${release.minor}.${build.number}"/>
+        <replace file="${dir.fileset}/Readme.txt" token="Release date:" value="Release date: ${TODAY}" />
         
         
         <!-- Copy release.properties -->
@@ -496,6 +458,69 @@ Forge file for Funambol Outlook Plug-in
         </exec>
     </target>
     
+   
+    <!--
+    ========================================================================
+    CLEAN
+    ========================================================================
+    -->
+    <target name="clean" depends="init">
+        <delete dir="${dir.output}"/>
+        <delete dir="${dir.fileset}"/>
+    </target>
+
+
+
+    <!--
+    ========================================================================
+    CREATE DOCS
+    ========================================================================
+    -->
+    <target name="create-docs" depends="init,checkout-src">
+        
+        <mkdir dir="${dir.output}"/>
+        <property name="doxyfile"      value="${dir.distribution}/doxygen/Doxyfile"/>
+        <property name="olclient.root" value="output/export"/>
+        <property name="cppapi.root"   value="output/export/cpp-sdk"  />
+
+        <echo message="Creating documentation with doxygen..." />
+	<exec dir="output/export/docs" executable="doxygen" output="${log.doxygen}" >
+            <arg line="${doxyfile}" />
+            <env key="FUNAMBOL_OLPLUGIN_ROOT" path="${olclient.root}"/>			<!-- root of OLPlugin project      -->
+            <env key="FUNAMBOL_NATIVE_ROOT"   path="${cppapi.root}"/>			<!-- root of Native API project    -->
+            <env key="ENABLED_SECTIONS"  value="API OLPLUGIN" />			<!-- add "DEV" for complete docs   -->
+            <env key="SHOW_PRIVATE_DATA" value="YES" />					<!-- "YES" to show private members -->
+            <env key="HAVE_DOT"          value="YES" />					<!-- "NO" to hide graphs           -->
+        </exec>
+    </target>
+
+
+    <!--
+    ========================================================================
+    CREATE DOCS - NO CHECKOUT
+    ========================================================================
+    -->   
+    <target name="create-docs-no-checkout" depends="init">
+        <!-- Create doxygen docs from working env -->
+        
+        <mkdir dir="${dir.output}"/>
+        <property name="doxyfile"      value="${dir.distribution}/doxygen/Doxyfile"/>
+        <property name="olclient.root" value="${dir.outlook}"   />
+        <property name="cppapi.root"   value="${dir.native_api}"/>
+
+        <echo message="Creating documentation with doxygen..." />
+	<exec dir="${dir.design}" executable="doxygen" output="${log.doxygen}" >
+            <arg line="${doxyfile}" />
+	    <env key="FUNAMBOL_OLPLUGIN_ROOT" path="${olclient.root}"/>			<!-- root of OLPlugin project      -->
+	    <env key="FUNAMBOL_NATIVE_ROOT"   path="${cppapi.root}"/>			<!-- root of Native API project    -->
+	    <env key="ENABLED_SECTIONS"      value="API OLPLUGIN" />			<!-- add "DEV" for complete docs   -->
+	    <env key="SHOW_PRIVATE_DATA"     value="YES" />				<!-- "YES" to show private members -->
+	    <env key="HAVE_DOT"              value="YES" />				<!-- "NO" to hide graphs           -->
+        </exec>
+    </target>
+
+
+    
     <!--
     ========================================================================
     Replace the pass-key with the value for the portal
@@ -558,66 +583,6 @@ Forge file for Funambol Outlook Plug-in
             value='#define CARED_KEY    false' summary="true">              
      </replace>     
    </target>
-   
-    <!--
-    ========================================================================
-    CLEAN
-    ========================================================================
-    -->
-    <target name="clean" depends="init">
-        <delete dir="${dir.output}"/>
-        <delete dir="${dir.fileset}"/>
-    </target>
-
-
-
-    <!--
-    ========================================================================
-    CREATE DOCS
-    ========================================================================
-    -->
-    <target name="create-docs" depends="init,checkout-src">
-        
-        <mkdir dir="${dir.output}"/>
-        <property name="doxyfile"      value="${dir.distribution}/doxygen/Doxyfile"/>
-        <property name="olplugin.root" value="output/export"/>
-        <property name="cppapi.root"   value="output/export/cpp-sdk"  />
-
-        <echo message="Creating documentation with doxygen..." />
-	<exec dir="output/export/docs" executable="doxygen" output="${log.doxygen}" >
-            <arg line="${doxyfile}" />
-            <env key="FUNAMBOL_OLPLUGIN_ROOT" path="${olplugin.root}"/>			<!-- root of OLPlugin project      -->
-            <env key="FUNAMBOL_NATIVE_ROOT"   path="${cppapi.root}"/>			<!-- root of Native API project    -->
-            <env key="ENABLED_SECTIONS"  value="API OLPLUGIN" />			<!-- add "DEV" for complete docs   -->
-            <env key="SHOW_PRIVATE_DATA" value="YES" />					<!-- "YES" to show private members -->
-            <env key="HAVE_DOT"          value="YES" />					<!-- "NO" to hide graphs           -->
-        </exec>
-    </target>
-
-
-    <!--
-    ========================================================================
-    CREATE DOCS - NO CHECKOUT
-    ========================================================================
-    -->   
-    <target name="create-docs-no-checkout" depends="init">
-        <!-- Create doxygen docs from working env -->
-        
-        <mkdir dir="${dir.output}"/>
-        <property name="doxyfile"      value="${dir.distribution}/doxygen/Doxyfile"/>
-        <property name="olplugin.root" value="${dir.outlook}"   />
-        <property name="cppapi.root"   value="${dir.native_api}"/>
-
-        <echo message="Creating documentation with doxygen..." />
-	<exec dir="${dir.design}" executable="doxygen" output="${log.doxygen}" >
-            <arg line="${doxyfile}" />
-	    <env key="FUNAMBOL_OLPLUGIN_ROOT" path="${olplugin.root}"/>			<!-- root of OLPlugin project      -->
-	    <env key="FUNAMBOL_NATIVE_ROOT"   path="${cppapi.root}"/>			<!-- root of Native API project    -->
-	    <env key="ENABLED_SECTIONS"      value="API OLPLUGIN" />			<!-- add "DEV" for complete docs   -->
-	    <env key="SHOW_PRIVATE_DATA"     value="YES" />				<!-- "YES" to show private members -->
-	    <env key="HAVE_DOT"              value="YES" />				<!-- "NO" to hide graphs           -->
-        </exec>
-    </target>
 
 
 </project>
