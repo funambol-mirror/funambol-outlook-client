@@ -87,7 +87,7 @@ DeviceConfig* DefaultWinConfigFactory::getDeviceConfig() {
     DeviceConfig* dc = new DeviceConfig();
 
     dc->setMan                  ("Funambol");
-    dc->setMod                  ("Funambol Outlook Plug-in");
+    dc->setMod                  (PROGRAM_NAME);
     dc->setOem                  ("");
     dc->setFwv                  ("");
     dc->setSwv                  ("");                                   // This is replaced during config.upgradeConfig()

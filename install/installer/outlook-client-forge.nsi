@@ -34,17 +34,17 @@
  ;
 
 ; ------ defines ------
-!define PRODUCT_NAME                            "Funambol Outlook Plug-in"
+!define PRODUCT_NAME                            "Funambol Outlook Sync Client"
 !define PRODUCT_NAME_EXE                        "OutlookPlugin.exe"
 !define PRODUCT_PUBLISHER                       "Funambol"
 !define PRODUCT_WEB_SITE                        "http://www.funambol.com"
-!define STARTMENU_CONTEXT                       "Funambol\Outlook Plug-in"
-!define INSTALLDIR_CONTEXT                      "Funambol\Outlook Plug-in"
-!define DATAFILES_CONTEXT                       "Funambol\Outlook Plug-in"
+!define STARTMENU_CONTEXT                       "Funambol\Outlook Sync Client"
+!define INSTALLDIR_CONTEXT                      "Funambol\Outlook Client"
+!define DATAFILES_CONTEXT                       "Funambol\Outlook Client"
 !define MICROSOFT_OUTLOOK                       "Microsoft Outlook"
 !define MICROSOFT_OUTLOOK_CLASS_NAME            "rctrl_renwnd32"
 !define PLUGIN_UI_CLASS_NAME                    "FunambolApp"
-!define PLUGIN_UI_TITLE                         "Funambol Outlook Plug-in"
+!define PLUGIN_UI_TITLE                         "Funambol Outlook Sync Client"
 !define PRODUCT_WELCOME_BMP                     "Logo-Startup.bmp"
 
 !define PRODUCT_UNINST_ROOT_KEY                 "HKLM"
@@ -61,6 +61,12 @@
 !define PROPERTY_SP                             "portal"
 !define PROPERTY_DESCRIPTION                    "Description"
 
+; Before v.7.1.4 the product name was "Funambol Outlook Plug-in"
+; We want to be able to upgrade the Client from versions < 7.1.4.
+!define OLD_PRODUCT_NAME                        "Funambol Outlook Plug-in"
+!define OLD_PRODUCT_UNINST_KEY                  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OLD_PRODUCT_NAME}"
+!define OLD_STARTMENU_CONTEXT                   "Funambol\Outlook Plug-in"
+!define OLD_INSTALLDIR_CONTEXT                  "Funambol\Outlook Plug-in"
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
@@ -81,7 +87,6 @@
 
 ; Directory page, the first two define check if the install dir is correct
 !define MUI_DIRECTORYPAGE_VERIFYONLEAVE
-;!define MUI_PAGE_CUSTOMFUNCTION_LEAVE           CheckInstallDir          ; Not used cause we now support upgrades (dirs preserved).
 !insertmacro MUI_PAGE_DIRECTORY
 
 var ICONS_GROUP
@@ -130,7 +135,7 @@ Function CheckMicrosoftApp
         IntCmp $0 0 checkProcess
         MessageBox MB_OKCANCEL "I need to close ${MICROSOFT_OUTLOOK} to proceed with the installation of $(^Name). Ok?" IDCANCEL Cancel
         SendMessage $0 16  0 0  $R1 /TIMEOUT=1000            ; WM_CLOSE = 16, timeout = 1000 ms
-        Sleep 500                                            ; wait 500 ms for Outlook closing
+        Sleep 1500                                           ; wait 1500 ms for Outlook closing
 
         ; If Outlook still running, ask to close it manually.
         FindWindow $0 "${MICROSOFT_OUTLOOK_CLASS_NAME}"
@@ -165,7 +170,7 @@ Function un.CheckMicrosoftApp
         IntCmp $0 0 checkProcess
         MessageBox MB_OKCANCEL "I need to close ${MICROSOFT_OUTLOOK} to proceed with the uninstallation of $(^Name). Ok?" IDCANCEL Cancel
         SendMessage $0 16  0 0  $R1 /TIMEOUT=1000            ; WM_CLOSE = 16, timeout = 1000 ms
-        Sleep 800                                            ; wait 800 ms for Outlook closing
+        Sleep 1500                                           ; wait 1500 ms for Outlook closing
 
         ; If Outlook still running, ask to close it manually.
         FindWindow $0 "${MICROSOFT_OUTLOOK_CLASS_NAME}"
@@ -273,11 +278,24 @@ FunctionEnd
 Function CheckAppInstalled
 
        ReadRegStr $R0 HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
+       StrCmp $R0 "" +3
+       ReadRegStr $R1 HKLM "${PRODUCT_UNINST_KEY}" "DisplayVersion"         ; $R1 = installed version "x.y.z"
+       Goto upgrade
+       
+       ; since v.7.1.4.
+       ; Also check the old product name "Outlook Plug-in"
+       ReadRegStr $R0 HKLM "${OLD_PRODUCT_UNINST_KEY}" "UninstallString"
        StrCmp $R0 "" done
+       ReadRegStr $R1 HKLM "${OLD_PRODUCT_UNINST_KEY}" "DisplayVersion"     ; $R1 = installed version "x.y.z"
+       
        
        ; ------------------- This is an UPGRADE ------------------
-       ReadRegStr $R1 HKLM "${PRODUCT_UNINST_KEY}" "DisplayVersion"     ; $R1 = installed version "x.y.z"
-
+   upgrade:
+   
+       ; $9 (global) now contains the old installdir
+       ; It's important because INSTDIR can be changed by the user, but we MUST delete the old files!
+       StrCpy $9 $INSTDIR
+   
        ;
        ; Compare installed version with current one. We suppose version string
        ; not longer than 12 chars, and in the format "x.y.z"
@@ -310,6 +328,11 @@ Function CheckAppInstalled
                   IDCANCEL cancel
 
        StrCpy $R9 "uninstForUpgrade"     ; Cannot call now: user can cancel installation!
+
+       ; New name since v.7.1.4.
+       ; If the old installDir folder is the old default one, let's change it with the new naming.
+       StrCmp $INSTDIR "$PROGRAMFILES\${OLD_INSTALLDIR_CONTEXT}" +1 +2
+       StrCpy $INSTDIR "$PROGRAMFILES\${INSTALLDIR_CONTEXT}"
        Goto done
 
 
@@ -347,15 +370,20 @@ FunctionEnd
 
 ; Uninstall plugin for an upgrade.
 ; Uregister DLLs and delete files required.
+; Note: $9 (global) contains the old installdir (may be = $INSTDIR)
 Function uninstForUpgrade
 
-     ; Unregister DLLs.
-     UnRegDLL "$INSTDIR\Redemption.dll"
-     UnRegDLL "$INSTDIR\FunambolAddin.dll"
+     ;
+     StrCmp $9 "" +1 +2
+     StrCpy $9 $INSTDIR
 
-     ; Delete files from installDir.
-     Delete "$INSTDIR\*.*"
-     RMDir /r "$INSTDIR"
+     ; Unregister DLLs.
+     UnRegDLL "$9\Redemption.dll"
+     UnRegDLL "$9\FunambolAddin.dll"
+
+     ; Delete files from old installDir.
+     Delete "$9\*.*"
+     RMDir /r "$9"
 
      ; Delete application registered from System (version could be changed).
      DeleteRegKey HKLM "${PRODUCT_UNINST_KEY}"
@@ -364,6 +392,20 @@ Function uninstForUpgrade
      ; Addin need to be reinstalled for ALL users (replace menu/bars).
      Call resetUsersAddinState
      
+     ;
+     ; Versions < 7.1.4.
+     ; TODO: better to do the following actions ONLY if $R1 is < 7.1.4.
+     ; (now we're always doing it)
+     ;
+     DeleteRegKey HKLM "${OLD_PRODUCT_UNINST_KEY}"
+
+     ; Delete old startMenu shortcuts
+     SetShellVarContext all
+     Delete "$SMPROGRAMS\${OLD_STARTMENU_CONTEXT}\*.*"
+     RMDir  "$SMPROGRAMS\${OLD_STARTMENU_CONTEXT}"
+     
+
+
      ; NOTE:
      ; $R1 is the installed product version.
      ; Insert here code to manage upgrades from specific versions...

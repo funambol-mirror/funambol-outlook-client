@@ -1589,7 +1589,7 @@ int WindowsSyncSource::addForcedItemsToModList(itemKeyList& forcedItems) {
 /**
  * Reset the specified data file: destroy any content and
  * add a "<itemType>" tag at the beginning of file.
- * The file path is "<APP_DATA>\Funambol\Outlook Plugin\<itemType>.db"
+ * The file path is "<APP_DATA>\Funambol\Outlook Client\<itemType>.db"
  *
  * @param itemType  the itemType
  * @return          0 if no errors
@@ -1614,7 +1614,7 @@ int WindowsSyncSource::resetDataFile(const wstring& itemType) {
 /**
  * Close the specified data file: append a "</itemType>" tag 
  * at the end of the file.
- * The file path is "<APP_DATA>\Funambol\Outlook Plugin\<itemType>.db"
+ * The file path is "<APP_DATA>\Funambol\Outlook Client\<itemType>.db"
  *
  * @param itemType  the itemType
  * @return          0 if no errors

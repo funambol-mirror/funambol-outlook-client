@@ -64,7 +64,7 @@ static char THIS_FILE[] = __FILE__;
 
 
 //
-// The Outlook Plug-in licence text, to be displayed in About dialog.
+// The Outlook Sync Client licence text, to be displayed in About dialog.
 //
 static WCHAR licence[] = TEXT("This program is provided AS IS, without warranty licensed under AGPLV3. The\n") \
                          TEXT("Program is free software; you can redistribute it and/or modify it under the\n") \

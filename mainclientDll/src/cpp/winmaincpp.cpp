@@ -120,7 +120,7 @@ int initializeClient(bool isScheduled) {
 
         // Execute actions to upgrade the plugin from old version.
         upgradePlugin(config->getOldSwv());
-        sprintf(logText, INFO_SWV_UPGRADED, config->getDeviceConfig().getSwv());
+        sprintf(logText, INFO_SWV_UPGRADED, config->getClientConfig().getSwv());
     }
 
     // Simply save to public var.
@@ -171,9 +171,9 @@ int initLog(bool isScheduled) {
     //Log(0, config->getLogDir(), OL_PLUGIN_LOG_NAME);
     LOG.setLogPath(config->getLogDir());
     LOG.setLogName(OL_PLUGIN_LOG_NAME);
-    LOG.setLevel(config->getDeviceConfig().getLogLevel());
+    LOG.setLevel(config->getClientConfig().getLogLevel());
 
-    string title = "Outlook Plugin opened";
+    string title = "Outlook Sync Client opened";
     if (!isScheduled) {
         resetLog = true;    // Will reset when first sync starts
     }
@@ -224,7 +224,7 @@ int startSync() {
     if (resetLog) {
         string title = PROGRAM_NAME;
         title += " v. ";
-        title += config->getDeviceConfig().getSwv();
+        title += config->getClientConfig().getSwv();
         title += " - LOG file";
         if (isScheduledSync) title += " (scheduled sync)";
         LOG.reset(title.c_str());
@@ -232,7 +232,7 @@ int startSync() {
     }
 
     // Update log level: could be changed from initialize().
-    LOG.setLevel(config->getDeviceConfig().getLogLevel());
+    LOG.setLevel(config->getClientConfig().getLogLevel());
     LOG.debug("Starting the Sync process...");
 
     // Manually disable notes if it's a portal build.
@@ -924,9 +924,7 @@ void upgradePlugin(int oldVersion) {
 
         // usually: "C:\Windows\Tasks\Funambol Outlook Plug-in.job"
         string jobPath = tmp;
-        jobPath += "\\Tasks\\";
-        jobPath += PROGRAM_NAME;
-        jobPath += ".job";
+        jobPath += "\\Tasks\\Funambol Outlook Plug-in.job";
         remove(jobPath.c_str());
     }
 
@@ -936,6 +934,95 @@ void upgradePlugin(int oldVersion) {
         string oldLogPath = config->getLogDir();
         oldLogPath += "\\OLPlugin.log";
         remove(oldLogPath.c_str());
+    }
+
+
+    // Old version < 7.1.4: Client name has changed, was "Outlook Plug-in"
+    //   1. move cache files and delete old folder
+    //   2. remove old cache dir
+    //   3. rename scheduler task if existing
+    if (oldVersion < 70104) {
+
+        makeDataDirs();
+
+        // Get 'application data' folder for current user.
+        WCHAR appDataPath[MAX_PATH_LENGTH];
+        if ( FAILED(SHGetFolderPath(NULL, 
+                                    CSIDL_APPDATA | CSIDL_FLAG_CREATE,
+                                    NULL,
+                                    0,
+                                    appDataPath)) ) {
+            DWORD code = GetLastError();
+            char* msg = readSystemErrorMsg(code);
+            LOG.error(ERR_APPDATA_PATH, code, msg);
+            delete [] msg;
+            return;
+        }
+
+        wstring oldDataPath(appDataPath);
+        oldDataPath += TEXT("\\");
+        oldDataPath += FUNAMBOL_DIR_NAME;
+        oldDataPath += TEXT("\\");
+        oldDataPath += TEXT("Outlook Plug-in");
+
+        wstring newDataPath(appDataPath);
+        newDataPath += TEXT("\\");
+        newDataPath += FUNAMBOL_DIR_NAME;
+        newDataPath += TEXT("\\");
+        newDataPath += OLPLUGIN_DIR_NAME;
+
+        // List of possible cache files to copy
+        list<wstring> fileNames;
+        fileNames.clear();
+        fileNames.push_back(TEXT("\\appointment.db"));
+        fileNames.push_back(TEXT("\\appointment_modified.db"));
+        fileNames.push_back(TEXT("\\contact.db"));
+        fileNames.push_back(TEXT("\\note.db"));
+        fileNames.push_back(TEXT("\\task.db"));
+
+        // Copy ALL cache files (*.db) to new location.
+        wstring oldName, newName;
+        list<wstring>::iterator it;
+        for (it = fileNames.begin(); it != fileNames.end(); it++) {
+            oldName = oldDataPath;  oldName += *it;
+            newName = newDataPath;  newName += *it;
+            CopyFile(oldName.c_str(), newName.c_str(), FALSE);
+        }
+
+        // TODO: better use this method.
+        //char* buf = toMultibyte(oldDataPath.c_str());
+        //StringBuffer oldPath(buf);
+        //delete [] buf;
+        //ArrayList filesToCopy = getAllFilesInDir(oldPath, "*.db");  <-- add in API!
+
+
+        // 2. Now we can remove the old cache dir with all its content.
+        char* oldDir = toMultibyte(oldDataPath.c_str());
+        removeFileInDir(oldDir);
+        delete [] oldDir;
+        RemoveDirectory(oldDataPath.c_str());
+
+
+        // 3. Rename the scheduled task for this user only (we don't have more permissions)
+        // was: "C:\Windows\Tasks\Funambol Outlook Plug-in - <username>.job"
+        wstring user;
+        getWindowsUser(user);
+        WCHAR winDir[MAX_PATH_LENGTH];
+        GetWindowsDirectory(winDir, MAX_PATH_LENGTH);
+
+        wstring oldTaskName(winDir);
+        oldTaskName += TEXT("\\Tasks\\Funambol Outlook Plug-in - ");
+        oldTaskName += user;
+        oldTaskName += TEXT(".job");
+
+        wstring name;
+        getScheduledTaskName(name);     // Using this function, so it's always the correct name
+        wstring newTaskName(winDir);
+        newTaskName += TEXT("\\Tasks\\");
+        newTaskName += name;
+        newTaskName += TEXT(".job");
+
+        _wrename(oldTaskName.c_str(), newTaskName.c_str());
     }
 }
 

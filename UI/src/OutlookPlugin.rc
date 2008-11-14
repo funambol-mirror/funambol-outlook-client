@@ -53,7 +53,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0xEE
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,93,248,57,14,WS_GROUP
     CONTROL         141,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,0,229,89
-    CTEXT           "Funambol Outlook Plug-in\nv.x.y.z",IDC_ABOUT_MAIN,7,88,229,18
+    CTEXT           "Funambol Outlook Sync Client\nv.x.y.z",IDC_ABOUT_MAIN,7,88,229,18
     CTEXT           "www.funambol.com",IDC_ABOUT_LINK,7,129,229,8,SS_NOTIFY
     CTEXT           "This program is provided AS IS...\n...\n...\n...",IDC_ABOUT_LICENCE,7,142,229,104
     CTEXT           "Copyright © 2003 - 2007 Funambol, Inc.\nAll rights reserved.",IDC_ABOUT_COPYRIGHT,7,108,229,17
@@ -521,7 +521,7 @@ BEGIN
     BEGIN
         MENUITEM "&View User Guide\tCTRL+U",    ID_VIEW_GUIDE
         MENUITEM SEPARATOR
-        MENUITEM "&About Funambol Outlook Plug-in...\tCtrl+H", ID_APP_ABOUT
+        MENUITEM "&About Funambol Outlook Sync Client...\tCtrl+H", ID_APP_ABOUT
     END
 END
 
@@ -546,7 +546,7 @@ BEGIN
     END
     POPUP "&Help", GRAYED
     BEGIN
-        MENUITEM "&About Outlook Plugin...",    ID_APP_ABOUT
+        MENUITEM "&About Outlook Sync Client...",    ID_APP_ABOUT
     END
 END
 
@@ -590,7 +590,7 @@ BEGIN
         BLOCK "000904b0"
         BEGIN
             VALUE "CompanyName", "Funambol"
-            VALUE "FileDescription", "Funambol Outlook Plug-in"
+            VALUE "FileDescription", "Funambol Outlook Sync Client"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "OutlookPlugin"
             VALUE "LegalCopyright", "Copyright (C) 2006 Funambol"
@@ -655,7 +655,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_VIEW_GUIDE           "Open Funambol Outlook Plugin User Guide"
+    ID_VIEW_GUIDE           "Open Funambol Outlook Sync Client User Guide"
 END
 
 STRINGTABLE 
@@ -739,7 +739,7 @@ BEGIN
     IDS_MAIN_NOTES          "Notes"
     IDS_ERROR_SET_CONNECTION 
                             "You must enter your account information before attempting a sync."
-    IDS_ABOUT_TITLE         "About Funambol Outlook Plug-in"
+    IDS_ABOUT_TITLE         "About Funambol Outlook Sync Client"
     IDS_MAIN_LAST_SYNC_FAILED "Last sync failed"
     IDS_MAIN_LAST_SYNC_CANCELED "Last sync canceled"
     IDS_CODE_HTTP_NOT_FOUND_2060 
@@ -749,7 +749,7 @@ BEGIN
     IDS_CODE_DROPPED_ITEMS  "Warning: some items were not correctly saved in Outlook."
     IDS_TEXT_CHECKING       "Checking"
     IDS_FINISHED_SENDING    "Waiting for Server data..."
-    IDS_GUIDE_LINK          "http://download.forge.objectweb.org/sync4j/Outlook_Plugin_User_Guide_v7.pdf"
+    IDS_GUIDE_LINK          "http://download.forge.objectweb.org/sync4j/funambol-outlook-plugin-v7-user-guide.pdf"
     IDS_ERR_SERVER_TIMOUT   "Server returned timeout error: current session has expired.\nPlease retry later."
     IDS_CODE_SERVER_BUSY    "Server is busy, please retry later."
 END
@@ -792,7 +792,7 @@ BEGIN
     IDS_SYNC_SETTINGS       "Synchronization Settings"
     IDS_APPLY               "&Apply"
     IDS_ERROR_SYNC_TERMINATED 
-                            "Sync process could not be terminated correctly.\nOutlook Plugin will now be closed."
+                            "Sync process could not be terminated correctly.\nOutlook Sync Client will now be closed."
     IDS_TEXT_CANCELING_SYNC "Canceling sync, please wait..."
     IDS_MAIN_PRESS_TO_SYNC  "Sync All"
     IDS_MAIN_PRESS_TO_CANCEL "Cancel Sync"

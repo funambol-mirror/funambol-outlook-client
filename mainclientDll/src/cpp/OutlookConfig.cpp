@@ -927,7 +927,7 @@ bool OutlookConfig::checkToUpgrade() {
 
     bool ret = false;
     const char* newSwv = readCurrentSwv();
-    const char* oldSwv = getDeviceConfig().getSwv();
+    const char* oldSwv = getClientConfig().getSwv();
     if (strcmp(oldSwv, newSwv)) {
         ret = true;
     }
@@ -944,13 +944,13 @@ bool OutlookConfig::checkToUpgrade() {
 void OutlookConfig::upgradeConfig() {
 
     // Backup old Swv.
-    oldSwv = getBuildNumberFromVersion(getDeviceConfig().getSwv());
+    oldSwv = getBuildNumberFromVersion(getClientConfig().getSwv());
 
     // Set the new Swv.
     const char* newSwv = readCurrentSwv();
-    getDeviceConfig().setSwv(newSwv);
+    getClientConfig().setSwv(newSwv);
 
-    // Set the new User Agent = "Funambol Outlook Plug-In v. x.y.z"
+    // Set the new User Agent = "Funambol Outlook Sync Client v. x.y.z"
     char* userAgent = new char[strlen(PROGRAM_NAME) + strlen(newSwv) + 5];
     sprintf(userAgent, "%s v. %s", PROGRAM_NAME, newSwv);
     accessConfig.setUserAgent(userAgent);
@@ -1009,6 +1009,12 @@ void OutlookConfig::upgradeConfig() {
             ssc->setVersion("2.1");
             ssc->setEncoding("bin");
         }
+    }
+
+    // Old version < 7.1.4: Client name has changed.
+    if (oldSwv < 70104) {
+        DeviceConfig& dc = getClientConfig();
+        dc.setMod(PROGRAM_NAME);
     }
 
         
@@ -1127,7 +1133,7 @@ int OutlookConfig::setUniqueDevID() {
 
 
     // Set it to configuration.
-    getDeviceConfig().setDevID(devID);
+    getClientConfig().setDevID(devID);
     LOG.info(INFO_CONFIG_DEVID_SAVED, devID);
 
 
@@ -1258,7 +1264,7 @@ bool OutlookConfig::checkPortalBuild() {
 int OutlookConfig::decryptPrivateData() {
 
     // Check if previous version is < 6.0.9.
-    const char* installedSwv = getDeviceConfig().getSwv();
+    const char* installedSwv = getClientConfig().getSwv();
     int version = getBuildNumberFromVersion(installedSwv);
     
     // to handle the new upgrade to the new key with the new password for portal

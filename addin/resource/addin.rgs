@@ -39,8 +39,8 @@ Software
 					{ 
 					'FunambolAddin.Addin' 
 						{ 
-						val FriendlyName    = s 'Funambol Outlook Plug-in' 
-						val Description     = s 'Funambol Outlook Plug-in v6' 
+						val FriendlyName    = s 'Funambol Outlook Sync Client' 
+						val Description     = s 'Funambol Outlook Sync Client' 
 						val LoadBehavior    = d '00000003' 
 						val CommandLineSafe = d '00000000' 
 						} 

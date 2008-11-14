@@ -41,9 +41,9 @@
 #include "resource.h"      // main symbols
 
 // ----------------------- definitions -------------------------------
-#define PROGRAM_NAME                        "Funambol Outlook Plug-in"
+#define PROGRAM_NAME                        "Funambol Outlook Sync Client"
 #define PROGRAM_NAME_EXE                    "OutlookPlugin.exe"             // The application to run
-#define PLUGIN_UI_TITLE                     "Funambol Outlook Plug-in"      // The UI windows title (must be unique!)
+#define PLUGIN_UI_TITLE                     "Funambol Outlook Sync Client"  // The UI windows title (must be unique!)
 #define PLUGIN_UI_CLASSNAME                 "FunambolApp"                   // The UI windows classname
 #define FUN                                 "FUN"
 #define PARAM_OUTLOOK_SYNC                  "sync"                          // The command-line parameter passed to PROGRAM_NAME_EXE application
@@ -52,7 +52,7 @@
 
 
 #define FUNAMBOL                           L"Funa&mbol"
-#define CAPTION                            L"Funambol Outlook Plug-in"
+#define CAPTION                            L"Funambol Outlook Sync Client"
 #define BUTTON_SYNCHRONIZE                 L"&Sync All        Ctrl+F7"
 #define BUTTON_GOTO_PLUGIN                 L"&Go to...        Ctrl+F8"
 #define BUTTON_CONFIGURATION               L"Op&tions...     Ctrl+F9"
@@ -75,7 +75,7 @@
 #define PROPERTY_SW_VERSION                 "swv"                       // Software version
 
                                                                         // **** change this value when addin need to be reinstalled ****
-#define LAST_COMPATIBLE_VERSION             60011                       // "6.0.11" is the latest version compatible with this addin
+#define LAST_COMPATIBLE_VERSION             70104                       // "7.1.4" is the latest version compatible with this addin
                                                                         // *************************************************************
 
 // Possible addin states:
