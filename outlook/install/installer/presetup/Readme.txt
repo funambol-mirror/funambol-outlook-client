@@ -1,13 +1,14 @@
-Funambol Outlook Plug-in
+Funambol Outlook Sync Client
+----------------------------
 
-Version: 7.1.3
-Release date: November 11, 2008
+Version: 
+Release date: 
 
 Funambol offers commercial support for this software.
-See http://www.funambol.com/support.
+See http://www.funambol.com/support
 
 You can also get support from the open source community.
-See http://www.funambol.com/opensource/support.
+See https://www.forge.funambol.org/support
 
 Copyright (C) 2003 - 2008 Funambol, Inc. All rights reserved. 
 
