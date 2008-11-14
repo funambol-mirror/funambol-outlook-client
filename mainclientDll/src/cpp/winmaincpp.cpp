@@ -480,7 +480,7 @@ void endSync() {
     //CoUninitialize();
 
     // Unset Listeners
-    ManageListener::dispose();
+    ManageListener::releaseAllListeners();
 }
 
 
