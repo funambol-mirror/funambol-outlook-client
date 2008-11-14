@@ -1,3 +1,22 @@
+Funambol Outlook Plugin 7.1.4
+---------------------------------------
+2008-11-14
+   - toccy: changed name of application: "Outlook Plug-in" into "Outlook Sync Client"
+              * changed UI titles and labels
+              * changed the cache directory: "<app_data>\Funambol\Outlook Plugin" -> "<app_data>\Funambol\Outlook Client"
+              * changed log file name: "outlook-client-log.txt"
+              * changed scheduler task name: "Funambol Outlook Sync Client - <username>"
+              * fixed installer and application, to manage upgrades from previous versions
+   - toccy: fixed installer script: INSTDIR can be changed by the user, we MUST save it with a global var ($9) 
+            to make sure we delete the old files.
+   - toccy: build.xml script will now update the Readme.txt automatically with version and release date.
+            So it's no more necessary to update the Readme file for each build.
+   - toccy: replaced obsolete calls to config->getDeviceConfig() with config->getClientConfig().
+   - toccy: updated link to UserGuide
+
+2008-11-13
+   - toccy: removed obsolete folder 'UI\Language'
+
 Funambol Outlook Plugin 7.1.3
 ---------------------------------------
 2008-11-11
