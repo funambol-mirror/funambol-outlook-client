@@ -263,7 +263,7 @@ STDMETHODIMP Caddin::OnStartupComplete(LPSAFEARRAY* custom) {
         //
         if (addinState == 3) {
             // addin "uninstalled" -> wrong! force "installing"
-            LOG.debug("Detected Outlook plugin installed -> state = installing");
+            LOG.debug("Detected Outlook Sync Client installed -> state = installing");
             addinState = 1;
         }
         else {
@@ -292,7 +292,7 @@ STDMETHODIMP Caddin::OnStartupComplete(LPSAFEARRAY* custom) {
         //
         if (addinState == 0) {
             // addin "installed" -> wrong! force "uninstalling"
-            LOG.debug("Outlook plugin not detected -> state = uninstalling");
+            LOG.debug("Outlook Sync Client not detected -> state = uninstalling");
             addinState = 2;
         }
     }
@@ -579,10 +579,10 @@ void __stdcall Caddin::OnClickConfiguration(IDispatch* Ctrl,VARIANT_BOOL * Cance
 
 
 /**
- * Launch the Outlook Plug-in executable with the passed parameter.
+ * Launch the Outlook Sync Client executable with the passed parameter.
  * @param parameter   can be "sync" to start automatially the sync,
  *                    or "options" to open up the Config window.
- *                    NULL to simply launch Outlook Plug-in.
+ *                    NULL to simply launch Outlook Sync Client.
  */
 void Caddin::launchSyncClientOutlook(const char* parameter) {
 
@@ -601,7 +601,7 @@ void Caddin::launchSyncClientOutlook(const char* parameter) {
         return;
     }
 
-    // program = "C:\...\Funambol Outlook Plug-in.exe [param]"
+    // program = "C:\...\OutlookPlugin.exe [param]"
     char* program = NULL;
     if (parameter) {
         program = new char[strlen(dir) + strlen(PROGRAM_NAME_EXE) + strlen(parameter) + 3];
@@ -1128,6 +1128,25 @@ HRESULT Caddin::removeAddin() {
             if (SUCCEEDED(hr)) {
                 LOG.debug("deleted.");
                 deletedMenuBar = true;
+            }
+        }
+        else {
+            LOG.debug("not found.");
+        }
+
+
+        //
+        // Try to remove old Funambol Command Bar (before v.7.1.4 its name was "Funambol Outlook Plug-in")
+        // Better would be to check the oldSwv, and see if < 7.1.4. But to be sure, we can do it anyway.
+        //
+        LOG.debug("Removing any old Funambol CommandBar...");
+        variant.bstrVal = SysAllocString(L"Funambol Outlook Plug-in");
+        hr = spCmdBars->get_Item(variant, &spCmdBar);
+        if (SUCCEEDED(hr)) {
+            hr = spCmdBar->Delete();
+            if (SUCCEEDED(hr)) {
+                LOG.debug("deleted.");
+                deletedCommandBar = true;
             }
         }
         else {

@@ -313,7 +313,7 @@ WCHAR* readAppDataPath() {
 /**
  * Returns the path of file where data files for current user are stored. 
  * It is located under 'application data' folder. For example: 
- * "C:\Documents And Settings\Settimio\Application Data\Funambol\Outlook Plug-in"
+ * "C:\Documents And Settings\Settimio\Application Data\Funambol\Outlook Client"
  * The string returned is allocated new, so MUST be freed by caller.
  * Returns NULL in case of errors (set lastErrorMessage).
  *
@@ -469,7 +469,7 @@ int makeDataDirs() {
         }
     }
 
-    // Create 'Outlook Plug-in' directory
+    // Create 'Outlook Client' directory
     tmpPath += L"\\";
     tmpPath += OLPLUGIN_DIR_NAME;
     if ( _wmkdir(tmpPath.c_str()) ) {

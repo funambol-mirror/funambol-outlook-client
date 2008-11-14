@@ -42,12 +42,12 @@
 
 // ------------------------------- Definitions ------------------------------
 // Program parameters:
-#define PROGRAM_NAME                        "Funambol Outlook Plug-in"
-#define WPROGRAM_NAME                      L"Funambol Outlook Plug-in"
+#define PROGRAM_NAME                        "Funambol Outlook Sync Client"
+#define WPROGRAM_NAME                      L"Funambol Outlook Sync Client"
 #define PROGRAM_NAME_EXE                    "OutlookPlugin.exe"
-#define OL_PLUGIN_LOG_NAME                  "OLPlugin.txt"
+#define OL_PLUGIN_LOG_NAME                  "outlook-client-log.txt"
 #define SYNC_MUTEX_NAME                     "fol-SyncInProgress"
-#define TIME_OUT_ABORT                      8                           /**<  8  seconds   */
+#define TIME_OUT_ABORT                      8                           /**< 8  seconds    */
 #define ASK_SLOW_TIMEOUT                    25                          /**< 25 seconds    */
 #define SCHED_DEFAULT_REPEAT_MINS           15                          /**< 15 minutes    */
 #define SCHED_DURATION_DAYS                 1                           /**< 1 day         */
@@ -69,9 +69,9 @@
 #define SIFN_DEFAULT_NAME                  L"snote"
 
 
-/// Data files are stored under 'Doc&Settings\Application Data\Funambol\Outlook Plug-in' folder.
+/// Data files are stored under 'Doc&Settings\Application Data\Funambol\Outlook Client' folder.
 #define FUNAMBOL_DIR_NAME                  L"Funambol"
-#define OLPLUGIN_DIR_NAME                  L"Outlook Plug-in"
+#define OLPLUGIN_DIR_NAME                  L"Outlook Client"
 #define MAX_PATH_LENGTH                     512
 
 //
@@ -124,7 +124,7 @@ static WCHAR* itemTypesUsed[] = {
 // Scheduler defines:
 /** @addtogroup scheduler */
 /** @{ */
-#define SCHED_COMMENT                      L"Funambol Outlook Plug-in scheduler"
+#define SCHED_COMMENT                      L"Funambol Outlook Sync Client scheduler"
 #define SCHED_PARAM                        L"schedule"
 #define NEVER                               "Never"
 #define EVERY_DAY                           "Every day"

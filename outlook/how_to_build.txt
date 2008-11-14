@@ -1,9 +1,9 @@
-How to build the Funambol Outlook Plug-in
---------------------------------------------------------------
+How to build the Funambol Outlook Sync Client
+---------------------------------------------
 
 1. Overview
 
-    The Outlook Client consists of 4 projects: 
+    The Outlook Sync Client consists of 4 projects: 
     - OutlookPlugin: the GUI interface of the Plug-in, written in C++ with MFC support (Microsoft Foundation Classes) 
     - winmainclientdll: the Client DLL, used by OutlookPlugin, written in C++ with STL support (Standard Library) 
     - FunambolAddin: the COM Addin for Microsoft Outlook 
@@ -31,7 +31,7 @@ How to build the Funambol Outlook Plug-in
     During the building process, all projects are compiled using the Visual Studio compiler. 
 
     1) Go to the folder: 'funambol\clients\outlook\install\build'
-    2) Open the file 'funambol-outlook-plugin-forge.properties' using a text editor
+    2) Open the file 'funambol-outlook-client-forge.properties' using a text editor
        - redefine the path of Visual Studio 2005 (devenv.exe) if necessary (i.e., if different)
        - redefine the path of the directory 'redist\x86' of Visual Studio 2005 if necessary 
        - redefine the path of NSIS (makensis.exe) if necessary 
@@ -47,4 +47,4 @@ How to build the Funambol Outlook Plug-in
        - create a zip file containing the source files 
        - build the Plug-in installer 
        Output files will be placed in 'funambol\clients\outlook\install\output'.
-       Doxygen documentation is generated in 'funambol\clients\outlook\docs\html'; the start page is 'index.html'. 
+       Doxygen documentation is generated in 'funambol\clients\outlook\docs\html'; the start page is 'index.html'.
