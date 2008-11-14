@@ -110,11 +110,11 @@ BOOL CLogSettings::OnInitDialog(){
 
     // read config from Registry 
     OutlookConfig* conf = (OutlookConfig*)getConfig();
-    if(conf->getDeviceConfig().getLogLevel() == LOG_LEVEL_NONE)
+    if(conf->getClientConfig().getLogLevel() == LOG_LEVEL_NONE)
         radioNone.SetCheck(BST_CHECKED);
-    if(conf->getDeviceConfig().getLogLevel() == LOG_LEVEL_INFO)
+    if(conf->getClientConfig().getLogLevel() == LOG_LEVEL_INFO)
         radioInfo.SetCheck(BST_CHECKED);
-    if(conf->getDeviceConfig().getLogLevel() == LOG_LEVEL_DEBUG)
+    if(conf->getClientConfig().getLogLevel() == LOG_LEVEL_DEBUG)
         radioDebug.SetCheck(BST_CHECKED);
 
     // disable windows xp theme, otherwise any color setting for groupbox
@@ -134,11 +134,11 @@ bool CLogSettings::saveSettings(bool saveToDisk)
 {
     OutlookConfig* conf = (OutlookConfig*)getConfig();
     if(radioNone.GetCheck() == BST_CHECKED)
-        conf->getDeviceConfig().setLogLevel(LOG_LEVEL_NONE);
+        conf->getClientConfig().setLogLevel(LOG_LEVEL_NONE);
     if(radioInfo.GetCheck() == BST_CHECKED)
-        conf->getDeviceConfig().setLogLevel(LOG_LEVEL_INFO);
+        conf->getClientConfig().setLogLevel(LOG_LEVEL_INFO);
     if(radioDebug.GetCheck() == BST_CHECKED)
-        conf->getDeviceConfig().setLogLevel(LOG_LEVEL_DEBUG);
+        conf->getClientConfig().setLogLevel(LOG_LEVEL_DEBUG);
 
     if(saveToDisk)
         conf->save();
