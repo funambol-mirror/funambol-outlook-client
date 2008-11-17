@@ -119,7 +119,6 @@ OutlookConfig::~OutlookConfig() {
  */
 bool OutlookConfig::read() {
 
-    bool ret = false;
     unsigned int i=0;
 
     // Read timezone info.
@@ -130,9 +129,13 @@ bool OutlookConfig::read() {
     //
     //lastErrorCode = ERR_NONE;
     resetError();
-    ret = DMTClientConfig::read();
+    DMTClientConfig::read();
     if (getLastErrorCode() != ERR_NONE) {
-        return false;
+        // Double check on the value of swv. If empty, we consider the config not existing.
+        StringBuffer currentSwv(getClientConfig().getSwv());
+        if (currentSwv.empty()) {
+            return false;
+        }
     }
 
     // Username/Password are stored encrypted (new since 6.0.9).
