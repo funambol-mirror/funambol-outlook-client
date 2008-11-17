@@ -199,7 +199,7 @@ bool OutlookConfig::read() {
     if (installPath) delete [] installPath;
     if (logPath)     delete [] logPath;
     if (wlogPath)    delete [] wlogPath;
-    return ret;
+    return true;
 }
 
 /**
