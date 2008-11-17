@@ -1,4 +1,10 @@
-Funambol Outlook Plugin 7.1.4
+Funambol Outlook Sync Client 7.1.5
+---------------------------------------
+2008-11-17
+   - toccy: fixed NSIS installer: check also for old plugin running at startup (bug #6374)
+            fixed OutlookConfig::read(), to correctly manage upgrade of configuration (bug #6369)
+
+Funambol Outlook Sync Client 7.1.4
 ---------------------------------------
 2008-11-14
    - toccy: changed name of application: "Outlook Plug-in" into "Outlook Sync Client"
