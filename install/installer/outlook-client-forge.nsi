@@ -67,6 +67,7 @@
 !define OLD_PRODUCT_UNINST_KEY                  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${OLD_PRODUCT_NAME}"
 !define OLD_STARTMENU_CONTEXT                   "Funambol\Outlook Plug-in"
 !define OLD_INSTALLDIR_CONTEXT                  "Funambol\Outlook Plug-in"
+!define OLD_PLUGIN_UI_TITLE                     "Funambol Outlook Plug-in"
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
@@ -212,6 +213,28 @@ Function CheckFunClientApp
         FindWindow $0 "${PLUGIN_UI_CLASS_NAME}" "${PLUGIN_UI_TITLE}"
         IntCmp $0 0 done
         MessageBox MB_OKCANCEL "Could not close ${PRODUCT_NAME}. Please close it manually to proceed with the installation of $(^Name)." IDCANCEL Cancel
+        goto loop1
+  done:
+        Return
+  Cancel:
+        MessageBox MB_OK "Installation aborted."
+        Abort
+FunctionEnd
+
+
+; Check if "OutlookPlugin.exe" is running - for OLD Client versions (< 7.1.4)
+Function CheckOldFunClientApp
+        ; First try to close Outlook plugin automatically.
+        FindWindow $0 "${PLUGIN_UI_CLASS_NAME}" "${OLD_PLUGIN_UI_TITLE}"
+        IntCmp $0 0 done
+        MessageBox MB_OKCANCEL "I need to close ${OLD_PRODUCT_NAME} to proceed with the installation of $(^Name). Ok?" IDCANCEL Cancel
+        SendMessage $0 16  0 0  $R1 /TIMEOUT=1000            ; WM_CLOSE = 16, timeout = 1000 ms
+        Sleep 500                                            ; wait 500 ms for plugin closing
+  loop1:
+        ; If plugin still running, ask to close it manually.
+        FindWindow $0 "${PLUGIN_UI_CLASS_NAME}" "${OLD_PLUGIN_UI_TITLE}"
+        IntCmp $0 0 done
+        MessageBox MB_OKCANCEL "Could not close ${OLD_PRODUCT_NAME}. Please close it manually to proceed with the installation of $(^Name)." IDCANCEL Cancel
         goto loop1
   done:
         Return
@@ -482,6 +505,7 @@ Function .onInit
       Call CheckAppInstalled
       Call CheckMicrosoftApp
       Call CheckFunClientApp
+      Call CheckOldFunClientApp
 FunctionEnd
 
 
