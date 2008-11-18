@@ -1,0 +1,47 @@
+How to build the Funambol Outlook Plug-in
+--------------------------------------------------------------
+
+1. Overview
+
+    The Outlook Client consists of 4 projects: 
+    - OutlookPlugin: the GUI interface of the Plug-in, written in C++ with MFC support (Microsoft Foundation Classes) 
+    - winmainclientdll: the Client DLL, used by OutlookPlugin, written in C++ with STL support (Standard Library) 
+    - FunambolAddin: the COM Addin for Microsoft Outlook 
+    - win32: the Funambol native API C++ for Windows32; winmainclientdll and FunambolAddin are based on this project 
+
+    All projects are developed in C++. 
+
+
+2. Requirements
+
+    To compile the source files, you need to install the following: 
+    - Microsoft Visual Studio 2005. All projects have been developed with Microsoft Visual Studio 2005, the installation process has been automated using Microsoft Visual Studio 2005 C++ compiler. 
+    - Microsoft Outlook 2003 or later. winmainclientdll and FunambolAddin projects import some Microsoft Outlook libraries, so you need to install Microsoft Outlook to register these libraries into the System. 
+
+    To build the installer, you need to download and install the following: 
+    - Apache Ant (http://ant.apache.org/) 
+    - NSIS (http://nsis.sourceforge.net) 
+    - NSIS processwork plugin (http://www.esanu.name/programs/processwork.rar). Extract 'processwork.dll' inside the 'Plugins' folder under the NSIS installation directory (this library will be used building the installer). 
+    - Doxygen (http://www.stack.nl/~dimitri/doxygen/download.html) 
+
+
+3. Building the installer
+
+    The installer is a NSIS Windows installer, launched by the Apache 'ant' build tool.
+    During the building process, all projects are compiled using the Visual Studio compiler. 
+
+    1) Go to the folder: 'funambol\clients\outlook\install\build'
+    2) Open the file 'funambol-outlook-plugin-forge.properties' using a text editor
+       - redefine the path of Visual Studio 2005 (devenv.exe) if necessary (i.e., if different)
+       - redefine the path of the directory 'redist\x86' of Visual Studio 2005 if necessary 
+       - redefine the path of NSIS (makensis.exe) if necessary 
+    3) Open a command prompt 
+    4) Go to the directory 'funambol\clients\outlook\install\build'
+    5) Type 'ant release'. This procedure will automatically do the following: 
+       - register Redemption library 
+       - checkout the source files from CVS 
+       - create the doxygen documentation 
+       - create a zip file containing the source files 
+       - build the Plug-in installer 
+       Output files will be placed in 'funambol\clients\outlook\install\output'.
+       Doxygen documentation is generated in 'funambol\clients\outlook\docs\html'; the start page is 'index.html'. 
