@@ -1,0 +1,874 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+IDR_241                 RT_MANIFEST             "res\\OutlookPlugin.exe.manifest"
+#endif    // Neutral resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 243, 259
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_WINDOWEDGE
+CAPTION "About"
+FONT 8, "MS Shell Dlg", 400, 0, 0xEE
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,93,239,57,14,WS_GROUP
+    CONTROL         141,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,0,229,89
+    CTEXT           "Funambol Outlook Plug-in\nv.x.y.z",IDC_ABOUT_MAIN,7,88,229,18
+    CTEXT           "www.funambol.com",IDC_ABOUT_LINK,7,120,229,8,SS_NOTIFY
+    CTEXT           "This program is provided AS IS...\n...\n...\n...",IDC_ABOUT_LICENCE,7,133,229,104
+    CTEXT           "Copyright © 2003 - 2007 Funambol, Inc.",IDC_ABOUT_COPYRIGHT,7,108,229,12
+END
+
+IDD_FORM_LEFT DIALOGEX 0, 0, 65, 246
+STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_LEFT_LIST,"SysListView32",LVS_SINGLESEL | LVS_NOSCROLL | WS_TABSTOP,0,0,65,148
+    CONTROL         269,IDC_SEP1,"Static",SS_BITMAP,0,39,43,1
+    CONTROL         269,IDC_SEP2,"Static",SS_BITMAP,0,78,43,1
+END
+
+IDD_SYNC_FORM DIALOGEX 0, 0, 234, 170
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_BORDER
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    CONTROL         256,IDC_MAIN_BK_SYNC,"Static",SS_BITMAP | SS_NOTIFY,6,5,217,31,WS_EX_TRANSPARENT
+    CONTROL         257,IDC_MAIN_BK_CONTACTS,"Static",SS_BITMAP | SS_NOTIFY,6,41,217,31,WS_EX_TRANSPARENT
+    CONTROL         257,IDC_MAIN_BK_NOTES,"Static",SS_BITMAP | SS_NOTIFY,6,132,217,31,WS_EX_TRANSPARENT
+    CONTROL         257,IDC_MAIN_BK_TASKS,"Static",SS_BITMAP | SS_NOTIFY,6,102,217,31,WS_EX_TRANSPARENT
+    CONTROL         257,IDC_MAIN_BK_CALENDAR,"Static",SS_BITMAP | SS_NOTIFY,6,72,217,31,WS_EX_TRANSPARENT
+    LTEXT           "[Press to start synchronization...]",IDC_MAIN_MSG_PRESS,43,15,128,12,0,WS_EX_TRANSPARENT
+    ICON            IDI_CONTACTS,IDC_MAIN_ICON_CONTACTS,16,47,20,20,SS_NOTIFY,WS_EX_TRANSPARENT
+    LTEXT           "[Contacts]",IDC_MAIN_STATIC_CONTACTS,43,46,80,10,SS_NOTIFY
+    LTEXT           "[Done]",IDC_MAIN_STATIC_STATUS_CONTACTS,43,58,139,8
+    ICON            IDI_CALENDAR,IDC_MAIN_ICON_CALENDAR,16,78,20,20,SS_NOTIFY,WS_EX_TRANSPARENT
+    LTEXT           "[Calendar]",IDC_MAIN_STATIC_CALENDAR,43,76,95,10,SS_NOTIFY,WS_EX_TRANSPARENT
+    LTEXT           "[Done]",IDC_MAIN_STATIC_STATUS_CALENDAR,43,88,145,8
+    ICON            IDI_NOTES,IDC_MAIN_ICON_NOTES,16,138,20,20,SS_NOTIFY,WS_EX_TRANSPARENT
+    LTEXT           "[Done]",IDC_MAIN_STATIC_STATUS_NOTES,43,149,141,8
+    LTEXT           "[Notes]",IDC_MAIN_STATIC_NOTES,43,138,57,10,SS_NOTIFY
+    ICON            IDI_LOGO,IDC_MAIN_BUT_START,16,11,20,20,SS_NOTIFY,WS_EX_TRANSPARENT
+    ICON            IDI_TASKS,IDC_MAIN_ICON_TASKS,16,107,20,20,SS_NOTIFY
+    LTEXT           "[Tasks]",IDC_MAIN_STATIC_TASKS,43,107,72,10,SS_NOTIFY
+    LTEXT           "[Done]",IDC_MAIN_STATIC_STATUS_TASKS,43,119,143,8
+    CONTROL         "",IDC_MAIN_ICON_STATUS_CONTACTS,"Static",SS_ICON | 0x20,196,47,20,20
+    CONTROL         "",IDC_MAIN_ICON_STATUS_CALENDAR,"Static",SS_ICON | 0x20,196,78,20,20
+    CONTROL         "",IDC_MAIN_ICON_STATUS_TASKS,"Static",SS_ICON | 0x20,196,108,20,20
+    CONTROL         "",IDC_MAIN_ICON_STATUS_NOTES,"Static",SS_ICON | 0x20,196,139,20,20
+    CONTROL         "",IDC_MAIN_ICON_STATUS_SYNC,"Static",SS_ICON | 0x20,196,11,20,20
+END
+
+IDD_ACCOUNT DIALOGEX 0, 0, 252, 206
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0xEE
+BEGIN
+    LTEXT           "[Location]",IDC_ACCOUNT_STATIC_URL,23,22,51,8
+    EDITTEXT        IDC_ACCOUNT_EDIT_URL,68,20,151,14,ES_AUTOHSCROLL
+    LTEXT           "[Username:]",IDC_ACCOUNT_STATIC_USERNAME,23,44,50,8
+    EDITTEXT        IDC_ACCOUNT_EDIT_USERNAME,68,43,151,14,ES_AUTOHSCROLL
+    LTEXT           "[Password:]",IDC_ACCOUNT_STATIC_PASSWORD,23,70,51,8
+    EDITTEXT        IDC_ACCOUNT_EDIT_PASSWORD,68,67,151,14,ES_PASSWORD | ES_AUTOHSCROLL
+    PUSHBUTTON      "[Proxy Settings...]",IDC_ACCOUNT_BUT_PROXY,149,102,84,14
+    DEFPUSHBUTTON   "&OK",IDC_ACCOUNT_BUTOK,123,184,50,14
+    PUSHBUTTON      "&Cancel",IDC_ACCOUNT_BUT_CANCEL,183,184,50,14
+    GROUPBOX        "[Server]",IDC_ACCOUNT_GROUP_SERVER,9,6,224,85,BS_NOTIFY
+END
+
+IDD_SYNC DIALOGEX 0, 0, 250, 206
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    CONTROL         "Contacts",IDC_SYNC_CHECK_CONTACTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,21,70,10
+    CONTROL         "Calendar",IDC_SYNC_CHECK_CALENDAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,42,44,10
+    CONTROL         "Tasks",IDC_SYNC_CHECK_TASKS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,63,40,10
+    CONTROL         "Notes",IDC_SYNC_CHECK_NOTES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,87,43,10
+    PUSHBUTTON      "Details...",IDC_SYNC_BUT_CONTACTS,173,17,47,14
+    PUSHBUTTON      "Details",IDC_SYNC_BUT_CALENDAR,173,40,47,14
+    PUSHBUTTON      "Details",IDC_SYNC_BUT_TASKS,173,63,47,14
+    PUSHBUTTON      "Details",IDC_SYNC_BUT_NOTES,173,86,47,14
+    CONTROL         "[Synchronize every:]",IDC_SCHEDULER_CHECK_ENABLED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,120,80,15
+    GROUPBOX        "[Scheduler]",IDC_SCHEDULER_GROUP,8,109,224,33
+    GROUPBOX        "[Items]",IDC_SYNC_GROUP_ITEMS,8,7,224,98
+    GROUPBOX        "[&Security]",IDC_SYNC_GROUP_SECURITY,8,146,224,30
+    CONTROL         "[Enable Encryption]",IDC_SYNC_CHECK_ENCRYPTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,159,79,10
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ | SS_SUNKEN,22,35,190,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ | SS_SUNKEN,21,58,190,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ | SS_SUNKEN,21,81,190,1
+    DEFPUSHBUTTON   "&OK",IDC_SYNC_OK,123,184,50,14
+    PUSHBUTTON      "&Cancel",IDC_SYNC_CANCEL,183,184,50,14
+    COMBOBOX        IDC_SCHEDULER_COMBO_VALUE,119,121,101,12,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_CONTACTS DIALOGEX 0, 0, 299, 198
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "[Contacts Settings]"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "[Sync Direction]",IDC_CONTACTS_GROUP_DIRECTION,8,6,281,34
+    COMBOBOX        IDC_CONTACTS_COMBO_SYNCTYPE,17,18,127,67,CBS_DROPDOWNLIST | WS_TABSTOP
+    GROUPBOX        "[Contacts Folder]",IDC_CONTACTS_GROUP_FOLDER,8,47,281,54
+    LTEXT           "[Current:]",IDC_CONTACTS_STATIC_FOLDER,17,62,55,8
+    EDITTEXT        IDC_CONTACTS_EDIT_FOLDER,72,60,144,14,ES_AUTOHSCROLL | ES_READONLY
+    CONTROL         "Include subfolders",IDC_CONTACTS_CHECK_INCLUDE,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,72,79,108,17
+    PUSHBUTTON      "[Change...]",IDC_CONTACTS_BUT_FOLDER,226,60,50,15,BS_MULTILINE
+    GROUPBOX        "[Advanced]",IDC_CONTACTS_GROUP_ADVANCED,8,106,281,55
+    LTEXT           "Remote name:",IDC_CONTACTS_STATIC_REMOTE,17,121,48,8
+    EDITTEXT        IDC_CONTACTS_EDIT_REMOTE,72,119,144,14,ES_AUTOHSCROLL
+    LTEXT           "Data Format:",IDC_CONTACTS_STATIC_DATAFORMAT,17,142,55,15
+    CONTROL         "SIF",IDC_CONTACTS_RADIO_SIF,"Button",BS_AUTORADIOBUTTON,72,142,36,10
+    CONTROL         "vCalendar",IDC_CONTACTS_RADIO_VCARD,"Button",BS_AUTORADIOBUTTON,114,142,48,10
+    DEFPUSHBUTTON   "&OK",IDC_CONTACTS_BUTOK,181,174,50,14
+    PUSHBUTTON      "&Cancel",IDC_CONTACTS_BUTCANCEL,239,174,50,14
+END
+
+IDD_CALENDAR DIALOGEX 0, 0, 299, 198
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "[Calendar Settings]"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    COMBOBOX        IDC_CALENDAR_COMBO_SYNCTYPE,17,18,127,67,CBS_DROPDOWNLIST | WS_TABSTOP
+    LTEXT           "[Current:]",IDC_CALENDAR_STATIC_FOLDER,17,62,55,8
+    EDITTEXT        IDC_CALENDAR_EDIT_FOLDER,71,60,145,14,ES_AUTOHSCROLL | ES_READONLY
+    CONTROL         "[Include Sub-Folders]",IDC_CALENDAR_CHECK_INCLUDE,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,71,79,108,17
+    PUSHBUTTON      "[Choose...]",IDC_CALENDAR_BUT_SELECT,226,60,50,15,BS_MULTILINE
+    LTEXT           "Remote name:",IDC_CALENDAR_STATIC_REMOTE,18,122,47,8
+    EDITTEXT        IDC_CALENDAR_EDIT_REMOTE,71,120,145,14,ES_AUTOHSCROLL
+    LTEXT           "Data Format:",IDC_CALENDAR_STATIC_DATAFORMAT,17,142,63,15
+    CONTROL         "SIF",IDC_CALENDAR_RADIO_SIF,"Button",BS_AUTORADIOBUTTON,71,142,27,10
+    CONTROL         "VCalendar",IDC_CALENDAR_RADIO_VCARD,"Button",BS_AUTORADIOBUTTON,114,142,48,10
+    GROUPBOX        "[Sync Direction]",IDC_CALENDAR_GROUP_DIRECTION,7,6,282,34,BS_NOTIFY
+    GROUPBOX        "[Folder:]",IDC_CALENDAR_GROUP_FOLDER,7,47,282,54,BS_NOTIFY
+    GROUPBOX        "[Advanced]",IDC_CALENDAR_GROUP_ADVANCED,8,106,281,55,BS_NOTIFY
+    PUSHBUTTON      "&OK",IDC_CALENDAR_BUTOK,181,174,50,14
+    PUSHBUTTON      "&Cancel",IDC_CALENDAR_BUTCANCEL,239,174,50,14
+END
+
+IDD_TASKS DIALOGEX 0, 0, 299, 198
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "[Tasks Settings]"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    COMBOBOX        IDC_TASKS_COMBO_SYNCTYPE,17,18,127,67,CBS_DROPDOWNLIST | WS_TABSTOP
+    LTEXT           "Outlook Folder:",IDC_TASKS_STATIC_FOLDER,17,62,55,8
+    EDITTEXT        IDC_TASKS_EDIT_FOLDER,72,60,144,14,ES_AUTOHSCROLL | ES_READONLY
+    CONTROL         "Include subfolders",IDC_TASKS_CHECK_INCLUDE,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,72,79,108,17
+    PUSHBUTTON      "[Change...]",IDC_TASKS_BUT_SELECT,226,60,50,15
+    LTEXT           "Remote name:",IDC_TASKS_STATIC_REMOTE,17,122,48,8
+    EDITTEXT        IDC_TASKS_EDIT_REMOTE,72,120,144,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDC_TASKS_OK,179,174,50,14
+    PUSHBUTTON      "&Cancel",IDC_TASKS_CANCEL,239,174,50,14
+    GROUPBOX        "[Sync Direction:]",IDC_TASKS_GROUP_DIRECTION,8,4,281,37
+    GROUPBOX        "[Tasks Folder:]",IDC_TASKS_GROUP_FOLDER,8,47,281,54
+    GROUPBOX        "[Advanced]",IDC_TASKS_ADVANCED,8,106,281,55
+    LTEXT           "Data Format:",IDC_TASKS_STATIC_DATAFORMAT,17,142,63,15
+    CONTROL         "SIF",IDC_TASKS_RADIO_SIF,"Button",BS_AUTORADIOBUTTON,72,142,36,10
+    CONTROL         "vCalendar",IDC_TASKS_RADIO_VTODO,"Button",BS_AUTORADIOBUTTON,114,142,48,10
+END
+
+IDD_NOTES DIALOGEX 0, 0, 299, 198
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "[Notes Settings]"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    COMBOBOX        IDC_NOTES_COMBO_SYNCTYPE,17,18,127,67,CBS_DROPDOWNLIST | WS_TABSTOP
+    LTEXT           "[Current:]",IDC_NOTES_STATIC_FOLDER,17,62,55,8
+    EDITTEXT        IDC_NOTES_EDIT_FOLDER,72,60,144,14,ES_AUTOHSCROLL | ES_READONLY
+    CONTROL         "Include Subfolders",IDC_NOTES_CHECK_INCLUDE,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,72,79,108,17
+    PUSHBUTTON      "[Change...]",IDC_NOTES_BUT_SELECT,226,60,50,15,BS_MULTILINE
+    LTEXT           "Remote name:",IDC_NOTES_STATIC_REMOTE,18,122,47,8
+    EDITTEXT        IDC_NOTES_EDIT_REMOTE,72,120,144,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDC_NOTES_OK,180,174,50,14
+    PUSHBUTTON      "&Cancel",IDC_NOTES_CANCEL,239,174,50,14
+    GROUPBOX        "[Sync Direction:]",IDC_NOTES_GROUP_DIRECTION,7,3,282,39
+    GROUPBOX        "[Notes Folder:]",IDC_NOTES_GROUP_FOLDER,7,47,282,54
+    GROUPBOX        "[Advanced:]",IDC_NOTES_GROUP_ADVANCED,7,106,282,55
+    LTEXT           "Data Format:",IDC_NOTES_STATIC_DATAFORMAT,17,142,63,15
+    CONTROL         "SIF",IDC_NOTES_RADIO_SIF,"Button",BS_AUTORADIOBUTTON,72,142,36,10
+    CONTROL         "vNote",IDC_NOTES_RADIO_VNOTE,"Button",BS_AUTORADIOBUTTON,114,142,48,10
+END
+
+IDD_LOG DIALOGEX 0, 0, 189, 94
+STYLE DS_SETFONT | DS_MODALFRAME | DS_NOIDLEMSG | DS_FIXEDSYS | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Log"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "[Log Level]",IDC_LOG_GROUP_LOGLEVEL,6,4,175,31
+    CONTROL         "Error",IDC_LOG_RADIO_NONE,"Button",BS_AUTORADIOBUTTON,13,17,53,10
+    CONTROL         "Info",IDC_LOG_RADIO_INFO,"Button",BS_AUTORADIOBUTTON,75,17,49,10
+    CONTROL         "Debug",IDC_LOG_RADIO_DEBUG,"Button",BS_AUTORADIOBUTTON,129,17,46,10
+    PUSHBUTTON      "View log...",IDC_LOG_VIEWLOG,108,45,73,14
+    DEFPUSHBUTTON   "&OK",IDC_LOG_OK,73,70,50,14
+    PUSHBUTTON      "&Cancel",IDC_LOG_CANCEL,131,70,50,14
+END
+
+IDD_FULLSYNC DIALOGEX 0, 0, 241, 171
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Full Sync"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "[Items]",IDC_FULLSYNC_GROUP_ITEMS,13,100,213,39
+    CONTROL         "[Replace all of the Outlook data with data from the server]",IDC_FULLSYNC_RADIO2,
+                    "Button",BS_AUTORADIOBUTTON,21,66,203,10
+    CONTROL         "[Replace all of the server data with data from Outlook]",IDC_FULLSYNC_RADIO3,
+                    "Button",BS_AUTORADIOBUTTON,21,49,202,10
+    CONTROL         "Contacts",IDC_FULLSYNC_CHECK_CONTACTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,117,51,10
+    CONTROL         "Calendar",IDC_FULLSYNC_CHECK_CALENDAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,117,48,10
+    CONTROL         "Tasks",IDC_FULLSYNC_CHECK_TASKS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,130,117,38,10
+    CONTROL         "Notes",IDC_FULLSYNC_CHECK_NOTES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,181,117,39,10
+    LTEXT           "[Recover performs a""full sync"" operation to refresh all data in Outlook or on the server.]",IDC_FULLSYNC_STATIC_RECOVER,15,8,212,24
+    GROUPBOX        "[Direction]",IDC_FULLSYNC_GROUP_DIRECTION,13,34,213,54
+    DEFPUSHBUTTON   "[Recover]",IDOK,102,151,59,14
+    PUSHBUTTON      "[Cancel]",IDCANCEL,171,151,55,14
+    CONTROL         "[Two-way - DISABLED]",IDC_FULLSYNC_RADIO1,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,21,41,177,10
+END
+
+IDD_PROXY DIALOGEX 0, 0, 240, 99
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "[Proxy Settings]"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    PUSHBUTTON      "OK",IDOK,114,79,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,175,79,50,14
+    CONTROL         "[Enable]",IDC_PROXY_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,8,44,10
+    CONTROL         "[Requires authorization]",IDC_PROXY_AUTH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,37,24,188,10
+    LTEXT           "[Username:]",IDC_PROXY_STATIC_USER,48,41,44,8
+    LTEXT           "[Password:]",IDC_PROXY_STATIC_PASSWORD,48,61,49,8
+    EDITTEXT        IDC_PROXY_EDIT_PASS,92,58,133,14,ES_PASSWORD | ES_AUTOHSCROLL
+    EDITTEXT        IDC_PROXY_EDIT_USER,92,40,133,14,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 236
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 252
+    END
+
+    IDD_SYNC_FORM, DIALOG
+    BEGIN
+        VERTGUIDE, 43
+        VERTGUIDE, 100
+        VERTGUIDE, 217
+        HORZGUIDE, 48
+        HORZGUIDE, 55
+        HORZGUIDE, 67
+        HORZGUIDE, 76
+        HORZGUIDE, 83
+        HORZGUIDE, 95
+        HORZGUIDE, 105
+        HORZGUIDE, 112
+        HORZGUIDE, 124
+        HORZGUIDE, 135
+        HORZGUIDE, 142
+        HORZGUIDE, 153
+    END
+
+    IDD_ACCOUNT, DIALOG
+    BEGIN
+        VERTGUIDE, 23
+        VERTGUIDE, 68
+        VERTGUIDE, 219
+        VERTGUIDE, 233
+    END
+
+    IDD_SYNC, DIALOG
+    BEGIN
+        VERTGUIDE, 8
+        VERTGUIDE, 18
+        VERTGUIDE, 173
+        VERTGUIDE, 220
+        VERTGUIDE, 232
+    END
+
+    IDD_CONTACTS, DIALOG
+    BEGIN
+        VERTGUIDE, 8
+        VERTGUIDE, 17
+        VERTGUIDE, 72
+        VERTGUIDE, 216
+        VERTGUIDE, 289
+    END
+
+    IDD_CALENDAR, DIALOG
+    BEGIN
+        VERTGUIDE, 17
+        VERTGUIDE, 71
+        VERTGUIDE, 216
+        VERTGUIDE, 289
+    END
+
+    IDD_TASKS, DIALOG
+    BEGIN
+        VERTGUIDE, 8
+        VERTGUIDE, 17
+        VERTGUIDE, 72
+        VERTGUIDE, 216
+        VERTGUIDE, 289
+    END
+
+    IDD_NOTES, DIALOG
+    BEGIN
+        VERTGUIDE, 7
+        VERTGUIDE, 72
+        VERTGUIDE, 216
+        VERTGUIDE, 289
+    END
+
+    IDD_LOG, DIALOG
+    BEGIN
+        VERTGUIDE, 181
+        HORZGUIDE, 70
+    END
+
+    IDD_FULLSYNC, DIALOG
+    BEGIN
+        VERTGUIDE, 13
+        VERTGUIDE, 21
+        VERTGUIDE, 226
+    END
+
+    IDD_PROXY, DIALOG
+    BEGIN
+        VERTGUIDE, 48
+        VERTGUIDE, 92
+        VERTGUIDE, 225
+        BOTTOMMARGIN, 95
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\OutlookPlugin.ico"
+IDI_ARROWS32A           ICON                    "res\\arrows32a.ico"
+IDI_ARROWS32B           ICON                    "res\\arrows32b.ico"
+IDI_CANCEL              ICON                    "res\\cancel.ico"
+IDI_CONTACTS            ICON                    "res\\contacts.ico"
+IDI_CALENDAR            ICON                    "res\\calendar.ico"
+IDI_TASKS               ICON                    "res\\tasks.ico"
+IDI_NOTES               ICON                    "res\\notes.ico"
+IDI_ARROWS32C           ICON                    "res\\arrows32c.ico"
+IDI_ARROWS32D           ICON                    "res\\arrows32d.ico"
+IDI_CONTACTS_GREY       ICON                    "res\\contacts_grey.ico"
+IDI_CALENDAR_GREY       ICON                    "res\\calendar_grey.ico"
+IDI_TASKS_GREY          ICON                    "res\\tasks_grey.ico"
+IDI_NOTES_GREY          ICON                    "res\\notes_grey.ico"
+IDI_LOGO                ICON                    "res\\icon_logo.ico"
+IDI_SYNC                ICON                    "res\\icon_syncing.ico"
+IDI_ACCOUNT             ICON                    "res\\icon_account.ico"
+IDI_SYNC_ALL            ICON                    "res\\icon_sync_all.ico"
+IDI_ALERT               ICON                    "res\\icon_alert.ico"
+IDI_COMPLETE            ICON                    "res\\icon_complete.ico"
+IDI_SYNC_ALL_BLUE       ICON                    "res\\icon_sync_all_blue.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+IDB_BITMAP1             BITMAP                  "res\\about_logo.bmp"
+IDB_BK_DARK             BITMAP                  "res\\bg_button_dark.bmp"
+IDB_BK_LIGHT            BITMAP                  "res\\bg_button_light.bmp"
+IDB_BK_BLUE             BITMAP                  "res\\bg_button_blue.bmp"
+IDB_BK_DARK_BLUE        BITMAP                  "res\\bg_button_darkblue.bmp"
+IDB_LEFT_BUTTON         BITMAP                  "res\\left_button.bmp"
+IDB_SEPARATOR           BITMAP                  "res\\left_separator.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR  16, 15
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_EDIT_CUT
+    BUTTON      ID_EDIT_COPY
+    BUTTON      ID_EDIT_PASTE
+    SEPARATOR
+    BUTTON      ID_FILE_PRINT
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Synchronize\tCtrl+S",        ID_FILE_SYNCHRONIZE
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit\tAlt+F4",               ID_APP_EXIT
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "Op&tions...\tCtrl+T",         ID_FILE_CONFIGURATION
+        MENUITEM SEPARATOR
+        MENUITEM "&Recover...\tCtrl+R",         ID_TOOLS_FULLSYNC
+        MENUITEM "&Logging...\tCtrl+L",         ID_TOOLS_SETLOGLEVEL
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&View User Guide\tCTRL+U",    ID_VIEW_GUIDE
+        MENUITEM SEPARATOR
+        MENUITEM "&About Funambol Outlook Plug-in...\tCtrl+H", ID_APP_ABOUT
+    END
+END
+
+IDR_NULLMENU MENU 
+BEGIN
+    MENUITEM "",                            IDM_NULLMENU, GRAYED
+END
+
+IDR_MAINFRAME_DISABLED MENU 
+BEGIN
+    POPUP "&File", GRAYED
+    BEGIN
+        MENUITEM "&Synchronize",                ID_FILE_SYNCHRONIZE
+        MENUITEM "&Options...",                 ID_FILE_CONFIGURATION
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Tools", GRAYED
+    BEGIN
+        MENUITEM "&Full Sync...",               ID_TOOLS_FULLSYNC
+        MENUITEM "&Set Log Level...",           ID_TOOLS_SETLOGLEVEL
+    END
+    POPUP "&Help", GRAYED
+    BEGIN
+        MENUITEM "&About Outlook Plugin...",    ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS 
+BEGIN
+    "H",            ID_APP_ABOUT,           VIRTKEY, CONTROL, NOINVERT
+    "T",            ID_FILE_CONFIGURATION,  VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SYNCHRONIZE,    VIRTKEY, CONTROL, NOINVERT
+    "R",            ID_TOOLS_FULLSYNC,      VIRTKEY, CONTROL, NOINVERT
+    "L",            ID_TOOLS_SETLOGLEVEL,   VIRTKEY, CONTROL, NOINVERT
+    "U",            ID_VIEW_GUIDE,          VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000904b0"
+        BEGIN
+            VALUE "CompanyName", "Funambol"
+            VALUE "FileDescription", "Funambol Outlook Plug-in"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "OutlookPlugin"
+            VALUE "LegalCopyright", "Copyright (C) 2006 Funambol"
+            VALUE "OriginalFilename", "OutlookPlugin.EXE"
+            VALUE "ProductName", "OutlookPlugin"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x9, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_MAINFRAME           "OutlookPlugin\n\\OutlookPlugin\n\n\\OutlookPlugin.Document\\OutlookPlugin Document"
+    IDS_SYNCTYPE1           "Two-way"
+    IDS_SYNCTYPE2           "One-way: Server -> Outlook"
+    IDS_SYNCTYPE3           "One-way: Outlook -> Server"
+    IDS_ACCOUNT_SETTINGS    "Account Settings"
+    IDS_ACCOUNT_URL         "&Location:"
+    IDS_ACCOUNT_USERNAME    "&Username:"
+    IDS_ACCOUNT_PASSWORD    "Pa&ssword:"
+    IDS_ACCOUNT_USEPROXY    "Enable"
+    IDS_ACCOUNT_PROXY_AUTH  "Requires authorization"
+    IDS_ACCOUNT_PROXY_USER  "&Username:"
+    IDS_ACCOUNT_PROXY_PASS  "Password:"
+    IDS_OK                  "&OK"
+    IDS_CANCEL              "&Cancel"
+    IDS_ACCOUNT             "Account"
+    IDS_OUTLOOK_FOLDER      "Outlook Folder:"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "Funambol"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application\nExit"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_GUIDE           "Open Funambol Outlook Plugin User Guide"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_CONFIGURATION   "Configuration Options"
+    ID_FILE_SYNCHRONIZE     "Perform the sync"
+    ID_TOOLS_FULLSYNC       "Open full sync window"
+    ID_TOOLS_SETLOGLEVEL    "Set log level"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_INCLUDE_SUBFOLDERS  "I&nclude sub-folders"
+    IDS_SELECT_FOLDER       "C&hange..."
+    IDS_REMOTE_NAME         "R&emote name:"
+    IDS_SYNC                "Sync"
+    IDS_ENABLED             "Enabled"
+    IDS_ADVANCED_CALENDAR   "Advanced Calendar Settings"
+    IDS_DATA_FORMAT         "&Data format:"
+    IDS_USE_SIF             "SIF"
+    IDS_USE_VCARD           "vCard"
+    IDS_ENCRYPTION          "Encryption"
+    IDS_ADVANCED_CONTACTS   "Advanced Contact Settings"
+    IDS_FULLSYNC_PERFORM    "Perform full sync for:"
+    IDS_CONTACTS            "Contact&s"
+    IDS_CALENDAR            "Cal&endar"
+    IDS_NOTES               "&Notes"
+    IDS_TASKS               "&Tasks"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SYNCHRONIZE         "Synchronize"
+    IDS_LOG_LEVEL           "Log Level"
+    IDS_LOG_NONE            "Error"
+    IDS_LOG_INFO            "Info"
+    IDS_LOG_DEBUG           "Debug"
+    IDS_ADVANCED_NOTES      "Notes Advanced Settings"
+    IDS_ADVANCED_TASKS      "Advanced Tasks Settings "
+    IDS_ERROR_CANNOT_CHANGE_SETTINGS 
+                            "Sync is in progress. Cannot change the settings."
+    IDS_ERROR_SET_URL       "Please set the url"
+    IDS_ERROR_SET_USERNAME  "Please set the user name"
+    IDS_ERROR_SET_PASSWORD  "Please set the password"
+    IDS_ERROR_PROXY_USERNAME "Please set the proxy user name"
+    IDS_ERROR_PROXY_PASSWORD "Please set the proxy password"
+    IDS_ERROR_SET_REMOTE_NAME "Please set the remote name"
+    IDS_SCHEDULER_EVERY     "Every"
+    IDS_MINUTES             "minutes"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CODE_NOSOURCE_10    "No sources to sync"
+    IDS_CODE_SYNC_STOPPED   "Synchronization terminated by the user"
+    IDS_CODE_AUTH_EXPIRED_402 "Error: account expired."
+    IDS_CODE_NOTFOUND_404   "Can't recognize remote name. Correct remote name in Sync Options."
+    IDS_CODE_INVALID_CREDENTIALS_401 
+                            "Can't access your account. Correct your server location, username or password."
+    IDS_CODE_ERROR_CONNECT_2001 
+                            "Can't access the server. Check your network connectivity and your account's server location."
+    IDS_CODE_ERROR_READING_CONTENT_2002 
+                            "Error reading content. Server unavailable."
+    IDS_CODE_SERVER_NOT_FOUND_2003 
+                            "Error: server not found. Check server uri."
+    IDS_CODE_INTERNET_CONNECTION_MISSING_2005 
+                            "Error: Cannot establish an internet connection."
+    IDS_CODE_NETWORK_ERROR_2007 "Sync not completed. Network error."
+    IDS_ERROR_SYNC_NOT_COMPLETED "Sync not completed. See log for details"
+    IDS_TEXT_APPOINTMENTS   "appointments"
+    IDS_TEXT_CONTACTS       "contacts"
+    IDS_TEXT_NOTES          "notes"
+    IDS_TEXT_TASKS          "tasks"
+    IDS_TEXT_SENDING        "Sending"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_MAIN_CONTACTS       "Contacts"
+    IDS_MAIN_TASKS          "Tasks"
+    IDS_MAIN_NOTES          "Notes"
+    IDS_ERROR_SET_CONNECTION 
+                            "You must enter your account information before attempting a sync."
+    IDS_ABOUT_TITLE         "About Funambol Outlook Plug-in"
+    IDS_MAIN_LAST_SYNC_FAILED "Last sync failed"
+    IDS_MAIN_LAST_SYNC_CANCELED "Last sync canceled"
+    IDS_CODE_HTTP_NOT_FOUND_2060 
+                            "Error 404: resource not found. Please check your credentials."
+    IDS_UNEXPECTED_EXCEPTION "An unexpected exception has occurred!"
+    IDS_SYNCALL             "Sync All"
+    IDS_CODE_DROPPED_ITEMS  "Warning: some items were not correctly saved in Outlook."
+    IDS_TEXT_CHECKING       "Checking"
+    IDS_FINISHED_SENDING    "Waiting for Server data..."
+    IDS_GUIDE_LINK          "http://download.forge.objectweb.org/sync4j/Outlook_Plugin_User_Guide_v6.5.pdf"
+    IDS_ERR_SERVER_TIMOUT   "Server returned timeout error: current session has expired.\nPlease retry later."
+    IDS_CODE_SERVER_BUSY    "Server is busy, please retry later."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TEXT_RECEIVING      "Receiving"
+    IDS_TEXT_SYNC_ENDED     "Sync ended"
+    IDS_MAINBUT_SYNCHRONIZE "&Synchronize"
+    IDS_MAINBUT_CANCEL      "&Cancel"
+    IDS_TEXT_STARTING_SYNC  "Starting sync..."
+    IDS_TEXT_SYNC_CANCELED  "Sync canceled"
+    IDS_LEFTVIEW_ACCOUNT    "Account"
+    IDS_LEFTVIEW_SYNCHRONIZATION "Synchronization"
+    IDS_HOURS               "hours"
+    IDS_SCHEDULER_PLEASE_SET_VALUE "Please set the scheduled value."
+    IDS_SCHEDULER_MIN_VALUE_IS "The minimum value is"
+    IDS_SCHEDULER_MAX_VALUE_IS "The maximum value is"
+    IDS_SCHEDULER_CANNOT_SCHEDULE "Cannot schedule"
+    IDS_LEFTVIEW_CONTACTS   "Contacts"
+    IDS_LEFTVIEW_CALENDAR   "Calendar"
+    IDS_LEFTVIEW_TASKS      "Tasks"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_LEFTVIEW_NOTES      "Notes"
+    IDS_SCHEDULER           "Scheduler"
+    IDS_LEFTVIEW_LOG        "Log"
+    IDS_DAYS                "days"
+    IDS_MSG_CLOSE_SYNC_IN_PROGRESS 
+                            "Synchronization in progress. Please wait or cancel it."
+    IDS_ABOUT_COPYRIGHT     "Copyright © 2003 - 2007 Funambol, Inc."
+    IDS_TEXT_SYNC_ALREADY_RUNNING 
+                            "Sync already in progress.\nPlease wait until the sync is finished."
+    IDS_SYNC_ABORTED_AVOID_FULLSYNC 
+                            "Sync aborted by the user to avoid full-sync"
+    IDS_TEXT_SYNC_IN_PROGRESS "A scheduled sync is currently in progress."
+    IDS_DETAILS             "&Details..."
+    IDS_SYNC_SETTINGS       "Synchronization Settings"
+    IDS_APPLY               "&Apply"
+    IDS_ERROR_SYNC_TERMINATED 
+                            "Sync process could not be terminated correctly.\nOutlook Plugin will now be closed."
+    IDS_TEXT_CANCELING_SYNC "Canceling sync, please wait..."
+    IDS_MAIN_PRESS_TO_SYNC  "Sync All"
+    IDS_MAIN_PRESS_TO_CANCEL "Cancel Sync"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_DONE                "Done"
+    IDS_SERVER              "Server"
+    IDS_PROXY_SETTINGS      "&Proxy Settings…"
+    IDS_PROXY_SETTINGS2     "Proxy Settings"
+    IDS_ITEMS               "Items"
+    IDS_SYNC_SYNCHRONIZE_EVERY "S&ynchronize every"
+    IDS_SECURITY            "Security"
+    IDS_SYNC_ENABLE_ENCRYPTION "Enable enc&ryption"
+    IDS_CONTACTS_DETAILS    "Contacts Details"
+    IDS_SYNC_DIRECTION      "&Sync Direction"
+    IDS_CONTACTS_FOLDER     "Contacts &Folder"
+    IDS_CURRENT             "Current:"
+    IDS_ADVANCED            "Ad&vanced"
+    IDS_CALENDAR_DETAILS    "Calendar Details"
+    IDS_CALENDAR_FOLDER     "Calendar &Folder"
+    IDS_USE_VCAL            "vCalendar"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TASKS_DETAILS       "Tasks Details"
+    IDS_TASKS_FOLDER        "Tasks &Folder"
+    IDS_NOTES_DETAILS       "Notes Details"
+    IDS_NOTES_FOLDER        "Notes &Folder"
+    IDS_RECOVER_PERFORMS    "Recover performs a “full sync” operation to refresh all data in Outlook or on the server."
+    IDS_DIRECTION           "&Direction"
+    IDS_FULLSYNC_SYNCTYPE2  "Replace all of the Outlook data with data from the server"
+    IDS_FULLSYNC_SYNCTYPE1  "Two-way"
+    IDS_FULLSYNC_SYNCTYPE3  "Replace all of the server data with data from Outlook"
+    IDS_RECOVER             "Recover"
+    IDS_LOGGING             "Logging"
+    IDS_NOT_SYNCHRONIZED    "Not synchronized"
+    IDS_FUNAMBOL_LINK       "www.funambol.com"
+    IDS_SYNCHRONIZED        "Last sync:"
+    IDS_AT                  "at"
+    IDS_MAIN_CALENDAR       "Calendar"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CODE_SERVER_BUSY_SYNC 
+                            "The server is busy. It is possible that another sync is in progress for this account on another device. Please try later."
+    IDS_CODE_SERVER_ERROR_2052 "Sync not completed: Server failure."
+    IDS_CODE_DROPPED_ITEMS_SERVER 
+                            "Warning: some items were not correctly transferred on Server."
+    IDS_CODE_NO_SOURCES     "No sources to sync.\nPlease select at least one source from Sync Options panel."
+    IDS_HOUR                "hour"
+    IDS_CODE_FORBIDDEN_403  "Forbidden: please activate your account."
+    IDS_USE_VTODO           "vCalendar"
+    IDS_USE_VNOTE           "vNote"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
