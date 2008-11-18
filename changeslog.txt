@@ -1,0 +1,400 @@
+Funambol Outlook Plugin 7.0.8
+---------------------------------------
+2008-08-04
+   - Toccy: Fixed bug regarding patternEndDate: to make sure it's the correct date in local time.
+
+
+Funambol Outlook Plugin 7.0.7
+---------------------------------------
+2008-07-29
+   - Toccy: Fixed bug: empty fields were not updated in Outlook.
+
+
+Funambol Outlook Plugin 7.0.6
+---------------------------------------
+2008-07-24
+   - Magi: Added check to improve the Timezone handling if the PatternStartDate is in UTC.
+           Actually the fix is in the WinEventSIF api file
+
+Funambol Outlook Plugin 7.0.5
+---------------------------------------
+2008-07-10
+  - Toccy: Just fixed the readme.txt file
+
+Funambol Outlook Plugin 7.0.4
+---------------------------------------
+2008-07-02
+  - Magi: Changed a little the procedure to build the plugin
+
+Funambol Outlook Plugin 7.0.3
+---------------------------------------
+
+2008-06-17
+  - Magi: Fixed issue in task recurrence and PatterEndDate handling.
+
+2008-06-12
+  - Magi: fixed timezone issue: after set the timezone in recurring apps, the
+          start and end date changed and their value was related to the tz of the OS
+          instead of the tz of the appointment. So its value is modified after the tz set.
+          Removed the choice between vnote and sif-n. It is only sif-e.  
+
+Funambol Outlook Plugin 7.0.2
+---------------------------------------
+2008-06-06
+  - Magi: fixed bugs related to the note visualization
+          changed default settings for comed and cared version
+
+Funambol Outlook Plugin 7.0.1
+---------------------------------------
+2008-05-08
+  - Magi: unified build for cared and comed version. Changed the encryption key
+          for cared version.
+          Changed key selection for addin to avoid conflicts with the ones
+          buit in in outlook
+          Improved the way to find the proper timezone string in the registry.
+          If the rule of the server appointment is the same of the one on the laptop
+          this is retrieved
+  
+  
+2008-05-05
+  - Magi: added Timezone handling on recurring events.
+          updated release version to 7.0.0
+          updated to new c++ api configuration 
+2008-04-11
+  - Fixed bug on recurrence events like "every 12*n months"
+
+2008-02-12
+  - replaced all direct references to lastErrorMsg, now using only get/set methods for errors.
+
+
+Released Funambol Outlook Plugin 6.6.0
+---------------------------------------
+
+2007-12-07
+  - Removed event properties "OptionalAttendees" and "UnRead" 
+    (not required and not mapped with vCalendar)
+  - Updated design document with complete list of properties mapping (Appendix C)
+
+2007-12-06
+  - Full support for vNotes 1.1 (parser/formatter are in API)
+  - Added auto-upgrade of the config if previous installed plugin is < 6.6.0
+
+2007-12-05
+  - Added vTodo option on UI advanced dialog of tasks
+  - Added vNote option on UI advanced dialog of notes
+
+2007-12-03
+  - Added 'version' value in registry for SIF data (1.0).
+
+2007-11-28
+  - Changed License.txt (AGPL)
+  - changed headers of source files (AGPL)
+  - updated about dialog (AGPL licence)
+
+2007-11-20
+  - All data types are using WinObjects from API (windows/vocl). 
+    Parsing/formatting of SIF / vCard / vCalendar is managed only by API.
+  - Removed obsolete functions for data transformation
+
+2007-11-14
+  - Added 'Importance' as complex task property (often the value received is wrong, safe checks)
+  - Removed task properties (unused + no vTodo correspondance): 
+    ContactNames, NoAging, Owner, Role, SchedulePlusPriority, UnRead
+
+<-- BRANCHED "b_v65" -->
+
+2007-11-14
+  - changed headers of source files (GPLv3)
+  - updated about dialog (added GPL V3 licence)
+
+
+Released Funambol Outlook Plugin 6.5.4 (beta2)
+----------------------------------------------
+
+2007-11-08
+  - Added message for error code 403 (forbidden)
+
+2007-11-06
+  - Changed FunambolAddin target build to "Release MinDependency" to maximize compatibility with all systems.
+
+
+Released Funambol Outlook Plugin 6.5.3 (beta1)
+----------------------------------------------
+
+2007-11-02
+  - Fixed PatternEndDate value for recurring events.
+    Now PatternEndDate is the exact date+time when the last occurrence starts.
+
+
+Released Funambol Outlook Plugin 6.5.2
+--------------------------------------
+
+2007-10-31
+  - Close the OUTLOOK.EXE process during installation/uninstallation is Outlook is stuck
+  - "ReminderTime" property of tasks is now sent in local time "YYYYMMDDThhmmss" instead of UTC. 
+    However both UTC and local time values are accepted for incoming tasks.
+  - "BusinessWebPage" is no more supported for contacts on Outlook plugin.
+
+2007-10-29
+  - Scheduler time is set -1min, to avoid starting a sync immediately
+  - Scheduler options are fixed with a drop-down list
+
+2007-10-26
+  - Added a messagebox for error code 2102 (no sources to sync)
+
+2007-10-25
+  - Added warning msgbox in case of items dropped on Server side (if we receive at least 1 status 500)
+
+2007-10-19
+  - Fixed release of RedUtils library: it must be released normally for synchronizations.
+    But it should not be invoked when accessing Outlook only to pickFolder from options.
+
+Released Funambol Outlook Plugin 6.5.1
+--------------------------------------
+
+2007-10-17
+  - Fixed handling of contacts picture, added TYPE attribute to <Photo> tag in SIF
+  - Fixed conversion of default folder name from Client to Server
+
+2007-10-10
+  - Modified UI for portal version semplifications: remove the settings for remote uri & item format
+
+2007-09-05
+ - Fixed error on Anniversary/Birthday handling: use REFERRED_MAX_DATE to clear dates
+
+
+Released Funambol Outlook Plugin 6.5.0
+--------------------------------------
+
+2007-08-09
+  - Plugin won't stop in case of bad items found (drawing/recording files in notes folder)
+  - Portal build: notes syncMode is set to "none" every sync.
+
+2007-08-08
+  - Added handling of 'ReminderSoundFile' property for appointments
+  - Added "Picture" property for contacts. It's supported only by Outlook 2003 or later.
+
+2007-08-06
+  - dataTransformer.cpp: SIF contacts are parsed/formatted using WinContactSIF from API
+
+2007-07-11
+  - vObject conversion is now moved to API (windows/vocl classes)
+  - Cleaned up utils functions about time/string conversions: some no more used, some moved to API
+  - Recurrence fields are now separated from event/task fields.
+    get/set recurrence properties only from the recurrence object (getPropertyValue, setPropertyValue)
+  - added 'CLientRecurrence::isAllDay' attribute to better check if the father event is an allday-event
+  - allday format changed from "yyyy-MM-dd" to "yyyyMMdd": now vCalendar format is the default
+  - removed +1/-1 correction of EndDate for allday-events: now vCalendar format is the default
+  - more efficient implementation of ClientApplication::getSMTPfromEX() method
+
+2007-06-22
+  - Added error messages for Server failure (2052) and Timeout (2029)
+  - Fixed 'OnMsgSyncSourceState': the spinning icon should be stopped immediately
+  - Updated projects: API source files under 'win32' have been moved to 'windows'
+
+2007-06-19
+  - Changed sequence to save an appointment item: 
+    get the new ID before saving all exceptions, so we can handle also dummy events with all occurrences deleted ;)
+  - Added support of 'X-FUNAMBOL-FOLDER' for vCard / vCalendar.
+
+2007-06-18
+  - Added patch to correctly manage DST changes since 2007 for U.S. (bug #307186)
+
+2007-06-15
+  - Changed shortcut for Users Guide to CTRL+U
+  - Added 'currentTimezone' structure in OutlookConfig to store the tz inforations. 
+    It's populated when configuaration is read.
+
+2007-06-12
+  - Redemption.dll is no more registered to the system.
+    It's now used as a Registration-Free COM object (see manifest file)
+
+2007-06-11
+  - improved handling of bad items found during initial scan (pushAllItemsToList).
+    'distribution_list' items are recognized and ignored.
+ 
+2007-06-06
+  - Fixed bugs #30710: "Categories" are sent out comma separated, instead of semicolon separated.
+    Both formats are accepted for incoming items. 
+  - Fixed bug #307104: "Color" is deprecated inOutlook2007 ("Categories" is used) 
+    so 'Color' is now ignored if using Outlook2007
+  - "FileAs" is set after name fields, otherwise Outlook will automatically fill it with a name field.
+  - First add of Outlook Plug-in Design Document v6
+  - Fixed bug #307005: must use 'toMultibyte' and 'toWideChar' when reading/writing files to disk, 
+    to ensure correct conversions with UTF-8
+
+2007-05-23
+  - Task and notes supports only SIF format, so if mime-type is wrong we use the default = SIF
+  - "StartDate" property is the first one to set for Tasks (MUST be set before "DueDate")
+
+2007-05-10
+  - Added doxygen documentation (first add)
+
+2007-05-08
+  - Updated Redemption.dll to v.4.3
+
+2007-05-07
+  - reworked build.xml procedure: now release build will checkout files automatically from CVS
+    * added specifc targets ("ant release" and "ant installer")
+    * added 'checkout' target to export src files from CVS (MUST set a correct tag for this)
+    * redirected some output to log files (NSIS, builds, CVS)
+    * 'forge-src' and 'forge' read files directly exported from CVS (only for release)
+    * improved output / added checks 'failonerror'
+
+
+Released Funambol Outlook Plugin 6.0.14 (v6 stable release)
+------------------------------------------------------------
+
+2007-05-05
+  - new message for the error 503 from server.
+
+2007-05-03
+Released Funambol Outlook Plugin 6.0.12
+
+2007-04-30
+  - fixed error on UI: sync direction was not usable for Calendar item type
+  - fixed errors with special characters (from client to server)
+  - reset log file if its size is too big (1MB for addin, 10MB for plugin)
+
+2007-04-27
+Released Funambol Outlook Plugin 6.0.11
+
+2007-04-26
+  - Added keyboard shortcuts to Outlook Addin (ALT+M / G / T)
+  - Char "\" is converted to "%5C"for subfolders names (client to server)
+  - Fixed error of cache files for appointment exceptions
+
+2007-04-20
+Released Funambol Outlook Plugin 6.0.10
+
+2007-04-18
+  - Merged branch "e_6_0_8_UIfixes" into HEAD (Razvan):
+    * display problem with dpi settings != 96 (now plugin is usable)
+    * main window menu could disappear at the end of sync
+    * fixed UI freezing problem
+    * cleaned up obsolete code in UI
+    * resources are loaded using AfxGetInstanceHandle() -> to ensure resources loaded from exe file
+    * updated Language.dll to new resources
+  - Fixed error on chars "\" and "/" inside folders names - "\" is sent escaped as "\\"
+  - added 'upgradePlugin' function for all actions to do when upgrading plugin to newer version
+
+2007-04-16
+  - Fixed scheduler: now scheduled jobs are specific for each user
+  - Updating items (from server to client) with <Folder> tag changed, will result in moving items to the new position in Outlook
+  - Fixed errors on config button "Select Folder"
+
+2007-04-13
+Released Funambol Outlook Plugin 6.0.9
+  - Fixed error on reminderMinutes of iCal: value must be rounded to int
+  - added User Guide links to plugin menu and Start menu folder
+
+2007-04-12
+  - Private data (username/pwd) are stored encrypted in win registry
+  - log file has .txt extention (was .log)
+  - vCard/iCal: all fields are always sent, even if empty
+  - iCal: DTEND is sent/expected +1day for all-day events
+  - Improved cache of old items.db (store item's ID and also Folder, to catch if a folder name has been changed)
+
+2007-04-05
+Released Funambol Outlook Plugin 6.0.8
+
+2007-04-04
+  - added checks on VCard/iCal productID (MUST match) and version (log.info if wrong) for incoming items
+  - added warning msg if some items dropped on Outlook at the end of sync
+  - Addin: Funambol menu placed before Help menu
+
+2007-04-02
+  - Improved installer: automatically close Outlook or plugin if opened
+  - Config panel is opened on sync-settings by default
+  - Improved build.xml: API C++ and ZLB library added to forge_src
+
+2007-03-30
+  - Removed syncThreadController, added SyncException class to handle exceptions of sync process
+  - Added lock and unlock of main UI buttons (for first phase of sync)
+
+2007-03-23
+Released Funambol Outlook Plugin 6.0.7
+  - Improved plugin stability: added checks on threads from StartSync()
+  - Changed winSourceConfigs array in OutlookConfig
+  - Changed plugin icon
+  - Changed Funambol menu inside Outlook (Sync All / Go to... / Options...)
+
+2007-03-14
+Released Funambol Outlook Plugin 6.0.6
+  - improved UI (spinning arrows, greyed buttons, selection buttons on option left menu)
+  - Support for ZLIB on SyncML messages (in API C++) -> checkout "sync4j/tools/zlib/" module from CVS.
+  - Portal build: disable encryption from UI
+  - CleanUp() of ClientApplication moved after Release() of OL pointers (caused stability issues)
+  - Fixed StartDate value on recurring task items (PatternStartDate is copied from StartDate)
+
+2007-03-01
+Released Funambol Outlook Plugin 6.0.5
+  - Fixed bug #306709: Protected fields are overwritten with the ones of the first item used
+  - Changed sync-mutex usage -> imporved stability when canceling sync
+  - Tasks re-enabled for portal build
+  - Changed About dialog window
+
+2007-02-23
+Released Funambol Outlook Plugin 6.0.4
+  - Improved client stability on scheduled sync (see known issues of 6.0.3)
+  - Changed "PatternStartDate" field on SIF appointments (now it's always = "Start" field)
+  - Changed plugin icon
+  - Scheduled sync don't reset the log file
+
+2007-02-20
+  - Fixed errors for scheduled sync with UI opened
+  - Improved client stability on scheduled sync
+
+2007-02-19
+  - Changed "PatternStartDate" and "PatternEndDate" to "yyyy-MM-dd" format
+  - Fixed some memory leaks
+  - Changed color of main button when mouse is over (blue)
+
+2007-02-15
+  - Refresh-from-server: items are removed internally BEFORE the sync
+  - Added support for appointments exceptions for iCal
+  - Use vCard/iCal as default if MIME type not specified (or wrong)
+  - Added checks for items dropped and items internally removed on syncReport
+
+2007-02-08
+Released Funambol Outlook Plugin 6.0.3 (alpha1)
+  - Plugin UI has been reworked, new icons used
+  - Support for appointment exceptions (using SIF)
+  - New synchronization report (in the log)
+  - Improved error handling of plugin
+  - fixed addin error: Outlook bar/icon not removed after uninstall
+  - fixed issues related to scheduled sync running with UI opened
+  - minor bugs fixed
+  
+2007-01-25
+Released Funambol Outlook Plugin 6.0.2 (pre-alpha1)
+  - New User-Interface completely reworked
+  - improved plugin stability
+  - fixed error of multiple birthday creation
+  - fixed error on 'Tools->Set Log Level'
+  - fixed bug on subfolders selection
+  - fixed error of synchronization with vCard
+  - minor bugs fixed
+
+2007-01-08
+Released Funambol Outlook Plugin 6.0.1
+  - changed plugin icon
+  - scheduler tasks could not be saved
+  - minor bugs fixed
+
+2006-12-22
+First v6 major release: Funambol Outlook Plugin 6.0.0
+  - Main improvements from 3.0:
+    * Multiuser support / plugin can be used by users without Admin rights
+    * Subfolders support for all sources
+    * New User-Interface completely reworked
+    * added ability to cancel sync
+    * all sources synced in same syncml session
+    * select folder support (also from different datastore)
+    * recurrence support for tasks
+    * logs/datafiles moved under "D&S\<userName>\Application Data\Funabol" folder
+    * upgrade of installer (from older/same version, only available from 6.0.0 or later)
+    * threaded sync -> no freezed GUI
+    * sync process has a lower priority
+    * Improved stability on Outlook Addin
+    * Added keyboard shortcuts for Plugin and Outlook Addin
