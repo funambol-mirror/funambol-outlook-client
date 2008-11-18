@@ -1,0 +1,53 @@
+HKCR
+{
+	FunambolAddin.addin.1 = s 'addin Class'
+	{
+		CLSID = s '{2F84C560-A346-4E08-99DA-E37ECB529FB9}'
+	}
+	FunambolAddin.addin = s 'addin Class'
+	{
+		CLSID = s '{2F84C560-A346-4E08-99DA-E37ECB529FB9}'
+		CurVer = s 'FunambolAddin.addin.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {2F84C560-A346-4E08-99DA-E37ECB529FB9} = s 'addin Class'
+		{
+			ProgID = s 'FunambolAddin.addin.1'
+			VersionIndependentProgID = s 'FunambolAddin.addin'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{65D964FF-3CA0-4735-9976-2566C0A8F4AE}'
+		}
+	}
+}
+
+HKLM
+{ 
+Software 
+	{ 
+	Microsoft 
+		{ 
+		Office 
+			{ 
+			Outlook 
+				{ 
+				Addins 
+					{ 
+					'FunambolAddin.Addin' 
+						{ 
+						val FriendlyName    = s 'Funambol Outlook Plug-in' 
+						val Description     = s 'Funambol Outlook Plug-in v6' 
+						val LoadBehavior    = d '00000003' 
+						val CommandLineSafe = d '00000000' 
+						} 
+					} 
+				} 
+			} 
+		} 
+	} 
+}
+
