@@ -1,0 +1,17 @@
+By installing this software you agree to the following terms and conditions:
+
+1. This software product is licensed to you for the software development 
+purposes only. This product may not be distributed or copied except for backup purposes.
+
+2. If you need a distributable version, please visit
+http://www.dimastr.com/Redemption/
+
+LIMITATION OF LIABILITY. TO THE MAXIMUM EXTENT PERMITTED BY 
+APPLICABLE LAW, IN NO EVENT SHALL THE CREATOR OF THIS 
+SOFTWARE BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR 
+CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, WITHOUT 
+LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS, BUSINESS 
+INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER 
+PECUNIARY LOSS) ARISING OUT OF THE USE OF OR INABILITY TO USE 
+THE SOFTWARE PRODUCT OR THE FAILURE TO PROVIDE SUPPORT 
+SERVICES.
