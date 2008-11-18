@@ -1,0 +1,644 @@
+<!--
+/*
+ * Funambol is a mobile platform developed by Funambol, Inc. 
+ * Copyright (C) 2003 - 2007 Funambol, Inc.
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License version 3 as published by
+ * the Free Software Foundation with the addition of the following permission 
+ * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
+ * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE 
+ * WARRANTY OF NON INFRINGEMENT  OF THIRD PARTY RIGHTS.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License 
+ * along with this program; if not, see http://www.gnu.org/licenses or write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301 USA.
+ * 
+ * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite 
+ * 305, Redwood City, CA 94063, USA, or at email address info@funambol.com.
+ * 
+ * The interactive user interfaces in modified source and object code versions
+ * of this program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU Affero General Public License version 3.
+ * 
+ * In accordance with Section 7(b) of the GNU Affero General Public License
+ * version 3, these Appropriate Legal Notices must retain the display of the
+ * "Powered by Funambol" logo. If the display of the logo is not reasonably 
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Powered by Funambol".
+ */
+ -->
+ 
+<?html version="1.0" enconding="UTF-8"?>
+
+<!-- $Id: build.xml,v 1.28 2008-07-02 16:16:05 magi Exp $
+===================================================================================================
+Forge file for Funambol Outlook Plug-in
+
+====================================================================================================
+-->
+
+<project basedir=".." default="all" name="FunambolOutlookPlugin">
+
+
+    <!--
+    ========================================================================
+      ALL
+    ========================================================================
+    -->
+    <target name="all">            
+       <echo message="Usage: ant [options]"/>      
+       <echo message=""/> 
+       <echo message="where options is"/> 
+       <echo message="release           : to regdll + checkout + build + forge + generate docs. Both for comed and cared"/>      
+       <echo message="release-nodocs    : to regdll + checkout + build + forge. Both for comed and cared"/>  
+       <echo message="forge-docs        : to checkout + forge + generate docs"/> 
+       <echo message=""/> 
+       <echo message="installer-all        : clean, build the installer, no checkout (build from dev working dirs). Both for comed and cared"/> 
+       <echo message="installer-dev        : no clean, build the installer, no checkout (build from dev working dirs). Comed"/> 
+       <echo message="installer-cared-dev  : no clean, build the installer, no checkout (build from dev working dirs). Cared"/> 
+       <echo message="docs-dev             : clean, to only generate doxygen docs, no checkout (build from dev working dirs)"/> 
+    </target>
+
+    <!--target name="release"         depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, build-install-sp"/-->
+    <!--target name="release"         depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, 
+                                                                                        set-portal-password-key,
+                                                                                        compile-outlook-plugin,
+                                                                                        move-mainclientdll-sp,
+                                                                                        restore-empty-password-key,
+                                                                                        build-install-sp"/-->
+    
+     <target name="release"         depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install,                                                                                         
+                                                                                        compile-outlook-plugin,
+                                                                                        move-mainclientdll-sp,                                                                                        
+                                                                                        build-install-cared"/>
+                                                                                                                                                                            
+    <target name="release-nodocs"  depends="init, clean, build, register-dll, checkout-src, forge-src, compile, forge, build-install, 
+                                                                                        compile-outlook-plugin,
+                                                                                        move-mainclientdll-sp,
+                                                                                        build-install-sp"/>
+    
+    <target name="forge-docs"      depends="init, clean, build, checkout-src, create-docs, forge-src"/>
+    
+    <!--target name="installer-all">
+        <antcall target="clean"/>
+        <antcall target="installer-dev"/>
+        <antcall target="installer-sp-dev"/>
+    </target-->
+
+    <target name="installer-all">
+        <antcall target="clean"/>
+        <antcall target="installer-dev"/>
+        <antcall target="installer-cared-dev"/>
+    </target>
+    
+    <!-- These execute on working dir (for dev purpose) -->    
+    <target name="installer-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install"/>    
+    <target name="installer-sp-dev" depends="init, build, register-dll,
+                                                          set-portal-password-key-dev,
+                                                          forge-no-checkout,
+                                                          restore-empty-password-key-dev,                                                                                                                   
+                                                          build-install-sp"/>   
+    <target name="installer-cared-dev" depends="init, build, register-dll,                                                       
+                                                       compile-no-checkout, 
+                                                       forge-no-checkout,                                                        
+                                                       build-install-cared"/>    
+                                                                                                                 
+    <target name="docs-dev"      depends="init, clean, build, create-docs-no-checkout"/>
+                                                              
+    
+    <!--
+    ========================================================================
+      INIT: Setting variables
+    ========================================================================
+    -->
+    <target name="init">
+
+        <!-- Output dirs -->
+        <property name="dir.distribution"         value="${basedir}"/>
+        <property name="dir.output"               value="${dir.distribution}/output"/>
+        <property name="dir.export.CVS"           value="${dir.distribution}/output/export"/>
+        <property name="dir.forge"                value="${dir.distribution}/installer"/>
+        <property name="dir.fileset"              value="${dir.distribution}/installer/fileset"/>
+        <property name="dir.presetup"             value="${dir.distribution}/installer/presetup"/>
+        <property name="dir.redemptionLib"        value="${dir.distribution}/installer/Redemption_Lib"/>
+        <property name="dir.redemptionLibRedist"  value="${dir.distribution}/installer/Redemption_Lib/enterprise"/>
+        
+        <!-- Dirs to read src from (no-checkout build) -->
+        <property name="dir.src"            value="funambol-outlook-plugin-src-"/>
+        <property name="dir.outlook"        value="${dir.distribution}/.."/>
+    	<property name="dir.ui"             value="${dir.outlook}/UI"/>
+    	<property name="dir.mainclientdll"  value="${dir.outlook}/mainclientDll"/>	
+    	<property name="dir.outlookaddin"   value="${dir.outlook}/Addin"/>
+    	<property name="dir.design"         value="${dir.outlook}/docs"/>
+    	<property name="dir.native_api"     value="${dir.outlook}/../../client-api/native"/>
+    	<property name="dir.zlib"           value="${dir.outlook}/../../tools/zlib"/>
+	
+    	<!-- Log files -->
+    	<property name="log.CVS"            value="${dir.output}/CVS_export.log"/>
+    	<property name="log.plugin"         value="${dir.output}/build_plugin.log"/>
+        <property name="log.addin"          value="${dir.output}/build_addin.log"/>
+        <property name="log.NSIS"           value="${dir.output}/build_NSIS.log"/>
+        <property name="log.NSIS_sp"        value="${dir.output}/build_NSIS_SP.log"/>
+        <property name="log.doxygen"        value="${dir.output}/build_doxygen.log"/>
+	
+ 	<property file="${user.home}/funambol-outlook-plugin-forge.properties"/>
+	<property file="build/funambol-outlook-plugin-forge.properties"/>
+	
+	<property file="build/extra.properties"/>    
+    <!-- it defaults the wm.pass.key if not defines in other parts -->
+    <property name="wm.pass.key"        value="NULL"/>
+
+    </target>
+
+
+    <!--
+    ========================================================================
+      BUILD
+    ========================================================================
+    -->
+    <target name="build" depends="init">
+    
+        <!-- Update the build date automatically, build number is manually set -->
+        <propertyfile file  = "${dir.distribution}/build/release.properties" comment = "Funambol Outlook Plug-in" >
+            <entry key="build.date"   type="date" value="now" pattern="yyyyMMdd"/>
+            <!--entry key="build.number" type="int"  operation = "+" default="1"/-->
+        </propertyfile>
+
+        <!-- Load release.propeties -->
+        <property file="${dir.distribution}/build/release.properties"/>
+        <echo message="*********************" />
+        <echo message="Build release: ${release.major}.${release.minor}.${build.number}" />
+        <echo message="*********************" />
+        
+        
+	<!-- Output dirs for src files -->
+	<property name="dir.output_src"               value="${dir.output}/${dir.src}${release.major}.${release.minor}.${build.number}"/>
+	<property name="dir.output_src.home"          value="${dir.output_src}/Funambol/Outlook Plug-in"/>
+	<property name="dir.output_src.outlook"       value="${dir.output_src.home}/clients/outlook"/>
+	<property name="dir.output_src.native_api"    value="${dir.output_src.home}/client-api/native"/>
+	<property name="dir.output_src.zlib"          value="${dir.output_src.home}/tools/zlib"/>
+	<property name="dir.output_src.UI"            value="${dir.output_src.outlook}/UI"/>
+	<property name="dir.output_src.mainclientdll" value="${dir.output_src.outlook}/mainclientdll"/>
+	<property name="dir.output_src.outlookaddin"  value="${dir.output_src.outlook}/Addin"/>
+	<property name="dir.output_src.design"        value="${dir.output_src.outlook}/docs"/>
+	<property name="dir.output_src.install"       value="${dir.output_src.outlook}/install"/>
+        
+    </target>
+
+
+
+    <!--
+    ========================================================================
+      CHECKOUT-SRC
+    ========================================================================
+    -->
+    <target name="checkout-src" depends="init">
+
+        <mkdir dir="${dir.export.CVS}"/>
+
+        <!-- 
+        Checkout files from CVS.
+        -->
+        <echo message="Checkout source files from CVS (tag = ${module.src.tag})..."/>
+        <echo message="output to file: ${log.CVS}"/>
+        <!-- API (use tag) -->
+        <echo message="cvs -z3 -d ${cvsroot} export -r ${module.src.tag} ${cppapi.modulename}"/>
+        <exec dir="${dir.export.CVS}" executable="cvs" failonerror="true" output="${log.CVS}">
+             <arg line="-z3 -d ${cvsroot} export -r ${module.src.tag} ${cppapi.modulename}"/>
+        </exec>
+        <!-- zlib library (use HEAD) -->
+        <echo message="cvs -z3 -d ${cvsroot} export -r HEAD ${zlib.modulename}"/>
+        <exec dir="${dir.export.CVS}" executable="cvs" failonerror="true" output="${log.CVS}" append="true">
+             <arg line="-z3 -d ${cvsroot} export -r HEAD ${zlib.modulename}"/>
+        </exec>
+        <!-- Outlook Plug-in (use tag) -->
+        <echo message="cvs -z3 -d ${cvsroot} export -r ${module.src.tag} ${olplugin.modulename}"/>
+        <exec dir="${dir.export.CVS}" executable="cvs" failonerror="true" output="${log.CVS}" append="true">
+             <arg line="-z3 -d ${cvsroot} export -r ${module.src.tag} ${olplugin.modulename}"/>
+        </exec>
+
+    </target>
+
+
+
+
+    <!--
+    ========================================================================
+      REGISTER-DLL
+    ========================================================================
+    -->
+    <target name="register-dll" depends="init">
+
+        <echo message="Registering Redemption DLL..."/>
+        <exec dir="${dir.redemptionLib}" executable="regsvr32">        
+            <arg line="/s Redemption.dll"/>
+        </exec>
+
+    </target>
+
+
+    <!--
+    ========================================================================
+      FORGE SRC
+    ========================================================================
+    -->
+    <target name="forge-src" depends="init,build,checkout-src">
+    
+        <mkdir dir="${dir.output_src}"/>
+
+        <!-- 
+        Move source files to generate the correct directory structure under 'funambol' 
+        -->
+        <copy todir="${dir.output_src.zlib}" >
+            <fileset dir="${dir.export.CVS}/tools/zlib"/>
+        </copy>
+        <copy todir="${dir.output_src.home}">
+            <fileset dir="${dir.export.CVS}/funambol" />
+            <fileset dir="${dir.export.CVS}/3x" />          <!-- *** TODO: remove this once API C++ are under the same folder in CVS! *** -->
+        </copy>
+
+        <!-- <delete dir="${dir.export.CVS}" quiet="true"/> -->
+
+
+        <!-- ZIP files -->
+        <zip destfile="${dir.output_src}.zip">
+            <fileset dir="${dir.output_src}"/>
+        </zip>
+        
+    </target>
+
+    
+    
+    
+    <!--
+    ========================================================================
+      COMPILE
+    ========================================================================
+    -->
+    
+     <target name="compile-outlook-plugin" depends="init,build">         
+        <echo message="Compiling OutlookPlugin..."/>
+        <exec dir="${dir.output_src.UI}/build" executable="${vs2005.devenv}/devenv" failonerror="true">
+            <arg line="OutlookPlugin.sln /Out ${log.plugin} /Build ${plugin.targetbuild}"/>
+        </exec>              
+    </target>
+    
+    <target name="compile" depends="init,checkout-src"> 
+        <mkdir dir="${dir.output}"/>
+                
+        <echo message="Compiling OutlookPlugin..."/>
+        <exec dir="${dir.output_src.UI}/build" executable="${vs2005.devenv}/devenv" failonerror="true">
+            <arg line="OutlookPlugin.sln /Out ${log.plugin} /Build ${plugin.targetbuild}"/>
+        </exec>
+
+        <echo message="Compiling FunambolAddin..."/>
+        <exec dir="${dir.output_src.outlookaddin}" executable="${vs2005.devenv}/devenv" failonerror="true">        
+            <arg line="FunambolAddin.sln /Out ${log.addin} /Build ${addin.targetbuild}"/>
+        </exec>
+        
+        <!-- Open logs and continue -->
+        <exec dir="${dir.output}" executable="notepad" spawn="true">
+            <arg line="${log.plugin}"/>
+        </exec>
+        <exec executable="notepad" spawn="true">
+            <arg line="${log.addin}" />
+        </exec>
+      
+    </target>
+
+
+    <!--
+    ========================================================================
+      COMPILE-NO-CHECKOUT
+    ========================================================================
+    -->
+    
+    <target name="compile-no-checkout" depends="init">
+        <mkdir dir="${dir.output}"/>
+    
+        <!-- Note: compile from dev working dirs -->
+        
+        <echo message="Compiling OutlookPlugin..."/>
+        <exec dir="${dir.ui}/build" executable="${vs2005.devenv}/devenv" failonerror="true">
+            <arg line="OutlookPlugin.sln /Out ${log.plugin} /Build ${plugin.targetbuild}"/>
+        </exec>
+
+        <echo message="Compiling FunambolAddin..."/>
+        <exec dir="${dir.outlookaddin}" executable="${vs2005.devenv}/devenv" failonerror="true">        
+            <arg line="FunambolAddin.sln /Out ${log.addin} /Build ${addin.targetbuild}"/>
+        </exec>
+        
+        <!-- Open logs and continue -->
+        <exec executable="notepad" spawn="true">
+            <arg line="${log.plugin}"/>
+        </exec>
+        <exec executable="notepad" spawn="true">
+            <arg line="${log.addin}" />
+        </exec>
+      
+    </target>
+
+
+    <!--
+    ========================================================================
+      FORGE
+    ========================================================================
+    -->
+    <target name="move-mainclientdll-sp" depends="init,build,forge-src,compile">
+        <copy todir="${dir.fileset}" overwrite="TRUE">
+            <fileset dir="${dir.output_src.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
+        </copy>
+	</target>
+	
+    <target name="forge" depends="init,build,forge-src,compile">
+
+        <echo message="Forge files from ${dir.output_src}..." />
+
+        <!-- Create the directory structure under 'fileset' -->
+        <mkdir dir="${dir.fileset}"/>
+        <mkdir dir="${dir.fileset}/redist"/>
+        <mkdir dir="${dir.fileset}/docs"/>
+        <mkdir dir="${dir.fileset}/images"/>
+        <mkdir dir="${dir.fileset}/LICENSES"/>
+
+
+        <!--Copy ALL files from 'presetup' to 'fileset' -->
+        <copy todir="${dir.fileset}" >
+            <fileset dir="${dir.output_src.install}/installer/presetup"/>
+        </copy>
+
+
+        <!-- 'release.properties' is copied from this working dir -->
+        <copy file="${dir.distribution}/build/release.properties" todir="${dir.fileset}/docs"/>
+
+
+        <!--
+        Copy DLLs and needed files into fileset dir
+        -->        
+	<copy todir="${dir.fileset}" overwrite="TRUE">
+	    <fileset dir="${dir.output_src.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
+	    <fileset dir="${dir.output_src.UI}/build/Release"                  includes="OutlookPlugin.exe"/>
+	    <fileset dir="${dir.output_src.install}/installer/Redemption_Lib"  includes="Redemption.dll"/>
+	    <fileset dir="${dir.output_src.outlookaddin}/ReleaseMinDependency" includes="FunambolAddin.dll"/>
+        </copy>
+        
+        <copy todir="${dir.fileset}/images" overwrite="TRUE">
+            <fileset dir="${dir.output_src.UI}/src/res" includes="OutlookPlugin.ico"/>
+        </copy>
+
+	
+	<!-- These are DLLs required to run VC++ software -->
+        <copy todir="${dir.fileset}/redist" overwrite="TRUE">
+            <fileset dir="${dir.VCpp2005Lib}" includes="**/Microsoft.VC80.ATL/, **/Microsoft.VC80.CRT/, **/Microsoft.VC80.MFC/" />
+        </copy> 
+
+    </target>
+
+
+    <!--
+    ========================================================================
+      FORGE-NO-CHECKOUT
+    ========================================================================
+    -->
+    <target name="forge-no-checkout" depends="init,build,compile-no-checkout">
+        
+        <!-- Note: files are copied from dev working dirs -->
+        <echo message="Forge files from ${dir.outlook}..." />
+
+        <!-- Create the directory structure under 'fileset' -->
+        <mkdir dir="${dir.fileset}"/>
+        <mkdir dir="${dir.fileset}/redist"/>
+        <mkdir dir="${dir.fileset}/docs"/>
+        <mkdir dir="${dir.fileset}/images"/>
+        <mkdir dir="${dir.fileset}/LICENSES"/>
+
+
+        <!--Copy all files from 'presetup' to 'fileset' -->
+        <copy todir="${dir.fileset}" >
+            <fileset dir="${dir.presetup}" excludes="**/*.bak, **/*.my, **/.#*, **/CVS/" />
+        </copy>
+        
+        
+        <!-- Copy release.properties -->
+        <copy file="${dir.distribution}/build/release.properties" todir="${dir.fileset}/docs"/>
+
+
+        <!--
+        Copy DLLs and needed files into fileset dir
+        -->        
+	<copy todir="${dir.fileset}" overwrite="TRUE">
+	    <fileset dir="${dir.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
+	    <fileset dir="${dir.ui}/build/Release"                  includes="OutlookPlugin.exe"/>
+	    <fileset dir="${dir.redemptionLib}"                     includes="Redemption.dll"/>
+	    <fileset dir="${dir.outlookaddin}/ReleaseMinDependency" includes="FunambolAddin.dll"/>
+        </copy>
+        
+        <copy todir="${dir.fileset}/images" overwrite="TRUE">
+            <fileset dir="${dir.ui}/src/res" includes="OutlookPlugin.ico"/>
+        </copy>
+
+	
+	<!-- These are DLLs required to run VC++ software -->
+        <copy todir="${dir.fileset}/redist" overwrite="TRUE">
+            <fileset dir="${dir.VCpp2005Lib}" includes="**/Microsoft.VC80.ATL/, **/Microsoft.VC80.CRT/, **/Microsoft.VC80.MFC/" />
+        </copy> 
+
+    </target>
+
+
+    <!--
+    ========================================================================
+    BUILD-INSTALL
+    ========================================================================
+    -->
+    <target name="build-install" depends="init" >
+        <mkdir dir="${dir.output}"/>
+    
+        <echo message="${install-builder.nsi}" />
+        <echo message="output to: ${log.NSIS}" />
+        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS}">        
+            <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
+	               /DFILE_NAME=${fileName}  ${script.nsi} "/>
+        </exec>
+    </target>
+
+    <!--
+    ========================================================================
+    BUILD-INSTALL_FOR_PORTAL
+    ========================================================================
+    -->
+    <target name="build-install-sp" depends="init" >
+        <mkdir dir="${dir.output}"/>
+        
+        <!-- Portal version is builded with the REDIST REDEMPTION.DLL -->
+        <echo message="Replace Redemption.dll with the redistributable one..." />
+	    <copy todir="${dir.fileset}" overwrite="TRUE">
+            <fileset dir="${dir.redemptionLibRedist}" includes="Redemption.dll"/>
+        </copy>
+        
+        
+        <echo message="${install-builder.nsi} ${sp}" />
+        <echo message="output to: ${log.NSIS_sp}" />
+        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}">        
+            <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
+                       /DFILE_NAME=${fileNameSp}
+                       /DSP  ${script.nsi} " />
+        </exec>
+    </target>
+    
+     <!--
+    ========================================================================
+    BUILD-INSTALL_FOR_CARED
+    ========================================================================
+    -->
+    <target name="build-install-cared" depends="init" >
+        <mkdir dir="${dir.output}"/>
+        
+        <!-- Portal version is builded with the REDIST REDEMPTION.DLL -->
+        <echo message="Replace Redemption.dll with the redistributable one..." />
+	    <copy todir="${dir.fileset}" overwrite="TRUE">
+            <fileset dir="${dir.redemptionLibRedist}" includes="Redemption.dll"/>
+        </copy>
+        
+        
+        <echo message="${install-builder.nsi} ${sp}" />
+        <echo message="output to: ${log.NSIS_sp}" />
+        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}">        
+            <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
+                       /DFILE_NAME=${fileNameCared}
+                        ${script.nsi} " />
+        </exec>
+    </target>
+    
+    <!--
+    ========================================================================
+    Replace the pass-key with the value for the portal
+    ========================================================================
+    -->
+    
+     <!-- used only for the portal version. It changes the password for the cared release in the
+          local directory (not in the one with server checkout-->
+   <target name="set-portal-password-key-dev" depends="init">      
+     <echo message="${wm.pass.key}" />         
+     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h" 
+            token='#define PASS_KEY    NULL'
+            value='#define PASS_KEY    ${wm.pass.key}' summary="true">            
+     </replace>     
+   </target>
+   
+   <target name="restore-empty-password-key-dev" depends="init">      
+     <echo message="${wm.pass.key}" />         
+     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h" 
+            token='#define PASS_KEY    ${wm.pass.key}'
+            value='#define PASS_KEY    NULL' summary="true">              
+     </replace>     
+   </target>
+    
+    <!-- used only for the portal version. It changes the password for the cared release 
+         FOR THE RELEASE WITH CHECKOUT -->          
+    <target name="set-portal-password-key" depends="init">      
+     <echo message="${wm.pass.key}" />         
+     <replace file="${dir.output_src.mainclientdll}/src/include/OutlookConfig.h" 
+            token='#define PASS_KEY    NULL'
+            value='#define PASS_KEY    ${wm.pass.key}' summary="true">            
+     </replace>     
+   </target>
+   
+   <target name="restore-empty-password-key" depends="init">      
+     <echo message="${wm.pass.key}" />         
+     <replace file="${dir.output_src.mainclientdll}/src/include/OutlookConfig.h" 
+            token='#define PASS_KEY    ${wm.pass.key}'
+            value='#define PASS_KEY    NULL' summary="true">              
+     </replace>     
+   </target>
+    
+    <!--
+    ========================================================================
+    REPLACE THE CARED_KEY TO TRUE WHEN THE BUILD IS FOR THE CARED VERSION (PASS_KEY CUSTOMIZED)
+    ========================================================================
+    -->    
+    <target name="set-cared-key-true-dev" depends="init">      
+     <echo message="set CARED_KEY to true" />         
+     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h" 
+            token='#define CARED_KEY    false'
+            value='#define CARED_KEY    true' summary="true">            
+     </replace>     
+   </target>
+   
+   <target name="set-cared-key-false-dev" depends="init">      
+     <echo message="set CARED_KEY to false" />         
+     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h" 
+            token='#define CARED_KEY    true'
+            value='#define CARED_KEY    false' summary="true">              
+     </replace>     
+   </target>
+   
+    <!--
+    ========================================================================
+    CLEAN
+    ========================================================================
+    -->
+    <target name="clean" depends="init">
+        <delete dir="${dir.output}"/>
+        <delete dir="${dir.fileset}"/>
+    </target>
+
+
+
+    <!--
+    ========================================================================
+    CREATE DOCS
+    ========================================================================
+    -->
+    <target name="create-docs" depends="init,checkout-src">
+        
+        <mkdir dir="${dir.output}"/>
+        <property name="doxyfile"      value="${dir.distribution}/doxygen/Doxyfile"/>
+        <property name="olplugin.root" value="output/export/${olplugin.modulename}"/>
+        <property name="cppapi.root"   value="output/export/${cppapi.modulename}"  />
+
+        <echo message="Creating documentation with doxygen..." />
+	<exec dir="output/export/${olplugin.modulename}/docs" executable="doxygen" output="${log.doxygen}" >
+            <arg line="${doxyfile}" />
+            <env key="FUNAMBOL_OLPLUGIN_ROOT" path="${olplugin.root}"/>			<!-- root of OLPlugin project      -->
+            <env key="FUNAMBOL_NATIVE_ROOT"   path="${cppapi.root}"/>			<!-- root of Native API project    -->
+            <env key="ENABLED_SECTIONS"  value="API OLPLUGIN" />			<!-- add "DEV" for complete docs   -->
+            <env key="SHOW_PRIVATE_DATA" value="YES" />					<!-- "YES" to show private members -->
+            <env key="HAVE_DOT"          value="YES" />					<!-- "NO" to hide graphs           -->
+        </exec>
+    </target>
+
+
+    <!--
+    ========================================================================
+    CREATE DOCS - NO CHECKOUT
+    ========================================================================
+    -->   
+    <target name="create-docs-no-checkout" depends="init">
+        <!-- Create doxygen docs from working env -->
+        
+        <mkdir dir="${dir.output}"/>
+        <property name="doxyfile"      value="${dir.distribution}/doxygen/Doxyfile"/>
+        <property name="olplugin.root" value="${dir.outlook}"   />
+        <property name="cppapi.root"   value="${dir.native_api}"/>
+
+        <echo message="Creating documentation with doxygen..." />
+	<exec dir="${dir.design}" executable="doxygen" output="${log.doxygen}" >
+            <arg line="${doxyfile}" />
+	    <env key="FUNAMBOL_OLPLUGIN_ROOT" path="${olplugin.root}"/>			<!-- root of OLPlugin project      -->
+	    <env key="FUNAMBOL_NATIVE_ROOT"   path="${cppapi.root}"/>			<!-- root of Native API project    -->
+	    <env key="ENABLED_SECTIONS"      value="API OLPLUGIN" />			<!-- add "DEV" for complete docs   -->
+	    <env key="SHOW_PRIVATE_DATA"     value="YES" />				<!-- "YES" to show private members -->
+	    <env key="HAVE_DOT"              value="YES" />				<!-- "NO" to hide graphs           -->
+        </exec>
+    </target>
+
+
+</project>
