@@ -23,28 +23,31 @@ How to build the Funambol Outlook Sync Client
     - NSIS (http://nsis.sourceforge.net) 
     - NSIS processwork plugin (http://www.esanu.name/software/wp-content/uploads/2008/06/processwork.rar). Extract 'processwork.dll' inside the 'Plugins' folder under the NSIS installation directory (this library will be used building the installer). 
     - Doxygen (http://www.stack.nl/~dimitri/doxygen/download.html) 
+    - [optional] Graphviz (to generate graphs in doxygen doc, http://www.graphviz.org/Download..php)
 
 
 3. Building the installer
 
     The installer is a NSIS Windows installer, launched by the Apache 'ant' build tool.
-    During the building process, all projects are compiled using the Visual Studio compiler. 
-
-    1) Go to the folder: 'funambol\clients\outlook\install\build'
-    2) Open the file 'funambol-outlook-client-forge.properties' using a text editor
-       - redefine the path of Visual Studio 2005 (devenv.exe) if necessary (i.e., if different)
+    During the building process, all projects are compiled using the Visual Studio compiler.
+    
+    1) Checkout the Outlook Sync Client project from SVN.
+       The project repository is: https://core.forge.funambol.org/svn/core/
+       HEAD revision can be found under 'trunk/outlook' path, tags are located under 'tags' (use "guest" username with an empty password).
+       Note: external projects (like Funambol C++ APIs) will be checkout automatically.
+    2) Open file 'install\build\funambol-outlook-client-forge.properties'
+       - redefine the path of Visual Studio 2005 (devenv.exe) (if different)
        - redefine the path of the directory 'redist\x86' of Visual Studio 2005 if necessary 
        - redefine the path of NSIS (makensis.exe) if necessary 
-    3) Open a command prompt 
-    4) Go to the directory 'funambol\clients\outlook\install\build'
-    5) Type: "svn list https://core.forge.funambol.org/svn/core/trunk/funambol/clients/outlook/ --username guest"
-       When asked, enter a empty password and store permanently the SVN certificate fingerprint.
-       (This point is necessary just to store permanently the SVN fingerprint on your system, any other svn command can be used as well)
-    6) Type 'ant release'. This procedure will automatically do the following: 
-       - register Redemption library 
-       - checkout the source files from CVS 
+    3) Open file 'install\build\release.properties' and set the release version number desired.
+    4) From directory 'install\build', type 'ant work-all'. 
+       This procedure will build the installer, doing the following: 
+       - register Redemption library
        - create the doxygen documentation 
        - create a zip file containing the source files 
-       - build the Plug-in installer 
-       Output files will be placed in 'funambol\clients\outlook\install\output'.
-       Doxygen documentation is generated in 'funambol\clients\outlook\docs\html'; the start page is 'index.html'.
+       - build the Outlook Sync Client installer
+       
+    Output files will be placed in 'install\output'.
+    Doxygen documentation is generated in 'docs\html'; the start page is 'index.html'.
+    
+    Note: with "ant release" you can build the Outlook Sync Client installer as well, but all source files will be downloaded from SVN by the script.
