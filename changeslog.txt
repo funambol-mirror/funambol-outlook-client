@@ -1,3 +1,8 @@
+Funambol Outlook Sync Client 7.1.6
+---------------------------------------
+2008-11-28
+   - toccy: just updated to the Native API HEAD at 2008-11-28
+
 Funambol Outlook Sync Client 7.1.5
 ---------------------------------------
 2008-11-17
