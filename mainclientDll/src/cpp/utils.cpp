@@ -394,7 +394,7 @@ int writeToFile(const wstring& content, const wstring& filePath, const WCHAR* mo
     char* tmp = toMultibyte(content.c_str());
     if (tmp) {
         if (fprintf(f, "%s", tmp) < 0) {
-            setErrorF(getLastErrorCode(), ERR_WFILE_WRITE, filePath.c_str());
+            setErrorF(getLastErrorCode(), ERR_WFILE_WRITE_ON, filePath.c_str());
             return 1;
         }
         delete [] tmp;
@@ -427,7 +427,7 @@ int writeToFile(const string& content, const string& filePath, const char* mode)
     }
 
     if (fprintf(f, "%s", content.c_str()) < 0) {
-        setErrorF(getLastErrorCode(), ERR_FILE_WRITE, filePath.c_str());
+        setErrorF(getLastErrorCode(), ERR_FILE_WRITE_ON, filePath.c_str());
         return 1;
     }
 

@@ -177,10 +177,13 @@ protected:
      * @param direction  DIR_IN if it's an incoming item, DIR_OUT if it's an outgoing item
      *                   (the method will also check filters settings)
      *                   TODO: 'direction' should be defined in a more generic 'ClientFilter' class.
+     * @param command    It is the command the server send to the client. It could be ADD, DELETE, REPLACE
+     *                   There are some test to be perfomed in the method.
+     *                   It is null by default because for exiting items we don't need to know it.
      * @return           true, if the item passed all filters (so it should be synced)
      *                   false, if the item didn't pass at least 1 filter (so it should be filtered out, ignored)
      */
-    bool filterClientItem(ClientItem* item, DateFilter::FilterDirection direction);
+    bool filterClientItem(ClientItem* item, DateFilter::FilterDirection direction, const char* command = NULL);
 
     /**
      * Refresh all active filters.
