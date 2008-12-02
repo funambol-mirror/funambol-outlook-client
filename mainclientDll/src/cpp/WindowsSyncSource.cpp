@@ -44,6 +44,8 @@
 #include "HwndFunctions.h"
 #include "outlook/ClientFolder.h"
 #include "outlook/ClientException.h"
+#include "spds/constants.h"
+
 
 using namespace std;
 
@@ -709,7 +711,7 @@ int WindowsSyncSource::addItem(SyncItem& item) {
     //
     // Filter incoming items: only if direction INPUT is enabled.
     //
-    if (!filterClientItem(cItem, DateFilter::DIR_IN)) {
+    if (!filterClientItem(cItem, DateFilter::DIR_IN, COMMAND_ADD)) {
         goto filteredItem;
     }
 
@@ -896,7 +898,7 @@ int WindowsSyncSource::updateItem(SyncItem& item) {
     //
     // Filter incoming items: only if direction INPUT is enabled.
     // (note: filter must be done AFTER we modified the item with updated data)
-    if (!filterClientItem(cItem, DateFilter::DIR_IN)) {
+    if (!filterClientItem(cItem, DateFilter::DIR_IN, COMMAND_REPLACE)) {
         goto filteredItem;
     }
 
@@ -1008,7 +1010,7 @@ int WindowsSyncSource::deleteItem(SyncItem& item) {
     //
     // Filter incoming items: only if direction INPUT is enabled.
     // (sure we need this, for deleted items?)
-    if (!filterClientItem(cItem, DateFilter::DIR_IN)) {
+    if (!filterClientItem(cItem, DateFilter::DIR_IN, COMMAND_DELETE)) {
         goto filteredItem;
     }
 
@@ -1261,28 +1263,28 @@ void WindowsSyncSource::pushAllItemsToList(ClientFolder* folder, itemKeyList& li
 }
 
 
-bool WindowsSyncSource::filterClientItem(ClientItem* item, DateFilter::FilterDirection direction)
+bool WindowsSyncSource::filterClientItem(ClientItem* item, 
+                                         DateFilter::FilterDirection direction,
+                                         const char* command)
 {
     if (!item) return false;
 
     // So far, only 'date filter' for appointments
     if (item->getType() == APPOINTMENT) {
         ClientAppointment* cApp = (ClientAppointment*)item;
-        if (!cApp) return false;
-        
-        if (direction == DateFilter::DIR_IN) {
-            // Incoming items: if recurring, we MUST save the recPattern
-            // otherwise the recPattern will result non-updated.
-            ClientRecurrence* cRec = cApp->getRecPattern();
-            if (cRec) cRec->save();
-        }
+        if (!cApp) return false;                      
 
         // Apply the filter.
         // Filter only if desired direction is enabled.
         DateFilter& filter = getDateFilter();
         if (filter.getDirection() & direction) {
-
             if (direction == DateFilter::DIR_IN) {
+                if (command && strcmp(command, COMMAND_DELETE) != 0) {
+                    // Incoming items: if recurring, we MUST save the recPattern
+                    // otherwise the recPattern will result non-updated.
+                    ClientRecurrence* cRec = cApp->getRecPattern();
+                    if (cRec) cRec->save();
+                }
                 // Incoming items: the COMPtr for recPattern is not yet valid (it will
                 // be ok once item saved) so we check the ClientItem members (strings).
                 return filter.execute(item);
