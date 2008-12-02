@@ -1,3 +1,10 @@
+Funambol Outlook Sync Client 7.1.7
+---------------------------------------
+2008-12-02
+    - toccy: Don't change the source URI of contacts during upgrades from versions < 7.1.2. 
+             If we were using "scard", it will be preserved during upgrade. 
+             This is required to keep the anchors Server side and avoid a 1st time slow-sync of contacts.
+
 Funambol Outlook Sync Client 7.1.6
 ---------------------------------------
 2008-11-28
