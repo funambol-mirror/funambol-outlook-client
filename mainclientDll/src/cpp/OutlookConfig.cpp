@@ -1007,7 +1007,9 @@ void OutlookConfig::upgradeConfig() {
     if (oldSwv < 70102) {
         WindowsSyncSourceConfig* ssc = getSyncSourceConfig(CONTACT_);
         if (ssc) {
-            ssc->setURI("card");
+			// Don't change the source URI. If we were using "scard", it will be preserved during
+			// upgrade. This is required to keep the anchors Server side and avoid a 1st time slow-sync.
+            //ssc->setURI("card");
             ssc->setType("text/x-vcard");
             ssc->setVersion("2.1");
             ssc->setEncoding("bin");
