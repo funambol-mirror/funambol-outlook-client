@@ -631,6 +631,14 @@ const wstring ClientAppointment::getComplexProperty(const wstring& propertyName)
         }
     }
 
+    // Get the BusyStatus. It should be a simple property but in the receiving we must check
+    // if its value is a numeric one or a literal one (it must be 1, 2 not FREE, TENTATIVE...)
+    else if (propertyName == L"BusyStatus") {
+        OlBusyStatus value = pAppointment->GetBusyStatus();   
+        wchar_t tmp[10];
+        wsprintf(tmp, TEXT("%i"), value);                
+        propertyValue = tmp;
+    }
 
     else {
         setErrorF(getLastErrorCode(), ERR_OUTLOOK_PROP_NOT_FOUND, propertyName.c_str(), itemType.c_str());
@@ -775,6 +783,23 @@ int ClientAppointment::setComplexProperty(const wstring& propertyName, const wst
         else {
             hr = pAppointment->put_ReminderPlaySound(VARIANT_FALSE);
         }
+    }
+
+    // Set the busy status. Check if the value is one the possible in a digit format.
+    // otherwise convert it
+    // possible values are olBusy(2), olFree(0), olOutOfOffice(3), or olTentative(1). 
+    else if (propertyName == L"BusyStatus") {
+        int value = 0; // FREE        
+        if (propertyValue.length() > 0) {
+            if (propertyValue == L"BUSY" || propertyValue == L"2") {
+                value = 2;
+            } else if (propertyValue == L"TENTATIVE" || propertyValue == L"1") {
+                value = 1;
+            } else if (propertyValue == L"OOF" || propertyValue == L"3") { // Out of office
+                value = 3;
+            }            
+        }        
+        pAppointment->PutBusyStatus((OlBusyStatus)value);                    
     }
 
     else {

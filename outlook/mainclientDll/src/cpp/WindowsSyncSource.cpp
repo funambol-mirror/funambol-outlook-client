@@ -2019,8 +2019,22 @@ void WindowsSyncSource::extractFolder(const wstring dataString, const wstring da
         replaceAll(L"&amp;", L"&", path);
     }
     else {
+        // creating the WinItem just to take the x-funambol-folder in the proper way without
+        // duplicate code
+        wstring propertyValue;
+        WCHAR* fields[] = {{L"Folder"}};
+        // Internally switch to the correct WinObject and
+        // fill it (parse data string + fill propertyMap).
+        WinItem* winItem = createWinItem(isSifFormat, getName(), dataString, (const WCHAR**)fields);
+        bool res = winItem->getProperty(L"Folder", propertyValue);
+        if (res) {
+            path = propertyValue;
+            delete winItem;
+        } else {
+            LOG.debug("extractFolder method: failed to get the folder. use the default");
+        }
         // vCard/vCalendar: parse the string.
-        path = getVPropertyValue(dataString, L"X-FUNAMBOL-FOLDER");
+        //path = getVPropertyValue(dataString, L"X-FUNAMBOL-FOLDER");
     }
 
     if (path != EMPTY_WSTRING) {
