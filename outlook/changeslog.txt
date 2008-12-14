@@ -1,3 +1,12 @@
+Funambol Outlook Sync Client 7.1.8
+---------------------------------------
+2008-12-14
+    - magi:  Fixed issue with japanese chars into folder names
+             Fixed issue in BusyStatus property that was not properly handled
+             if it was in the X-MICROSOFT-CDO property vcalendar. In SIF is a value 0,1,2,3
+             In vCal it is FREE, BUSY, TENTATIVE, OOF and must be converted. The property is put in the
+             complex ones list
+
 Funambol Outlook Sync Client 7.1.7
 ---------------------------------------
 2008-12-02
