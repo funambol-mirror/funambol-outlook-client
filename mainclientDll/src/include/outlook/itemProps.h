@@ -176,6 +176,7 @@ static WCHAR* complexCalendarProps[] = {
     {L"ReminderSoundFile"           },      // Because we need to check the 'ReminderPlaySound'
     {L"LastModificationTime"        },      // Used by SyncSource
     {L"Categories"                  },      // To convert separator: ";" into ","
+    {L"BusyStatus"                  },      // To convert FREE, BUSY, TENTATIVE, OOF string into 0, 1, 2, 3 digit
     {NULL}
 
 };

@@ -801,17 +801,13 @@ void printReport(SyncReport* sr, WindowsSyncSource** sources) {
         return;
     }
 
-    // Just to remove any "\r\n" at the end of system error messages.
-    char* lastErrorMsg = stringdup(getLastErrorMsg());
-    int i = strlen(lastErrorMsg) - 1;
-    if (i>0) {
-        while (lastErrorMsg[i] == '\n' || lastErrorMsg[i] == '\r') {
-            if (i==0) break;
-            lastErrorMsg[i] = 0;
-           i--;
-        }
+    //
+    // Allows to don't crash if the error message is NULL
+    //
+    const char* lastErrorMsg = getLastErrorMsg();
+    if (lastErrorMsg == NULL) {
+        setErrorF(getLastErrorCode(), "%s", "");
     }
-    if (lastErrorMsg) { delete [] lastErrorMsg; lastErrorMsg = NULL; }
 
     // Update SyncReport with last error from sync
     sr->setLastErrorCode(getLastErrorCode());
@@ -838,7 +834,7 @@ void printReport(SyncReport* sr, WindowsSyncSource** sources) {
         res.append(tmp);
     }
 
-    i=0;
+    int i=0;
     while (sources[i]) {
         ssr = sr->getSyncSourceReport(sources[i]->getConfig().getName());
         if (!ssr) {
