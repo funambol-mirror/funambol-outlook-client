@@ -56,7 +56,7 @@
 #include "event/OutlookSyncStatusListener.h"
 #include "event/OutlookSyncItemListener.h"
 #include "event/OutlookTransportListener.h"
-
+#include "base/adapter/PlatformAdapter.h"
 #include <string>
 using namespace std;
 
@@ -965,11 +965,17 @@ void upgradePlugin(int oldVersion) {
         oldDataPath += TEXT("\\");
         oldDataPath += TEXT("Outlook Plug-in");
 
+        static const StringBuffer& pt = PlatformAdapter::getConfigFolder();    
+        WCHAR* dataPath = toWideChar(pt.c_str());
+        wstring newDataPath(dataPath);
+        delete [] dataPath;
+        /*
         wstring newDataPath(appDataPath);
         newDataPath += TEXT("\\");
         newDataPath += FUNAMBOL_DIR_NAME;
         newDataPath += TEXT("\\");
         newDataPath += OLPLUGIN_DIR_NAME;
+        */
 
         // List of possible cache files to copy
         list<wstring> fileNames;

@@ -71,7 +71,7 @@
 
 /// Data files are stored under 'Doc&Settings\Application Data\Funambol\Outlook Client' folder.
 #define FUNAMBOL_DIR_NAME                  L"Funambol"
-#define OLPLUGIN_DIR_NAME                  L"Outlook Client"
+//#define OLPLUGIN_DIR_NAME                  L"OutlookClient" // the same as the PlatformAdapter
 #define MAX_PATH_LENGTH                     512
 
 //
