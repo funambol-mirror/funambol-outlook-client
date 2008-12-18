@@ -78,7 +78,7 @@ Forge file for Funambol Outlook Sync Client
                                                                                         build-install-sp"/-->
     
     <target name="release"        depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, build-install-cared"/>                                                                                                                                                                     
-    <target name="release-nodocs" depends="init, clean, build, register-dll, checkout-src, forge-src, compile, forge, build-install, build-install-sp"/> 
+    <target name="release-nodocs" depends="init, clean, build, register-dll, checkout-src, forge-src, compile, forge, build-install, build-install-cared"/> 
     <target name="docs "          depends="init, clean, build, checkout-src, create-docs, forge-src"/>
     
     
@@ -89,9 +89,10 @@ Forge file for Funambol Outlook Sync Client
         <antcall target="work-cared-dev"/>
     </target>
     <target name="work-dev"       depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install"/>    
-    <target name="work-sp-dev"    depends="init, build, register-dll, set-portal-password-key-dev, forge-no-checkout, restore-empty-password-key-dev, build-install-sp"/>   
     <target name="work-cared-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install-cared"/>    
     <target name="docs-dev"       depends="init, clean, build, create-docs-no-checkout"/>
+    <!-- old sp version. no more used... -->
+    <!--target name="work-sp-dev"    depends="init, build, register-dll, set-portal-password-key-dev, forge-no-checkout, restore-empty-password-key-dev, build-install-sp"/-->   
                                                               
     
     <!--
