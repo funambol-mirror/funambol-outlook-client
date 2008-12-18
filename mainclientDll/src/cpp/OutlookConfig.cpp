@@ -47,6 +47,8 @@
 #include "outlook/ClientApplication.h"
 #include "outlook/ClientException.h"
 
+#include "base/adapter/PlatformAdapter.h"
+
 using namespace std;
 
 
@@ -61,6 +63,7 @@ OutlookConfig* OutlookConfig::pinstance = NULL;
  */
 OutlookConfig* OutlookConfig::getInstance() {
     if (pinstance == NULL) {
+        PlatformAdapter::init(APPLICATION_URI);
         pinstance = new OutlookConfig;
     }
     return pinstance;
@@ -73,7 +76,10 @@ bool OutlookConfig::isInstantiated() {
 
 
 /// Constructor
-OutlookConfig::OutlookConfig() : DMTClientConfig(APPLICATION_URI) {
+//OutlookConfig::OutlookConfig() : DMTClientConfig(APPLICATION_URI) {
+OutlookConfig::OutlookConfig() {
+    
+    DMTClientConfig::initialize();
     winSourceConfigs      = NULL;
     workingDir            = NULL;
     logDir                = NULL;

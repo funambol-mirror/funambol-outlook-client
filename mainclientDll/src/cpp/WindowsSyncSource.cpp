@@ -2069,7 +2069,11 @@ void WindowsSyncSource::manageSourceError(const int errorCode, const char* error
     // Set the global errors (message and code)? 
     // No: we want only the source error, not a global sync error.
     //setError(errorCode, errorMsg);
+    if (errorMsg == NULL) {
+        LOG.error("manageSourceError: the errorMsg is NULL. Set to empty...");
+        errorMsg = "";
 
+    }
     report->setLastErrorCode(errorCode);
     report->setLastErrorMsg (errorMsg);
     

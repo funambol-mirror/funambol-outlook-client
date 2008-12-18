@@ -56,7 +56,7 @@
 #include "OutlookConfig.h"
 #include "utils.h"
 
-
+#include "base/adapter/PlatformAdapter.h"
 
 
 using namespace std;
@@ -287,7 +287,12 @@ void toWindows(char* str) {
  * @return   path of current user's tmp folder under 'application data'
  */
 WCHAR* readAppDataPath() {
-
+    
+    static const StringBuffer& pt = PlatformAdapter::getConfigFolder();    
+    WCHAR* dataPath = toWideChar(pt.c_str());
+    return dataPath;
+    
+    /*
     // Get 'application data' folder for current user.
     WCHAR appDataPath[MAX_PATH_LENGTH];
     if ( FAILED(SHGetFolderPath(NULL, 
@@ -307,6 +312,7 @@ WCHAR* readAppDataPath() {
     wsprintf(dataPath, L"%s\\%s\\%s", appDataPath, FUNAMBOL_DIR_NAME, OLPLUGIN_DIR_NAME);
 
     return dataPath;
+    */
 }
 
 
@@ -442,7 +448,16 @@ int writeToFile(const string& content, const string& filePath, const char* mode)
  */
 int makeDataDirs() {
     int err = 0;
-
+    
+    static const StringBuffer& pt = PlatformAdapter::getConfigFolder();    
+    err = createFolder(pt.c_str());
+    if (err) {
+        setErrorF(getLastErrorCode(), ERR_DIR_CREATE, pt.c_str());
+        return 1;   
+    }
+    return err;
+    
+    /*
     // Get 'application data' folder for current user.
     WCHAR appDataPath[MAX_PATH_LENGTH];
     if ( FAILED(SHGetFolderPath(NULL, 
@@ -456,7 +471,7 @@ int makeDataDirs() {
         delete [] msg;
         return 1;
     }
-
+    
     // Create 'Funambol' directory
     wstring tmpPath = appDataPath;
     tmpPath += L"\\";
@@ -481,6 +496,7 @@ int makeDataDirs() {
     }
 
     return 0;
+    */
 }
 
 
