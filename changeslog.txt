@@ -1,3 +1,11 @@
+Funambol Outlook Sync Client 7.1.9
+---------------------------------------
+2008-12-18
+    - magi: Fixed issue related to the "Outlook Client" used by the plug-in and the "OutlookClient" name used also from the api. 
+            They used now the same "OutlookClient" from the PlatformAdapter class of the api.
+            Be sure the upgrade come from a 7.0.x version (previous ga).
+            Fixed minor issue related to japanese chars
+
 Funambol Outlook Sync Client 7.1.8
 ---------------------------------------
 2008-12-14

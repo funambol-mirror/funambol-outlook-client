@@ -40,7 +40,7 @@
 !define PRODUCT_WEB_SITE                        "http://www.funambol.com"
 !define STARTMENU_CONTEXT                       "Funambol\Outlook Sync Client"
 !define INSTALLDIR_CONTEXT                      "Funambol\Outlook Client"
-!define DATAFILES_CONTEXT                       "Funambol\Outlook Client"
+!define DATAFILES_CONTEXT                       "Funambol\OutlookClient"
 !define MICROSOFT_OUTLOOK                       "Microsoft Outlook"
 !define MICROSOFT_OUTLOOK_CLASS_NAME            "rctrl_renwnd32"
 !define PLUGIN_UI_CLASS_NAME                    "FunambolApp"
