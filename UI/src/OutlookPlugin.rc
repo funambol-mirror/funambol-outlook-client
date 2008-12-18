@@ -546,7 +546,7 @@ BEGIN
     END
     POPUP "&Help", GRAYED
     BEGIN
-        MENUITEM "&About Outlook Sync Client...",    ID_APP_ABOUT
+        MENUITEM "&About Outlook Sync Client...", ID_APP_ABOUT
     END
 END
 
@@ -782,7 +782,7 @@ BEGIN
     IDS_DAYS                "days"
     IDS_MSG_CLOSE_SYNC_IN_PROGRESS 
                             "Synchronization in progress. Please wait or cancel it."
-    IDS_ABOUT_COPYRIGHT     "Copyright © 2003 - 2008 Funambol, Inc.\nAll rights reserved."
+    IDS_ABOUT_COPYRIGHT     "Copyright © 2003 - 2009 Funambol, Inc.\nAll rights reserved."
     IDS_TEXT_SYNC_ALREADY_RUNNING 
                             "Sync already in progress.\nPlease wait until the sync is finished."
     IDS_SYNC_ABORTED_AVOID_FULLSYNC 
