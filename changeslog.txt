@@ -1,3 +1,9 @@
+Funambol Outlook Sync Client 7.1.10
+---------------------------------------
+2009-01-09
+    - magi: Fixed link to get user guide
+            Build with new sdk api (7.1.4) 
+
 Funambol Outlook Sync Client 7.1.9
 ---------------------------------------
 2008-12-18
