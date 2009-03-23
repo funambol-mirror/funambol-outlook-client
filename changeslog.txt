@@ -1,5 +1,6 @@
 2009-03-23
     - toccy: added PicturesSyncsource class, to handle pictures sync.
+    - toccy: added default configuration and fixed config upgrade to handle pictures source.
 
 *** Created branch US1655 (from r88) for Pictures Sync ***
 

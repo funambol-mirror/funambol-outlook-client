@@ -147,6 +147,14 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setEncoding         ("b64");
         sc->setSupportedTypes   ("text/x-s4j-sifn:1.0,text/x-vnote:1.1");
     }
+    else if (wname == PICTURE){
+        sc->setURI              ("picture");
+        sc->setType             ("application/*");
+        sc->setVersion          ("");
+        sc->setEncoding         ("b64");
+        sc->setSupportedTypes   ("application/*");
+        sc->setSync             ("one-way-from-server");    // *** syncmode fixed to one-way-from-server ***
+    }
 
     if (name) delete [] name;
     return sc;
