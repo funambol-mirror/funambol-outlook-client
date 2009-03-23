@@ -66,7 +66,8 @@ END_MESSAGE_MAP()
 
 
 // CCustomPane message handlers
-void CCustomPane::OnMouseMove(UINT nFlags, CPoint point){
+void CCustomPane::OnMouseMove(UINT nFlags, CPoint point) {
+
     if( (state == STATE_SYNC) || (state == STATE_PANE_DISABLED) )
         return;
 
@@ -86,38 +87,47 @@ void CCustomPane::OnMouseMove(UINT nFlags, CPoint point){
             SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpBlue);
         }
 
+        // TODO: move to class member?
+        CSyncForm* mainForm = (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1);
+
         // when the mouse cursor is over a source pane we show the arrow icons
-        if(type == PANE_TYPE_CONTACTS){
-            hPrevStatusIcon = ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusContacts.GetIcon();
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusContacts.ShowWindow(SW_SHOW);
-        };
+        if (type == PANE_TYPE_CONTACTS){
+            hPrevStatusIcon = mainForm->iconStatusContacts.GetIcon();
+            mainForm->iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
+            mainForm->iconStatusContacts.ShowWindow(SW_SHOW);
+        }
 
-        if(type == PANE_TYPE_CALENDAR){
-             hPrevStatusIcon = ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusCalendar.GetIcon();
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusCalendar.ShowWindow(SW_SHOW);
-        };
+        if (type == PANE_TYPE_CALENDAR){
+             hPrevStatusIcon = mainForm->iconStatusCalendar.GetIcon();
+            mainForm->iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
+            mainForm->iconStatusCalendar.ShowWindow(SW_SHOW);
+        }
 
-        if(type == PANE_TYPE_TASKS){
-            hPrevStatusIcon = ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusTasks.GetIcon();
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusTasks.ShowWindow(SW_SHOW);
-        };
+        if (type == PANE_TYPE_TASKS){
+            hPrevStatusIcon = mainForm->iconStatusTasks.GetIcon();
+            mainForm->iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
+            mainForm->iconStatusTasks.ShowWindow(SW_SHOW);
+        }
 
-        if(type == PANE_TYPE_NOTES){
-            hPrevStatusIcon = ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusNotes.GetIcon();
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusNotes.ShowWindow(SW_SHOW);
-        };
+        if (type == PANE_TYPE_NOTES){
+            hPrevStatusIcon = mainForm->iconStatusNotes.GetIcon();
+            mainForm->iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
+            mainForm->iconStatusNotes.ShowWindow(SW_SHOW);
+        }
+        if (type == PANE_TYPE_PICTURES){
+            hPrevStatusIcon = mainForm->iconStatusPictures.GetIcon();
+            mainForm->iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
+            mainForm->iconStatusPictures.ShowWindow(SW_SHOW);
+        }
 
         Invalidate();
         
-    };    
+    }   
     CStatic::OnMouseMove(nFlags, point);
 }
 
-void CCustomPane::OnPaint(){
+void CCustomPane::OnPaint() {
+
     CPaintDC dc(this);
     CDC tempdc;
     tempdc.CreateCompatibleDC(&dc);
@@ -140,70 +150,77 @@ void CCustomPane::OnPaint(){
     
     dc.SelectObject(pOldBitmap);
 
+    // TODO: move to class member?
+    CSyncForm* mainForm = (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1);
+
     if (type == PANE_TYPE_SYNC){
 
         if(bMouseCaptured) {
             // Mouse move: show blue arrows
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusSync.ShowWindow(SW_SHOW);
+            mainForm->iconStatusSync.ShowWindow(SW_SHOW);
         }
         else {
             if( ((CMainSyncFrame*)AfxGetMainWnd())->bSyncStarted && !getConfig()->getScheduledSync() ) {
                 // Sync started, not scheduled: show blue arrows
-                ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusSync.ShowWindow(SW_SHOW);
+                mainForm->iconStatusSync.ShowWindow(SW_SHOW);
             }
             else {
                 // Sync not started or sched sync: hide blue arrows
-                ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusSync.ShowWindow(SW_HIDE);
+                mainForm->iconStatusSync.ShowWindow(SW_HIDE);
             }
         }
     }
 
     tempdc.DeleteDC();
-    // update all stuff above it
-   ( (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->repaintPaneControls(type);
 
+    // update all stuff above it
+    mainForm->repaintPaneControls(type);
 }
 
-LRESULT CCustomPane::OnMouseLeave(WPARAM wParam, LPARAM lParam){
-// we restore the visual state of the pane, as it was when the mouse cursor entered it
+
+LRESULT CCustomPane::OnMouseLeave(WPARAM wParam, LPARAM lParam) {
+
+    // we restore the visual state of the pane, as it was when the mouse cursor entered it
     if(bMouseCaptured){
         bMouseCaptured = false;
-
 
         if(type == PANE_TYPE_SYNC) {
             SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpDark);
             Invalidate();
         }
         else {
+            // TODO: move to class member?
+            CSyncForm* mainForm = (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1);
+
             if( ((CMainSyncFrame*)AfxGetMainWnd())->bSyncStarted == false || getConfig()->getScheduledSync() ) {
                 
                 SetBitmap((HBITMAP)((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
 
-                if( (type == PANE_TYPE_CONTACTS) && (state != STATE_SYNC) ){
-                    ( (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusContacts.SetIcon(hPrevStatusIcon);
-                    Invalidate();
-                };
-
-                if( (type == PANE_TYPE_CALENDAR) && (state != STATE_SYNC) ){
-                    ( (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusCalendar.SetIcon(hPrevStatusIcon);
+                if ( (type == PANE_TYPE_CONTACTS) && (state != STATE_SYNC) ) {
+                    mainForm->iconStatusContacts.SetIcon(hPrevStatusIcon);
                     Invalidate();
                 }
-
-                if( (type == PANE_TYPE_TASKS) && (state != STATE_SYNC) ){
-                    ( (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusTasks.SetIcon(hPrevStatusIcon);
+                if ( (type == PANE_TYPE_CALENDAR) && (state != STATE_SYNC) ) {
+                    mainForm->iconStatusCalendar.SetIcon(hPrevStatusIcon);
                     Invalidate();
                 }
-
-                if( (type == PANE_TYPE_NOTES) && (state != STATE_SYNC) ){
-                    ( (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->iconStatusNotes.SetIcon(hPrevStatusIcon);
+                if ( (type == PANE_TYPE_TASKS) && (state != STATE_SYNC) ) {
+                    mainForm->iconStatusTasks.SetIcon(hPrevStatusIcon);
+                    Invalidate();
+                }
+                if ( (type == PANE_TYPE_NOTES) && (state != STATE_SYNC) ) {
+                    mainForm->iconStatusNotes.SetIcon(hPrevStatusIcon);
+                    Invalidate();
+                }
+                if ( (type == PANE_TYPE_PICTURES) && (state != STATE_SYNC) ) {
+                    mainForm->iconStatusPictures.SetIcon(hPrevStatusIcon);
                     Invalidate();
                 }
             }
         }
 
         // update all stuff above it
-       //( (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->repaintPaneControls(type);
+        //mainForm->repaintPaneControls(type);
     }
-   
     return 0;
 }

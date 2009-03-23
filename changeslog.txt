@@ -3,6 +3,7 @@
     - toccy: added PicturesSyncsource class and pictures configuration in DLL, to handle pictures sync.
     - toccy: added utils functions to manage source name/ID conversion, fixed printReport.
     - toccy: Now SyncSource** array passed to WindowsSyncClient is no more a WindowsSyncSource**, because one source is a PicturesncSource.
+    - toccy: some code cleaning and reformatting of UI/MainSyncfOrm, UI/SyncForm, UI/CustomPane.
 
 *** Created branch US1655 (from r88) for Pictures Sync ***
 

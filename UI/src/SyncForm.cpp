@@ -51,22 +51,17 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
-// CSyncForm
 
 IMPLEMENT_DYNCREATE(CSyncForm, CFormView)
 
 CSyncForm::CSyncForm()
 	: CFormView(CSyncForm::IDD)
 {
-	//{{AFX_DATA_INIT(CSyncForm)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
-
     syncSourceContactState  = SYNCSOURCE_STATE_OK; 
     syncSourceCalendarState = SYNCSOURCE_STATE_OK; 
     syncSourceTaskState     = SYNCSOURCE_STATE_OK;    
-    syncSourceNoteState     = SYNCSOURCE_STATE_OK; 
+    syncSourceNoteState     = SYNCSOURCE_STATE_OK;
+    syncSourcePictureState  = SYNCSOURCE_STATE_OK; 
 
     lockedUI = false;
 }
@@ -78,62 +73,65 @@ CSyncForm::~CSyncForm()
 void CSyncForm::DoDataExchange(CDataExchange* pDX)
 {
     CFormView::DoDataExchange(pDX);
-    //{{AFX_DATA_MAP(CSyncForm)
-    // NOTE: the ClassWizard will add DDX and DDV calls here
-    DDX_Control(pDX, IDC_MAIN_BUT_START, butStart);
+
+    DDX_Control(pDX, IDC_MAIN_BUT_START,        butStart);
+    
     DDX_Control(pDX, IDC_MAIN_ICON_CONTACTS, iconContacts);
     DDX_Control(pDX, IDC_MAIN_ICON_CALENDAR, iconCalendar);
-    DDX_Control(pDX, IDC_MAIN_ICON_TASKS, iconTasks);
-    DDX_Control(pDX, IDC_MAIN_ICON_NOTES, iconNotes);
-    //}}AFX_DATA_MAP
+    DDX_Control(pDX, IDC_MAIN_ICON_TASKS,    iconTasks);
+    DDX_Control(pDX, IDC_MAIN_ICON_NOTES,    iconNotes);
+    DDX_Control(pDX, IDC_MAIN_ICON_PICTURES, iconPictures);
+
+    DDX_Control(pDX, IDC_MAIN_ICON_STATUS_SYNC,     iconStatusSync);
     DDX_Control(pDX, IDC_MAIN_ICON_STATUS_CONTACTS, iconStatusContacts);
     DDX_Control(pDX, IDC_MAIN_ICON_STATUS_CALENDAR, iconStatusCalendar);
-    DDX_Control(pDX, IDC_MAIN_ICON_STATUS_TASKS, iconStatusTasks);
-    DDX_Control(pDX, IDC_MAIN_ICON_STATUS_NOTES, iconStatusNotes);
-    DDX_Control(pDX, IDC_MAIN_ICON_STATUS_SYNC, iconStatusSync);
-    DDX_Control(pDX, IDC_MAIN_BK_SYNC, paneSync);
+    DDX_Control(pDX, IDC_MAIN_ICON_STATUS_TASKS,    iconStatusTasks);
+    DDX_Control(pDX, IDC_MAIN_ICON_STATUS_NOTES,    iconStatusNotes);
+    DDX_Control(pDX, IDC_MAIN_ICON_STATUS_PICTURES, iconStatusPictures);
+
+    DDX_Control(pDX, IDC_MAIN_BK_SYNC,     paneSync);
     DDX_Control(pDX, IDC_MAIN_BK_CONTACTS, paneContacts);
     DDX_Control(pDX, IDC_MAIN_BK_CALENDAR, paneCalendar);
-    DDX_Control(pDX, IDC_MAIN_BK_TASKS, paneTasks);
-    DDX_Control(pDX, IDC_MAIN_BK_NOTES, paneNotes);
+    DDX_Control(pDX, IDC_MAIN_BK_TASKS,    paneTasks);
+    DDX_Control(pDX, IDC_MAIN_BK_NOTES,    paneNotes);
+    DDX_Control(pDX, IDC_MAIN_BK_PICTURES, panePictures);
 }
 
 
 BEGIN_MESSAGE_MAP(CSyncForm, CFormView)
-	//{{AFX_MSG_MAP(CSyncForm)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-	//}}AFX_MSG_MAP
+
     ON_MESSAGE( WM_INITDIALOG, OnInitForm ) 
     ON_WM_NCPAINT( )
     ON_WM_CTLCOLOR()
     ON_WM_ERASEBKGND()
     
     ON_STN_CLICKED(IDC_MAIN_BK_CONTACTS, &CSyncForm::OnStnClickedMainBkContacts)
-    ON_STN_CLICKED(IDC_MAIN_BK_SYNC, &CSyncForm::OnStnClickedMainBkSync)
+    ON_STN_CLICKED(IDC_MAIN_BK_SYNC,     &CSyncForm::OnStnClickedMainBkSync)
     ON_STN_CLICKED(IDC_MAIN_BK_CALENDAR, &CSyncForm::OnStnClickedMainBkCalendar)
-    ON_STN_CLICKED(IDC_MAIN_BK_TASKS, &CSyncForm::OnStnClickedMainBkTasks)
-    ON_STN_CLICKED(IDC_MAIN_BK_NOTES, &CSyncForm::OnStnClickedMainBkNotes)
+    ON_STN_CLICKED(IDC_MAIN_BK_TASKS,    &CSyncForm::OnStnClickedMainBkTasks)
+    ON_STN_CLICKED(IDC_MAIN_BK_NOTES,    &CSyncForm::OnStnClickedMainBkNotes)
+    ON_STN_CLICKED(IDC_MAIN_BK_PICTURES, &CSyncForm::OnStnClickedMainBkPictures)
+
 END_MESSAGE_MAP()
+
 
 /////////////////////////////////////////////////////////////////////////////
 // CSyncForm diagnostics
-
 #ifdef _DEBUG
 void CSyncForm::AssertValid() const
 {
 	CFormView::AssertValid();
 }
-
 void CSyncForm::Dump(CDumpContext& dc) const
 {
 	CFormView::Dump(dc);
 }
 #endif //_DEBUG
 
+
 /////////////////////////////////////////////////////////////////////////////
 // CSyncForm message handlers
-
-LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM){
+LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM) {
     CFormView::OnInitialUpdate(); //!!
 
     CString s1; 
@@ -145,14 +143,16 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM){
     // Load pane titles
     contactsLabel.LoadString(IDS_MAIN_CONTACTS);
     calendarLabel.LoadString(IDS_MAIN_CALENDAR);
-    tasksLabel.LoadString(IDS_MAIN_TASKS);
-    notesLabel.LoadString(IDS_MAIN_NOTES);
+    tasksLabel.LoadString   (IDS_MAIN_TASKS);
+    notesLabel.LoadString   (IDS_MAIN_NOTES);
+    picturesLabel.LoadString(IDS_MAIN_PICTURES);
 
     // TODO: for now icon states not really used anywhere
     iconContacts.state = STATE_INVISIBLE;
     iconCalendar.state = STATE_INVISIBLE;
     iconTasks.state    = STATE_INVISIBLE;
     iconNotes.state    = STATE_INVISIBLE;
+    iconPictures.state = STATE_INVISIBLE;
 
     butStart.SetIcon(::LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_LOGO)));
 
@@ -173,12 +173,14 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM){
     GetDlgItem(IDC_MAIN_STATIC_CALENDAR)->SetFont(&fontBold);
     GetDlgItem(IDC_MAIN_STATIC_TASKS)->SetFont(&fontBold);
     GetDlgItem(IDC_MAIN_STATIC_NOTES)->SetFont(&fontBold);
+    GetDlgItem(IDC_MAIN_STATIC_PICTURES)->SetFont(&fontBold);
     GetDlgItem(IDC_MAIN_MSG_PRESS)->SetFont(&fontBold);
 
     GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->SetFont(&fontNormal);
     GetDlgItem(IDC_MAIN_STATIC_STATUS_CALENDAR)->SetFont(&fontNormal);
     GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->SetFont(&fontNormal);
     GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->SetFont(&fontNormal);
+    GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->SetFont(&fontNormal);
 
     iconStatusSync.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL_BLUE)));
     paneSync.type     = PANE_TYPE_SYNC; 
@@ -186,11 +188,13 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM){
     paneCalendar.type = PANE_TYPE_CALENDAR;
     paneTasks.type    = PANE_TYPE_TASKS; 
     paneNotes.type    = PANE_TYPE_NOTES;
+    panePictures.type = PANE_TYPE_PICTURES;
 
     paneContacts.state = STATE_NORMAL; 
     paneCalendar.state = STATE_NORMAL; 
     paneTasks.state    = STATE_NORMAL; 
-    paneNotes.state    = STATE_NORMAL; 
+    paneNotes.state    = STATE_NORMAL;
+    panePictures.state = STATE_NORMAL; 
 
     refreshSources();
     VERIFY(brushHollow.CreateStockObject(HOLLOW_BRUSH));
@@ -202,7 +206,7 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM){
     ::ReleaseDC(0,hdc);
 
     double dx = FRAME_MAIN_X * ((double)dpiX/96);      // default DPI = 96
-    if( (dpiX != 96) || (dpiY != 96) ){
+    if( (dpiX != 96) || (dpiY != 96) ) {
         CRect rectIcon;
    
         iconStatusSync.GetWindowRect(&rectIcon);
@@ -239,6 +243,13 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM){
             (int)(dx - rectIcon.Width()- 70),
             rectIcon.TopLeft().y, rectIcon.Width(),
             rectIcon.Height(), SWP_SHOWWINDOW);
+
+        iconStatusPictures.GetWindowRect(&rectIcon);
+        ScreenToClient(&rectIcon);
+        iconStatusPictures.SetWindowPos(&CWnd::wndTop, 
+            (int)(dx - rectIcon.Width()- 70),
+            rectIcon.TopLeft().y, rectIcon.Width(),
+            rectIcon.Height(), SWP_SHOWWINDOW);
     }
 
     return 0;
@@ -246,18 +257,25 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM){
 
 void CSyncForm::showSyncControls( BOOL show )
 {
-    if(!show){
-        iconContacts.ShowWindow(SW_HIDE); iconCalendar.ShowWindow(SW_HIDE);
-        iconTasks.ShowWindow(SW_HIDE); iconNotes.ShowWindow(SW_HIDE);
+    if (!show) {
+        iconContacts.ShowWindow(SW_HIDE); 
+        iconCalendar.ShowWindow(SW_HIDE);
+        iconTasks.ShowWindow(SW_HIDE); 
+        iconNotes.ShowWindow(SW_HIDE);
+        iconPictures.ShowWindow(SW_HIDE);
+
         GetDlgItem(IDC_MAIN_STATIC_CONTACTS)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_CALENDAR)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_TASKS)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_NOTES)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_MAIN_STATIC_PICTURES)->ShowWindow(SW_HIDE);
+
         GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_STATUS_CALENDAR)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->ShowWindow(SW_HIDE);
-    };
+        GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->ShowWindow(SW_HIDE);
+    }
 }
 
 void CSyncForm::OnNcPaint(){
@@ -265,9 +283,7 @@ void CSyncForm::OnNcPaint(){
     CFormView::OnNcPaint();
 
     CScrollView::SetScrollSizes(MM_TEXT, CSize(0,0));
-    //CMainSyncFrame *pFrame=(CMainSyncFrame*)AfxGetMainWnd();
-
-    CScrollView::SetScrollSizes(MM_TEXT, CSize(0,0)); 
+    //CScrollView::SetScrollSizes(MM_TEXT, CSize(0,0));         <---- double ???
 }
 
 
@@ -287,9 +303,13 @@ void CSyncForm::changeTasksStatus(CString& status){
 void CSyncForm::changeNotesStatus(CString& status){
     notesStatusLabel = status;
 }
+void CSyncForm::changePicturesStatus(CString& status){
+    picturesStatusLabel = status;
+}
 
 
-HBRUSH CSyncForm::OnCtlColor( CDC* pDC, CWnd* pWnd, UINT nCtlColor){
+HBRUSH CSyncForm::OnCtlColor( CDC* pDC, CWnd* pWnd, UINT nCtlColor) 
+{
     HBRUSH hbr = CFormView::OnCtlColor(pDC, pWnd, nCtlColor);
 
     pDC->SetBkMode(TRANSPARENT);
@@ -299,7 +319,7 @@ HBRUSH CSyncForm::OnCtlColor( CDC* pDC, CWnd* pWnd, UINT nCtlColor){
     }
     if(pWnd->GetRuntimeClass() == RUNTIME_CLASS(CAnimatedIcon) ){
         return HBRUSH(brushHollow);
-    };
+    }
     
     switch(nCtlColor) {
             case CTLCOLOR_STATIC:
@@ -315,12 +335,14 @@ HBRUSH CSyncForm::OnCtlColor( CDC* pDC, CWnd* pWnd, UINT nCtlColor){
     return hbr;
 }
 
-void CSyncForm::refreshSources(){
+void CSyncForm::refreshSources() {
+
     // refresh all sources
     refreshSource(SYNCSOURCE_CONTACTS);
     refreshSource(SYNCSOURCE_CALENDAR);
     refreshSource(SYNCSOURCE_TASKS);
     refreshSource(SYNCSOURCE_NOTES);
+    refreshSource(SYNCSOURCE_PICTURES);
 
     // TODO: this is needed
     if(AfxGetMainWnd() != NULL){
@@ -328,6 +350,7 @@ void CSyncForm::refreshSources(){
         paneCalendar.SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
         paneTasks.SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
         paneNotes.SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
+        panePictures.SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
     }
     
 }
@@ -344,14 +367,14 @@ void CSyncForm::OnDraw(CDC* pDC){
     GetClientRect(&rect);
     CDC dc;
     dc.CreateCompatibleDC(pDC);
-    
 
-    CRect rect1;    GetWindowRect(&rect1); ScreenToClient(&rect1);
-    
+    CRect rect1;
+    GetWindowRect(&rect1);
+    ScreenToClient(&rect1);
+
     pDC->FillSolidRect(rect, COLOR_EXT_PANE);
 
     // no need for color, already has backgrounds
-
     dc.DeleteDC();
 }
 
@@ -362,7 +385,7 @@ void CSyncForm::repaintPaneControls(int paneType) {
         butStart.Invalidate();
         GetDlgItem(IDC_MAIN_MSG_PRESS)->Invalidate();
     }
-    if(paneType == PANE_TYPE_CONTACTS){
+    else if (paneType == PANE_TYPE_CONTACTS) {
         iconStatusContacts.Invalidate();
         iconContacts.Invalidate();
         SetDlgItemText(IDC_MAIN_STATIC_CONTACTS, contactsLabel);                    // Always fixed
@@ -370,7 +393,7 @@ void CSyncForm::repaintPaneControls(int paneType) {
         SetDlgItemText(IDC_MAIN_STATIC_STATUS_CONTACTS, contactsStatusLabel);       // Use the buffer set by 'changeContactsStatus'
         GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->Invalidate();
     }
-    if(paneType == PANE_TYPE_CALENDAR){
+    else if (paneType == PANE_TYPE_CALENDAR) {
         iconStatusCalendar.Invalidate();
         iconCalendar.Invalidate();
         SetDlgItemText(IDC_MAIN_STATIC_CALENDAR, calendarLabel);                    // Always fixed
@@ -378,7 +401,7 @@ void CSyncForm::repaintPaneControls(int paneType) {
         SetDlgItemText(IDC_MAIN_STATIC_STATUS_CALENDAR, calendarStatusLabel);       // Use the buffer set by 'changeCalendarStatus'
         GetDlgItem(IDC_MAIN_STATIC_STATUS_CALENDAR)->Invalidate();
     }
-    if(paneType == PANE_TYPE_TASKS){
+    else if (paneType == PANE_TYPE_TASKS) {
         iconStatusTasks.Invalidate();
         iconTasks.Invalidate();
         SetDlgItemText(IDC_MAIN_STATIC_TASKS, tasksLabel);                          // Always fixed
@@ -386,13 +409,21 @@ void CSyncForm::repaintPaneControls(int paneType) {
         SetDlgItemText(IDC_MAIN_STATIC_STATUS_TASKS, tasksStatusLabel);             // Use the buffer set by 'changeTasksStatus'
         GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->Invalidate();
     }
-    if(paneType == PANE_TYPE_NOTES){
+    else if (paneType == PANE_TYPE_NOTES) {
         iconStatusNotes.Invalidate();
         iconNotes.Invalidate();
         SetDlgItemText(IDC_MAIN_STATIC_NOTES, notesLabel);                          // Always fixed
         GetDlgItem(IDC_MAIN_STATIC_NOTES)->Invalidate();
         SetDlgItemText(IDC_MAIN_STATIC_STATUS_NOTES, notesStatusLabel);             // Use the buffer set by 'changeNotesStatus'
         GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->Invalidate();
+    }
+    else if (paneType == PANE_TYPE_PICTURES) {
+        iconStatusPictures.Invalidate();
+        iconPictures.Invalidate();
+        SetDlgItemText(IDC_MAIN_STATIC_PICTURES, picturesLabel);                     // Always fixed
+        GetDlgItem(IDC_MAIN_STATIC_PICTURES)->Invalidate();
+        SetDlgItemText(IDC_MAIN_STATIC_STATUS_PICTURES, picturesStatusLabel);        // Use the buffer set by 'changePicturesStatus'
+        GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->Invalidate();
     }
 }
 
@@ -442,8 +473,9 @@ void CSyncForm::OnStnClickedMainBkContacts()
         // Start Sync of a single source
         ((CMainSyncFrame*)AfxGetMainWnd())->backupSyncModeSettings();
         getConfig()->getSyncSourceConfig(APPOINTMENT_)->setSync(syncModeName(SYNC_NONE));
-        getConfig()->getSyncSourceConfig(TASK_)->setSync(syncModeName(SYNC_NONE));
-        getConfig()->getSyncSourceConfig(NOTE_)->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(TASK_       )->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(NOTE_       )->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(PICTURE_    )->setSync(syncModeName(SYNC_NONE));
 
         ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
     }
@@ -469,8 +501,9 @@ void CSyncForm::OnStnClickedMainBkCalendar()
         ((CMainSyncFrame*)AfxGetMainWnd())->backupSyncModeSettings();
         // start a sync for calendar
         getConfig()->getSyncSourceConfig(CONTACT_)->setSync(syncModeName(SYNC_NONE));
-        getConfig()->getSyncSourceConfig(TASK_)->setSync(syncModeName(SYNC_NONE));
-        getConfig()->getSyncSourceConfig(NOTE_)->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(TASK_   )->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(NOTE_   )->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(PICTURE_)->setSync(syncModeName(SYNC_NONE));
 
         ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
     }
@@ -495,8 +528,9 @@ void CSyncForm::OnStnClickedMainBkTasks()
         // Start Sync of a single source
         ((CMainSyncFrame*)AfxGetMainWnd())->backupSyncModeSettings();
         getConfig()->getSyncSourceConfig(APPOINTMENT_)->setSync(syncModeName(SYNC_NONE));
-        getConfig()->getSyncSourceConfig(CONTACT_)->setSync(syncModeName(SYNC_NONE));
-        getConfig()->getSyncSourceConfig(NOTE_)->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(CONTACT_    )->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(NOTE_       )->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(PICTURE_    )->setSync(syncModeName(SYNC_NONE));
 
         ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
     }
@@ -521,18 +555,48 @@ void CSyncForm::OnStnClickedMainBkNotes()
         // Start Sync of a single source
         ((CMainSyncFrame*)AfxGetMainWnd())->backupSyncModeSettings();
         getConfig()->getSyncSourceConfig(APPOINTMENT_)->setSync(syncModeName(SYNC_NONE));
-        getConfig()->getSyncSourceConfig(CONTACT_)->setSync(syncModeName(SYNC_NONE));
-        getConfig()->getSyncSourceConfig(TASK_)->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(CONTACT_    )->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(TASK_       )->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(PICTURE_    )->setSync(syncModeName(SYNC_NONE));
 
         ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
     }
 }
 
+
+void CSyncForm::OnStnClickedMainBkPictures()
+{
+    if (lockedUI) {
+        return;
+    }
+
+    if ( (panePictures.state == STATE_PANE_DISABLED) || (panePictures.state == STATE_SYNC) )
+        return;
+
+    if (checkSyncInProgress()) {
+        // It's running a sync -> error msg.
+        CString s1;
+        s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
+        MessageBox(s1);
+    }
+    else {
+        // Start Sync of a single source
+        ((CMainSyncFrame*)AfxGetMainWnd())->backupSyncModeSettings();
+        getConfig()->getSyncSourceConfig(APPOINTMENT_)->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(CONTACT_    )->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(TASK_       )->setSync(syncModeName(SYNC_NONE));
+        getConfig()->getSyncSourceConfig(NOTE_       )->setSync(syncModeName(SYNC_NONE));
+
+        ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
+    }
+}
+
+
 void CSyncForm::refreshSource( int sourceId )
 {
     CString s1;
 
-    if(sourceId == SYNCSOURCE_CONTACTS){
+    if (sourceId == SYNCSOURCE_CONTACTS) {
         BOOL enableContacts;
         unsigned long lastSyncContacts=0;
 
@@ -579,9 +643,9 @@ void CSyncForm::refreshSource( int sourceId )
         SetDlgItemText(IDC_MAIN_STATIC_STATUS_CONTACTS, s1);
         paneContacts.Invalidate();
     }
-    
 
-    if(sourceId == SYNCSOURCE_CALENDAR){
+
+    else if (sourceId == SYNCSOURCE_CALENDAR) {
         BOOL enableCalendar;
         unsigned long lastSyncCalendar=0;
 
@@ -630,8 +694,7 @@ void CSyncForm::refreshSource( int sourceId )
         paneCalendar.Invalidate();
     }
 
-
-    if(sourceId == SYNCSOURCE_TASKS){
+    else if (sourceId == SYNCSOURCE_TASKS) {
         BOOL enableTasks;
         unsigned long lastSyncTasks=0;
 
@@ -680,7 +743,7 @@ void CSyncForm::refreshSource( int sourceId )
     }
 
 
-    if(sourceId == SYNCSOURCE_NOTES){
+    else if (sourceId == SYNCSOURCE_NOTES) {
         BOOL enableNotes;
         unsigned long lastSyncNotes=0;
         iconStatusNotes.StopAnim();
@@ -741,6 +804,77 @@ void CSyncForm::refreshSource( int sourceId )
         SetDlgItemText(IDC_MAIN_STATIC_NOTES, notesLabel);    // Set directly here, pane could be disabled
         SetDlgItemText(IDC_MAIN_STATIC_STATUS_NOTES, s1);
         paneNotes.Invalidate();
+    }
+
+
+    else if (sourceId == SYNCSOURCE_PICTURES) {
+        BOOL enablePictures;
+        unsigned long lastSyncPictures = 0;
+        iconStatusPictures.StopAnim();
+
+        if (isSourceEnabled(PICTURE)) {
+            // source enabled
+
+            WindowsSyncSourceConfig* ssc = getConfig()->getSyncSourceConfig(PICTURE_);
+            if (!ssc) {
+                printLog("configuration not found for source picture", "ERROR");
+                // TODO: use string resources
+                MessageBox(L"Configuration error: please reinstall the application.");
+                exit(1);
+                return;
+            }
+
+            enablePictures = (strcmp(getConfig()->getSyncSourceConfig(PICTURE_)->getSync(), SYNCTYPE_NONE) != 0);
+            GetDlgItem(IDC_MAIN_STATIC_PICTURES)->EnableWindow(enablePictures);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->EnableWindow(enablePictures);
+            if(enablePictures) {
+                panePictures.ShowWindow(SW_NORMAL);
+                panePictures.state = STATE_NORMAL;
+                iconPictures.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_PICTURES)));
+            }
+            else {
+                panePictures.ShowWindow(SW_HIDE);
+                iconPictures.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_PICTURES_GREY)));
+            }
+            iconPictures.EnableWindow(enablePictures);
+        
+        }
+        else {
+            // source disabled: hide the controls
+            iconPictures.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_PICTURES)));
+            iconPictures.ShowWindow(SW_HIDE); 
+            GetDlgItem(IDC_MAIN_STATIC_PICTURES)->ShowWindow(SW_HIDE);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->ShowWindow(SW_HIDE);
+            panePictures.ShowWindow(SW_HIDE);
+        }
+
+        lastSyncPictures = getConfig()->getSyncSourceConfig(PICTURE_)->getEndTimestamp();
+
+
+        // check if the last sync failed
+        if (syncSourcePictureState == SYNCSOURCE_STATE_NOT_SYNCED){
+            s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
+            iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+            panePictures.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
+        }
+        // check if the last sync failed
+        else if (syncSourcePictureState == SYNCSOURCE_STATE_CANCELED){
+            s1.LoadString(IDS_MAIN_LAST_SYNC_CANCELED);
+            iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+            panePictures.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
+        }
+        else if (lastSyncPictures == 0) {
+            s1.LoadString(IDS_NOT_SYNCHRONIZED); 
+        }
+        else {
+            CTime timeSyncPictures(lastSyncPictures);
+            s1.LoadString(IDS_SYNCHRONIZED); s1+= " ";
+            s1 += timeSyncPictures.Format(LAST_SYNC_TIME_FORMAT);
+        }
+        changePicturesStatus(s1);
+        SetDlgItemText(IDC_MAIN_STATIC_PICTURES, picturesLabel);    // Set directly here, pane could be disabled
+        SetDlgItemText(IDC_MAIN_STATIC_STATUS_PICTURES, s1);
+        panePictures.Invalidate();
     }
 }
 
