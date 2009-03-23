@@ -48,11 +48,22 @@ typedef list<wstring>               sourceNameList;
 typedef sourceNameList::iterator    sourceNameIterator;
 
 
+static bool checkSourceUnderSync(const WCHAR* sourceName, SyncSource** sources) {
+    for (int i=0; sources[i]; i++) {
+        if (!wcscmp(sources[i]->getName(), sourceName)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
 /**
  * Constructor. Set the pointer of (externally owned) SyncSources array.
  */
-WindowsSyncClient::WindowsSyncClient(WindowsSyncSource** sources) : SyncClient() {
-    winSyncSources = sources;
+WindowsSyncClient::WindowsSyncClient(SyncSource** sources) : SyncClient() {
+    syncSources = sources;
 }
 
 WindowsSyncClient::~WindowsSyncClient() {
@@ -72,15 +83,19 @@ WindowsSyncClient::~WindowsSyncClient() {
  *         5 if user aborted the synchronization (error code 5 = Sync aborted by the user to avoid full-sync)
  */
 int WindowsSyncClient::continueAfterPrepareSync() {
+
     int ret = 0;
     LOG.debug("Checking for forced slow-sync...");
-    
-    // it sets to use the timezone in outgoing recurring appointment
-    ClientApplication* cApp = ClientApplication::getInstance();
-    cApp->setOutgoingTimezone(true);
 
-    if (winSyncSources == NULL) {
+    if (syncSources == NULL) {
         return 0;
+    }
+
+    // Only if synchronizing calendar. Don't want to open Outlook if we're syncing only pictures.
+    // It sets to use the timezone in outgoing recurring appointment.
+    if (checkSourceUnderSync(APPOINTMENT, syncSources)) {
+        ClientApplication* cApp = ClientApplication::getInstance();
+        cApp->setOutgoingTimezone(true);
     }
 
 
@@ -95,12 +110,12 @@ int WindowsSyncClient::continueAfterPrepareSync() {
         // Create a list of sources that will run a slow-sync (requested by server).
         //
         int i=0;
-        while (winSyncSources[i]) {
-            currentSyncMode = winSyncSources[i]->getSyncMode();
-            initialSyncMode = syncModeCode(winSyncSources[i]->getConfig().getSync());
+        while (syncSources[i]) {
+            currentSyncMode = syncSources[i]->getSyncMode();
+            initialSyncMode = syncModeCode(syncSources[i]->getConfig().getSync());
 
             if ( isFullSyncMode(currentSyncMode) && (initialSyncMode != currentSyncMode) ) {
-                slowSyncList.push_back(winSyncSources[i]->getName());
+                slowSyncList.push_back(syncSources[i]->getName());
             }
             i++;
         }
