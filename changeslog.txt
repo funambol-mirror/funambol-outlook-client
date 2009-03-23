@@ -1,7 +1,8 @@
 2009-03-23
-    - toccy: added PicturesSyncsource class, to handle pictures sync.
-    - toccy: added default configuration and fixed config upgrade to handle pictures source.
+    - toccy: added "Pictures" pane on main screen, and resources for the pictures sync.
+    - toccy: added PicturesSyncsource class and pictures configuration in DLL, to handle pictures sync.
     - toccy: added utils functions to manage source name/ID conversion, fixed printReport.
+    - toccy: Now SyncSource** array passed to WindowsSyncClient is no more a WindowsSyncSource**, because one source is a PicturesncSource.
 
 *** Created branch US1655 (from r88) for Pictures Sync ***
 
