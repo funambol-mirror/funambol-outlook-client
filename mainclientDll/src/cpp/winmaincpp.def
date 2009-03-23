@@ -60,3 +60,4 @@ checkPortalBuild
 syncModeName
 saveSyncModes
 readSyncModes
+isSourceEnabled
