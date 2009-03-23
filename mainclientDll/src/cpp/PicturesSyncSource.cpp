@@ -62,8 +62,6 @@ PicturesSyncSource::PicturesSyncSource(const WCHAR* name, WindowsSyncSourceConfi
             picturesConfig.setFolderPath(path.c_str());
         }
     }
-
-    setDir();
     
     // "folderPath" is the one read from config, stored in registry.
     // "dir" is used by FileSyncSource during the sync process.
