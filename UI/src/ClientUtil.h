@@ -43,10 +43,11 @@
 #define SYNC_DEFAULT_TOTAL_ITEMS  20
 
 // Default dimensions of frames (in case of 96dpi)
-#define FRAME_CONFIG_X 440
-#define FRAME_CONFIG_Y 382
-#define FRAME_MAIN_X 350
-#define FRAME_MAIN_Y 350
+#define FRAME_CONFIG_X      440
+#define FRAME_CONFIG_Y      382
+#define FRAME_MAIN_X        350
+#define FRAME_MAIN_Y        350
+#define SOURCE_PANE_SIZE_Y  40      // height of each source pane on main screen
 
 #define MAIN_PROGRESSBAR_COLOR RGB(255,255,255)
 
