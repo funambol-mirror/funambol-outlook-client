@@ -1,3 +1,5 @@
+Funambol Outlook Sync Client 7.2.US1655.0
+---------------------------------------
 2009-03-23
     - toccy: added "Pictures" pane on main screen, and resources for the pictures sync.
     - toccy: added PicturesSyncsource class and pictures configuration in DLL, to handle pictures sync.
