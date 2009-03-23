@@ -1,3 +1,8 @@
+2009-03-23
+    - toccy: added PicturesSyncsource class, to handle pictures sync.
+
+*** Created branch US1655 (from r88) for Pictures Sync ***
+
 Funambol Outlook Sync Client 7.1.10
 ---------------------------------------
 2009-01-09
