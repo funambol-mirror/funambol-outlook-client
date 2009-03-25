@@ -46,6 +46,10 @@
 #include "outlook/utils.h"
 #include "outlook/itemProps.h"
 
+#define extAdrSeparator " ["
+#define extAdrSeparatorEnd "]"
+#define extAdrSeparatorLenght 2
+
 
 using namespace std;
 
@@ -76,6 +80,10 @@ ClientContact::ClientContact() : ClientItem() {
             delete [] path;
         }
     }
+    addressStreet = new StringBuffer();
+    addressExtended = new StringBuffer();
+    findAddressStreet = false;
+    findAddressExtended = false;
 }
 
 
@@ -451,6 +459,41 @@ const wstring ClientContact::getComplexProperty(const wstring& propertyName) {
     WCHAR tmp[32];
     DATE date;
 
+    StringBuffer valueBuffer;
+    StringBuffer address1;
+    StringBuffer address2;
+    if( propertyName == L"HomeAddressStreet" || propertyName == L"HomeAddressExtended" ||
+        propertyName == L"BusinessAddressStreet"  || propertyName == L"BusinessAddressExtended" ||
+        propertyName == L"OtherAddressStreet"  || propertyName == L"OtherAddressExtended"){
+            
+            WCHAR* tmpwchar;
+            if(propertyName == L"HomeAddressStreet" || propertyName == L"HomeAddressExtended" ){
+                tmpwchar =(WCHAR*)pContact->GetHomeAddressStreet();
+            }else if(propertyName == L"BusinessAddressStreet"  || propertyName == L"BusinessAddressExtended"){
+                tmpwchar = (WCHAR*)pContact->GetBusinessAddressStreet();
+            }if(propertyName == L"OtherAddressStreet"  || propertyName == L"OtherAddressExtended"){
+                tmpwchar = (WCHAR*)pContact->GetOtherAddressStreet();
+            }
+            char* tmpchar = toMultibyte(tmpwchar);
+            valueBuffer = tmpchar;
+            delete tmpchar;
+            int separator = valueBuffer.find(extAdrSeparator);
+            if ( separator == StringBuffer::npos){ //No extended address
+                address1 = valueBuffer;
+                address2 = "";
+            }else if ( separator == 0 ){ //Only extended address (if possible)
+                address1 = "";
+                address2 = valueBuffer;
+            }else{
+                address1 = valueBuffer.substr(0 , separator);
+                int separatorEnd = valueBuffer.find(extAdrSeparatorEnd);
+                if (separatorEnd == StringBuffer::npos){
+                    separatorEnd = valueBuffer.length();
+                }
+                address2 = valueBuffer.substr((separator + extAdrSeparatorLenght), (separatorEnd - separator - extAdrSeparatorLenght) );
+            }
+    }
+
     //
     // Name: correct first char...
     //
@@ -497,6 +540,29 @@ const wstring ClientContact::getComplexProperty(const wstring& propertyName) {
             propertyValue = (WCHAR*)categories;
             replaceAll(L";", L",", propertyValue);
         }
+    }
+    else if (propertyName == L"HomeAddressStreet" || 
+        propertyName == L"BusinessAddressStreet" ||
+        propertyName == L"OtherAddressStreet"){
+            if (address1.empty()){
+                propertyValue = L"";
+            }else{
+                WCHAR* tmp = toWideChar(address1.c_str());
+                propertyValue = tmp;
+                delete tmp;
+            }
+    }
+
+    else if (propertyName == L"HomeAddressExtended" ||
+        propertyName == L"BusinessAddressExtended" ||
+        propertyName == L"OtherAddressExtended"){
+            if (address1.empty()){
+                propertyValue = L"";
+            }else{
+                WCHAR* tmp = toWideChar(address2.c_str());
+                propertyValue = tmp;
+                delete tmp;
+            } 
     }
 
     // Read the contact's picture from disk.
@@ -589,6 +655,120 @@ int ClientContact::setComplexProperty(const wstring& propertyName, const wstring
         if (SUCCEEDED(hr) && date < LIMIT_MAX_DATE) {       // Outlook will create automatically an event!
             willCreateBirthdayEvent = true;
         }
+    }
+
+    else if (propertyName == L"HomeAddressStreet" || 
+        propertyName == L"BusinessAddressStreet" ||
+        propertyName == L"OtherAddressStreet"){
+
+
+            StringBuffer valueBuffer;
+            WCHAR* tmp;
+            if(propertyName == L"HomeAddressStreet" ){
+                tmp = (WCHAR*)pContact->GetHomeAddressStreet();
+            }else if(propertyName == L"BusinessAddressStreet" ){
+                tmp = (WCHAR*)pContact->GetBusinessAddressStreet();
+            }if(propertyName == L"OtherAddressStreet" ){
+                tmp = (WCHAR*)pContact->GetOtherAddressStreet();
+            }
+            char* tmpchar = toMultibyte(tmp);
+            valueBuffer = tmpchar;
+            delete tmpchar;
+            int separator = valueBuffer.find(extAdrSeparator);
+            tmpchar = toMultibyte(propertyValue.c_str());
+            StringBuffer address1 = tmpchar ;
+            StringBuffer address2;
+            
+            if (separator != StringBuffer::npos) {
+                int separatorEnd = valueBuffer.find(extAdrSeparatorEnd);
+                if (separatorEnd == StringBuffer::npos){
+                    separatorEnd = valueBuffer.length();
+                }
+                address2 = valueBuffer.substr((separator+extAdrSeparatorLenght), separatorEnd);
+            } else {
+                address2 = "";
+            }
+
+            addressStreet->assign(address1.c_str());
+            
+            if(addressExtended->empty() && !findAddressExtended){
+                addressExtended->assign(address2.c_str());
+            }else{
+                address2.assign(addressExtended->c_str());
+            }
+            findAddressStreet = true;
+
+            address1.append(extAdrSeparator);
+            address1.append(address2);
+            address1.append(extAdrSeparatorEnd);
+            WCHAR* tmpwchar;
+            if(propertyName == L"HomeAddressStreet"){
+                tmpwchar = toWideChar(address1.c_str());
+                pContact->PutHomeAddressStreet(tmpwchar);
+            }else if (propertyName == L"BusinessAddressStreet"){
+                tmpwchar = toWideChar(address1.c_str());
+                pContact->PutBusinessAddressStreet(tmpwchar);
+            }else if (propertyName == L"OtherAddressStreet"){
+                tmpwchar = toWideChar(address1.c_str());
+                pContact->PutOtherAddressStreet(tmpwchar);
+            }
+            delete tmpwchar;
+    }
+
+    else if (propertyName == L"HomeAddressExtended" ||
+        propertyName == L"BusinessAddressExtended" ||
+        propertyName == L"OtherAddressExtended"){
+            StringBuffer valueBuffer;
+            WCHAR* tmp;
+            if(propertyName == L"HomeAddressExtended" ){
+                tmp =(WCHAR*)pContact->GetHomeAddressStreet();
+                
+            }else if(propertyName == L"BusinessAddressExtended" ){
+                tmp = (WCHAR*)pContact->GetBusinessAddressStreet();
+            }if(propertyName == L"OtherAddressExtended" ){
+                tmp = (WCHAR*)pContact->GetOtherAddressStreet();
+            }
+            char* tmpchar = toMultibyte(tmp);
+            valueBuffer = tmpchar;
+            delete tmpchar;
+            int separator = valueBuffer.find(extAdrSeparator);
+
+            StringBuffer address1;
+            if (separator != StringBuffer::npos){
+                address1 = valueBuffer.substr(0, separator);
+            }else{
+                address1 = ""; //this means that the address value is empty
+            }
+            StringBuffer address2;
+            tmpchar = toMultibyte(propertyValue.c_str());
+            address2 = tmpchar;
+            delete tmpchar;    
+
+            addressExtended->assign(address2.c_str());
+                
+            if(addressStreet->empty() && !findAddressStreet){
+                addressStreet->assign(address1.c_str());
+            }else{
+                address1.assign(addressStreet->c_str());
+            }
+            findAddressExtended = true;
+            if(!(address2.empty())){
+                address1.append(extAdrSeparator);
+                address1.append(address2);
+                address1.append(extAdrSeparatorEnd);
+            }
+            WCHAR* tmpwchar;
+            if (propertyName == L"HomeAddressExtended"){
+                tmpwchar = toWideChar(address1.c_str());
+                pContact->PutHomeAddressStreet(tmpwchar);
+            }else if (propertyName == L"BusinessAddressExtended"){
+                tmpwchar = toWideChar(address1.c_str());
+                pContact->PutBusinessAddressStreet(tmpwchar);
+            }else if (propertyName == L"OtherAddressExtended"){
+                tmpwchar = toWideChar(address1.c_str());
+                pContact->PutOtherAddressStreet(tmpwchar);
+            }
+            delete tmpwchar;
     }
 
     // Separator for Categories in Outlook can be "," or ";".

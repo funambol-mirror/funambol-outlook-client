@@ -193,7 +193,13 @@ static WCHAR* complexContactProps[] = {
     {L"LastName"                    },      // For first letter capitalization...
     {L"Categories"                  },      // To convert separator: ";" into ","
     {L"LastModificationTime"        },      // Used by SyncSource
-    {L"Photo"                       },      // Contact's picture (b64)
+    {L"HomeAddressExtended"         },      
+	{L"BusinessAddressExtended"     },      
+	{L"OtherAddressExtended"        },  
+	{L"HomeAddressStreet"           },      
+	{L"BusinessAddressStreet"       },      
+	{L"OtherAddressStreet"          }, 
+	{L"Photo"                       },      // Contact's picture (b64)
     {NULL}
 
 };
