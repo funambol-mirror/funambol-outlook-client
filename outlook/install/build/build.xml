@@ -405,7 +405,7 @@ Forge file for Funambol Outlook Sync Client
     
         <echo message="${install-builder.nsi}" />
         <echo message="output to: ${log.NSIS}" />
-        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS}">        
+        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS}"  failonerror="true">        
             <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
 	               /DFILE_NAME=${fileName}  ${script.nsi} "/>
         </exec>
@@ -428,7 +428,7 @@ Forge file for Funambol Outlook Sync Client
         
         <echo message="${install-builder.nsi} ${sp}" />
         <echo message="output to: ${log.NSIS_sp}" />
-        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}">        
+        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}" failonerror="true">        
             <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
                        /DFILE_NAME=${fileNameSp}
                        /DSP  ${script.nsi} " />
@@ -452,7 +452,7 @@ Forge file for Funambol Outlook Sync Client
         
         <echo message="${install-builder.nsi} ${sp}" />
         <echo message="output to: ${log.NSIS_sp}" />
-        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}">        
+        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}"  failonerror="true">        
             <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
                        /DFILE_NAME=${fileNameCared}
                         ${script.nsi} " />
