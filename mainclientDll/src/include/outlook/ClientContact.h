@@ -93,6 +93,12 @@ private:
     char*  encodeWithSpaces(const char *msg, int len);
     int    savePictureToFile(const std::wstring& b64content, const std::wstring& filename);
 
+    // Stringbuffer to store Address Street and Extended Address
+    StringBuffer* addressStreet; //In this one we store the Address Street
+    StringBuffer* addressExtended; //in this one we store the Extended Address
+    bool findAddressStreet;
+    bool findAddressExtended;
+
 public:
 
     /// Constructor

@@ -143,7 +143,8 @@ static WCHAR* contactFields[] = {
     {L"BusinessAddressPostOfficeBox"       },                // Returns or sets the post office box number portion of the business address for the contact
     {L"BusinessAddressState"               },                // Returns or sets the state code portion of the business address for the contact
     {L"BusinessAddressStreet"              },                // Returns or sets the street address portion of the business address for the contact
-    {L"BusinessFaxNumber"                  },                // Returns or sets the business fax number for the contact
+    {L"BusinessAddressExtended"                },                // Returns or sets the city portion of the business extended for the contact
+	{L"BusinessFaxNumber"                  },                // Returns or sets the business fax number for the contact
     {L"BusinessTelephoneNumber"            },                // Returns or sets the first business telephone number for the contact
 //  {L"BusinessWebPage"                    },    // Duplicated: inside Outlook it's the same of "WebPage" -> removed since 6.5.2
     {L"CallbackTelephoneNumber"            },                // Returns or sets the callback telephone number for the contact
@@ -166,7 +167,8 @@ static WCHAR* contactFields[] = {
     {L"Hobby"                              },                // Returns or sets the hobby for the contact
     {L"Home2TelephoneNumber"               },                // Returns or sets the second home telephone number for the contact
     {L"HomeAddressCity"                    },                // Returns or sets the city portion of the home address for the contact
-    {L"HomeAddressCountry"                 },                // Returns or sets the country portion of the home address for the contact
+    {L"HomeAddressExtended"                },                // Returns or sets the city portion of the home extended for the contact
+	{L"HomeAddressCountry"                 },                // Returns or sets the country portion of the home address for the contact
     {L"HomeAddressPostalCode"              },                // Returns or sets the postal code portion of the home address for the contact
     {L"HomeAddressPostOfficeBox"           },                // Returns or sets the post office box number portion of the home address for the contact
     {L"HomeAddressState"                   },                // Returns or sets the state portion of the home address for the contact
@@ -193,7 +195,8 @@ static WCHAR* contactFields[] = {
     {L"OtherAddressPostalCode"             },                // Returns or sets the postal code portion of the other address for the contact
     {L"OtherAddressPostOfficeBox"          },                // Returns or sets the post office box portion of the other address for the contact
     {L"OtherAddressState"                  },                // Returns or sets the state portion of the other address for the contact
-    {L"OtherAddressStreet"                 },                // Returns or sets the street portion of the other address for the contact
+    {L"OtherAddressExtended"                },                // Returns or sets the city portion of the other extended for the contact
+	{L"OtherAddressStreet"                 },                // Returns or sets the street portion of the other address for the contact
     {L"OtherFaxNumber"                     },                // Returns or sets the other fax number for the contact
     {L"OtherTelephoneNumber"               },                // Returns or sets the other telephone number for the contact
     {L"PagerNumber"                        },                // Returns or sets the pager number for the contact
