@@ -483,7 +483,7 @@ const wstring ClientContact::getComplexProperty(const wstring& propertyName) {
                 address2 = "";
             }else if ( separator == 0 ){ //Only extended address (if possible)
                 address1 = "";
-                address2 = valueBuffer;
+                address2 = valueBuffer.substr(1, (valueBuffer.length()-1));
             }else{
                 address1 = valueBuffer.substr(0 , separator);
                 int separatorEnd = valueBuffer.find(extAdrSeparatorEnd);
@@ -697,10 +697,11 @@ int ClientContact::setComplexProperty(const wstring& propertyName, const wstring
                 address2.assign(addressExtended->c_str());
             }
             findAddressStreet = true;
-
-            address1.append(extAdrSeparator);
-            address1.append(address2);
-            address1.append(extAdrSeparatorEnd);
+            if(!(address2.empty())){
+                address1.append(extAdrSeparator);
+                address1.append(address2);
+                address1.append(extAdrSeparatorEnd);
+            }
             WCHAR* tmpwchar;
             if(propertyName == L"HomeAddressStreet"){
                 tmpwchar = toWideChar(address1.c_str());
@@ -770,7 +771,12 @@ int ClientContact::setComplexProperty(const wstring& propertyName, const wstring
             }
             delete tmpwchar;
     }
-
+    if (findAddressStreet && findAddressExtended){
+        findAddressStreet = false;
+        findAddressExtended = false;
+        addressExtended->assign("");
+        addressStreet->assign("");
+    }
     // Separator for Categories in Outlook can be "," or ";".
     // Nothing to do (both accepted by Outlook).
     else if (propertyName == L"Categories") {
