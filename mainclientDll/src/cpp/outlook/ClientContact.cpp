@@ -478,12 +478,15 @@ const wstring ClientContact::getComplexProperty(const wstring& propertyName) {
             valueBuffer = tmpchar;
             delete tmpchar;
             int separator = valueBuffer.find(extAdrSeparator);
+            if ( separator == StringBuffer::npos){
+                separator = valueBuffer.find("[");
+            }
             if ( separator == StringBuffer::npos){ //No extended address
                 address1 = valueBuffer;
                 address2 = "";
             }else if ( separator == 0 ){ //Only extended address (if possible)
                 address1 = "";
-                address2 = valueBuffer.substr(1, (valueBuffer.length()-1));
+                address2 = valueBuffer.substr(1, (valueBuffer.length()-2));
             }else{
                 address1 = valueBuffer.substr(0 , separator);
                 int separatorEnd = valueBuffer.find(extAdrSeparatorEnd);
@@ -556,11 +559,11 @@ const wstring ClientContact::getComplexProperty(const wstring& propertyName) {
     else if (propertyName == L"HomeAddressExtended" ||
         propertyName == L"BusinessAddressExtended" ||
         propertyName == L"OtherAddressExtended"){
-            if (address1.empty()){
+            if (address2.empty()){
                 propertyValue = L"";
             }else{
                 WCHAR* tmp = toWideChar(address2.c_str());
-                propertyValue = tmp;
+                propertyValue.assign(tmp);
                 delete tmp;
             } 
     }
@@ -680,11 +683,15 @@ int ClientContact::setComplexProperty(const wstring& propertyName, const wstring
             StringBuffer address2;
             
             if (separator != StringBuffer::npos) {
-                int separatorEnd = valueBuffer.find(extAdrSeparatorEnd);
-                if (separatorEnd == StringBuffer::npos){
-                    separatorEnd = valueBuffer.length();
+                if(separator == 0){
+                    address2 = valueBuffer.substr(1,(valueBuffer.length()-2));
+                }else{
+                    int separatorEnd = valueBuffer.find(extAdrSeparatorEnd);
+                    if (separatorEnd == StringBuffer::npos){
+                        separatorEnd = valueBuffer.length();
+                    }
+                    address2 = valueBuffer.substr((separator+extAdrSeparatorLenght), separatorEnd);
                 }
-                address2 = valueBuffer.substr((separator+extAdrSeparatorLenght), separatorEnd);
             } else {
                 address2 = "";
             }
