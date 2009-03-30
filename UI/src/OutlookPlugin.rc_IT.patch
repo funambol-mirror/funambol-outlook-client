@@ -1,0 +1,403 @@
+Index: OutlookPlugin.rc
+===================================================================
+--- OutlookPlugin.rc	(revision 109)
++++ OutlookPlugin.rc	(working copy)
+@@ -1158,27 +1158,27 @@
+ STRINGTABLE 
+ BEGIN
+     IDR_MAINFRAME           "OutlookPlugin\n\\OutlookPlugin\n\n\\OutlookPlugin.Document\\OutlookPlugin Document"
+-    IDS_SYNCTYPE1           "Two-way"
+-    IDS_SYNCTYPE2           "One-way: Server -> Outlook"
+-    IDS_SYNCTYPE3           "One-way: Outlook -> Server"
++    IDS_SYNCTYPE1           "Bidirezionale"
++    IDS_SYNCTYPE2           "Senso unico: Server -> Outlook"
++    IDS_SYNCTYPE3           "Senso unico: Outlook -> Server"
+     IDS_ACCOUNT_SETTINGS    "Account Settings"
+-    IDS_ACCOUNT_URL         "&Location:"
+-    IDS_ACCOUNT_USERNAME    "&Username:"
++    IDS_ACCOUNT_URL         "&URL:"
++    IDS_ACCOUNT_USERNAME    "&Nome utente:"
+     IDS_ACCOUNT_PASSWORD    "Pa&ssword:"
+-    IDS_ACCOUNT_USEPROXY    "Enable"
+-    IDS_ACCOUNT_PROXY_AUTH  "Requires authorization"
+-    IDS_ACCOUNT_PROXY_USER  "&Username:"
++    IDS_ACCOUNT_USEPROXY    "Abilita"
++    IDS_ACCOUNT_PROXY_AUTH  "Richiede autorizzazione"
++    IDS_ACCOUNT_PROXY_USER  "&Utente:"
+     IDS_ACCOUNT_PROXY_PASS  "Password:"
+     IDS_OK                  "&OK"
+-    IDS_CANCEL              "&Cancel"
+-    IDS_ACCOUNT             "Account"
++    IDS_CANCEL              "&Annulla"
++    IDS_ACCOUNT             "Impostazioni"
+     IDS_OUTLOOK_FOLDER      "Outlook Folder:"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+     AFX_IDS_APP_TITLE       "Funambol"
+-    AFX_IDS_IDLEMESSAGE     "Ready"
++    AFX_IDS_IDLEMESSAGE     "Completato"
+ END
+ 
+ STRINGTABLE 
+@@ -1193,220 +1193,220 @@
+ 
+ STRINGTABLE 
+ BEGIN
+-    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+-    ID_APP_EXIT             "Quit the application\nExit"
++    ID_APP_ABOUT            "Mostra informazioni sul programma, numero di versione\ncopyright\nInformazioni"
++    ID_APP_EXIT             "Termina l'applicazione\nEsci"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+-    ID_VIEW_GUIDE           "Open Funambol Outlook Sync Client User Guide"
++    ID_VIEW_GUIDE           "Vai alla guida dell'utente Funambol Outlook Sync Client"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+-    ID_FILE_CONFIGURATION   "Configuration Options"
+-    ID_FILE_SYNCHRONIZE     "Perform the sync"
+-    ID_TOOLS_FULLSYNC       "Open full sync window"
+-    ID_TOOLS_SETLOGLEVEL    "Set log level"
++    ID_FILE_CONFIGURATION   "Opzioni di configurazione"
++    ID_FILE_SYNCHRONIZE     "Esegui la sincronizzazione"
++    ID_TOOLS_FULLSYNC       "Apri la finestra per la syncronizzazione completa"
++    ID_TOOLS_SETLOGLEVEL    "Stabilisci il livello di log"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+-    IDS_INCLUDE_SUBFOLDERS  "I&nclude sub-folders"
+-    IDS_SELECT_FOLDER       "C&hange..."
+-    IDS_REMOTE_NAME         "R&emote name:"
+-    IDS_SYNC                "Sync"
+-    IDS_ENABLED             "Enabled"
+-    IDS_ADVANCED_CALENDAR   "Advanced Calendar Settings"
+-    IDS_DATA_FORMAT         "&Data format:"
++    IDS_INCLUDE_SUBFOLDERS  "I&ncludi le sotto-cartelle"
++    IDS_SELECT_FOLDER       "C&ambia..."
++    IDS_REMOTE_NAME         "Nome remoto:"
++    IDS_SYNC                "Sincronizza"
++    IDS_ENABLED             "Abilitato"
++    IDS_ADVANCED_CALENDAR   "Impostazioni avanzate del calendario"
++    IDS_DATA_FORMAT         "&Formato data:"
+     IDS_USE_SIF             "SIF"
+     IDS_USE_VCARD           "vCard"
+-    IDS_ENCRYPTION          "Encryption"
+-    IDS_ADVANCED_CONTACTS   "Advanced Contact Settings"
+-    IDS_FULLSYNC_PERFORM    "Perform full sync for:"
+-    IDS_CONTACTS            "Contact&s"
+-    IDS_CALENDAR            "Cal&endar"
+-    IDS_NOTES               "&Notes"
+-    IDS_TASKS               "&Tasks"
++    IDS_ENCRYPTION          "Cifratura"
++    IDS_ADVANCED_CONTACTS   "Impostazioni avanzate dei contatti"
++    IDS_FULLSYNC_PERFORM    "Esegui sinc completa per:"
++    IDS_CONTACTS            "Contat&ti"
++    IDS_CALENDAR            "Cal&endario"
++    IDS_NOTES               "&Note"
++    IDS_TASKS               "&Attività"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+-    IDS_SYNCHRONIZE         "Synchronize"
+-    IDS_LOG_LEVEL           "Log Level"
+-    IDS_LOG_NONE            "Error"
++    IDS_SYNCHRONIZE         "Sincronizza"
++    IDS_LOG_LEVEL           "Livello di log"
++    IDS_LOG_NONE            "Errori"
+     IDS_LOG_INFO            "Info"
+     IDS_LOG_DEBUG           "Debug"
+-    IDS_ADVANCED_NOTES      "Notes Advanced Settings"
+-    IDS_ADVANCED_TASKS      "Advanced Tasks Settings "
++    IDS_ADVANCED_NOTES      "Impostazioni avanzate delle note"
++    IDS_ADVANCED_TASKS      "Impostazione avanzate delle attività"
+     IDS_ERROR_CANNOT_CHANGE_SETTINGS 
+-                            "Sync is in progress. Cannot change the settings."
+-    IDS_ERROR_SET_URL       "Please set the url"
+-    IDS_ERROR_SET_USERNAME  "Please set the user name"
+-    IDS_ERROR_SET_PASSWORD  "Please set the password"
+-    IDS_ERROR_PROXY_USERNAME "Please set the proxy user name"
+-    IDS_ERROR_PROXY_PASSWORD "Please set the proxy password"
+-    IDS_ERROR_SET_REMOTE_NAME "Please set the remote name"
+-    IDS_SCHEDULER_EVERY     "Every"
+-    IDS_MINUTES             "minutes"
++                            "Sync in esecuzione. Non è possibile cambiare le impostazioni"
++    IDS_ERROR_SET_URL       "Specifica una url"
++    IDS_ERROR_SET_USERNAME  "Specifica il nome utente"
++    IDS_ERROR_SET_PASSWORD  "Specifica la password"
++    IDS_ERROR_PROXY_USERNAME "Specifica il nome utente per il proxy"
++    IDS_ERROR_PROXY_PASSWORD "Specifica la password del proxy"
++    IDS_ERROR_SET_REMOTE_NAME "Specifica la url remota"
++    IDS_SCHEDULER_EVERY     "Ogni"
++    IDS_MINUTES             "minuti"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+-    IDS_CODE_NOSOURCE_10    "No sources to sync"
+-    IDS_CODE_SYNC_STOPPED   "Synchronization terminated by the user"
+-    IDS_CODE_AUTH_EXPIRED_402 "Error: account expired."
+-    IDS_CODE_NOTFOUND_404   "Can't recognize remote name. Correct remote name in Sync Options."
++    IDS_CODE_NOSOURCE_10    "Niente da sincronizzare"
++    IDS_CODE_SYNC_STOPPED   "Sincronizzazione interrotta dall'utente"
++    IDS_CODE_AUTH_EXPIRED_402 "Errore: account scaduto."
++    IDS_CODE_NOTFOUND_404   "URL remota non riconoscibile. Verifica la URL remota nelle impostazioni."
+     IDS_CODE_INVALID_CREDENTIALS_401 
+-                            "Can't access your account. Correct your server location, username or password."
++                            "Account non accessibile. Verifica la URL del server, nome utente e password."
+     IDS_CODE_ERROR_CONNECT_2001 
+-                            "Can't access the server. Check your network connectivity and your account's server location."
++                            "Server non raggiungibile. Verifica la copertura di rete e la URL del server."
+     IDS_CODE_ERROR_READING_CONTENT_2002 
+-                            "Error reading content. Server unavailable."
++                            "Errore di rete. Server non disponbile."
+     IDS_CODE_SERVER_NOT_FOUND_2003 
+-                            "Error: server not found. Check server uri."
++                            "Errore: server non trovato. Verifical a URL."
+     IDS_CODE_INTERNET_CONNECTION_MISSING_2005 
+-                            "Error: Cannot establish an internet connection."
+-    IDS_CODE_NETWORK_ERROR_2007 "Sync not completed. Network error."
+-    IDS_ERROR_SYNC_NOT_COMPLETED "Sync not completed. See log for details"
+-    IDS_TEXT_APPOINTMENTS   "appointments"
+-    IDS_TEXT_CONTACTS       "contacts"
+-    IDS_TEXT_NOTES          "notes"
+-    IDS_TEXT_TASKS          "tasks"
+-    IDS_TEXT_SENDING        "Sending"
++                            "Errore: Impossibile stabilire uan connessione a Internet."
++    IDS_CODE_NETWORK_ERROR_2007 "Sinc non completata completed. Errore di rete."
++    IDS_ERROR_SYNC_NOT_COMPLETED "Sync non completata. Controlla i log per i dettagli."
++    IDS_TEXT_APPOINTMENTS   "appuntamenti"
++    IDS_TEXT_CONTACTS       "contatti"
++    IDS_TEXT_NOTES          "note"
++    IDS_TEXT_TASKS          "attività"
++    IDS_TEXT_SENDING        "Invio in corso"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+-    IDS_MAIN_CONTACTS       "Contacts"
+-    IDS_MAIN_TASKS          "Tasks"
+-    IDS_MAIN_NOTES          "Notes"
++    IDS_MAIN_CONTACTS       "Contatti"
++    IDS_MAIN_TASKS          "Attività"
++    IDS_MAIN_NOTES          "Note"
+     IDS_ERROR_SET_CONNECTION 
+-                            "You must enter your account information before attempting a sync."
+-    IDS_ABOUT_TITLE         "About Funambol Outlook Sync Client"
+-    IDS_MAIN_LAST_SYNC_FAILED "Last sync failed"
+-    IDS_MAIN_LAST_SYNC_CANCELED "Last sync canceled"
++                            "Completare le impostazioni prima di tentare la sincronizzazione."
++    IDS_ABOUT_TITLE         "Informazioni sul Funambol Outlook Sync Client"
++    IDS_MAIN_LAST_SYNC_FAILED "Ultima sync non completata"
++    IDS_MAIN_LAST_SYNC_CANCELED "Ultima sync annullata"
+     IDS_CODE_HTTP_NOT_FOUND_2060 
+-                            "Error 404: resource not found. Please check your credentials."
+-    IDS_UNEXPECTED_EXCEPTION "An unexpected exception has occurred!"
+-    IDS_SYNCALL             "Sync All"
+-    IDS_CODE_DROPPED_ITEMS  "Warning: some items were not correctly saved in Outlook."
+-    IDS_TEXT_CHECKING       "Checking"
+-    IDS_FINISHED_SENDING    "Waiting for Server data..."
++                            "Errore 404: risorsa non trovata. Verifica nome utente e password"
++    IDS_UNEXPECTED_EXCEPTION "Errore non previsto!"
++    IDS_SYNCALL             "Syncronizza tutto"
++    IDS_CODE_DROPPED_ITEMS  "Attenzione: alcuni elementi non sono stati salvati correttamente."
++    IDS_TEXT_CHECKING       "Verifica in corso"
++    IDS_FINISHED_SENDING    "In attesa di dati dal server..."
+     IDS_GUIDE_LINK          "http://funambol.com/docs/v71/funambol-outlook-sync-client-v7.1-user-guide.pdf"
+-    IDS_ERR_SERVER_TIMOUT   "Server returned timeout error: current session has expired.\nPlease retry later."
+-    IDS_CODE_SERVER_BUSY    "Server is busy, please retry later."
++    IDS_ERR_SERVER_TIMOUT   "Il server non ha risposto in tempo: la sessione corrente è scaduta.\nRiprova più tardi."
++    IDS_CODE_SERVER_BUSY    "Il server è impegnato. Riprova più tardi."
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+-    IDS_TEXT_RECEIVING      "Receiving"
+-    IDS_TEXT_SYNC_ENDED     "Sync ended"
+-    IDS_MAINBUT_SYNCHRONIZE "&Synchronize"
+-    IDS_MAINBUT_CANCEL      "&Cancel"
+-    IDS_TEXT_STARTING_SYNC  "Starting sync..."
+-    IDS_TEXT_SYNC_CANCELED  "Sync canceled"
++    IDS_TEXT_RECEIVING      "Dati in arrivo"
++    IDS_TEXT_SYNC_ENDED     "Sync terminata"
++    IDS_MAINBUT_SYNCHRONIZE "&Sincronizza"
++    IDS_MAINBUT_CANCEL      "&Annulla"
++    IDS_TEXT_STARTING_SYNC  "Avvio della sync..."
++    IDS_TEXT_SYNC_CANCELED  "Sync bloccata"
+     IDS_LEFTVIEW_ACCOUNT    "Account"
+-    IDS_LEFTVIEW_SYNCHRONIZATION "Synchronization"
+-    IDS_HOURS               "hours"
+-    IDS_SCHEDULER_PLEASE_SET_VALUE "Please set the scheduled value."
+-    IDS_SCHEDULER_MIN_VALUE_IS "The minimum value is"
+-    IDS_SCHEDULER_MAX_VALUE_IS "The maximum value is"
+-    IDS_SCHEDULER_CANNOT_SCHEDULE "Cannot schedule"
+-    IDS_LEFTVIEW_CONTACTS   "Contacts"
+-    IDS_LEFTVIEW_CALENDAR   "Calendar"
+-    IDS_LEFTVIEW_TASKS      "Tasks"
++    IDS_LEFTVIEW_SYNCHRONIZATION "Sincronizzazione"
++    IDS_HOURS               "ore"
++    IDS_SCHEDULER_PLEASE_SET_VALUE "Stabilisci il valore programmato."
++    IDS_SCHEDULER_MIN_VALUE_IS "Il valore minimo è"
++    IDS_SCHEDULER_MAX_VALUE_IS "Il valore massimo è"
++    IDS_SCHEDULER_CANNOT_SCHEDULE "Impossibile programmare"
++    IDS_LEFTVIEW_CONTACTS   "Contatti"
++    IDS_LEFTVIEW_CALENDAR   "Calendario"
++    IDS_LEFTVIEW_TASKS      "Attività"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+-    IDS_LEFTVIEW_NOTES      "Notes"
+-    IDS_SCHEDULER           "Scheduler"
++    IDS_LEFTVIEW_NOTES      "Note"
++    IDS_SCHEDULER           "Programmato"
+     IDS_LEFTVIEW_LOG        "Log"
+-    IDS_DAYS                "days"
++    IDS_DAYS                "giorni"
+     IDS_MSG_CLOSE_SYNC_IN_PROGRESS 
+-                            "Synchronization in progress. Please wait or cancel it."
++                            "Sincronizzazione in corso. Attendere o interrompere."
+     IDS_ABOUT_COPYRIGHT     "Copyright © 2003 - 2009 Funambol, Inc.\nAll rights reserved."
+     IDS_TEXT_SYNC_ALREADY_RUNNING 
+-                            "Sync already in progress.\nPlease wait until the sync is finished."
++                            "Sync in corso.\nAttendere il completamento."
+     IDS_SYNC_ABORTED_AVOID_FULLSYNC 
+-                            "Sync aborted by the user to avoid full-sync"
+-    IDS_TEXT_SYNC_IN_PROGRESS "A scheduled sync is currently in progress."
+-    IDS_DETAILS             "&Details..."
+-    IDS_SYNC_SETTINGS       "Synchronization Settings"
+-    IDS_APPLY               "&Apply"
++                            "Sync interrotta dall'utente per evitare una full-sync"
++    IDS_TEXT_SYNC_IN_PROGRESS "Una sync programmata è attualmente in corso."
++    IDS_DETAILS             "&Dettagli..."
++    IDS_SYNC_SETTINGS       "Imposta sincronizzazione"
++    IDS_APPLY               "&Applica"
+     IDS_ERROR_SYNC_TERMINATED 
+-                            "Sync process could not be terminated correctly.\nOutlook Sync Client will now be closed."
+-    IDS_TEXT_CANCELING_SYNC "Canceling sync, please wait..."
+-    IDS_MAIN_PRESS_TO_SYNC  "Sync All"
+-    IDS_MAIN_PRESS_TO_CANCEL "Cancel Sync"
++                            "Impossibile terminare correttamente la sincronizzazione.\nOutlook Sync Client verrà chiuso."
++    IDS_TEXT_CANCELING_SYNC "Attendere mentre si interrompe la sync..."
++    IDS_MAIN_PRESS_TO_SYNC  "Sincronizza tutto"
++    IDS_MAIN_PRESS_TO_CANCEL "Interrompi la sync"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+-    IDS_DONE                "Done"
++    IDS_DONE                "Fatto"
+     IDS_SERVER              "Server"
+-    IDS_PROXY_SETTINGS      "&Proxy Settings…"
+-    IDS_PROXY_SETTINGS2     "Proxy Settings"
+-    IDS_ITEMS               "Items"
+-    IDS_SYNC_SYNCHRONIZE_EVERY "S&ynchronize every"
+-    IDS_SECURITY            "Security"
+-    IDS_SYNC_ENABLE_ENCRYPTION "Enable enc&ryption"
+-    IDS_CONTACTS_DETAILS    "Contacts Details"
+-    IDS_SYNC_DIRECTION      "&Sync Direction"
+-    IDS_CONTACTS_FOLDER     "Contacts &Folder"
+-    IDS_CURRENT             "Current:"
+-    IDS_ADVANCED            "Ad&vanced"
+-    IDS_CALENDAR_DETAILS    "Calendar Details"
+-    IDS_CALENDAR_FOLDER     "Calendar &Folder"
++    IDS_PROXY_SETTINGS      "Imposta &proxy"
++    IDS_PROXY_SETTINGS2     "Impostazioni del proxy"
++    IDS_ITEMS               "Elementi"
++    IDS_SYNC_SYNCHRONIZE_EVERY "S&incronizza ogni"
++    IDS_SECURITY            "Sicurezza"
++    IDS_SYNC_ENABLE_ENCRYPTION "Abilita cif&ratura"
++    IDS_CONTACTS_DETAILS    "Dettaglio contatti"
++    IDS_SYNC_DIRECTION      "Direzione della &Sync "
++    IDS_CONTACTS_FOLDER     "Cartella C&ontatti"
++    IDS_CURRENT             "Attuale:"
++    IDS_ADVANCED            "A&vanzate"
++    IDS_CALENDAR_DETAILS    "Dettagli Calendario"
++    IDS_CALENDAR_FOLDER     "Cartella C&alendario"
+     IDS_USE_VCAL            "vCalendar"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+-    IDS_TASKS_DETAILS       "Tasks Details"
+-    IDS_TASKS_FOLDER        "Tasks &Folder"
+-    IDS_NOTES_DETAILS       "Notes Details"
+-    IDS_NOTES_FOLDER        "Notes &Folder"
+-    IDS_RECOVER_PERFORMS    "Recover performs a “full sync” operation to refresh all data in Outlook or on the server."
+-    IDS_DIRECTION           "&Direction"
+-    IDS_FULLSYNC_SYNCTYPE2  "Replace all of the Outlook data with data from the server"
+-    IDS_FULLSYNC_SYNCTYPE1  "Two-way"
+-    IDS_FULLSYNC_SYNCTYPE3  "Replace all of the server data with data from Outlook"
+-    IDS_RECOVER             "Recover"
+-    IDS_LOGGING             "Logging"
+-    IDS_NOT_SYNCHRONIZED    "Not synchronized"
++    IDS_TASKS_DETAILS       "Dettagli attività"
++    IDS_TASKS_FOLDER        "Cartella A&ttività"
++    IDS_NOTES_DETAILS       "Dettagli note"
++    IDS_NOTES_FOLDER        "Cartella N&ote"
++    IDS_RECOVER_PERFORMS    "Ripristina esegue una sync completa per rinnovare tutti i dati in Outlook o sul server remoto."
++    IDS_DIRECTION           "&Direzione"
++    IDS_FULLSYNC_SYNCTYPE2  "Rimpiazza tutti i dati su Outlook con i dati presenti sul server."
++    IDS_FULLSYNC_SYNCTYPE1  "Bidirezionale"
++    IDS_FULLSYNC_SYNCTYPE3  "Rimpiazza tutti i dati sul server con i dati presenti su Outlook"
++    IDS_RECOVER             "Ripristina"
++    IDS_LOGGING             "Log"
++    IDS_NOT_SYNCHRONIZED    "Non sincronizzato"
+     IDS_FUNAMBOL_LINK       "www.funambol.com"
+-    IDS_SYNCHRONIZED        "Last sync:"
+-    IDS_AT                  "at"
+-    IDS_MAIN_CALENDAR       "Calendar"
++    IDS_SYNCHRONIZED        "Ultima sync:"
++    IDS_AT                  "al"
++    IDS_MAIN_CALENDAR       "Calendario"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+     IDS_CODE_SERVER_BUSY_SYNC 
+-                            "The server is busy. It is possible that another sync is in progress for this account on another device. Please try later."
+-    IDS_CODE_SERVER_ERROR_2052 "Sync not completed: Server failure."
++                            "Il server è impegnato. È possibile che sia in corso un'altra sync da un altro dispositivo. Riprovare più tardi."
++    IDS_CODE_SERVER_ERROR_2052 "Sync non completata: Errore sul server."
+     IDS_CODE_DROPPED_ITEMS_SERVER 
+-                            "Warning: some items were not correctly transferred on Server."
+-    IDS_CODE_NO_SOURCES     "No sources to sync.\nPlease select at least one source from Sync Options panel."
+-    IDS_HOUR                "hour"
+-    IDS_CODE_FORBIDDEN_403  "Forbidden: please activate your account."
++                            "Attenzione: alcuni elementi non sono stati trasferiti correttamente sul server."
++    IDS_CODE_NO_SOURCES     "Nessun elemento da sincronizzare.\nSelezionare almeno un elemento dalle impostazioni di sincronizzazione."
++    IDS_HOUR                "ora"
++    IDS_CODE_FORBIDDEN_403  "Bloccato: Attivare l'account."
+     IDS_USE_VTODO           "vCalendar"
+     IDS_USE_VNOTE           "vNote"
+-    IDS_EVENT_FILTER        "Filter"
+-    IDS_SYNC_PAST_EVENTS    "Sync Outlook appointments:"
+-    IDS_DATE_FILTER_NONE    "Future only"
+-    IDS_DATE_FILTER_LAST_WEEK "Since last week"
+-    IDS_DATE_FILTER_LAST_MONTH "Since last month"
+-    IDS_DATE_FILTER_LAST_3_MONTHS "Since last 3 months"
+-    IDS_DATE_FILTER_LAST_6_MONTHS "Since last 6 months"
+-    IDS_DATE_FILTER_ALL     "All"
++    IDS_EVENT_FILTER        "Filtro"
++    IDS_SYNC_PAST_EVENTS    "Sincronizza appuntamenti di Outlook:"
++    IDS_DATE_FILTER_NONE    "Solo nel futuro"
++    IDS_DATE_FILTER_LAST_WEEK "Dalla scorsa settimana"
++    IDS_DATE_FILTER_LAST_MONTH "Dal mese scorso"
++    IDS_DATE_FILTER_LAST_3_MONTHS "Dagli ultimi 3 mesi"
++    IDS_DATE_FILTER_LAST_6_MONTHS "Dagli ultimi 6 mesi"
++    IDS_DATE_FILTER_ALL     "Tutto"
+ END
+ 
+ STRINGTABLE 
+ BEGIN
+-    IDS_DATE_FILTER_LAST_2_WEEKS "Since last 2 weeks"
++    IDS_DATE_FILTER_LAST_2_WEEKS "Dalle ultime 3 settimane"
+ END
+ 
+ #endif    // Italian (Italy) resources
