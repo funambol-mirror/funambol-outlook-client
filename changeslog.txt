@@ -1,5 +1,18 @@
+2009-03-31
+   - toccy: merged from branch US1655 (Pictures Sync - main screen) - r128
+
 2009-03-27
    - teo: added extended added handlig feature
+
+        2009-03-23
+            released Funambol Outlook Sync Client 7.2.US1655.0
+            - toccy: added "Pictures" pane on main screen, and resources for the pictures sync.
+            - toccy: added PicturesSyncsource class and pictures configuration in DLL, to handle pictures sync.
+            - toccy: added utils functions to manage source name/ID conversion, fixed printReport.
+            - toccy: Now SyncSource** array passed to WindowsSyncClient is no more a WindowsSyncSource**, because one source is a PicturesncSource.
+            - toccy: some code cleaning and reformatting of UI/MainSyncfOrm, UI/SyncForm, UI/CustomPane.
+
+    - toccy: Created branch US1655 (from r88) Pictures Sync - main screen
 
 Funambol Outlook Sync Client 7.1.10
 ---------------------------------------

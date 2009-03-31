@@ -53,6 +53,7 @@
 #define SYNCSOURCE_CONTACTS     2
 #define SYNCSOURCE_NOTES        3
 #define SYNCSOURCE_TASKS        4
+#define SYNCSOURCE_PICTURES     5
 
 
 /*-----------utils functions -----------------*/
@@ -86,14 +87,20 @@ int          writeToFile           (const std::string&  content, const std::stri
 std::string  getSyncMutexName      ();
 char*        readSystemErrorMsg    (DWORD errorCode = 0);
 std::wstring getSafeItemName       (ClientItem* cItem);
-void         printReport           (SyncReport* sr, WindowsSyncSource** sources);
+void         printReport           (SyncReport* sr, SyncSource** sources);
 char*        friendlyName          (const char* sourceName);
 
 int          getBuildNumberFromVersion(const char* swv);
 long         variantTimeToTimeStamp   (const double vTime);
 
-int syncSourceNameToIndex(const char*);
+int          syncSourceNameToIndex(const StringBuffer& sourceName);
+StringBuffer syncSourceIndexToName(const int sourceID);
 
+/**
+ * Used to quicky check if a specific source is currently enabled/disabled.
+ * It checks the itemTypesUsed[] array.
+ */
+bool isSourceEnabled(const WCHAR* sourceName);
 
 
 /**

@@ -662,6 +662,58 @@ BOOL OutlookConfig::setSyncSourceConfig(WindowsSyncSourceConfig& wsc) {
 }
 
 
+bool OutlookConfig::addWindowsSyncSourceConfig(const wstring& sourceName) 
+{
+
+    unsigned int backupSourceConfigsCount = sourceConfigsCount;
+
+    try {
+        //
+        // Set (add) the default SyncSourceConfig (common props)
+        //
+        SyncSourceConfig* sc = DefaultWinConfigFactory::getSyncSourceConfig(sourceName.c_str());
+        DMTClientConfig::setSyncSourceConfig(*sc);
+        delete sc;
+
+        //
+        // Check if we added a new SSourceConfig
+        //
+        if (sourceConfigsCount > backupSourceConfigsCount) {
+
+            // The winSourceConfigs array is corrupted: "s" links point to free memory. 
+            // So we recreate it and link common props again.
+            if (winSourceConfigs) {
+                delete [] winSourceConfigs;
+            }
+            winSourceConfigs = new WindowsSyncSourceConfig[sourceConfigsCount];
+            for (unsigned int i=0; i<sourceConfigsCount; i++) {
+                // Link internal pointer to sourceConfigs array
+                winSourceConfigs[i].setCommonConfig(DMTClientConfig::getSyncSourceConfig(i));
+            }
+        }
+
+        //
+        // Set (add) the default WindowsSyncSourceConfig
+        //
+        char* name = toMultibyte(sourceName.c_str());
+        sc = DMTClientConfig::getSyncSourceConfig(name);
+        WindowsSyncSourceConfig* wsc = DefaultWinConfigFactory::getWinSyncSourceConfig(sourceName, sc);
+        setSyncSourceConfig(*wsc);
+        delete [] name;
+        delete wsc;
+
+    }
+    catch (char* e) {
+        setErrorF(getLastErrorCode(), ERR_DEFAULT_SSCONFIG, PICTURE_, e);
+        safeMessageBox(getLastErrorMsg());
+        return false;
+    }
+    return true;
+}
+
+
+
+
 /**
  * Adds the passed WindowsSyncSourceConfig.
  * It is added at the end of the 'winSourceConfig' array.
@@ -840,14 +892,14 @@ void OutlookConfig::createDefaultConfig() {
     //       object (inside constructor of WindowsSyncSourceConfig).
     // NOTE: create sources alphabetically sorted, because this will be the order of 
     //       nodes inside Win registry (and they must match)!
-    WCHAR* sourceNames[4] = {APPOINTMENT, CONTACT, NOTE, TASK};
-    for (int i=0; i<4; i++) {
+    WCHAR* sourceNames[5] = {APPOINTMENT, CONTACT, NOTE, PICTURE, TASK};
+    for (int i=0; i<5; i++) {
         WCHAR* wname = sourceNames[i];
         SyncSourceConfig* sc = DefaultWinConfigFactory::getSyncSourceConfig(wname);
         DMTClientConfig::setSyncSourceConfig(*sc);
         delete sc;
     }
-    for (int i=0; i<4; i++) {
+    for (int i=0; i<5; i++) {
         WCHAR* wname = sourceNames[i];
         char*   name = toMultibyte(wname);
 
@@ -1026,6 +1078,13 @@ void OutlookConfig::upgradeConfig() {
     if (oldSwv < 70104) {
         DeviceConfig& dc = getClientConfig();
         dc.setMod(PROGRAM_NAME);
+    }
+
+        // Old version < 7.2.0: Pictures source added.
+    if (oldSwv < 70200) {
+        if (!addWindowsSyncSourceConfig(PICTURE)) {
+            LOG.error("upgradeConfig - error adding the config for %s source", PICTURE_);
+        }
     }
 
         

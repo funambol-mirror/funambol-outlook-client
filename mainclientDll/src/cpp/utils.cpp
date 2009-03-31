@@ -55,6 +55,7 @@
 #include "winmaincpp.h"
 #include "OutlookConfig.h"
 #include "utils.h"
+#include "PicturesSyncSource.h"
 
 #include "base/adapter/PlatformAdapter.h"
 
@@ -291,28 +292,6 @@ WCHAR* readAppDataPath() {
     static const StringBuffer& pt = PlatformAdapter::getConfigFolder();    
     WCHAR* dataPath = toWideChar(pt.c_str());
     return dataPath;
-    
-    /*
-    // Get 'application data' folder for current user.
-    WCHAR appDataPath[MAX_PATH_LENGTH];
-    if ( FAILED(SHGetFolderPath(NULL, 
-                                CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                                NULL,
-                                0,
-                                appDataPath)) ) {
-        DWORD code = GetLastError();
-        char* msg = readSystemErrorMsg(code);
-        setErrorF(getLastErrorCode(), ERR_APPDATA_PATH, code, msg);
-        delete [] msg;
-        return NULL;
-    }
-
-    int len = wcslen(appDataPath) + wcslen(FUNAMBOL_DIR_NAME) + wcslen(OLPLUGIN_DIR_NAME) + 3;
-    WCHAR* dataPath = new WCHAR[len];
-    wsprintf(dataPath, L"%s\\%s\\%s", appDataPath, FUNAMBOL_DIR_NAME, OLPLUGIN_DIR_NAME);
-
-    return dataPath;
-    */
 }
 
 
@@ -456,47 +435,6 @@ int makeDataDirs() {
         return 1;   
     }
     return err;
-    
-    /*
-    // Get 'application data' folder for current user.
-    WCHAR appDataPath[MAX_PATH_LENGTH];
-    if ( FAILED(SHGetFolderPath(NULL, 
-                                CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                                NULL,
-                                0,
-                                appDataPath)) ) {
-        DWORD code = GetLastError();
-        char* msg = readSystemErrorMsg(code);
-        setErrorF(getLastErrorCode(), ERR_APPDATA_PATH, code, msg);
-        delete [] msg;
-        return 1;
-    }
-    
-    // Create 'Funambol' directory
-    wstring tmpPath = appDataPath;
-    tmpPath += L"\\";
-    tmpPath += FUNAMBOL_DIR_NAME;
-    if ( _wmkdir(tmpPath.c_str()) ) {
-        _get_errno(&err);
-        if (err != EEXIST) {
-            setErrorF(getLastErrorCode(), ERR_DIR_CREATE, tmpPath.c_str());
-            return 1;
-        }
-    }
-
-    // Create 'Outlook Client' directory
-    tmpPath += L"\\";
-    tmpPath += OLPLUGIN_DIR_NAME;
-    if ( _wmkdir(tmpPath.c_str()) ) {
-        _get_errno(&err);
-        if (err != EEXIST) {
-            setErrorF(getLastErrorCode(), ERR_DIR_CREATE, tmpPath.c_str());
-            return 1;
-        }
-    }
-
-    return 0;
-    */
 }
 
 
@@ -787,30 +725,49 @@ wstring getSafeItemName(ClientItem* cItem) {
 
 
 
-/// Used by UI
-int syncSourceNameToIndex(const char* syncSource){
-    int value = 0;
 
-    if(! strcmp(syncSource,"appointment")) {
-        value = SYNCSOURCE_CALENDAR;
+int syncSourceNameToIndex(const StringBuffer& sourceName) 
+{
+    int id = 0;
+
+    if (sourceName == CONTACT_) {
+        id = SYNCSOURCE_CONTACTS;
     }
-    else if(! strcmp(syncSource,"contact")) {
-        value = SYNCSOURCE_CONTACTS;
+    else if (sourceName == APPOINTMENT_) {
+        id = SYNCSOURCE_CALENDAR;
     }
-    else if(! strcmp(syncSource,"task")) {
-        value = SYNCSOURCE_TASKS;
+    else if (sourceName == TASK_) {
+        id = SYNCSOURCE_TASKS;
     }
-    else if(! strcmp(syncSource,"note")) {
-        value = SYNCSOURCE_NOTES;
+    else if (sourceName == NOTE_) {
+        id = SYNCSOURCE_NOTES;
     }
-    return value;
+    else if (sourceName == PICTURE_) {
+        id = SYNCSOURCE_PICTURES;
+    }
+
+    return id;
 }
+
+StringBuffer syncSourceIndexToName(const int sourceID)
+{
+    switch (sourceID) {
+        case (SYNCSOURCE_CONTACTS): return CONTACT_;
+        case (SYNCSOURCE_CALENDAR): return APPOINTMENT_;
+        case (SYNCSOURCE_TASKS):    return TASK_;
+        case (SYNCSOURCE_NOTES):    return NOTE_;
+        case (SYNCSOURCE_PICTURES): return PICTURE_;
+        default:                    return "";
+    }
+}
+
 
 
 /**
  * Prints a smart synchronization report table into LOG file.
+ * TODO: use SyncReport::toString() ?
  */
-void printReport(SyncReport* sr, WindowsSyncSource** sources) {
+void printReport(SyncReport* sr, SyncSource** sources) {
 
     if (sr == NULL) {
         LOG.debug("SyncReport is NULL");
@@ -907,8 +864,19 @@ void printReport(SyncReport* sr, WindowsSyncSource** sources) {
         //
         if (ssr->checkState()) {
 
-            // Source not synced
-            if (sources[i]->getConfig().getIsSynced() == false) {
+            // Check if source not synced
+            int sourceID = syncSourceNameToIndex(sources[i]->getConfig().getName());
+            bool synced = false;
+            if (sourceID == SYNCSOURCE_PICTURES) {
+                PicturesSyncSource* ss = (PicturesSyncSource*)sources[i];
+                if (ss->getIsSynced()) synced = true;
+            }
+            else {
+                // All other ssources are WindowsSyncSources
+                WindowsSyncSource* ss = (WindowsSyncSource*)sources[i];
+                if (ss->getConfig().getIsSynced()) synced = true;
+            }
+            if (!synced) {
                 res.append("    Not synced.\n\n");
                 i++;
                 continue;
@@ -1018,6 +986,9 @@ char* friendlyName(const char* sourceName) {
     else if (!strcmp(sourceName, TASK_)) {
         return "Tasks";
     }
+    else if (!strcmp(sourceName, PICTURE_)) {
+        return "Pictures";
+    }
     return EMPTY_STRING;
 }
 
@@ -1036,6 +1007,19 @@ int getBuildNumberFromVersion(const char* swv) {
     sscanf(swv, "%d.%d.%d", &major, &minor, &build);
     return (major*10000 + minor*100 + build);
 }
+
+
+bool isSourceEnabled(const WCHAR* sourceName)
+{
+    for (int i=0; itemTypesUsed[i]; i++) {
+        if (!wcscmp(itemTypesUsed[i], sourceName)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 
 
 //
@@ -1068,5 +1052,4 @@ long variantTimeToTimeStamp(const double vTime) {
     // This call automatically converts to UTC!
     return (long)mktime(&t);
 }
-
 

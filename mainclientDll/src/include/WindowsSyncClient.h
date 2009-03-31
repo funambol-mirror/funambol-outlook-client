@@ -53,12 +53,12 @@ protected:
 
     /// Pointer to the NULL terminated vector of active SyncSources.
     /// It's externally owned, must NOT be freed.
-    WindowsSyncSource** winSyncSources;
+    SyncSource** syncSources;
 
 
 public:
 
-    WindowsSyncClient(WindowsSyncSource** sources);
+    WindowsSyncClient(SyncSource** sources);
     ~WindowsSyncClient();
 
     // To check if server requested a slow-sync -> display warning.

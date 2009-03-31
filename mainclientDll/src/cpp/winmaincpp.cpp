@@ -40,6 +40,7 @@
 
 #include "winmaincpp.h"
 #include "WindowsSyncSource.h"
+#include "PicturesSyncSource.h"
 #include "WindowsSyncClient.h"
 #include "utils.h"
 #include "HwndFunctions.h"
@@ -235,12 +236,6 @@ int startSync() {
     LOG.setLevel(config->getClientConfig().getLogLevel());
     LOG.debug("Starting the Sync process...");
 
-    // Manually disable notes if it's a portal build.
-    // new 7.0.3: changed portal meaning
-    //if (config->checkPortalBuild()) {
-    //    config->getSyncSourceConfig(NOTE_)->setSync("none");
-    //}
-
     // If here, this is the ONLY instance of sync process 
     // -> set the scheduled flag on win registry.
     config->setScheduledSync(isScheduledSync);
@@ -288,13 +283,15 @@ int startSync() {
     // ----------------------------------------------------------
     LOG.debug("Creating SyncSources...");
     int sourcesCount = config->getSyncSourceConfigsCount();
-    WindowsSyncSource** sources = new WindowsSyncSource*[sourcesCount+1];
+    SyncSource** sources = new SyncSource*[sourcesCount+1];
 
+    // Sources not icluded into the itemTypesUsed[] array will not be synced.
     // Sources order is important: 
     // 1. "Contacts"
     // 2. "Calendar"
     // 3. "Tasks"
     // 4. "Notes"
+    // 5. "Pictures"
     int j=0;
     while (itemTypesUsed[j]) {
         for (int i=0; i<sourcesCount; i++) {
@@ -303,8 +300,15 @@ int startSync() {
 
                 wname = toWideChar(config->getSyncSourceConfig(i)->getName());
                 if (!wcscmp(wname, itemTypesUsed[j])) {
-                    // Here the right WindowsSyncSourceConfig is passed to the SyncSource!
-                    sources[sourcesActive] = new WindowsSyncSource(wname, config->getSyncSourceConfig(i));
+
+                    // Here the right SyncSource is added to the source array.
+                    // The source is created passing the right SSConfig.
+                    if (wcscmp(wname, PICTURE) == 0) {
+                        sources[sourcesActive] = new PicturesSyncSource(wname, config->getSyncSourceConfig(i));
+                    }
+                    else {
+                        sources[sourcesActive] = new WindowsSyncSource(wname, config->getSyncSourceConfig(i));
+                    }
                     sourcesActive++;
                 }
                 delete [] wname;
@@ -368,7 +372,7 @@ int startSync() {
     // Create the SyncClient object and kick off the sync
     //
     LOG.debug("Start SyncClient::Sync() with %d sources", sourcesActive);
-    ret = winClient.sync(*config, (SyncSource**)sources);
+    ret = winClient.sync(*config, sources);
     // --------------------------------------------------
 
 
@@ -400,27 +404,34 @@ finally:
         setErrorF(report->getLastErrorCode(), "%s", report->getLastErrorMsg());
         ret = getLastErrorCode();
 
+        //
+        // Fire the SOURCE_STATE message to the UI, to tell the state of sources synced
+        //
         int i=0;
-        while(sources[i]){
+        while (sources[i]) {
             SyncSourceReport* ssReport = NULL;
             ssReport = sources[i]->getReport();
+            LPARAM sourceState = SYNCSOURCE_STATE_NOT_SYNCED;
 
-            if (ssReport){
-                if (!strcmp(ssReport->getSourceName(), CONTACT_))
-                    sourceID = SYNCSOURCE_CONTACTS;
-                else if (!strcmp(ssReport->getSourceName(), APPOINTMENT_))
-                    sourceID = SYNCSOURCE_CALENDAR;
-                else if (!strcmp(ssReport->getSourceName(), TASK_))
-                    sourceID = SYNCSOURCE_TASKS;
-                else if (!strcmp(ssReport->getSourceName(), NOTE_))
-                    sourceID = SYNCSOURCE_NOTES;
+            if (ssReport) {
+                sourceID = syncSourceNameToIndex(ssReport->getSourceName());
+                if (sourceID) {
+                    if (sourceID == SYNCSOURCE_PICTURES) {
+                        PicturesSyncSource* pss = (PicturesSyncSource*)sources[i];
+                        if ((ssReport->getState() != SOURCE_ERROR) && pss->getIsSynced()) {
+                            sourceState = SYNCSOURCE_STATE_OK;
+                        }
+                    }
+                    else {
+                        // All other ssources are WindowsSyncSources
+                        WindowsSyncSource* wss = (WindowsSyncSource*)sources[i];
+                        if ((ssReport->getState() != SOURCE_ERROR) && wss->getConfig().getIsSynced()) {
+                            sourceState = SYNCSOURCE_STATE_OK;
+                        }
+                    }
+                }
 
-                if( (ssReport->getState() != SOURCE_ERROR) && sources[i]->getConfig().getIsSynced() )
-                    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SOURCE_STATE, 
-                                (WPARAM)sourceID, (LPARAM)SYNCSOURCE_STATE_OK );
-                else
-                    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SOURCE_STATE, 
-                                (WPARAM)sourceID, (LPARAM)SYNCSOURCE_STATE_NOT_SYNCED );
+                SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SOURCE_STATE, (WPARAM)sourceID, sourceState);
             }
             i++;
         }

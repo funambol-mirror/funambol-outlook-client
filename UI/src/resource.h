@@ -198,7 +198,10 @@
 #define IDS_CODE_DROPPED_ITEMS          266
 #define IDS_TEXT_CHECKING               267
 #define IDB_LEFT_BUTTON                 267
+#define IDI_PICTURES                    267
 #define IDS_FINISHED_SENDING            268
+#define IDI_NOTES_GREY1                 268
+#define IDI_PICTURES_GREY               268
 #define IDB_SEPARATOR                   269
 #define IDS_GUIDE_LINK                  269
 #define IDS_ERR_SERVER_TIMOUT           270
@@ -221,6 +224,13 @@
 #define IDS_DATE_FILTER_LAST_6_MONTHS   286
 #define IDS_DATE_FILTER_ALL             287
 #define IDS_DATE_FILTER_LAST_2_WEEKS    288
+#define IDS_PICTURES                    289
+#define IDS_ADVANCED_PICTURES           290
+#define IDS_TEXT_PICTURES               291
+#define IDS_LEFTVIEW_PICTURES           292
+#define IDS_PICTURES_DETAILS            293
+#define IDS_PICTURES_FOLDER             294
+#define IDS_MAIN_PICTURES               295
 #define IDC_TREE1                       1005
 #define IDC_SCHEDULER_SPIN              1007
 #define IDC_EDIT2                       1008
@@ -423,7 +433,10 @@
 #define IDC_MAIN_STATIC_STATUS_NOTES    1178
 #define IDC_MAIN_STATIC_NOTES           1179
 #define IDC_MAIN_GROUP_SYNC             1180
+#define IDC_MAIN_ICON_PICTURES          1180
 #define IDC_MAIN_GROUP_SOURCES          1181
+#define IDC_MAIN_STATIC_STATUS_PICTURES 1181
+#define IDC_MAIN_STATIC_PICTURES        1182
 #define IDC_MAIN_LINK_CALENDAR          1183
 #define IDC_ABOUT_LINK                  1184
 #define IDC_MAIN_LINK_NOTES             1186
@@ -445,8 +458,10 @@
 #define IDC_MAIN_BK_CALENDAR3           1201
 #define IDC_MAIN_BK_NOTES               1201
 #define IDC_SEP1                        1202
+#define IDC_MAIN_BK_PICTURES            1202
 #define IDC_SEP2                        1203
 #define IDC_TASKS_RADIO_VTODO           1203
+#define IDC_MAIN_ICON_STATUS_PICTURES   1203
 #define IDC_NOTES_RADIO_VNOTE           1204
 #define ID_FILE_CONFIGURATION           32771
 #define ID_FILE_ZZZZ                    32772

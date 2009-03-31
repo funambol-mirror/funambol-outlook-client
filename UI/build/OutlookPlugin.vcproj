@@ -671,6 +671,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\res\pictures.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\src\res\pictures_gr.ico"
+				>
+			</File>
+			<File
 				RelativePath="..\src\res\tasks.ico"
 				>
 			</File>
