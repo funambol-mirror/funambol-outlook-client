@@ -239,6 +239,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\include\PicturesSyncSource.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\include\SIFFields.h"
 				>
 			</File>
@@ -381,6 +385,10 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\OutlookScheduler.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\cpp\PicturesSyncSource.cpp"
 				>
 			</File>
 			<File

@@ -48,8 +48,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-/////////////////////////////////////////////////////////////////////////////
-// CSyncForm form view
+
 
 #ifndef __AFXEXT_H__
 #include <afxext.h>
@@ -61,42 +60,10 @@
 /**
  * Form of the main window.
  * Contains objects on the main screen of the UI (panes, labels, ...).
+ * TODO - refactoring: please use arrays for sources (sourceStatusLabel, iconSource,...)
  */
 class CSyncForm : public CFormView
 {
-protected:
-	CSyncForm();           // protected constructor used by dynamic creation
-	DECLARE_DYNCREATE(CSyncForm)
-
-public:
-	//{{AFX_DATA(CSyncForm)
-	enum { IDD = IDD_SYNC_FORM };
-		// NOTE: the ClassWizard will add data members here
-	//}}AFX_DATA
-
-public:
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CSyncForm)
-protected:
-    virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-    virtual void OnDraw(CDC* pDC);
-
-	//}}AFX_VIRTUAL
-
-    virtual ~CSyncForm();
-
-#ifdef _DEBUG
-     virtual void AssertValid() const;
-     virtual void Dump(CDumpContext& dc) const;
-#endif
-
-	// Generated message map functions
-	//{{AFX_MSG(CSyncForm)
-		// NOTE - the ClassWizard will add and remove member functions here.
-	//}}AFX_MSG
-   DECLARE_MESSAGE_MAP()
 
 private:
     // true if the UI buttons are locked
@@ -107,21 +74,52 @@ private:
     CString calendarStatusLabel;
     CString tasksStatusLabel;
     CString notesStatusLabel;
+    CString picturesStatusLabel;
 
     // Buffers for source panel titles (fixed)
     CString contactsLabel;
     CString calendarLabel;
     CString tasksLabel;
     CString notesLabel;
+    CString picturesLabel;
+
+
+protected:
+
+    // protected constructor used by dynamic creation
+	CSyncForm();
+	DECLARE_DYNCREATE(CSyncForm)
+
+    virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+    virtual void OnDraw(CDC* pDC);
+    virtual ~CSyncForm();
+
+#ifdef _DEBUG
+     virtual void AssertValid() const;
+     virtual void Dump(CDumpContext& dc) const;
+#endif
+
+   // Generated message map functions
+   DECLARE_MESSAGE_MAP()
+
 
 public:
+
+	//{{AFX_DATA(CSyncForm)
+	enum { IDD = IDD_SYNC_FORM };
+		// NOTE: the ClassWizard will add data members here
+	//}}AFX_DATA
+
     CFont fontBold;
     CFont fontNormal;
     CAnimatedIcon butStart;
+
     CAnimatedIcon iconContacts;
     CAnimatedIcon iconCalendar;
     CAnimatedIcon iconTasks;
     CAnimatedIcon iconNotes;
+    CAnimatedIcon iconPictures;
+
     CBrush  brushHollow;
 
     // right hand status icons
@@ -129,6 +127,7 @@ public:
     CAnimatedIcon iconStatusCalendar;
     CAnimatedIcon iconStatusTasks;
     CAnimatedIcon iconStatusNotes;
+    CAnimatedIcon iconStatusPictures;
     CAnimatedIcon iconStatusSync;
 
     // panes
@@ -137,11 +136,15 @@ public:
     CCustomPane paneCalendar;
     CCustomPane paneTasks;
     CCustomPane paneNotes;
+    CCustomPane panePictures;
 
     // sync source states {SYNCSOURCE_STATE_OK, SYNCSOURCE_STATE_NOT_SYNCED, SYNCSOURCE_STATE_CANCELED}
     // defined in winmaincpp.h        
-    int syncSourceContactState, syncSourceCalendarState;
-    int syncSourceTaskState, syncSourceNoteState;
+    int syncSourceContactState;
+    int syncSourceCalendarState;
+    int syncSourceTaskState;
+    int syncSourceNoteState;
+    int syncSourcePictureState;
 
     
     /**
@@ -170,6 +173,7 @@ public:
     void changeCalendarStatus(CString& status);
     void changeTasksStatus   (CString& status);
     void changeNotesStatus   (CString& status);
+    void changePicturesStatus(CString& status);
 
     afx_msg LRESULT OnInitForm(WPARAM, LPARAM);
     afx_msg void OnBnClickedMainButSync();
@@ -185,14 +189,10 @@ public:
     afx_msg void OnStnClickedMainBkCalendar();
     afx_msg void OnStnClickedMainBkTasks();
     afx_msg void OnStnClickedMainBkNotes();
-
+    afx_msg void OnStnClickedMainBkPictures();
 };
 
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 /** @} */
 /** @endcond */
-#endif // !defined(AFX_FORM1_H__FA98B71B_D0B7_11D3_BC39_00C04F602FEE__INCLUDED_)
+#endif

@@ -49,29 +49,67 @@
 #include "ConfigFrm.h"
 
 
+// Thread related
+DWORD WINAPI syncThread(LPVOID lpParam);
+DWORD WINAPI syncThreadKiller(LPVOID lpParam);
+
+
 /**
  * Main window.
  * Contains: 
  * - images of main window
  * - methods to interact with the DLL
  * - methods called for msg mapping on main UI
+ *
+ * TODO: refactoring: use arrays of ssources
  */
 class CMainSyncFrame : public CFrameWnd
 {
 
 private:
+
     // Counters, incremented each time a source has begun.
     // (1 when begin sending data, 2 when begin receiving data)
     int contactsBegin;
     int calendarBegin;
     int tasksBegin;
     int notesBegin;
+    int picturesBegin;
 	
-protected: // create from serialization only
-  CMainSyncFrame();
-  DECLARE_DYNCREATE(CMainSyncFrame)
+
+protected:
+
+    CMainSyncFrame();
+    DECLARE_DYNCREATE(CMainSyncFrame)
+
+    HANDLE hSyncThread;
+    DWORD dwThreadId;
+    bool configOpened;
+    int dpiX, dpiY;
+
+    // info about sync modes for sources, used on full sync
+    int syncModeCalendar; 
+    int syncModeContacts;
+    int syncModeTasks;
+    int syncModeNotes;
+    int syncModePictures;
+
+    // info about the sync in progress
+    int currentSource;
+    int totalItems;
+    int currentItem;
+    
+    CFont fontBold;
+
+    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+
+	DECLARE_MESSAGE_MAP()
+
+	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
+
 
 public:
+
     CConfigFrame* pConfigFrame;
 
     // bitmaps, load once, use it everywhere
@@ -80,23 +118,7 @@ public:
     HBITMAP hBmpDark;
     HBITMAP hBmpLight;
 
-protected:
-    HANDLE hSyncThread;
-    DWORD dwThreadId;
-    bool configOpened;
-    int dpiX, dpiY;
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CConfigFrame)
-	public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	protected:
-	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
-	//}}AFX_VIRTUAL
-
-// Implementation
-public:
 	virtual ~CMainSyncFrame();
     void backupSyncModeSettings();
     void restoreSyncModeSettings();
@@ -113,21 +135,6 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected: 
-    // info about sync modes for sources, used on full sync
-    int syncModeCalendar; 
-    int syncModeContacts;
-    int syncModeTasks;
-    int syncModeNotes;
-
-    // info about the sync in progress
-    int currentSource;
-    int totalItems;
-    int currentItem;
-    
-    CFont fontBold;
-    
-public:
     CStatusBar wndStatusBar;
     CSplitter wndSplitter;
     bool bSyncStarted;
@@ -136,27 +143,18 @@ public:
     void StartSync();
     int CancelSync();
 
-// Generated message map functions
-protected:
-	//{{AFX_MSG(CConfigFrame)
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-		// NOTE - the ClassWizard will add and remove member functions here.
-		//    DO NOT EDIT what you see in these blocks of generated code!
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-public:
     //afx_msg void OnUpdatePage(CCmdUI *pCmdUI); //status bar update
-    afx_msg LRESULT OnMsgSyncBegin(WPARAM , LPARAM);
-    afx_msg LRESULT OnMsgSyncEnd(WPARAM , LPARAM);
+    afx_msg LRESULT OnMsgSyncBegin      (WPARAM , LPARAM);
+    afx_msg LRESULT OnMsgSyncEnd        (WPARAM , LPARAM);
     afx_msg LRESULT OnMsgSyncSourceBegin(WPARAM , LPARAM);
-    afx_msg LRESULT OnMsgSyncSourceEnd(WPARAM , LPARAM);
-    afx_msg LRESULT OnMsgItemSynced(WPARAM , LPARAM);
-    afx_msg LRESULT OnMsgTotalItems(WPARAM , LPARAM); 
-    afx_msg LRESULT OnMsgStartSyncBegin(WPARAM , LPARAM); 
-    afx_msg LRESULT OnMsgStartsyncEnded(WPARAM , LPARAM); 
+    afx_msg LRESULT OnMsgSyncSourceEnd  (WPARAM , LPARAM);
+    afx_msg LRESULT OnMsgItemSynced     (WPARAM , LPARAM);
+    afx_msg LRESULT OnMsgTotalItems     (WPARAM , LPARAM); 
+    afx_msg LRESULT OnMsgStartSyncBegin (WPARAM , LPARAM); 
+    afx_msg LRESULT OnMsgStartsyncEnded (WPARAM , LPARAM); 
     afx_msg LRESULT OnMsgRefreshStatusBar(WPARAM, LPARAM);
     afx_msg LRESULT OnMsgSyncSourceState(WPARAM, LPARAM);
-    afx_msg LRESULT OnMsgUnlockButtons(WPARAM, LPARAM);
+    afx_msg LRESULT OnMsgUnlockButtons  (WPARAM, LPARAM);
 
     afx_msg void OnFileConfiguration();
     afx_msg void OnToolsFullSync();
@@ -168,15 +166,7 @@ public:
     afx_msg void OnClose();
 };
 
-// Thread related
-DWORD WINAPI syncThread(LPVOID lpParam);
-DWORD WINAPI syncThreadKiller(LPVOID lpParam);
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 /** @} */
 /** @endcond */
-#endif // !defined(AFX_MAINFRM_H__FA98B70F_D0B7_11D3_BC39_00C04F602FEE__INCLUDED_)
+#endif

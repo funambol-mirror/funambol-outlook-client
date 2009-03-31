@@ -204,7 +204,7 @@ public:
      */
     WindowsSyncSource::WindowsSyncSource(const WCHAR* name, WindowsSyncSourceConfig* wsc);
 
-    ~WindowsSyncSource();
+    virtual ~WindowsSyncSource();
 
 
     /// Used to access configuration of SS
@@ -236,11 +236,6 @@ public:
 
     SyncItem* getFirstDeletedItem();
     SyncItem* getNextDeletedItem ();
-
-    // DEPRTECATED!
-    //SyncItem* getFirstItemKey() {return NULL; }
-    // DEPRTECATED!
-    //SyncItem* getNextItemKey() {return NULL; }
 
 
     // --------- Methods to set syncItems into Client --------------

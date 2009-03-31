@@ -66,28 +66,27 @@ static char THIS_FILE[] = __FILE__;
 IMPLEMENT_DYNCREATE(CMainSyncFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainSyncFrame, CFrameWnd)
-	//{{AFX_MSG_MAP(CConfigFrame)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-		//    DO NOT EDIT what you see in these blocks of generated code !
+
     ON_WM_CREATE()
-	//}}AFX_MSG_MAP
-    ON_MESSAGE(ID_MYMSG_SYNC_BEGIN, &CMainSyncFrame::OnMsgSyncBegin)
-    ON_MESSAGE(ID_MYMSG_SYNC_END, &CMainSyncFrame::OnMsgSyncEnd)
-    ON_MESSAGE(ID_MYMSG_SYNCSOURCE_BEGIN, &CMainSyncFrame::OnMsgSyncSourceBegin)
-    ON_MESSAGE(ID_MYMSG_SYNCSOURCE_END, &CMainSyncFrame::OnMsgSyncSourceEnd)
-    ON_MESSAGE(ID_MYMSG_SYNC_ITEM_SYNCED, &CMainSyncFrame::OnMsgItemSynced)
-    ON_MESSAGE(ID_MYMSG_SYNC_TOTALITEMS, &CMainSyncFrame::OnMsgTotalItems) 
-    ON_MESSAGE(ID_MYMSG_SYNC_STARTSYNC_BEGIN, &CMainSyncFrame::OnMsgStartSyncBegin) 
-    ON_MESSAGE(ID_MYMSG_STARTSYNC_ENDED, &CMainSyncFrame::OnMsgStartsyncEnded) 
-    ON_MESSAGE(ID_MYMSG_REFRESH_STATUSBAR, &CMainSyncFrame::OnMsgRefreshStatusBar) 
-    ON_MESSAGE(ID_MYMSG_SOURCE_STATE, &CMainSyncFrame::OnMsgSyncSourceState) 
-    ON_MESSAGE(ID_MYMSG_UNLOCK_BUTTONS, &CMainSyncFrame::OnMsgUnlockButtons)
-    ON_COMMAND(ID_FILE_CONFIGURATION, &CMainSyncFrame::OnFileConfiguration)
-    ON_COMMAND(ID_TOOLS_FULLSYNC, &CMainSyncFrame::OnToolsFullSync)
-    ON_COMMAND(ID_FILE_SYNCHRONIZE, &CMainSyncFrame::OnFileSynchronize)
-    ON_COMMAND(ID_TOOLS_SETLOGLEVEL, &CMainSyncFrame::OnToolsSetloglevel)
     ON_WM_NCACTIVATE()
     ON_WM_CLOSE()
+
+    ON_MESSAGE(ID_MYMSG_SYNC_BEGIN,             &CMainSyncFrame::OnMsgSyncBegin)
+    ON_MESSAGE(ID_MYMSG_SYNC_END,               &CMainSyncFrame::OnMsgSyncEnd)
+    ON_MESSAGE(ID_MYMSG_SYNCSOURCE_BEGIN,       &CMainSyncFrame::OnMsgSyncSourceBegin)
+    ON_MESSAGE(ID_MYMSG_SYNCSOURCE_END,         &CMainSyncFrame::OnMsgSyncSourceEnd)
+    ON_MESSAGE(ID_MYMSG_SYNC_ITEM_SYNCED,       &CMainSyncFrame::OnMsgItemSynced)
+    ON_MESSAGE(ID_MYMSG_SYNC_TOTALITEMS,        &CMainSyncFrame::OnMsgTotalItems) 
+    ON_MESSAGE(ID_MYMSG_SYNC_STARTSYNC_BEGIN,   &CMainSyncFrame::OnMsgStartSyncBegin) 
+    ON_MESSAGE(ID_MYMSG_STARTSYNC_ENDED,        &CMainSyncFrame::OnMsgStartsyncEnded) 
+    ON_MESSAGE(ID_MYMSG_REFRESH_STATUSBAR,      &CMainSyncFrame::OnMsgRefreshStatusBar) 
+    ON_MESSAGE(ID_MYMSG_SOURCE_STATE,           &CMainSyncFrame::OnMsgSyncSourceState) 
+    ON_MESSAGE(ID_MYMSG_UNLOCK_BUTTONS,         &CMainSyncFrame::OnMsgUnlockButtons)
+    ON_COMMAND(ID_FILE_CONFIGURATION,           &CMainSyncFrame::OnFileConfiguration)
+    ON_COMMAND(ID_TOOLS_FULLSYNC,               &CMainSyncFrame::OnToolsFullSync)
+    ON_COMMAND(ID_FILE_SYNCHRONIZE,             &CMainSyncFrame::OnFileSynchronize)
+    ON_COMMAND(ID_TOOLS_SETLOGLEVEL,            &CMainSyncFrame::OnToolsSetloglevel)
+
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -129,23 +128,29 @@ void refreshSourceLabels(CString& msg, int sourceIndex) {
     }
 
     if (!cancelingSync && msg.GetLength()) {
+        CSyncForm* mainForm = (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1);
+
         switch(sourceIndex){
             case SYNCSOURCE_CONTACTS:
-                ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->changeContactsStatus(msg); 
-                ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->paneContacts.Invalidate();
+                mainForm->changeContactsStatus(msg); 
+                mainForm->paneContacts.Invalidate();
                 break;
             case SYNCSOURCE_CALENDAR:
-                ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->changeCalendarStatus(msg); 
-                ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->paneCalendar.Invalidate();
+                mainForm->changeCalendarStatus(msg); 
+                mainForm->paneCalendar.Invalidate();
                 break;
             case SYNCSOURCE_TASKS:
-                ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->changeTasksStatus(msg);    
-                ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->paneTasks.Invalidate();
+                mainForm->changeTasksStatus(msg);    
+                mainForm->paneTasks.Invalidate();
                 break;
             case SYNCSOURCE_NOTES:
-                ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->changeNotesStatus(msg);
-                ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->paneNotes.Invalidate();
+                mainForm->changeNotesStatus(msg);
+                mainForm->paneNotes.Invalidate();
                 break;  
+            case SYNCSOURCE_PICTURES:
+                mainForm->changePicturesStatus(msg);
+                mainForm->panePictures.Invalidate();
+                break;
             default:
                 break;
         }
@@ -162,15 +167,19 @@ CMainSyncFrame::CMainSyncFrame() {
     configOpened = false;
     cancelingSync = false;
     
-    syncModeContacts = -1; syncModeCalendar = -1; 
-    syncModeTasks = -1; syncModeNotes = -1; 
-    dpiX = 0; dpiY =0;
+    syncModeContacts = -1; 
+    syncModeCalendar = -1; 
+    syncModeTasks    = -1;
+    syncModeNotes    = -1; 
+    syncModePictures = -1;
+    dpiX = 0; 
+    dpiY = 0;
 
     // load bitmaps
     hBmpDarkBlue = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BK_DARK_BLUE));
-    hBmpBlue = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BK_BLUE));
-    hBmpDark = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BK_DARK));
-    hBmpLight = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BK_LIGHT));
+    hBmpBlue     = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BK_BLUE));
+    hBmpDark     = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BK_DARK));
+    hBmpLight    = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BK_LIGHT));
 }
 
 CMainSyncFrame::~CMainSyncFrame() {
@@ -200,9 +209,9 @@ int CMainSyncFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     // TODO: hide splitter here
     EnableDocking(CBRS_ALIGN_ANY);
     wndSplitter.SetActivePane(0,1);
-    wndSplitter.SetColumnInfo(0,0,0); 
+    wndSplitter.SetColumnInfo(0,0,0);
     RecalcLayout();
-    SetWindowText(PLUGIN_UI_TITLE); 
+    SetWindowText(PLUGIN_UI_TITLE);
 
     bSyncStarted = false;
 
@@ -211,7 +220,7 @@ int CMainSyncFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 BOOL CMainSyncFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
-	if( !CFrameWnd::PreCreateWindow(cs) )
+	if (!CFrameWnd::PreCreateWindow(cs))
 		return FALSE;
 
     // TODO: set here main window size and style
@@ -222,8 +231,17 @@ BOOL CMainSyncFrame::PreCreateWindow(CREATESTRUCT& cs)
     dpiY = ::GetDeviceCaps(hdc,LOGPIXELSY);
     ::ReleaseDC(0,hdc);
 
-    double dx = FRAME_MAIN_X * ((double)dpiX/96);      // default DPI = 96
-    double dy = FRAME_MAIN_Y * ((double)dpiY/96);      // default DPI = 96
+    //
+    // TODO: set the window size dynamically based on the source number
+    //
+    int sizeX = FRAME_MAIN_X;
+    int sizeY = FRAME_MAIN_Y;
+    if (isSourceEnabled(PICTURE)) {
+        sizeY += SOURCE_PANE_SIZE_Y;
+    }
+
+    double dx = sizeX * ((double)dpiX/96);      // default DPI = 96
+    double dy = sizeY * ((double)dpiY/96);      // default DPI = 96
     cs.cy = (int)dy;
     cs.cx = (int)dx;
 
@@ -241,18 +259,15 @@ BOOL CMainSyncFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 /////////////////////////////////////////////////////////////////////////////
 // diagnostics
-
 #ifdef _DEBUG
 void CMainSyncFrame::AssertValid() const
 {
 	CFrameWnd::AssertValid();
 }
-
 void CMainSyncFrame::Dump(CDumpContext& dc) const
 {
 	CFrameWnd::Dump(dc);
 }
-
 #endif //_DEBUG
 
 
@@ -506,9 +521,12 @@ LRESULT CMainSyncFrame::OnMsgSyncBegin( WPARAM , LPARAM lParam) {
         }
         DrawMenuBar();
 
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CANCEL)));
+        // TODO: move to class member?
+        CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+
+        mainForm->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CANCEL)));
         s1.LoadString(IDS_MAIN_PRESS_TO_CANCEL); 
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
+        mainForm->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
     }
     else{
         // scheduled sync: keep black button
@@ -542,42 +560,58 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
     // if it is scheduled, we change only status bar text
     bool isScheduled = getConfig()->getScheduledSync();
 
-    if(!isScheduled){
+    // TODO: move to class member?
+    CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+
+    if (!isScheduled) {
         // change controls based on what source is currently syncing
-        switch(currentSource){
+        switch(currentSource) {
             case SYNCSOURCE_CONTACTS:
                 contactsBegin++;
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->GetDlgItem(IDC_MAIN_STATIC_CONTACTS)->ShowWindow(SW_SHOW);
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->ShowWindow(SW_SHOW);
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusContacts.Animate();
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->paneContacts.SetBitmap(hBmpBlue);
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_CONTACTS)->ShowWindow(SW_SHOW);
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->ShowWindow(SW_SHOW);
+                mainForm->iconStatusContacts.Animate();
+                mainForm->paneContacts.SetBitmap(hBmpBlue);
                 break;
 
             case SYNCSOURCE_CALENDAR:
                 calendarBegin++;
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->GetDlgItem(IDC_MAIN_STATIC_CALENDAR)->ShowWindow(SW_SHOW);
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->GetDlgItem(IDC_MAIN_STATIC_STATUS_CALENDAR)->ShowWindow(SW_SHOW);
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusCalendar.Animate();
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->paneCalendar.SetBitmap(hBmpBlue);
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_CALENDAR)->ShowWindow(SW_SHOW);
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_CALENDAR)->ShowWindow(SW_SHOW);
+                mainForm->iconStatusCalendar.Animate();
+                mainForm->paneCalendar.SetBitmap(hBmpBlue);
                 break;
 
             case SYNCSOURCE_TASKS:
                 tasksBegin++;
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->GetDlgItem(IDC_MAIN_STATIC_TASKS)->ShowWindow(SW_SHOW);
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->ShowWindow(SW_SHOW);
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusTasks.Animate();
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->paneTasks.SetBitmap(hBmpBlue);
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_TASKS)->ShowWindow(SW_SHOW);
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->ShowWindow(SW_SHOW);
+                mainForm->iconStatusTasks.Animate();
+                mainForm->paneTasks.SetBitmap(hBmpBlue);
                 break;
 
             case SYNCSOURCE_NOTES:
                 notesBegin++;
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->GetDlgItem(IDC_MAIN_STATIC_NOTES)->ShowWindow(SW_SHOW);
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->ShowWindow(SW_SHOW);
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusNotes.Animate();
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->paneNotes.SetBitmap(hBmpBlue);
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_NOTES)->ShowWindow(SW_SHOW);
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->ShowWindow(SW_SHOW);
+                mainForm->iconStatusNotes.Animate();
+                mainForm->paneNotes.SetBitmap(hBmpBlue);
                 break;
-        };
-    };
+
+            case SYNCSOURCE_PICTURES:
+                picturesBegin++;
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_PICTURES)->ShowWindow(SW_SHOW);
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->ShowWindow(SW_SHOW);
+                mainForm->iconStatusPictures.Animate();
+                mainForm->panePictures.SetBitmap(hBmpBlue);
+                break;
+        }
+    }
+
+
+    if (currentSource == SYNCSOURCE_PICTURES) {
+
+    }
 
 
     //
@@ -594,37 +628,51 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
 
 
     CString source;
-    switch(lParam){
+    switch(lParam) {
         case SYNCSOURCE_CONTACTS:
             source.LoadString(IDS_TEXT_CONTACTS);
             msg+=source;
-            if(!isScheduled)
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->changeContactsStatus(msg);
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneContacts.Invalidate();
+            if (!isScheduled) {
+                mainForm->changeContactsStatus(msg);
+            }
+            mainForm->paneContacts.Invalidate();
             break;
 
         case SYNCSOURCE_CALENDAR:
             source.LoadString(IDS_TEXT_APPOINTMENTS);
             msg+=source;
-            if(!isScheduled)
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->changeCalendarStatus(msg);
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneCalendar.Invalidate();
+            if (!isScheduled) {
+                mainForm->changeCalendarStatus(msg);
+            }
+            mainForm->paneCalendar.Invalidate();
             break;
 
         case SYNCSOURCE_TASKS:
             source.LoadString(IDS_TEXT_TASKS);
             msg+=source;
-            if(!isScheduled)
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->changeTasksStatus(msg);
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneTasks.Invalidate();
+            if (!isScheduled) {
+                mainForm->changeTasksStatus(msg);
+            }
+            mainForm->paneTasks.Invalidate();
             break;
 
         case SYNCSOURCE_NOTES:
             source.LoadString(IDS_TEXT_NOTES);
             msg+=source;
-            if(!isScheduled)
-                ((CSyncForm*)wndSplitter.GetPane(0,1))->changeNotesStatus(msg);
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneNotes.Invalidate();
+            if (!isScheduled) {
+                mainForm->changeNotesStatus(msg);
+            }
+            mainForm->paneNotes.Invalidate();
+            break;
+        
+        case SYNCSOURCE_PICTURES:
+            // Different behavior for pictures since we don't check the "Outlook pictures"
+            // so let's write we're starting to receive data from Server...
+            msg = SBAR_RECEIVING_DATA;
+            if (!isScheduled) {
+                mainForm->changePicturesStatus(msg);
+            }
+            mainForm->panePictures.Invalidate();
             break;
     }
     
@@ -647,85 +695,102 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceEnd( WPARAM , LPARAM lParam) {
         return 0;
     }
 
-    switch(currentSource){
+    // TODO: move to class member?
+    CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+
+    switch(currentSource) {
      case SYNCSOURCE_CONTACTS:
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusContacts.StopAnim();
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->iconContacts.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CONTACTS)));
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->paneContacts.SetBitmap(hBmpLight);
+         mainForm->iconStatusContacts.StopAnim();
+         mainForm->iconContacts.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CONTACTS)));
+         mainForm->paneContacts.SetBitmap(hBmpLight);
          if (contactsBegin == 2) {
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneContacts.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
+            mainForm->iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
+            mainForm->paneContacts.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
             s1.LoadString(IDS_DONE);
          }
          else {
-             ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusContacts.SetIcon(NULL);
+             mainForm->iconStatusContacts.SetIcon(NULL);
              s1.LoadString(IDS_FINISHED_SENDING);
          }
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->changeContactsStatus(s1);
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->paneContacts.Invalidate();
+         mainForm->changeContactsStatus(s1);
+         mainForm->paneContacts.Invalidate();
          break;
      
      case SYNCSOURCE_CALENDAR:
          s1.LoadString(IDS_DONE);
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusCalendar.StopAnim();
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->iconCalendar.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CALENDAR)));
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->paneCalendar.SetBitmap(hBmpLight);
-          if (calendarBegin == 2) {
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneCalendar.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
+         mainForm->iconStatusCalendar.StopAnim();
+         mainForm->iconCalendar.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CALENDAR)));
+         mainForm->paneCalendar.SetBitmap(hBmpLight);
+         if (calendarBegin == 2) {
+            mainForm->iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
+            mainForm->paneCalendar.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
             s1.LoadString(IDS_DONE);
          }
          else {
-             ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusCalendar.SetIcon(NULL);
+             mainForm->iconStatusCalendar.SetIcon(NULL);
              s1.LoadString(IDS_FINISHED_SENDING);
          }
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->changeCalendarStatus(s1);
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->paneCalendar.Invalidate();
+         mainForm->changeCalendarStatus(s1);
+         mainForm->paneCalendar.Invalidate();
          break;
       
      case SYNCSOURCE_TASKS:
          s1.LoadString(IDS_DONE);
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusTasks.StopAnim();
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->iconTasks.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TASKS)));
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->paneTasks.SetBitmap(hBmpLight);
-           if (tasksBegin == 2) {
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneTasks.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
+         mainForm->iconStatusTasks.StopAnim();
+         mainForm->iconTasks.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TASKS)));
+         mainForm->paneTasks.SetBitmap(hBmpLight);
+         if (tasksBegin == 2) {
+            mainForm->iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
+            mainForm->paneTasks.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
             s1.LoadString(IDS_DONE);
          }
          else {
-             ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusTasks.SetIcon(NULL);
+             mainForm->iconStatusTasks.SetIcon(NULL);
              s1.LoadString(IDS_FINISHED_SENDING);
          }
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->changeTasksStatus(s1);
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->paneTasks.Invalidate();
+         mainForm->changeTasksStatus(s1);
+         mainForm->paneTasks.Invalidate();
          break;
 
      case SYNCSOURCE_NOTES:
          s1.LoadString(IDS_DONE);
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusNotes.StopAnim();
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->iconNotes.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_NOTES)));
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->paneNotes.SetBitmap(hBmpLight);
-            if (notesBegin == 2) {
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneNotes.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
+         mainForm->iconStatusNotes.StopAnim();
+         mainForm->iconNotes.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_NOTES)));
+         mainForm->paneNotes.SetBitmap(hBmpLight);
+         if (notesBegin == 2) {
+            mainForm->iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
+            mainForm->paneNotes.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
             s1.LoadString(IDS_DONE);
          }
          else {
-             ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusNotes.SetIcon(NULL);
+             mainForm->iconStatusNotes.SetIcon(NULL);
              s1.LoadString(IDS_FINISHED_SENDING);
          }
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->changeNotesStatus(s1);
-         ((CSyncForm*)wndSplitter.GetPane(0,1))->paneNotes.Invalidate();
+         mainForm->changeNotesStatus(s1);
+         mainForm->paneNotes.Invalidate();
          break;
 
-    };
+     case SYNCSOURCE_PICTURES:
+         s1.LoadString(IDS_DONE);
+         mainForm->iconStatusPictures.StopAnim();
+         mainForm->iconPictures.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_PICTURES)));
+         mainForm->panePictures.SetBitmap(hBmpLight);
+         if (picturesBegin == 2) {
+            mainForm->iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
+            mainForm->panePictures.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
+            s1.LoadString(IDS_DONE);
+         }
+         else {
+             mainForm->iconStatusPictures.SetIcon(NULL);
+             s1.LoadString(IDS_FINISHED_SENDING);
+         }
+         mainForm->changePicturesStatus(s1);
+         mainForm->panePictures.Invalidate();
+         break;
+    }
 
-    //
     // Invalidating the currentSource, here it's finished.
-    //
     currentSource = 0;
-
     return 0;
 }
 
@@ -763,6 +828,10 @@ LRESULT CMainSyncFrame::OnMsgItemSynced( WPARAM wParam, LPARAM ) {
             s1.LoadString(IDS_TEXT_NOTES);
             statusBarText += s1;
             break;
+        case SYNCSOURCE_PICTURES:
+            s1.LoadString(IDS_TEXT_PICTURES);
+            statusBarText += s1;
+            break;
     }
     statusBarText += " ";
 
@@ -781,31 +850,37 @@ LRESULT CMainSyncFrame::OnMsgItemSynced( WPARAM wParam, LPARAM ) {
     refreshStatusBar(statusBarText);
 
 
-
     // if it is scheduled, we change only status bar text
     if(getConfig()->getScheduledSync()) {
         return 0;
     }
 
+    // TODO: move to class member?
+    CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+
     // change source status
     switch(currentSource){
         case SYNCSOURCE_CONTACTS:
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->changeContactsStatus(statusBarText); 
-            //((CSyncForm*)wndSplitter.GetPane(0,1))->repaintPaneControls(PANE_TYPE_CONTACTS);
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneContacts.Invalidate();
+            mainForm->changeContactsStatus(statusBarText); 
+            //mainForm->repaintPaneControls(PANE_TYPE_CONTACTS);
+            mainForm->paneContacts.Invalidate();
             break;
         case SYNCSOURCE_CALENDAR:
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->changeCalendarStatus(statusBarText); 
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneCalendar.Invalidate();
+            mainForm->changeCalendarStatus(statusBarText); 
+            mainForm->paneCalendar.Invalidate();
             break;
         case SYNCSOURCE_TASKS:
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->changeTasksStatus(statusBarText);    
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneTasks.Invalidate();
+            mainForm->changeTasksStatus(statusBarText);    
+            mainForm->paneTasks.Invalidate();
             break;
         case SYNCSOURCE_NOTES:
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->changeNotesStatus(statusBarText);
-            ((CSyncForm*)wndSplitter.GetPane(0,1))->paneNotes.Invalidate();
-            break;           
+            mainForm->changeNotesStatus(statusBarText);
+            mainForm->paneNotes.Invalidate();
+            break;
+        case SYNCSOURCE_PICTURES:
+            mainForm->changePicturesStatus(statusBarText);
+            mainForm->panePictures.Invalidate();
+            break;      
     }
 
     //Invalidate(FALSE);
@@ -864,12 +939,15 @@ afx_msg LRESULT CMainSyncFrame::OnMsgRefreshStatusBar( WPARAM wParam, LPARAM lPa
     refreshStatusBar(s1);
 
     // Refresh source labels for some case
-    if ( lParam == SBAR_SENDDATA_BEGIN ||
-         lParam == SBAR_RECEIVE_DATA_BEGIN ||
-         lParam == SBAR_SENDDATA_END ||
-         lParam == SBAR_DELETE_CLIENT_ITEMS ) {
+    // Not for pictures, because items are big and we need to keep the items' number on the source pane.
+    if (currentSource != SYNCSOURCE_PICTURES) {
+        if ( lParam == SBAR_SENDDATA_BEGIN ||
+             lParam == SBAR_RECEIVE_DATA_BEGIN ||
+             lParam == SBAR_SENDDATA_END ||
+             lParam == SBAR_DELETE_CLIENT_ITEMS ) {
 
-        refreshSourceLabels(s1, currentSource);
+            refreshSourceLabels(s1, currentSource);
+        }
     }
 
     return 0;
@@ -883,7 +961,7 @@ afx_msg LRESULT CMainSyncFrame::OnMsgTotalItems( WPARAM wParam, LPARAM lParam)
    
     CString source;
     CString msg; 
-    switch(currentSource){
+    switch (currentSource) {
         case SYNCSOURCE_CONTACTS:
             source.LoadString(IDS_TEXT_CONTACTS);
             break;
@@ -896,14 +974,20 @@ afx_msg LRESULT CMainSyncFrame::OnMsgTotalItems( WPARAM wParam, LPARAM lParam)
         case SYNCSOURCE_NOTES:
             source.LoadString(IDS_TEXT_NOTES);
             break;
-    };
+        case SYNCSOURCE_PICTURES:
+            source.LoadString(IDS_TEXT_PICTURES);
+            break;
+    }
     
     if(wParam == 1){
         msg.LoadString(IDS_TEXT_RECEIVING);
     }
-    else
+    else {
         msg.LoadString(IDS_TEXT_SENDING);
-    msg+=" "; msg+=source;
+    }
+
+    msg+=" "; 
+    msg+=source;
     refreshStatusBar(msg);
 
     //Invalidate();
@@ -911,11 +995,15 @@ afx_msg LRESULT CMainSyncFrame::OnMsgTotalItems( WPARAM wParam, LPARAM lParam)
 }
 
 // the config window has closed, and the user is returned to the main window
-void CMainSyncFrame::OnConfigClosed(){
+void CMainSyncFrame::OnConfigClosed() {
+
     EndModalState();
     SetForegroundWindow();
     configOpened = false;
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->refreshSources();
+
+    // TODO: move to class member?
+    CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+    mainForm->refreshSources();
 };
 
 LRESULT CMainSyncFrame::OnMsgStartSyncBegin(WPARAM wParam, LPARAM lParam){
@@ -937,7 +1025,10 @@ LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam){
     
     // Sync has finished: unlock buttons
     cancelingSync = false;
-    ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->unlockButtons();
+
+    // TODO: move to class member?
+    CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+    mainForm->unlockButtons();
     
     //
     // Error occurred: display error message on a msgBox.
@@ -978,40 +1069,53 @@ LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam){
     s1.LoadString(IDS_TEXT_SYNC_ENDED);
     refreshStatusBar(s1);
 
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->paneSync.SetBitmap(hBmpDark);
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL_BLUE)));
+    mainForm->paneSync.SetBitmap(hBmpDark);
+    mainForm->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL_BLUE)));
 
     s1.LoadString(IDS_MAIN_PRESS_TO_SYNC); 
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
+    mainForm->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
 
 
     // Correct source status in case of ClientException (code 3), killed thread (code 4), 
     // unexpected exception (code 6 & 7)
-    // *** TODO: change "notSynced" to "Failed"! or add a state ***
-    if (exitCode == 3 || exitCode == 4 || exitCode == 6 || exitCode == 7) {
-        if(strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(),"none") != 0)
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceContactState = SYNCSOURCE_STATE_NOT_SYNCED;
-        if(strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(),"none") != 0)
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceCalendarState = SYNCSOURCE_STATE_NOT_SYNCED;
-        if(strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(),"none") != 0)
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceTaskState = SYNCSOURCE_STATE_NOT_SYNCED;
-        if(strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(),"none") != 0)
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceNoteState = SYNCSOURCE_STATE_NOT_SYNCED;
+    // TODO: change "notSynced" to "Failed"! or add a state
+    if (exitCode == 3 || 
+        exitCode == 4 || 
+        exitCode == 6 || 
+        exitCode == 7) {
+        if (strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(), "none")) {
+            mainForm->syncSourceContactState = SYNCSOURCE_STATE_NOT_SYNCED;
+        }
+        if (strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(), "none")) {
+            mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_NOT_SYNCED;
+        }
+        if (strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(), "none")) {
+            mainForm->syncSourceTaskState = SYNCSOURCE_STATE_NOT_SYNCED;
+        }
+        if (strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(), "none")) {
+            mainForm->syncSourceNoteState = SYNCSOURCE_STATE_NOT_SYNCED;
+        }
+        if (strcmp(getConfig()->getSyncSourceConfig(PICTURE_)->getSync(), "none")) {
+            mainForm->syncSourcePictureState = SYNCSOURCE_STATE_NOT_SYNCED;
+        }
     }
-    else if (exitCode == 5){
+    else if (exitCode == 5) {
         // user avoided full sync, set canceled state
         // set sync source status
-        if(strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(),"none") != 0){
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceContactState = SYNCSOURCE_STATE_CANCELED;
+        if (strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(), "none") != 0) {
+            mainForm->syncSourceContactState = SYNCSOURCE_STATE_CANCELED;
         }
-        if(strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(),"none") != 0){
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceCalendarState = SYNCSOURCE_STATE_CANCELED;
+        if (strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(), "none") != 0) {
+            mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_CANCELED;
         }
-        if(strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(),"none") != 0){
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceTaskState = SYNCSOURCE_STATE_CANCELED;
+        if( strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(), "none") != 0) {
+            mainForm->syncSourceTaskState = SYNCSOURCE_STATE_CANCELED;
         }
-        if(strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(),"none") != 0){
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceNoteState = SYNCSOURCE_STATE_CANCELED;
+        if (strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(), "none") != 0) {
+            mainForm->syncSourceNoteState = SYNCSOURCE_STATE_CANCELED;
+        }
+        if (strcmp(getConfig()->getSyncSourceConfig(PICTURE_)->getSync(), "none") != 0) {
+            mainForm->syncSourcePictureState = SYNCSOURCE_STATE_CANCELED;
         }
     }
 
@@ -1023,7 +1127,6 @@ LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam){
         EnableMenuItem(hMenu, i, MF_BYPOSITION | MF_ENABLED);
     }
     DrawMenuBar();
-
     UpdateWindow();
 
 
@@ -1044,7 +1147,7 @@ LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam){
     }
 
     // Refresh sources.
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->refreshSources();
+    mainForm->refreshSources();
     SetForegroundWindow();
 
     Invalidate(FALSE);
@@ -1075,14 +1178,18 @@ void CMainSyncFrame::StartSync(){
         return;
     }
 
+    // TODO: move to class member?
+    CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+
     // Lock the UI buttons.
-    ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->lockButtons();
+    mainForm->lockButtons();
 
     // Reset counters.
     contactsBegin = 0;
     calendarBegin = 0;
     tasksBegin = 0;
     notesBegin = 0;
+    picturesBegin = 0;
 
     // Hide the menu.
     printLog("Hide menu", LOG_DEBUG);
@@ -1098,37 +1205,42 @@ void CMainSyncFrame::StartSync(){
     //
     // Clear source state for sources to sync, clear status icons.
     //
-    if(strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(), "none") != 0) {
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->syncSourceContactState = SYNCSOURCE_STATE_OK;
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusContacts.SetIcon(NULL);
+    if (strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(), "none") != 0) {
+        mainForm->syncSourceContactState = SYNCSOURCE_STATE_OK;
+        mainForm->iconStatusContacts.SetIcon(NULL);
     }
-    if(strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(), "none") != 0) {
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->syncSourceCalendarState = SYNCSOURCE_STATE_OK;
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusCalendar.SetIcon(NULL);
+    if (strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(), "none") != 0) {
+        mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_OK;
+        mainForm->iconStatusCalendar.SetIcon(NULL);
     }
-    if(strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(), "none") != 0) {
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->syncSourceTaskState = SYNCSOURCE_STATE_OK;
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusTasks.SetIcon(NULL);
+    if (strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(), "none") != 0) {
+        mainForm->syncSourceTaskState = SYNCSOURCE_STATE_OK;
+        mainForm->iconStatusTasks.SetIcon(NULL);
     }
-    if(strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(), "none") != 0) {
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->syncSourceNoteState = SYNCSOURCE_STATE_OK;
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusNotes.SetIcon(NULL);
+    if (strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(), "none") != 0) {
+        mainForm->syncSourceNoteState = SYNCSOURCE_STATE_OK;
+        mainForm->iconStatusNotes.SetIcon(NULL);
+    }
+    if (strcmp(getConfig()->getSyncSourceConfig(PICTURE_)->getSync(), "none") != 0) {
+        mainForm->syncSourcePictureState = SYNCSOURCE_STATE_OK;
+        mainForm->iconStatusPictures.SetIcon(NULL);
     }
 
     //
     // Refresh of main UI.
     //
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->refreshSources();
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CANCEL)));
+    mainForm->refreshSources();
+    mainForm->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CANCEL)));
     s1.LoadString(IDS_MAIN_PRESS_TO_CANCEL); 
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->Invalidate();
+    mainForm->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
+    mainForm->Invalidate();
 
     // Set state to panes
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->paneContacts.state = STATE_SYNC;
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->paneCalendar.state = STATE_SYNC;
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->paneTasks.state = STATE_SYNC;
-    ((CSyncForm*)wndSplitter.GetPane(0,1))->paneNotes.state = STATE_SYNC;
+    mainForm->paneContacts.state = STATE_SYNC;
+    mainForm->paneCalendar.state = STATE_SYNC;
+    mainForm->paneTasks.state    = STATE_SYNC;
+    mainForm->paneNotes.state    = STATE_SYNC;
+    mainForm->panePictures.state = STATE_SYNC;
     
 
     //
@@ -1182,7 +1294,10 @@ int CMainSyncFrame::CancelSync(){
 
         // LOCK the statusbar and other controls.
         cancelingSync = true;
-        ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->lockButtons();
+
+        // TODO: move to class member?
+        CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+        mainForm->lockButtons();
 
         // First we try to terminate the sync in a soft way.
         softTerminateSync();
@@ -1193,7 +1308,7 @@ int CMainSyncFrame::CancelSync(){
 
         bSyncStarted = false;
 
-        ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->OnNcPaint();
+        mainForm->OnNcPaint();
 
         // show the menu
         HMENU hMenu = ::GetMenu(GetSafeHwnd());
@@ -1203,24 +1318,27 @@ int CMainSyncFrame::CancelSync(){
         }
         DrawMenuBar();
 
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->refreshSources();
+        mainForm->refreshSources();
 
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CANCEL)));
+        mainForm->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CANCEL)));
         s1.LoadString(IDS_MAIN_PRESS_TO_SYNC); 
-        ((CSyncForm*)wndSplitter.GetPane(0,1))->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
+        mainForm->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
 
         // set sync source status
-        if(strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(),"none") != 0){
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceContactState = SYNCSOURCE_STATE_CANCELED;
+        if (strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(),"none") != 0){
+            mainForm->syncSourceContactState = SYNCSOURCE_STATE_CANCELED;
         }
-        if(strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(),"none") != 0){
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceCalendarState = SYNCSOURCE_STATE_CANCELED;
+        if (strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(),"none") != 0){
+            mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_CANCELED;
         }
-        if(strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(),"none") != 0){
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceTaskState = SYNCSOURCE_STATE_CANCELED;
+        if (strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(),"none") != 0){
+            mainForm->syncSourceTaskState = SYNCSOURCE_STATE_CANCELED;
         }
-        if(strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(),"none") != 0){
-            ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->syncSourceNoteState = SYNCSOURCE_STATE_CANCELED;
+        if (strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(),"none") != 0){
+            mainForm->syncSourceNoteState = SYNCSOURCE_STATE_CANCELED;
+        }
+        if (strcmp(getConfig()->getSyncSourceConfig(PICTURE_)->getSync(),"none") != 0){
+            mainForm->syncSourcePictureState = SYNCSOURCE_STATE_CANCELED;
         }
 
         //
@@ -1239,7 +1357,8 @@ int CMainSyncFrame::CancelSync(){
 }
 
 // handling for minimizing/restoring the UI when the config is opened
-BOOL CMainSyncFrame::OnNcActivate(BOOL bActive){
+BOOL CMainSyncFrame::OnNcActivate(BOOL bActive) {
+
     // needs special handling only when the config window is opened
     if(configOpened){
         if( (bActive) && (pConfigFrame != NULL))
@@ -1275,33 +1394,47 @@ void CMainSyncFrame::OnClose(){
 }
 
 
-void CMainSyncFrame::backupSyncModeSettings(){
+void CMainSyncFrame::backupSyncModeSettings() {
+
     syncModeContacts = getSyncModeCode(getConfig()->getSyncSourceConfig(CONTACT_)->getSync());
     syncModeCalendar = getSyncModeCode(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync());
-    syncModeTasks = getSyncModeCode(getConfig()->getSyncSourceConfig(TASK_)->getSync());
-    syncModeNotes = getSyncModeCode(getConfig()->getSyncSourceConfig(NOTE_)->getSync());
+    syncModeTasks    = getSyncModeCode(getConfig()->getSyncSourceConfig(TASK_)->getSync());
+    syncModeNotes    = getSyncModeCode(getConfig()->getSyncSourceConfig(NOTE_)->getSync());
+    syncModePictures = getSyncModeCode(getConfig()->getSyncSourceConfig(PICTURE_)->getSync());
 }
 
 void CMainSyncFrame::restoreSyncModeSettings(){
 
-    if(syncModeContacts != -1)
+    if (syncModeContacts != -1) {
         getConfig()->getSyncSourceConfig(CONTACT_)->setSync(syncModeName((SyncMode)syncModeContacts));
-    if(syncModeCalendar != -1)
+    }
+    if (syncModeCalendar != -1) {
         getConfig()->getSyncSourceConfig(APPOINTMENT_)->setSync(syncModeName((SyncMode)syncModeCalendar));
-    if(syncModeTasks    != -1)
+    }
+    if (syncModeTasks    != -1) {
         getConfig()->getSyncSourceConfig(TASK_)->setSync(syncModeName((SyncMode)syncModeTasks));
-    if(syncModeNotes    != -1)
+    }
+    if (syncModeNotes    != -1) {
         getConfig()->getSyncSourceConfig(NOTE_)->setSync(syncModeName((SyncMode)syncModeNotes));
+    }
+    if (syncModePictures != -1) {
+        getConfig()->getSyncSourceConfig(PICTURE_)->setSync(syncModeName((SyncMode)syncModePictures));
+    }
 
     // Save ONLY sync-modes of each source, if necessary.
     if ( syncModeContacts != -1 || 
          syncModeCalendar != -1 ||
          syncModeTasks    != -1 ||
-         syncModeNotes    != -1 ) {
+         syncModeNotes    != -1 ||
+         syncModePictures != -1 ) {
         getConfig()->saveSyncModes();
     }
     
-    syncModeContacts = -1; syncModeCalendar = -1; syncModeTasks = -1; syncModeNotes = -1;
+    syncModeContacts = -1; 
+    syncModeCalendar = -1; 
+    syncModeTasks    = -1; 
+    syncModeNotes    = -1;
+    syncModePictures = -1;
 }
 
 
@@ -1323,47 +1456,57 @@ bool CMainSyncFrame::checkConnectionSettings()
 
 LRESULT CMainSyncFrame::OnMsgSyncSourceState(WPARAM wParam, LPARAM lParam) {
 
-    CSyncForm* syncForm = (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1);
+    // TODO: move to class member?
+    CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
 
-    if(wParam == SYNCSOURCE_CONTACTS) {
-        syncForm->iconStatusContacts.StopAnim();
-        syncForm->syncSourceContactState = lParam;
+    if (wParam == SYNCSOURCE_CONTACTS) {
+        mainForm->iconStatusContacts.StopAnim();
+        mainForm->syncSourceContactState = lParam;
         // Update the status icon (funzilla #2110)
         if (lParam == SYNCSOURCE_STATE_OK)
-            syncForm->iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
+            mainForm->iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
         else 
-            syncForm->iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+            mainForm->iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
     }
 
-    if(wParam == SYNCSOURCE_CALENDAR) {
-        syncForm->iconStatusCalendar.StopAnim();
-        syncForm->syncSourceCalendarState = lParam;
+    if (wParam == SYNCSOURCE_CALENDAR) {
+        mainForm->iconStatusCalendar.StopAnim();
+        mainForm->syncSourceCalendarState = lParam;
         // Update the status icon (funzilla #2110)
         if (lParam == SYNCSOURCE_STATE_OK)
-            syncForm->iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
+            mainForm->iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
         else 
-            syncForm->iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+            mainForm->iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
     }
 
-    if(wParam == SYNCSOURCE_TASKS) {
-        syncForm->iconStatusTasks.StopAnim();
-        syncForm->syncSourceTaskState = lParam;
+    if (wParam == SYNCSOURCE_TASKS) {
+        mainForm->iconStatusTasks.StopAnim();
+        mainForm->syncSourceTaskState = lParam;
         // Update the status icon (funzilla #2110)
         if (lParam == SYNCSOURCE_STATE_OK)
-            syncForm->iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
+            mainForm->iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
         else 
-            syncForm->iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+            mainForm->iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
     }
 
-    if(wParam == SYNCSOURCE_NOTES) {
-        syncForm->iconStatusNotes.StopAnim();
-        syncForm->syncSourceNoteState = lParam;
+    if (wParam == SYNCSOURCE_NOTES) {
+        mainForm->iconStatusNotes.StopAnim();
+        mainForm->syncSourceNoteState = lParam;
         // Update the status icon (funzilla #2110)
         if (lParam == SYNCSOURCE_STATE_OK)
-            syncForm->iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
+            mainForm->iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
         else 
-            syncForm->iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+            mainForm->iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+    }
 
+    if (wParam == SYNCSOURCE_PICTURES) {
+        mainForm->iconStatusPictures.StopAnim();
+        mainForm->syncSourcePictureState = lParam;
+        // Update the status icon (funzilla #2110)
+        if (lParam == SYNCSOURCE_STATE_OK)
+            mainForm->iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
+        else 
+            mainForm->iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
     }
 
     return 0;
@@ -1374,7 +1517,8 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceState(WPARAM wParam, LPARAM lParam) {
  */
 LRESULT CMainSyncFrame::OnMsgUnlockButtons(WPARAM wParam, LPARAM lParam) {
 
-    ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->unlockButtons();
-
+    // TODO: move to class member?
+    CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+    mainForm->unlockButtons();
     return 0;
 }
