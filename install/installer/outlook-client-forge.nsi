@@ -59,6 +59,7 @@
 !define PROPERTY_ADDIN_NAME                     "FileName"
 !define PROPERTY_SWV                            "swv"
 !define PROPERTY_SP                             "portal"
+!define PROPERTY_CUSTOMER                       "Customer"
 !define PROPERTY_DESCRIPTION                    "Description"
 
 ; Before v.7.1.4 the product name was "Funambol Outlook Plug-in"
@@ -293,12 +294,18 @@ Function un.CheckUserRights
 FunctionEnd
 
 
-
 ;
 ; Test if the application is already installed.
 ; If yes, manage the upgrade of the plugin.
 ;
 Function CheckAppInstalled
+
+       ReadRegStr $R8 HKLM "${PLUGIN_REGKEY_CONTEXT}" "${PROPERTY_CUSTOMER}"
+       ReadRegStr $R7 HKLM "${PLUGIN_REGKEY_CONTEXT}" "${PROPERTY_SWV}"
+       
+       StrCmp $R8 "" +1 +2 ;if empty we control the swv field to check if no app installed
+       StrCmp $R7 "" +2 +1
+       StrCmp $R8 "${CUSTOMER}" +1 customerAbort
 
        ReadRegStr $R0 HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
        StrCmp $R0 "" +3
@@ -382,7 +389,11 @@ Function CheckAppInstalled
                   "A previous version of ${PRODUCT_NAME} is already installed (version $R1). $\nPlease uninstall it first."
        Abort
 
-
+  ; 5 Customer abort
+  customerAbort:
+       MessageBox MB_OK \
+                  "A different version of this client is present on this machine. Please unistall it first."
+       Abort
   done:
        Return
   cancel:
@@ -787,6 +798,8 @@ Function writeRegistry
      WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_SWV}"               "${PRODUCT_VERSION}"
      WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_PATH}"              "$INSTDIR"
      WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_DESCRIPTION}"       "${PRODUCT_NAME} v.${PRODUCT_VERSION}"
+     
+     WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_CUSTOMER}"       "${CUSTOMER}"
      
      ; Standard/portal build (SP passed as parameter by build.xml).
   !ifdef SP

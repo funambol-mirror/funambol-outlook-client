@@ -202,7 +202,7 @@ int CMainSyncFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     wndSplitter.SetActivePane(0,1);
     wndSplitter.SetColumnInfo(0,0,0); 
     RecalcLayout();
-    SetWindowText(PLUGIN_UI_TITLE); 
+    SetWindowText(WPROGRAM_NAME); 
 
     bSyncStarted = false;
 
