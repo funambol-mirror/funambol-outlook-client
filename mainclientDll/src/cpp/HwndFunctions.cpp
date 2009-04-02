@@ -40,7 +40,7 @@
 void findFunambolWindow2()
 {
 	//-- for finding if the UI window is present
-	HwndFunctions::wnd = FindWindow(PLUGIN_UI_CLASSNAME, PLUGIN_UI_TITLE);
+	HwndFunctions::wnd = FindWindow(PLUGIN_UI_CLASSNAME, WPROGRAM_NAME);
 
     if (HwndFunctions::wnd)
         ExitThread(1);
