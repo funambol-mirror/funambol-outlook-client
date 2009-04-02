@@ -478,17 +478,23 @@ const wstring ClientContact::getComplexProperty(const wstring& propertyName) {
             valueBuffer = tmpchar;
             delete tmpchar;
             int separator = valueBuffer.find(extAdrSeparator);
+            if ( separator == StringBuffer::npos){
+                separator = valueBuffer.find("[");
+            }
             if ( separator == StringBuffer::npos){ //No extended address
                 address1 = valueBuffer;
                 address2 = "";
             }else if ( separator == 0 ){ //Only extended address (if possible)
                 address1 = "";
-                address2 = valueBuffer;
+                address2 = valueBuffer.substr(1, (valueBuffer.length()-2));
             }else{
                 address1 = valueBuffer.substr(0 , separator);
                 int separatorEnd = valueBuffer.find(extAdrSeparatorEnd);
                 if (separatorEnd == StringBuffer::npos){
                     separatorEnd = valueBuffer.length();
+                }
+                if (separatorEnd < valueBuffer.length()){
+                    address1.append(valueBuffer.substr(separatorEnd +1, (valueBuffer.length() - separatorEnd -1)));
                 }
                 address2 = valueBuffer.substr((separator + extAdrSeparatorLenght), (separatorEnd - separator - extAdrSeparatorLenght) );
             }
@@ -556,11 +562,11 @@ const wstring ClientContact::getComplexProperty(const wstring& propertyName) {
     else if (propertyName == L"HomeAddressExtended" ||
         propertyName == L"BusinessAddressExtended" ||
         propertyName == L"OtherAddressExtended"){
-            if (address1.empty()){
+            if (address2.empty()){
                 propertyValue = L"";
             }else{
                 WCHAR* tmp = toWideChar(address2.c_str());
-                propertyValue = tmp;
+                propertyValue.assign(tmp);
                 delete tmp;
             } 
     }
@@ -680,11 +686,15 @@ int ClientContact::setComplexProperty(const wstring& propertyName, const wstring
             StringBuffer address2;
             
             if (separator != StringBuffer::npos) {
-                int separatorEnd = valueBuffer.find(extAdrSeparatorEnd);
-                if (separatorEnd == StringBuffer::npos){
-                    separatorEnd = valueBuffer.length();
+                if(separator == 0){
+                    address2 = valueBuffer.substr(1,(valueBuffer.length()-2));
+                }else{
+                    int separatorEnd = valueBuffer.find(extAdrSeparatorEnd);
+                    if (separatorEnd == StringBuffer::npos){
+                        separatorEnd = valueBuffer.length();
+                    }
+                    address2 = valueBuffer.substr((separator+extAdrSeparatorLenght), separatorEnd);
                 }
-                address2 = valueBuffer.substr((separator+extAdrSeparatorLenght), separatorEnd);
             } else {
                 address2 = "";
             }
@@ -697,10 +707,11 @@ int ClientContact::setComplexProperty(const wstring& propertyName, const wstring
                 address2.assign(addressExtended->c_str());
             }
             findAddressStreet = true;
-
-            address1.append(extAdrSeparator);
-            address1.append(address2);
-            address1.append(extAdrSeparatorEnd);
+            if(!(address2.empty())){
+                address1.append(extAdrSeparator);
+                address1.append(address2);
+                address1.append(extAdrSeparatorEnd);
+            }
             WCHAR* tmpwchar;
             if(propertyName == L"HomeAddressStreet"){
                 tmpwchar = toWideChar(address1.c_str());
@@ -770,7 +781,12 @@ int ClientContact::setComplexProperty(const wstring& propertyName, const wstring
             }
             delete tmpwchar;
     }
-
+    if (findAddressStreet && findAddressExtended){
+        findAddressStreet = false;
+        findAddressExtended = false;
+        addressExtended->assign("");
+        addressStreet->assign("");
+    }
     // Separator for Categories in Outlook can be "," or ";".
     // Nothing to do (both accepted by Outlook).
     else if (propertyName == L"Categories") {
