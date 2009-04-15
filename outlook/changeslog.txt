@@ -1,3 +1,6 @@
+2009-04-15
+   - teo: added customization.h
+
 2009-03-31
    - toccy: merged from branch US1655 (Pictures Sync - main screen) - r128
 
