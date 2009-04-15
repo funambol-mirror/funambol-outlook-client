@@ -944,21 +944,6 @@ void OutlookConfig::createDefaultConfig() {
     setLogDir(logPath);
 
 
-    //
-    // Update properties for portal build:
-    // -----------------------------------
-    //if (checkPortalBuild()) {
-
-        // Set different url/userName/password.
-        accessConfig.setSyncURL  (PORTAL_DEFAULT_SYNCURL);
-        accessConfig.setUsername (PORTAL_DEFAULT_USERNAME);
-        accessConfig.setPassword (PORTAL_DEFAULT_PASSWORD);
-
-        // Tasks/Notes actually disabled on portal build.
-    //    WindowsSyncSourceConfig* sc = NULL;
-    //    sc = getSyncSourceConfig(NOTE_);
-    //    if (sc)  sc->setSync("none");
-    //}
 
 
     //

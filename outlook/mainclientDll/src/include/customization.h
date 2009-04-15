@@ -33,49 +33,33 @@
  * the words "Powered by Funambol".
  */
 
-#include "HwndFunctions.h"
-#include "tchar.h"
+#ifndef INCL_CUSTOMIZATION
+#define INCL_CUSTOMIZATION
 
+//addin
+#define PROGRAM_NAME                        "Funambol Outlook Sync Client"
+#define WPROGRAM_NAME                      L"Funambol Outlook Sync Client"
 
-void findFunambolWindow2()
-{
-	//-- for finding if the UI window is present
-	HwndFunctions::wnd = FindWindow(PLUGIN_UI_CLASSNAME, WPROGRAM_NAME);
+#define DEFAULT_URL                         "http://my.funambol.com/sync"
+#define DEFAULT_USERNAME                    ""
+#define DEFAULT_PASSWORD                    ""
 
-    if (HwndFunctions::wnd)
-        ExitThread(1);
-    else
-        ExitThread(0);
-}
+#define PLUGIN_UI_TITLE                     PROGRAM_NAME  // The UI windows title (must be unique!)
+//This macro is used into the Outlook menu. The & is the value used to create a shortcut to open the client
+#define FUNAMBOL                           L"Funa&mbol"
+#define CAPTION                            WPROGRAM_NAME
+#define LAST_COMPATIBLE_VERSION             70104                       // "7.1.4" is the latest version compatible with this addin
 
+#define OL_PLUGIN_LOG_NAME                  "outlook-client-log.txt"
+#define TIME_OUT_ABORT                      8                           /**< 8  seconds    */
 
-int HwndFunctions::findFunambolWindow()
-{
-    HwndFunctions::wnd = NULL;
-    
-    HANDLE hand = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)findFunambolWindow2, NULL, 0, NULL);
-    DWORD t = WaitForSingleObject(hand, 2000); // 2 secs.
-    
-    DWORD exitcode = 0;
-    GetExitCodeThread(hand, &exitcode);
-    CloseHandle(hand);
+#define APP_NAME                            "Funambol"
 
-    return exitcode;
-}
+#define FUNAMBOL_DIR_NAME                  L"Funambol"
+#define SCHED_COMMENT                      L"Funambol Outlook Sync Client scheduler"
+#define WMSGBOX_ERROR_TITLE                L"Funambol Outlook Client Error"
+#define MSGBOX_ERROR_TITLE                  "Funambol Outlook Client Error"
 
-HWND HwndFunctions::getWindowHandle() {   
+#define CONFIG_WINDOW_TITLE         _T("Funambol Outlook Sync Client Options")
 
-    if (wnd == NULL) {
-        findFunambolWindow();
-    }
-    return wnd;    
-}
-
-void HwndFunctions::initHwnd() { 
-
-    if (wnd == NULL) {
-        findFunambolWindow();
-    }
-}
-
-HWND HwndFunctions::wnd = NULL;
+#endif
