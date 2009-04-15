@@ -32,7 +32,7 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by Funambol".
  */
-
+#include "customization.h"
 #ifndef INCL_HWND_FUNCTIONS
 #define INCL_HWND_FUNCTIONS
 
@@ -56,8 +56,6 @@
 #define ID_MYMSG_UNLOCK_BUTTONS       (WM_APP+13)
 /** @endcond */
 
-#define PLUGIN_UI_TITLE             _T("Funambol Outlook Sync Client")
-#define CONFIG_WINDOW_TITLE         _T("Funambol Outlook Sync Client Options")
 #define PLUGIN_UI_CLASSNAME         _T("FunambolApp")
 
 #include "windows.h"

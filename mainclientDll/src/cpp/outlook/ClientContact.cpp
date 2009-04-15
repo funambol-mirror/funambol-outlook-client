@@ -493,7 +493,7 @@ const wstring ClientContact::getComplexProperty(const wstring& propertyName) {
                 if (separatorEnd == StringBuffer::npos){
                     separatorEnd = valueBuffer.length();
                 }
-                if (separatorEnd < valueBuffer.length()){
+                if (separatorEnd < (int)(valueBuffer.length())){
                     address1.append(valueBuffer.substr(separatorEnd +1, (valueBuffer.length() - separatorEnd -1)));
                 }
                 address2 = valueBuffer.substr((separator + extAdrSeparatorLenght), (separatorEnd - separator - extAdrSeparatorLenght) );
