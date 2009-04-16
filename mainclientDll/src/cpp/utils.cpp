@@ -1009,7 +1009,7 @@ int getBuildNumberFromVersion(const char* swv) {
 }
 
 
-bool isSourceEnabled(const WCHAR* sourceName)
+bool isSourceVisible(const WCHAR* sourceName)
 {
     for (int i=0; itemTypesUsed[i]; i++) {
         if (!wcscmp(itemTypesUsed[i], sourceName)) {

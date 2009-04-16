@@ -97,10 +97,10 @@ int          syncSourceNameToIndex(const StringBuffer& sourceName);
 StringBuffer syncSourceIndexToName(const int sourceID);
 
 /**
- * Used to quicky check if a specific source is currently enabled/disabled.
+ * Used to quicky check if a specific source is visible or not.
  * It checks the itemTypesUsed[] array.
  */
-bool isSourceEnabled(const WCHAR* sourceName);
+bool isSourceVisible(const WCHAR* sourceName);
 
 
 /**
