@@ -53,9 +53,9 @@ AccessConfig* DefaultWinConfigFactory::getAccessConfig() {
 
     AccessConfig* ac = new AccessConfig();
 
-    ac->setUsername             ("guest");
-    ac->setPassword             ("guest");
-    ac->setSyncURL              ("http://localhost:8080/funambol/ds");
+    ac->setUsername             (DEFAULT_USERNAME);
+    ac->setPassword             (DEFAULT_PASSWORD);
+    ac->setSyncURL              (DEFAULT_URL);
     ac->setFirstTimeSyncMode    (SYNC_NONE);
     ac->setUseProxy             (FALSE);
     ac->setProxyHost            ("");
@@ -117,6 +117,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
     sc->setLast                 (0);
     sc->setSync                 ("two-way");
     sc->setEncryption           ("");
+    sc->setIsEnabled            (true);     // All sources enabled by default.
 
     if (wname == CONTACT){
         // since 7.1.2: default is vCard. Both still supported (for backw compaibility).

@@ -32,7 +32,7 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by Funambol".
  */
-
+#include "customization.h"
 #ifndef WINMAINCPP
 #define WINMAINCPP
 
@@ -76,11 +76,7 @@
 ///////////////////
 // ********* TODO: move to customization.h ***********
 //
-#define PROGRAM_NAME                        "Funambol Outlook Sync Client"
-#define WPROGRAM_NAME                      L"Funambol Outlook Sync Client"
 #define PROGRAM_NAME_EXE                    "OutlookPlugin.exe"
-#define OL_PLUGIN_LOG_NAME                  "outlook-client-log.txt"
-#define TIME_OUT_ABORT                      8                           /**< 8  seconds    */
 #define ASK_SLOW_TIMEOUT                    25                          /**< 25 seconds    */
 #define SCHED_DEFAULT_REPEAT_MINS           15                          /**< 15 minutes    */
 #define SCHED_DURATION_DAYS                 1                           /**< 1 day         */
@@ -111,7 +107,7 @@ static WCHAR* itemTypesUsed[] = {
     {APPOINTMENT        },
     {TASK               },
     {NOTE               },
-  //{PICTURE            },    // Pictures are disabled
+    {PICTURE            },
     {NULL}
 };
 ///////////////////
@@ -137,7 +133,6 @@ static WCHAR* itemTypesUsed[] = {
 // Scheduler defines:
 /** @addtogroup scheduler */
 /** @{ */
-#define SCHED_COMMENT                      WPROGRAM_NAME L" scheduler"
 #define SCHED_PARAM                        L"schedule"
 #define NEVER                               "Never"
 #define EVERY_DAY                           "Every day"
@@ -150,8 +145,6 @@ static WCHAR* itemTypesUsed[] = {
 //
 /** @cond DEV */
 // MessageBox messages
-#define WMSGBOX_ERROR_TITLE                L"Funambol Outlook Client Error"
-#define MSGBOX_ERROR_TITLE                  "Funambol Outlook Client Error"
 #define MSG_BOX_CANCEL_SYNC                 "Are you really sure you want to cancel current synchronization?"
 #define WMSG_BOX_CANCEL_SYNC               L"Are you really sure you want to cancel current synchronization?"
 #define WMSG_BOX_ASK_SLOW_1                L"The server has requested a full sync of all items for "
