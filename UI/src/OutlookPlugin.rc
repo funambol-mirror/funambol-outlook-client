@@ -89,7 +89,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_VIEW_GUIDE           "Open Funambol Outlook Sync Client User Guide"
+    ID_VIEW_GUIDE           "Open %s Outlook Sync Client User Guide"
 END
 
 STRINGTABLE 
@@ -173,7 +173,7 @@ BEGIN
     IDS_MAIN_NOTES          "Notes"
     IDS_ERROR_SET_CONNECTION 
                             "You must enter your account information before attempting a sync."
-    IDS_ABOUT_TITLE         "About Funambol Outlook Sync Client"
+    IDS_ABOUT_TITLE         "About %s Outlook Sync Client"
     IDS_MAIN_LAST_SYNC_FAILED "Last sync failed"
     IDS_MAIN_LAST_SYNC_CANCELED "Last sync canceled"
     IDS_CODE_HTTP_NOT_FOUND_2060 
@@ -297,6 +297,13 @@ END
 STRINGTABLE 
 BEGIN
     IDS_DATE_FILTER_LAST_2_WEEKS "Since last 2 weeks"
+    IDS_PICTURES            "&Pictures"
+    IDS_ADVANCED_PICTURES   "Pictures Advanced Settings"
+    IDS_TEXT_PICTURES       "pictures"
+    IDS_LEFTVIEW_PICTURES   "Pictures"
+    IDS_PICTURES_DETAILS    "Pictures Details"
+    IDS_PICTURES_FOLDER     "Pictures &Folder"
+    IDS_MAIN_PICTURES       "Pictures"
 END
 
 #endif    // German (Germany) resources
@@ -1214,7 +1221,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_VIEW_GUIDE           "Open Funambol Outlook Sync Client User Guide"
+    ID_VIEW_GUIDE           "Open %s Outlook Sync Client User Guide"
 END
 
 STRINGTABLE 
@@ -1298,7 +1305,7 @@ BEGIN
     IDS_MAIN_NOTES          "Notes"
     IDS_ERROR_SET_CONNECTION 
                             "You must enter your account information before attempting a sync."
-    IDS_ABOUT_TITLE         "About Funambol Outlook Sync Client"
+    IDS_ABOUT_TITLE         "About %s Outlook Sync Client"
     IDS_MAIN_LAST_SYNC_FAILED "Last sync failed"
     IDS_MAIN_LAST_SYNC_CANCELED "Last sync canceled"
     IDS_CODE_HTTP_NOT_FOUND_2060 
@@ -1422,6 +1429,13 @@ END
 STRINGTABLE 
 BEGIN
     IDS_DATE_FILTER_LAST_2_WEEKS "Since last 2 weeks"
+    IDS_PICTURES            "&Pictures"
+    IDS_ADVANCED_PICTURES   "Pictures Advanced Settings"
+    IDS_TEXT_PICTURES       "pictures"
+    IDS_LEFTVIEW_PICTURES   "Pictures"
+    IDS_PICTURES_DETAILS    "Pictures Details"
+    IDS_PICTURES_FOLDER     "Pictures &Folder"
+    IDS_MAIN_PICTURES       "Pictures"
 END
 
 #endif    // Italian (Italy) resources
