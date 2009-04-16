@@ -149,7 +149,6 @@ void CFullSync::OnBnClickedOk() {
         if (selected == IDNO) {
             return;
         }
-
         pos = 1;
     }
 
@@ -162,33 +161,36 @@ void CFullSync::OnBnClickedOk() {
     getConfig()->read();
 
     // enable the checked sources, disable the unchecked ones
-    if(checkContacts.GetCheck() == BST_CHECKED){
+    if(checkContacts.GetCheck() == BST_CHECKED) {
         getConfig()->getSyncSourceConfig(CONTACT_)->setSync(getFullSyncTypeName(pos));
     }
-    else{
-        getConfig()->getSyncSourceConfig(CONTACT_)->setSync(SYNCTYPE_NONE);
+    else {
+        getConfig()->getSyncSourceConfig(CONTACT_)->setIsEnabled(false);
     }
 
-    if(checkCalendar.GetCheck() == BST_CHECKED){
+    if(checkCalendar.GetCheck() == BST_CHECKED) {
         getConfig()->getSyncSourceConfig(APPOINTMENT_)->setSync(getFullSyncTypeName(pos));
     }
-    else{
-        getConfig()->getSyncSourceConfig(APPOINTMENT_)->setSync(SYNCTYPE_NONE);
+    else {
+        getConfig()->getSyncSourceConfig(APPOINTMENT_)->setIsEnabled(false);
     }
 
-    if(checkTasks.GetCheck() == BST_CHECKED){
+    if(checkTasks.GetCheck() == BST_CHECKED) {
         getConfig()->getSyncSourceConfig(TASK_)->setSync(getFullSyncTypeName(pos));
     }
-    else{
-        getConfig()->getSyncSourceConfig(TASK_)->setSync(SYNCTYPE_NONE);
+    else {
+        getConfig()->getSyncSourceConfig(TASK_)->setIsEnabled(false);
     }
 
-    if(checkNotes.GetCheck() == BST_CHECKED){
+    if(checkNotes.GetCheck() == BST_CHECKED) {
         getConfig()->getSyncSourceConfig(NOTE_)->setSync(getFullSyncTypeName(pos));
     }
-    else{
-        getConfig()->getSyncSourceConfig(NOTE_)->setSync(SYNCTYPE_NONE);
+    else {
+        getConfig()->getSyncSourceConfig(NOTE_)->setIsEnabled(false);
     }
+
+    // TODO: add check for pictures
+    getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(false);
 
 
     getConfig()->setFullSync(true);

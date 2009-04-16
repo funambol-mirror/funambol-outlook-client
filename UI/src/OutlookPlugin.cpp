@@ -159,7 +159,9 @@ BOOL CAboutDlg::OnInitDialog(){
 
     CString s1("");
     CString s2("");
-    s1.LoadString(IDS_ABOUT_TITLE); SetWindowText(s1); s1 = "";
+    //s1.LoadString(IDS_ABOUT_TITLE);
+    s1.FormatMessage(IDS_ABOUT_TITLE, APP_NAME);
+    SetWindowText(s1); s1 = "";
     CDialog::OnInitDialog();
 
     // Set fonts

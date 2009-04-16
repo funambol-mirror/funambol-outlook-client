@@ -1,4 +1,11 @@
+2009-04-16
+   released Funambol Outlook Sync Client 7.3.US2148.0
+   - toccy: [US2148] merged from trunk (r146)
+   - toccy: [US2148] use the SyncSourceConfig::enabled flag to know if a source is enabled/disabled.
+            Sync direction "none" is not used anymore.
+
 2009-04-15
+   - teo:   added customization.h
    - toccy: created branch US2148 (Sync direction not saved when source is disabled) - r138
 
 2009-03-31

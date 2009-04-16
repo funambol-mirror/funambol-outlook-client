@@ -135,9 +135,10 @@ public:
     const char*   getEncoding()       const     { return s->getEncoding()      ; }
     const char*   getVersion()        const     { return s->getVersion()       ; }
     const char*   getSupportedTypes() const     { return s->getSupportedTypes(); }
-    //CTCap         getCtCap()          const     { return s->getCtCap()         ; }
+    //CTCap       getCtCap()          const     { return s->getCtCap()         ; }
     unsigned long getLast()           const     { return s->getLast()          ; }
     const char*   getEncryption()     const     { return s->getEncryption()    ; }
+    const bool    isEnabled()         const     { return s->isEnabled()        ; }
 
     // Common properties: set original values in SSconfig 's'
     void setName          (const char*   v)     { s->setName(v)                ; }
@@ -148,9 +149,10 @@ public:
     void setEncoding      (const char*   v)     { s->setEncoding(v)            ; }
     void setVersion       (const char*   v)     { s->setVersion(v)             ; }
     void setSupportedTypes(const char*   v)     { s->setSupportedTypes(v)      ; }
-    //void setCtCap         (CTCap         v)     { s->setCtCap(v)               ; }
+    //void setCtCap       (CTCap         v)     { s->setCtCap(v)               ; }
     void setLast          (unsigned long v)     { s->setLast(v)                ; }
     void setEncryption    (const char*   v)     { s->setEncryption(v)          ; }
+    void setIsEnabled     (const bool    v)     { s->setIsEnabled(v)           ; }
 
 
     bool getIsSynced() const;

@@ -210,7 +210,7 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
 
     // enable/disable controls, depending of what sources are set to none
     WindowsSyncSourceConfig* ssc = getConfig()->getSyncSourceConfig(CONTACT_);
-    if(! strcmp(ssc->getSync(),"none")){
+    if (!ssc->isEnabled()) {
         checkContacts.SetCheck(BST_UNCHECKED);
         butContacts.EnableWindow(FALSE);
     }
@@ -219,7 +219,7 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     }
 
     ssc = getConfig()->getSyncSourceConfig(APPOINTMENT_);
-    if(! strcmp(ssc->getSync(),"none")){
+    if (!ssc->isEnabled()) {
         checkCalendar.SetCheck(BST_UNCHECKED);
         butCalendar.EnableWindow(FALSE);
     }
@@ -228,7 +228,7 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     }
 
     ssc = getConfig()->getSyncSourceConfig(TASK_);
-    if(! strcmp(ssc->getSync(),"none")){
+    if (!ssc->isEnabled()) {
         checkTasks.SetCheck(BST_UNCHECKED);
         butTasks.EnableWindow(FALSE);
     }
@@ -237,7 +237,7 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     }
 
     ssc = getConfig()->getSyncSourceConfig(NOTE_);
-    if(! strcmp(ssc->getSync(),"none")){
+    if (!ssc->isEnabled()) {
         checkNotes.SetCheck(BST_UNCHECKED);
         butNotes.EnableWindow(FALSE);
     }
@@ -421,49 +421,22 @@ bool CSyncSettings::saveSettings(bool saveToDisk)
     }
     saveScheduler = false;
 
-    if(saveSyncTypeContacts){
-        if(checkContacts.GetCheck() == BST_UNCHECKED)
-            getConfig()->getSyncSourceConfig(CONTACT_)->setSync(syncModeName(SYNC_NONE));
-        else {
-            if (!strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(), SYNCTYPE_NONE)) {
-                // "two-way" only if it was "none" (otherwise keep current syncmode)
-                getConfig()->getSyncSourceConfig(CONTACT_)->setSync(syncModeName(SYNC_TWO_WAY));
-            }
-        }
-    };
-
-    if(saveSyncTypeCalendar){
-        if(checkCalendar.GetCheck() == BST_UNCHECKED)
-            getConfig()->getSyncSourceConfig(APPOINTMENT_)->setSync(syncModeName(SYNC_NONE));
-        else {
-            if (!strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(), SYNCTYPE_NONE)) {
-                // "two-way" only if it was "none" (otherwise keep current syncmode)
-                getConfig()->getSyncSourceConfig(APPOINTMENT_)->setSync(syncModeName(SYNC_TWO_WAY));
-            }
-        }
+    if (saveSyncTypeContacts) {
+        bool enabled = (checkContacts.GetCheck() == BST_CHECKED)? true:false;
+        getConfig()->getSyncSourceConfig(CONTACT_)->setIsEnabled(enabled);
     }
-
-    if(saveSyncTypeTasks){
-        if(checkTasks.GetCheck() == BST_UNCHECKED)
-            getConfig()->getSyncSourceConfig(TASK_)->setSync(syncModeName(SYNC_NONE));
-        else {
-            if (!strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(), SYNCTYPE_NONE)) {
-                // "two-way" only if it was "none" (otherwise keep current syncmode)
-                getConfig()->getSyncSourceConfig(TASK_)->setSync(syncModeName(SYNC_TWO_WAY));
-            }
-        }
-    };
-
-    if(saveSyncTypeNotes){
-        if(checkNotes.GetCheck() == BST_UNCHECKED)
-            getConfig()->getSyncSourceConfig(NOTE_)->setSync(syncModeName(SYNC_NONE));
-        else {
-            if (!strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(), SYNCTYPE_NONE)) {
-                // "two-way" only if it was "none" (otherwise keep current syncmode)
-                getConfig()->getSyncSourceConfig(NOTE_)->setSync(syncModeName(SYNC_TWO_WAY));
-            }
-        }
-    };
+    if (saveSyncTypeCalendar) {
+        bool enabled = (checkCalendar.GetCheck() == BST_CHECKED)? true:false;
+        getConfig()->getSyncSourceConfig(APPOINTMENT_)->setIsEnabled(enabled);
+    }
+    if (saveSyncTypeTasks) {
+        bool enabled = (checkTasks.GetCheck() == BST_CHECKED)? true:false;
+        getConfig()->getSyncSourceConfig(TASK_)->setIsEnabled(enabled);
+    }
+    if (saveSyncTypeNotes) {
+        bool enabled = (checkNotes.GetCheck() == BST_CHECKED)? true:false;
+        getConfig()->getSyncSourceConfig(NOTE_)->setIsEnabled(enabled);
+    }
 
     // save encryption, global property
     if(checkEncryption.GetCheck()){
