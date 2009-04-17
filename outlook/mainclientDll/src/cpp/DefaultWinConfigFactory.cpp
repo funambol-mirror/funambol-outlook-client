@@ -117,6 +117,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
     sc->setLast                 (0);
     sc->setSync                 ("two-way");
     sc->setEncryption           ("");
+    sc->setIsEnabled            (true);     // All sources enabled by default.
 
     if (wname == CONTACT){
         // since 7.1.2: default is vCard. Both still supported (for backw compaibility).

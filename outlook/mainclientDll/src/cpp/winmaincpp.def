@@ -60,4 +60,4 @@ checkPortalBuild
 syncModeName
 saveSyncModes
 readSyncModes
-isSourceEnabled
+isSourceVisible

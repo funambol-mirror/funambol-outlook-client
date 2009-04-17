@@ -37,12 +37,6 @@
 #include "PicturesSyncSource.h"
 #include "winmaincpp.h"
 
-// for stat 
-//#include <sys/stat.h>
-//#include <sys/types.h>
-//#include <unistd.h>
-//#include <errno.h>
-
 
 using namespace std;
 

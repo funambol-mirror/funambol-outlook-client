@@ -236,7 +236,7 @@ BOOL CMainSyncFrame::PreCreateWindow(CREATESTRUCT& cs)
     //
     int sizeX = FRAME_MAIN_X;
     int sizeY = FRAME_MAIN_Y;
-    if (isSourceEnabled(PICTURE)) {
+    if (isSourceVisible(PICTURE)) {
         sizeY += SOURCE_PANE_SIZE_Y;
     }
 
@@ -1083,38 +1083,38 @@ LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam){
         exitCode == 4 || 
         exitCode == 6 || 
         exitCode == 7) {
-        if (strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(), "none")) {
+        if (!getConfig()->getSyncSourceConfig(CONTACT_)->isEnabled()) {
             mainForm->syncSourceContactState = SYNCSOURCE_STATE_NOT_SYNCED;
         }
-        if (strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(), "none")) {
+        if (!getConfig()->getSyncSourceConfig(APPOINTMENT_)->isEnabled()) {
             mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_NOT_SYNCED;
         }
-        if (strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(), "none")) {
+        if (!getConfig()->getSyncSourceConfig(TASK_)->isEnabled()) {
             mainForm->syncSourceTaskState = SYNCSOURCE_STATE_NOT_SYNCED;
         }
-        if (strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(), "none")) {
+        if (!getConfig()->getSyncSourceConfig(NOTE_)->isEnabled()) {
             mainForm->syncSourceNoteState = SYNCSOURCE_STATE_NOT_SYNCED;
         }
-        if (strcmp(getConfig()->getSyncSourceConfig(PICTURE_)->getSync(), "none")) {
+        if (!getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled()) {
             mainForm->syncSourcePictureState = SYNCSOURCE_STATE_NOT_SYNCED;
         }
     }
     else if (exitCode == 5) {
         // user avoided full sync, set canceled state
         // set sync source status
-        if (strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(), "none") != 0) {
+        if (getConfig()->getSyncSourceConfig(CONTACT_)->isEnabled()) {
             mainForm->syncSourceContactState = SYNCSOURCE_STATE_CANCELED;
         }
-        if (strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(), "none") != 0) {
+        if (getConfig()->getSyncSourceConfig(APPOINTMENT_)->isEnabled()) {
             mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_CANCELED;
         }
-        if( strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(), "none") != 0) {
+        if (getConfig()->getSyncSourceConfig(TASK_)->isEnabled()) {
             mainForm->syncSourceTaskState = SYNCSOURCE_STATE_CANCELED;
         }
-        if (strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(), "none") != 0) {
+        if (getConfig()->getSyncSourceConfig(NOTE_)->isEnabled()) {
             mainForm->syncSourceNoteState = SYNCSOURCE_STATE_CANCELED;
         }
-        if (strcmp(getConfig()->getSyncSourceConfig(PICTURE_)->getSync(), "none") != 0) {
+        if (getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled()) {
             mainForm->syncSourcePictureState = SYNCSOURCE_STATE_CANCELED;
         }
     }
@@ -1205,23 +1205,23 @@ void CMainSyncFrame::StartSync(){
     //
     // Clear source state for sources to sync, clear status icons.
     //
-    if (strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(), "none") != 0) {
+    if (getConfig()->getSyncSourceConfig(CONTACT_)->isEnabled()) {
         mainForm->syncSourceContactState = SYNCSOURCE_STATE_OK;
         mainForm->iconStatusContacts.SetIcon(NULL);
     }
-    if (strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(), "none") != 0) {
+    if (getConfig()->getSyncSourceConfig(APPOINTMENT_)->isEnabled()) {
         mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_OK;
         mainForm->iconStatusCalendar.SetIcon(NULL);
     }
-    if (strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(), "none") != 0) {
+    if (getConfig()->getSyncSourceConfig(TASK_)->isEnabled()) {
         mainForm->syncSourceTaskState = SYNCSOURCE_STATE_OK;
         mainForm->iconStatusTasks.SetIcon(NULL);
     }
-    if (strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(), "none") != 0) {
+    if (getConfig()->getSyncSourceConfig(NOTE_)->isEnabled()) {
         mainForm->syncSourceNoteState = SYNCSOURCE_STATE_OK;
         mainForm->iconStatusNotes.SetIcon(NULL);
     }
-    if (strcmp(getConfig()->getSyncSourceConfig(PICTURE_)->getSync(), "none") != 0) {
+    if (getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled()) {
         mainForm->syncSourcePictureState = SYNCSOURCE_STATE_OK;
         mainForm->iconStatusPictures.SetIcon(NULL);
     }
@@ -1325,19 +1325,19 @@ int CMainSyncFrame::CancelSync(){
         mainForm->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
 
         // set sync source status
-        if (strcmp(getConfig()->getSyncSourceConfig(CONTACT_)->getSync(),"none") != 0){
+        if (getConfig()->getSyncSourceConfig(CONTACT_)->isEnabled()){
             mainForm->syncSourceContactState = SYNCSOURCE_STATE_CANCELED;
         }
-        if (strcmp(getConfig()->getSyncSourceConfig(APPOINTMENT_)->getSync(),"none") != 0){
+        if (getConfig()->getSyncSourceConfig(APPOINTMENT_)->isEnabled()){
             mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_CANCELED;
         }
-        if (strcmp(getConfig()->getSyncSourceConfig(TASK_)->getSync(),"none") != 0){
+        if (getConfig()->getSyncSourceConfig(TASK_)->isEnabled()){
             mainForm->syncSourceTaskState = SYNCSOURCE_STATE_CANCELED;
         }
-        if (strcmp(getConfig()->getSyncSourceConfig(NOTE_)->getSync(),"none") != 0){
+        if (getConfig()->getSyncSourceConfig(NOTE_)->isEnabled()){
             mainForm->syncSourceNoteState = SYNCSOURCE_STATE_CANCELED;
         }
-        if (strcmp(getConfig()->getSyncSourceConfig(PICTURE_)->getSync(),"none") != 0){
+        if (getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled()){
             mainForm->syncSourcePictureState = SYNCSOURCE_STATE_CANCELED;
         }
 
@@ -1401,6 +1401,12 @@ void CMainSyncFrame::backupSyncModeSettings() {
     syncModeTasks    = getSyncModeCode(getConfig()->getSyncSourceConfig(TASK_)->getSync());
     syncModeNotes    = getSyncModeCode(getConfig()->getSyncSourceConfig(NOTE_)->getSync());
     syncModePictures = getSyncModeCode(getConfig()->getSyncSourceConfig(PICTURE_)->getSync());
+
+    backupEnabledContacts = getConfig()->getSyncSourceConfig(CONTACT_)->isEnabled();
+    backupEnabledCalendar = getConfig()->getSyncSourceConfig(APPOINTMENT_)->isEnabled();
+    backupEnabledTasks    = getConfig()->getSyncSourceConfig(TASK_)->isEnabled();
+    backupEnabledNotes    = getConfig()->getSyncSourceConfig(NOTE_)->isEnabled();
+    backupEnabledPictures = getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled();
 }
 
 void CMainSyncFrame::restoreSyncModeSettings(){
@@ -1422,11 +1428,20 @@ void CMainSyncFrame::restoreSyncModeSettings(){
     }
 
     // Save ONLY sync-modes of each source, if necessary.
+    // (this check is done to know if source modes/enabled have been backup or not)
     if ( syncModeContacts != -1 || 
          syncModeCalendar != -1 ||
          syncModeTasks    != -1 ||
          syncModeNotes    != -1 ||
          syncModePictures != -1 ) {
+
+        // Restore the enabled flag
+        getConfig()->getSyncSourceConfig(CONTACT_    )->setIsEnabled(backupEnabledContacts);
+        getConfig()->getSyncSourceConfig(APPOINTMENT_)->setIsEnabled(backupEnabledCalendar);
+        getConfig()->getSyncSourceConfig(TASK_       )->setIsEnabled(backupEnabledTasks);
+        getConfig()->getSyncSourceConfig(NOTE_       )->setIsEnabled(backupEnabledNotes);
+        getConfig()->getSyncSourceConfig(PICTURE_    )->setIsEnabled(backupEnabledPictures);
+
         getConfig()->saveSyncModes();
     }
     
@@ -1435,6 +1450,9 @@ void CMainSyncFrame::restoreSyncModeSettings(){
     syncModeTasks    = -1; 
     syncModeNotes    = -1;
     syncModePictures = -1;
+
+
+
 }
 
 

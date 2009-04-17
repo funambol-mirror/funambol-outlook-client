@@ -279,7 +279,7 @@ int startSync() {
 
 
     //
-    // Create the array of SyncSources (only if syncMode != none)
+    // Create the array of SyncSources (only if source enabled)
     // ----------------------------------------------------------
     LOG.debug("Creating SyncSources...");
     int sourcesCount = config->getSyncSourceConfigsCount();
@@ -295,9 +295,8 @@ int startSync() {
     int j=0;
     while (itemTypesUsed[j]) {
         for (int i=0; i<sourcesCount; i++) {
-            const char* syncMode = config->getSyncSourceConfig(i)->getSync();
-            if (syncMode && strcmp(syncMode, "none") && strcmp(syncMode, "")) {
-
+            const bool enabled = config->getSyncSourceConfig(i)->isEnabled();
+            if (enabled) {
                 wname = toWideChar(config->getSyncSourceConfig(i)->getName());
                 if (!wcscmp(wname, itemTypesUsed[j])) {
 
