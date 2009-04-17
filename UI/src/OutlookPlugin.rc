@@ -297,6 +297,13 @@ END
 STRINGTABLE 
 BEGIN
     IDS_DATE_FILTER_LAST_2_WEEKS "Since last 2 weeks"
+    IDS_PICTURES            "&Pictures"
+    IDS_ADVANCED_PICTURES   "Pictures Advanced Settings"
+    IDS_TEXT_PICTURES       "pictures"
+    IDS_LEFTVIEW_PICTURES   "Pictures"
+    IDS_PICTURES_DETAILS    "Pictures Details"
+    IDS_PICTURES_FOLDER     "Pictures &Folder"
+    IDS_MAIN_PICTURES       "Pictures"
 END
 
 #endif    // German (Germany) resources
@@ -1422,6 +1429,13 @@ END
 STRINGTABLE 
 BEGIN
     IDS_DATE_FILTER_LAST_2_WEEKS "Since last 2 weeks"
+    IDS_PICTURES            "&Pictures"
+    IDS_ADVANCED_PICTURES   "Pictures Advanced Settings"
+    IDS_TEXT_PICTURES       "pictures"
+    IDS_LEFTVIEW_PICTURES   "Pictures"
+    IDS_PICTURES_DETAILS    "Pictures Details"
+    IDS_PICTURES_FOLDER     "Pictures &Folder"
+    IDS_MAIN_PICTURES       "Pictures"
 END
 
 #endif    // Italian (Italy) resources

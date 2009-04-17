@@ -1,5 +1,14 @@
+2009-04-17
+   - toccy: merged from branch US2148 (Sync direction not saved when source is disabled) - r154
+
+2009-04-16
+   released Funambol Outlook Sync Client 7.3.US2148.0
+   - toccy: [US2148] use the SyncSourceConfig::enabled flag to know if a source is enabled/disabled.
+            Sync direction "none" is not used anymore.
+
 2009-04-15
-   - teo: added customization.h
+   - teo:   added customization.h
+   - toccy: created branch US2148 (Sync direction not saved when source is disabled) - r138
 
 2009-03-31
    - toccy: merged from branch US1655 (Pictures Sync - main screen) - r128
@@ -7,15 +16,15 @@
 2009-03-27
    - teo: added extended added handlig feature
 
-        2009-03-23
-            released Funambol Outlook Sync Client 7.2.US1655.0
-            - toccy: added "Pictures" pane on main screen, and resources for the pictures sync.
-            - toccy: added PicturesSyncsource class and pictures configuration in DLL, to handle pictures sync.
-            - toccy: added utils functions to manage source name/ID conversion, fixed printReport.
-            - toccy: Now SyncSource** array passed to WindowsSyncClient is no more a WindowsSyncSource**, because one source is a PicturesncSource.
-            - toccy: some code cleaning and reformatting of UI/MainSyncfOrm, UI/SyncForm, UI/CustomPane.
+2009-03-23
+   released Funambol Outlook Sync Client 7.2.US1655.0
+   - toccy: [US1655] added "Pictures" pane on main screen, and resources for the pictures sync.
+   - toccy: [US1655] added PicturesSyncsource class and pictures configuration in DLL, to handle pictures sync.
+   - toccy: [US1655] added utils functions to manage source name/ID conversion, fixed printReport.
+   - toccy: [US1655] Now SyncSource** array passed to WindowsSyncClient is no more a WindowsSyncSource**, because one source is a PicturesncSource.
+   - toccy: [US1655] some code cleaning and reformatting of UI/MainSyncfOrm, UI/SyncForm, UI/CustomPane.
 
-    - toccy: Created branch US1655 (from r88) Pictures Sync - main screen
+   - toccy: Created branch US1655 (from r88) Pictures Sync - main screen
 
 Funambol Outlook Sync Client 7.1.10
 ---------------------------------------

@@ -87,12 +87,20 @@ protected:
     bool configOpened;
     int dpiX, dpiY;
 
-    // info about sync modes for sources, used on full sync
+    // info about sync modes for sources, used on full sync (TODO: remove me)
     int syncModeCalendar; 
     int syncModeContacts;
     int syncModeTasks;
     int syncModeNotes;
     int syncModePictures;
+
+    // info about source enabled for sources, used on full sync (TODO: remove me)
+    bool backupEnabledContacts;
+    bool backupEnabledCalendar;
+    bool backupEnabledTasks;
+    bool backupEnabledNotes;
+    bool backupEnabledPictures;
+
 
     // info about the sync in progress
     int currentSource;

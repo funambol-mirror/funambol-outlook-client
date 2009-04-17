@@ -291,7 +291,13 @@ void OutlookConfig::readSyncModes() {
     for (unsigned int i=0; i<sourceConfigsCount; i++) {
         ManagementNode* node = sourcesNode->getChild(i);
         if (node) {
-            winSourceConfigs[i].setSync(node->readPropertyValue(PROPERTY_SOURCE_SYNC));
+            char* tmp = node->readPropertyValue(PROPERTY_SOURCE_SYNC);
+            winSourceConfigs[i].setSync(tmp);
+            delete [] tmp;
+
+            tmp = node->readPropertyValue(PROPERTY_SOURCE_ENABLED);
+            winSourceConfigs[i].setIsEnabled(strcmp(tmp, "0")? true:false);    // Set true if any value different from "0" (also if empty);
+            delete [] tmp;
         }
     }
 
@@ -508,6 +514,7 @@ void OutlookConfig::saveWinSourceConfig(unsigned int i) {
         node->setPropertyValue(PROPERTY_SOURCE_ENCODING,    winSourceConfigs[i].getEncoding      ());    
         node->setPropertyValue(PROPERTY_SOURCE_SUPP_TYPES,  winSourceConfigs[i].getSupportedTypes());
         node->setPropertyValue(PROPERTY_SOURCE_ENCRYPTION,  winSourceConfigs[i].getEncryption    ());
+        node->setPropertyValue(PROPERTY_SOURCE_ENABLED,     winSourceConfigs[i].isEnabled() ? "1" : "0");
 
         timestampToAnchor(winSourceConfigs[i].getLast(), buf); 
         node->setPropertyValue(PROPERTY_SOURCE_LAST_SYNC, buf);
@@ -547,7 +554,8 @@ void OutlookConfig::saveSyncModes() {
     for(unsigned int i=0; i<sourceConfigsCount; ++i) {
         node = sourcesNode->getChild(i);
         if (node) {
-            node->setPropertyValue(PROPERTY_SOURCE_SYNC, winSourceConfigs[i].getSync());
+            node->setPropertyValue(PROPERTY_SOURCE_SYNC,    winSourceConfigs[i].getSync());
+            node->setPropertyValue(PROPERTY_SOURCE_ENABLED, winSourceConfigs[i].isEnabled() ? "1":"0");
         }
         node = NULL;
     }
@@ -1065,10 +1073,30 @@ void OutlookConfig::upgradeConfig() {
         dc.setMod(PROGRAM_NAME);
     }
 
-        // Old version < 7.2.0: Pictures source added.
-    if (oldSwv < 70200) {
+
+    // Old version < 7.3.0
+    if (oldSwv < 70300) {
+
+        // Pictures source added.
         if (!addWindowsSyncSourceConfig(PICTURE)) {
             LOG.error("upgradeConfig - error adding the config for %s source", PICTURE_);
+        }
+
+        // added SyncSource boolean 'enabled' to enable/disable a source
+        // without losing the sync direction information.
+        // If syncmode = none -> disable ssource.
+        for (unsigned int i=0; i<winSourceConfigsCount; i++) {
+            WindowsSyncSourceConfig* wsc = getSyncSourceConfig(i);
+            if (wsc) {
+                StringBuffer syncMode = wsc->getSync();
+                if (syncMode == "none") { 
+                    wsc->setIsEnabled(false);
+                    wsc->setSync("two-way");    // Just as a default, if was disabled
+                }
+                else { 
+                    wsc->setIsEnabled(true); 
+                }
+            }
         }
     }
 
