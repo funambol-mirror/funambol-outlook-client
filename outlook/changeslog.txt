@@ -1,3 +1,6 @@
+2009-04-20
+   - toccy: added safe check for recurring calendar items with no timezone information (corrupted or imported with other apps)
+
 2009-04-17
    - toccy: merged from branch US2148 (Sync direction not saved when source is disabled) - r154
 
