@@ -1,3 +1,7 @@
+2009-04-28
+   - toccy: updated release version to v.8.0
+            linked svn::externals property to Funambol C++ SDK v.8 (branch "v8")
+
 2009-03-27
    - teo: added extended added handlig feature
 
