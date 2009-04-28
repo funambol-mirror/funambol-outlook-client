@@ -1,3 +1,6 @@
+2009-04-28
+   - toccy: updated trunk version to "8.5.0"
+
 2009-04-20
    - toccy: added safe check for recurring calendar items with no timezone information (corrupted or imported with other apps)
 
