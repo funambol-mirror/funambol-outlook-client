@@ -107,7 +107,7 @@ static WCHAR* itemTypesUsed[] = {
     {APPOINTMENT        },
     {TASK               },
     {NOTE               },
-    {PICTURE            },
+    //{PICTURE            },
     {NULL}
 };
 ///////////////////
