@@ -1074,8 +1074,8 @@ void OutlookConfig::upgradeConfig() {
     }
 
 
-    // Old version < 7.3.0
-    if (oldSwv < 70300) {
+    // Old version < 8.5.0
+    if (oldSwv < 80500) {
 
         // Pictures source added.
         if (!addWindowsSyncSourceConfig(PICTURE)) {

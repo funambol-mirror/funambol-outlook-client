@@ -41,9 +41,29 @@
 /** @{ */
 
 // ------------------------------- Definitions ------------------------------
-
-#define EMPTY_WSTRING                      L""
+// Program parameters:
+#define PROGRAM_NAME_EXE                    "OutlookPlugin.exe"
 #define SYNC_MUTEX_NAME                     "fol-SyncInProgress"
+#define ASK_SLOW_TIMEOUT                    25                          /**< 25 seconds    */
+#define SCHED_DEFAULT_REPEAT_MINS           15                          /**< 15 minutes    */
+#define SCHED_DURATION_DAYS                 1                           /**< 1 day         */
+#define SYNC_TIMEOUT                        120                         /**< 120 minutes   */
+#define MAX_LOG_SIZE                        10000000                    /**< 10 MB         */
+#define EMPTY_WSTRING                      L""
+#define DISPLAY_SLOWSYNC_WARNING            0         /**< 1 to display a timed-msgbox if Server requests a SLOW SYNC */
+
+
+// Default remote names:
+#define VCARD_DEFAULT_NAME                 L"card"
+#define VCALENDAR_DEFAULT_NAME             L"event"
+#define VTODO_DEFAULT_NAME                 L"task"
+#define VNOTE_DEFAULT_NAME                 L"note"
+
+#define SIFC_DEFAULT_NAME                  L"scard"
+#define SIFE_DEFAULT_NAME                  L"scal"
+#define SIFT_DEFAULT_NAME                  L"stask"
+#define SIFN_DEFAULT_NAME                  L"snote"
+
 
 //#define OLPLUGIN_DIR_NAME                  L"OutlookClient" // the same as the PlatformAdapter
 #define MAX_PATH_LENGTH                     512
@@ -72,33 +92,6 @@
 #define POST_                              "post"
 #define DISTRIBUTION_LIST_                 "distribution list"
 
-
-///////////////////
-// ********* TODO: move to customization.h ***********
-//
-#define PROGRAM_NAME_EXE                    "OutlookPlugin.exe"
-#define ASK_SLOW_TIMEOUT                    25                          /**< 25 seconds    */
-#define SCHED_DEFAULT_REPEAT_MINS           15                          /**< 15 minutes    */
-#define SCHED_DURATION_DAYS                 1                           /**< 1 day         */
-#define SYNC_TIMEOUT                        120                         /**< 120 minutes   */
-#define MAX_LOG_SIZE                        10000000                    /**< 10 MB         */
-#define DISPLAY_SLOWSYNC_WARNING            0         /**< 1 to display a timed-msgbox if Server requests a SLOW SYNC */
-
-/// Data files are stored under 'Doc&Settings\Application Data\Funambol\Outlook Client' folder.
-#define FUNAMBOL_DIR_NAME                  L"Funambol"
-
-// Default remote names:
-#define VCARD_DEFAULT_NAME                 L"card"
-#define VCALENDAR_DEFAULT_NAME             L"event"
-#define VTODO_DEFAULT_NAME                 L"task"
-#define VNOTE_DEFAULT_NAME                 L"note"
-
-#define SIFC_DEFAULT_NAME                  L"scard"
-#define SIFE_DEFAULT_NAME                  L"scal"
-#define SIFT_DEFAULT_NAME                  L"stask"
-#define SIFN_DEFAULT_NAME                  L"snote"
-
-
 /// Order is important: sources will be executed with this order.
 /// Sources not existing in this array will not be used/synchronized.
 /// TODO: use a enum of IDs only here, and util methods to get char/wchar
@@ -110,9 +103,6 @@ static WCHAR* itemTypesUsed[] = {
     //{PICTURE            },
     {NULL}
 };
-///////////////////
-
-
 
 /// Name of file to store 'forced' modified appointments
 #define APPOINTMENT_FORCED_MODIFIED        L"appointment_modified"

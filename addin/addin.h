@@ -39,11 +39,10 @@
 #define __ADDIN_H_
 
 #include "resource.h"      // main symbols
+#include "customization.h"
 
 // ----------------------- definitions -------------------------------
-#define PROGRAM_NAME                        "Funambol Outlook Sync Client"
 #define PROGRAM_NAME_EXE                    "OutlookPlugin.exe"             // The application to run
-#define PLUGIN_UI_TITLE                     "Funambol Outlook Sync Client"  // The UI windows title (must be unique!)
 #define PLUGIN_UI_CLASSNAME                 "FunambolApp"                   // The UI windows classname
 #define FUN                                 "FUN"
 #define PARAM_OUTLOOK_SYNC                  "sync"                          // The command-line parameter passed to PROGRAM_NAME_EXE application
@@ -51,8 +50,6 @@
 #define PARAM_OUTLOOK_OPTIONS               "options"                       // It's used to open automatically the options dialog.
 
 
-#define FUNAMBOL                           L"Funa&mbol"
-#define CAPTION                            L"Funambol Outlook Sync Client"
 #define BUTTON_SYNCHRONIZE                 L"&Sync All        Ctrl+F7"
 #define BUTTON_GOTO_PLUGIN                 L"&Go to...        Ctrl+F8"
 #define BUTTON_CONFIGURATION               L"Op&tions...     Ctrl+F9"
