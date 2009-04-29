@@ -223,6 +223,10 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
+				RelativePath="..\src\include\customization.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\include\DateFilter.h"
 				>
 			</File>
