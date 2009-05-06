@@ -999,7 +999,7 @@ TIME_ZONE_INFORMATION* ClientApplication::getTimezone(ClientAppointment* cApp) {
         long idx = -1;      
         const int MAX_TIMEZONE_LENGHT = 256; // the arraysize. It is already huge
         char timez[MAX_TIMEZONE_LENGHT];
-        VARIANT* ptr;
+        VARIANT* ptr = NULL;
 
         // set the timezone blob
         prop = pRedUtils->GetIDsFromNames(cApp->getCOMPtr()->MAPIOBJECT, 
@@ -1021,8 +1021,14 @@ TIME_ZONE_INFORMATION* ClientApplication::getTimezone(ClientAppointment* cApp) {
         hr = SafeArrayGetUBound (safe, 1, &lend);     // it is the last and must be used    
         hr = SafeArrayAccessData(safe, (void HUGEP**)&ptr);
 
-        for (long i = lstart; i <= lend; i++) {
-            timez[i] = ptr[i].cVal;           
+        if (lend-lstart > 0) {
+	        for (long i = lstart; i <= lend; i++) {
+	            timez[i] = ptr[i].cVal;           
+	        }
+        }
+        else {
+            LOG.info("Recurring appointment with no timezone information!");
+            return NULL;
         }
         SafeArrayUnaccessData(safe);       
                

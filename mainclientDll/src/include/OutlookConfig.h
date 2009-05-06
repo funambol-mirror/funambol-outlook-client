@@ -67,11 +67,6 @@
 /// Path in DMTree
 #define APPLICATION_URI                         "Funambol/OutlookClient"
 
-/// Default portal settings
-// leave te <blanks> as they are in the PORTAL_DEFAULT_SYNCURL definition
-
-#define PORTAL_DEFAULT_USERNAME                 ""
-#define PORTAL_DEFAULT_PASSWORD                 ""
 
 #define TIMEZONE_CONTEXT                       L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones"
 

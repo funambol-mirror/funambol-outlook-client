@@ -291,28 +291,6 @@ WCHAR* readAppDataPath() {
     static const StringBuffer& pt = PlatformAdapter::getConfigFolder();    
     WCHAR* dataPath = toWideChar(pt.c_str());
     return dataPath;
-    
-    /*
-    // Get 'application data' folder for current user.
-    WCHAR appDataPath[MAX_PATH_LENGTH];
-    if ( FAILED(SHGetFolderPath(NULL, 
-                                CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                                NULL,
-                                0,
-                                appDataPath)) ) {
-        DWORD code = GetLastError();
-        char* msg = readSystemErrorMsg(code);
-        setErrorF(getLastErrorCode(), ERR_APPDATA_PATH, code, msg);
-        delete [] msg;
-        return NULL;
-    }
-
-    int len = wcslen(appDataPath) + wcslen(FUNAMBOL_DIR_NAME) + wcslen(OLPLUGIN_DIR_NAME) + 3;
-    WCHAR* dataPath = new WCHAR[len];
-    wsprintf(dataPath, L"%s\\%s\\%s", appDataPath, FUNAMBOL_DIR_NAME, OLPLUGIN_DIR_NAME);
-
-    return dataPath;
-    */
 }
 
 
@@ -456,47 +434,6 @@ int makeDataDirs() {
         return 1;   
     }
     return err;
-    
-    /*
-    // Get 'application data' folder for current user.
-    WCHAR appDataPath[MAX_PATH_LENGTH];
-    if ( FAILED(SHGetFolderPath(NULL, 
-                                CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                                NULL,
-                                0,
-                                appDataPath)) ) {
-        DWORD code = GetLastError();
-        char* msg = readSystemErrorMsg(code);
-        setErrorF(getLastErrorCode(), ERR_APPDATA_PATH, code, msg);
-        delete [] msg;
-        return 1;
-    }
-    
-    // Create 'Funambol' directory
-    wstring tmpPath = appDataPath;
-    tmpPath += L"\\";
-    tmpPath += FUNAMBOL_DIR_NAME;
-    if ( _wmkdir(tmpPath.c_str()) ) {
-        _get_errno(&err);
-        if (err != EEXIST) {
-            setErrorF(getLastErrorCode(), ERR_DIR_CREATE, tmpPath.c_str());
-            return 1;
-        }
-    }
-
-    // Create 'Outlook Client' directory
-    tmpPath += L"\\";
-    tmpPath += OLPLUGIN_DIR_NAME;
-    if ( _wmkdir(tmpPath.c_str()) ) {
-        _get_errno(&err);
-        if (err != EEXIST) {
-            setErrorF(getLastErrorCode(), ERR_DIR_CREATE, tmpPath.c_str());
-            return 1;
-        }
-    }
-
-    return 0;
-    */
 }
 
 

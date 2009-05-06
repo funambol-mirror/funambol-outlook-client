@@ -50,7 +50,7 @@ using namespace Funambol;
 class OutlookTransportListener : public TransportListener {
 
 	void sendDataBegin   (TransportEvent &event);
-	void syncDataEnd     (TransportEvent &event);
+	void sendDataEnd     (TransportEvent &event);
 	void receiveDataBegin(TransportEvent &event);
 	void receivingData   (TransportEvent &event);
 	void receiveDataEnd  (TransportEvent &event);

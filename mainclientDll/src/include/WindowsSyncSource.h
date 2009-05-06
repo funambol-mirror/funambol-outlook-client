@@ -237,11 +237,6 @@ public:
     SyncItem* getFirstDeletedItem();
     SyncItem* getNextDeletedItem ();
 
-    // DEPRTECATED!
-    //SyncItem* getFirstItemKey() {return NULL; }
-    // DEPRTECATED!
-    //SyncItem* getNextItemKey() {return NULL; }
-
 
     // --------- Methods to set syncItems into Client --------------
     int addItem   (SyncItem& item);

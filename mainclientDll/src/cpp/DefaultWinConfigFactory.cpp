@@ -53,9 +53,9 @@ AccessConfig* DefaultWinConfigFactory::getAccessConfig() {
 
     AccessConfig* ac = new AccessConfig();
 
-    ac->setUsername             ("guest");
-    ac->setPassword             ("guest");
-    ac->setSyncURL              ("http://localhost:8080/funambol/ds");
+    ac->setUsername             (DEFAULT_USERNAME);
+    ac->setPassword             (DEFAULT_PASSWORD);
+    ac->setSyncURL              (DEFAULT_URL);
     ac->setFirstTimeSyncMode    (SYNC_NONE);
     ac->setUseProxy             (FALSE);
     ac->setProxyHost            ("");

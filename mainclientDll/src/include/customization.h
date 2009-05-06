@@ -40,9 +40,12 @@
 #define PROGRAM_NAME                        "Funambol Outlook Sync Client"
 #define WPROGRAM_NAME                      L"Funambol Outlook Sync Client"
 
-#define PORTAL_DEFAULT_SYNCURL                  "http://my.funambol.com/sync"
+#define DEFAULT_URL                         "http://my.funambol.com/sync"
+#define DEFAULT_USERNAME                    ""
+#define DEFAULT_PASSWORD                    ""
 
 #define PLUGIN_UI_TITLE                     PROGRAM_NAME  // The UI windows title (must be unique!)
+//This macro is used into the Outlook menu. The & is the value used to create a shortcut to open the client
 #define FUNAMBOL                           L"Funa&mbol"
 #define CAPTION                            WPROGRAM_NAME
 #define LAST_COMPATIBLE_VERSION             70104                       // "7.1.4" is the latest version compatible with this addin

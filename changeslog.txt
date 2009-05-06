@@ -1,5 +1,11 @@
+2009-05-06
+   - toccy: copied necessary fixes from trunk to v8 branch:
+            * fixed crash on recurring appointments win null timezone (bug 7146)
+            * OutlookTransportListener: fixed wrong method name (syncDataEnd -> sendDataEnd)
+            * fixed winmaincpp.h and customization.h definitions
+   
 2009-04-28
-   - toccy: updated release version to v.8.0
+   - toccy: updated release version to v.8.0 (rev. 166)
             linked svn::externals property to Funambol C++ SDK v.8 (branch "v8")
 
 2009-03-27

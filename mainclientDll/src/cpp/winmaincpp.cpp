@@ -235,12 +235,6 @@ int startSync() {
     LOG.setLevel(config->getClientConfig().getLogLevel());
     LOG.debug("Starting the Sync process...");
 
-    // Manually disable notes if it's a portal build.
-    // new 7.0.3: changed portal meaning
-    //if (config->checkPortalBuild()) {
-    //    config->getSyncSourceConfig(NOTE_)->setSync("none");
-    //}
-
     // If here, this is the ONLY instance of sync process 
     // -> set the scheduled flag on win registry.
     config->setScheduledSync(isScheduledSync);
