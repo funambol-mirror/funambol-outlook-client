@@ -424,6 +424,7 @@ bool OutlookConfig::save(SyncReport* report) {
     //
     saveAccessConfig(*syncMLNode);
     saveDeviceConfig(*syncMLNode);
+    saveDeviceConfig(*serverNode, true);
 
     // If asked, we need to return clear data...
     decryptPrivateData();
