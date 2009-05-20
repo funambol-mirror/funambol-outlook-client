@@ -153,6 +153,7 @@ public:
     typedef IDispEventSimpleImpl</*nID =*/ 4,Caddin, &__uuidof(_CommandBarButtonEvents)> ItemConfigurationEvent;
 
     Caddin(){}
+    virtual ~Caddin() {}
 
     DECLARE_REGISTRY_RESOURCEID(IDR_ADDIN)
     DECLARE_PROTECT_FINAL_CONSTRUCT()
