@@ -52,15 +52,6 @@
 #include "comutil.h"
 #include "afxwin.h"
 
-// set DEBUG_LOAD_RESOURCE to 1 to explicit load a resource dll
-#define LOAD_RESOURCE 1
-#define RESOURCE_LIBRARY_FILENAME TEXT("language.dll")
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 
 //
@@ -268,15 +259,13 @@ BOOL COutlookPluginApp::InitInstance()
     
 	AfxEnableControlContainer();
 
-    #if LOAD_RESOURCE
 
     //if( PRIMARYLANGID(LANGIDFROMLCID(GetThreadLocale())) != LANG_ENGLISH ){            
-        hInst = LoadLibrary(RESOURCE_LIBRARY_FILENAME);         
-        if (hInst != NULL)
-            AfxSetResourceHandle(hInst);  
+    //    hInst = LoadLibrary(RESOURCE_LIBRARY_FILENAME);         
+    //    if (hInst != NULL)
+    //        AfxSetResourceHandle(hInst);  
     //}
 
-    #endif
 
     hLib = LoadLibrary(_T("uxtheme.dll"));
 
