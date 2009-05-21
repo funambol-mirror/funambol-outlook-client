@@ -1,5 +1,6 @@
 2009-05-21
    - toccy: Raised max number of source errors to stop syncsource (from 10 to 500)
+   - toccy: Fixed bug#5964: Client terminates showing "Failed to create empty document"
 
 2009-04-29
    - toccy: fixed upgrade procedure for new swv = 8.5.0
