@@ -1,3 +1,7 @@
+2009-05-21
+   - toccy: Raised max number of source errors to stop syncsource (from 10 to 500)
+   - toccy: Fixed bug#5964: Client terminates showing "Failed to create empty document"
+
 2009-05-06
    - toccy: copied necessary fixes from trunk to v8 branch:
             * fixed crash on recurring appointments win null timezone (bug 7146)
