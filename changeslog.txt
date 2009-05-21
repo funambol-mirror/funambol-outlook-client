@@ -1,3 +1,5 @@
+Funambol Outlook Sync Client 8.0.1
+---------------------------------------
 2009-05-21
    - toccy: Raised max number of source errors to stop syncsource (from 10 to 500)
    - toccy: Fixed bug#5964: Client terminates showing "Failed to create empty document"
