@@ -78,7 +78,7 @@ typedef itemKeyList::iterator           itemKeyIterator;
 #define ERR_CODE_READ_ALL_ITEMS         112
 
 
-#define MAX_SOURCE_ERRORS                10     /**< Max number of bad errors allowed                    */
+#define MAX_SOURCE_ERRORS                 500   /**< Max number of bad errors allowed                    */
 #define TIMESTAMP_DELAY                   2     /**< Outlook introduces some delay while saving items    */
 #define DONT_SEND_FILTERED_DEL_ITEMS      1     /**< When filters change, there can be many Deleted items to send */
 
