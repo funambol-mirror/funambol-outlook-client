@@ -65,6 +65,7 @@ Forge file for Funambol Outlook Sync Client
        <echo message="docs            : to checkout + forge + generate docs"/> 
        <echo message=""/> 
        <echo message="work-all        : clean, build the installer, no checkout (build from dev working dirs). Both for comed and cared"/> 
+       <echo message="work-all-noreg  : clean, build the installer, no checkout (build from dev working dirs), no reg DLL. Both for comed and cared"/> 
        <echo message="work-dev        : no clean, build the installer, no checkout (build from dev working dirs). Comed"/> 
        <echo message="work-cared-dev  : no clean, build the installer, no checkout (build from dev working dirs). Cared"/> 
        <echo message="docs-dev        : clean, to only generate doxygen docs, no checkout (build from dev working dirs)"/> 
@@ -89,7 +90,16 @@ Forge file for Funambol Outlook Sync Client
         <antcall target="work-cared-dev"/>
     </target>
     <target name="work-dev"       depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install"/>    
-    <target name="work-cared-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install-cared"/>    
+    <target name="work-cared-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install-cared"/>
+    
+    <target name="work-all-noreg">
+        <antcall target="clean"/>
+        <antcall target="work-dev-noreg"/>
+        <antcall target="work-cared-dev-noreg"/>
+    </target>
+    <target name="work-dev-noreg"       depends="init, build, compile-no-checkout, forge-no-checkout, build-install"/>    
+    <target name="work-cared-dev-noreg" depends="init, build, compile-no-checkout, forge-no-checkout, build-install-cared"/> 
+    
     <target name="docs-dev"       depends="init, clean, build, create-docs-no-checkout"/>
     <!-- old sp version. no more used... -->
     <!--target name="work-sp-dev"    depends="init, build, register-dll, set-portal-password-key-dev, forge-no-checkout, restore-empty-password-key-dev, build-install-sp"/-->   
