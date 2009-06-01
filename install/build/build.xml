@@ -321,7 +321,7 @@ Forge file for Funambol Outlook Sync Client
         <!-- Update the Readme.txt file automatically: version and release date -->
         <replace file="${dir.fileset}/Readme.txt" token="Version:" value="Version: ${release.major}.${release.minor}.${build.number}"/>
         <replace file="${dir.fileset}/Readme.txt" token="Release date:" value="Release date: ${TODAY}" />
-        <fixcrlf file="${dir.fileset}/Readme.txt"/>
+        <fixcrlf srcdir="${dir.fileset}" includes="**/Readme.txt" eol="crlf"/>
 
         <!-- 'release.properties' is copied from this working dir -->
         <copy file="${dir.distribution}/build/release.properties" todir="${dir.fileset}/docs"/>
