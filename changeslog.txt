@@ -1,3 +1,5 @@
+2009-06-03
+   - teo: added filter on slowsync for appointment also with the incoming events to avoid dupes.
 2009-05-21
    - toccy: Raised max number of source errors to stop syncsource (from 10 to 500)
    - toccy: Fixed bug#5964: Client terminates showing "Failed to create empty document"
