@@ -101,6 +101,8 @@ private:
     /// Pointer to the sole instance of ClientApplication (singleton)
     ClientApplication* outlook;
 
+    int filterDirection;
+
 
 protected:
 

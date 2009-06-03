@@ -329,6 +329,190 @@ int ClientRecurrence::read() {
 }
 
 /**
+ * Retrieve all properties from Outlook -> set isUpdated = true.
+ * If UTC is used, all props are converted to correct values.
+ * For the Task remember the StartTime and EndTime are not valid properties
+ * so the timezone is not considered and the PatternStartDate and PatterEndDate
+ * are in the format yyyy-mm-dd according with the startdate and due date
+ * 
+ * @return: 0 if no errors
+ */
+int ClientRecurrence::refresh() {
+    
+    DATE patternEnd;
+    VARIANT_BOOL vNoEnd;
+    bool isAppointmentRecurrence = true;
+    DATE patternStartTime;
+    DATE patternEndTime;
+
+    // Check COM Ptr / Recurrence active
+    if (!pRec || !isRecurring()) {
+        setErrorF(getLastErrorCode(), ERR_OUTLOOK_REC_NOT_SET, L"read");
+        throwClientException(getLastErrorMsg());
+        return 1;
+    }
+
+
+
+    //
+    // ---------- Get ALL ------------
+    //
+    // TBD: add another try/catch (more specific)
+    recurrenceType = pRec->GetRecurrenceType();
+    interval       = pRec->GetInterval();
+    monthOfYear    = pRec->GetMonthOfYear(); 
+    dayOfMonth     = pRec->GetDayOfMonth();
+    dayOfWeekMask  = pRec->GetDayOfWeekMask();
+    instance       = pRec->GetInstance();
+    vNoEnd         = pRec->GetNoEndDate();
+    patternEnd     = pRec->GetPatternEndDate();
+    occurrences    = pRec->GetOccurrences();
+    
+    patternStartTime = pRec->GetStartTime(); 
+    patternEndTime   = pRec->GetEndTime();   
+    
+    
+
+    //
+    // Get patternStart from start (use exactly the same - new from 6.0.4).
+    //
+    patternStartDate = EMPTY_WSTRING;
+    if (start != EMPTY_WSTRING) {
+        patternStartDate = start;
+    }
+    else {
+        // If 'Start' is empty, use the patternStartDate...
+        DATE patternStart = pRec->GetPatternStartDate();
+        if (patternStart < LIMIT_MAX_DATE) {
+            doubleToSystemTime(patternStartDate, patternStart, FALSE, true);
+        }
+    }
+             
+     // set the startTime of the appointment
+    if (patternStartTime < LIMIT_MAX_DATE) {
+        doubleToSystemTime(startTime, patternStartTime, FALSE, false);
+    }
+    
+    // set the endTime of the appointment
+    if (patternEndTime < LIMIT_MAX_DATE) {
+        doubleToSystemTime(endTime, patternEndTime, FALSE, false);
+    }
+    
+    if (patternStartTime > LIMIT_MAX_DATE && patternEndTime > LIMIT_MAX_DATE) {
+        isAppointmentRecurrence = false; // this recurrence is for a task
+    }
+    //
+    // --------- Conversions ---------
+    //
+    if (recurrenceType == 5) {
+        // Yearly recurrence.
+        if ((interval > 12) && (interval%12 == 0)) {
+            // It's a monthly recurrence, like "every 24 months". 
+            // Outlook bug, fix: recType 5 -> recType 2.
+            recurrenceType = 2;
+        }
+        else {
+            // It's the normal "yearly" recurrence.
+            // Outlook bug, fix: interval 12 -> interval 1.
+            interval = 1;
+        }
+    }
+    // For compatibility: weekly with interval = 0 is not correct...
+    if ((recurrenceType == 1) && (interval == 0)) {
+        interval = 1;
+    }
+
+    noEndDate = vBoolToBOOL(vNoEnd);
+
+    if (patternEnd < LIMIT_MAX_DATE) {
+        // Fix for PatternEndDate (since v.6.5.3):
+        // We need the exact date+time when the last occurrence starts, so we get the
+        // time (hours) from startDate and add it to the patternEnd midnight.
+        DATE startDate = NULL;
+        systemTimeToDouble(start, &startDate);
+        if (startDate) {
+            double hours = startDate - (int)startDate;
+            patternEnd = (int)patternEnd + hours;
+        }
+        if (isAppointmentRecurrence) {
+            doubleToSystemTime(patternEndDate, patternEnd, USE_UTC, false);     // "YYYYMMDDThhmmssZ" - new from 6.0.4.
+        } else {
+            doubleToSystemTime(patternEndDate, patternEnd, FALSE, true); 
+        }
+    }
+    else {
+        patternEndDate = EMPTY_WSTRING;
+    }
+
+    // for compatibility
+    if (noEndDate) {
+        occurrences = 0;
+    }
+    
+    ClientApplication* cp = ClientApplication::getInstance();
+    if (cp->getOutgoingTimezone() && isAppointmentRecurrence) {
+        
+         // If 'Start' is empty, use the patternStartDate...
+        DATE patternStart = pRec->GetPatternStartDate();
+        if (patternStart < LIMIT_MAX_DATE) {
+            doubleToSystemTime(patternStartDate, patternStart, FALSE, true);
+        }
+
+        // "PatternStartDate" is composed by PatternStartDate + StartTime
+        if (patternStartDate.size() >= 8 && startTime.size() >= 15) {
+            patternStartDate  = patternStartDate.substr(0, 8);      // the start date
+            patternStartDate += TEXT("T");
+            patternStartDate += startTime.substr(9, 6);   // the start time
+        }
+        
+        if (patternEnd < LIMIT_MAX_DATE) {
+            // We need the local time!
+            DATE tmpDate = 0;
+            systemTimeToDouble(patternEndDate, &tmpDate);       // This converts to localtime if it was in UTC
+            doubleToSystemTime(patternEndDate, tmpDate, FALSE); // Now patternEndDate string is in localtime
+
+            // "PatternEndDate" is composed by PatternEndDate + StartTime 
+            // (note: StartTime, not EndTime!)
+            if (patternEndDate.size() >= 8 && startTime.size() >= 15) {
+                patternEndDate = patternEndDate.substr(0, 8);        // the end date
+                patternEndDate += TEXT("T");
+                patternEndDate += startTime.substr(9, 6);  // the start time
+            }
+        }
+    } 
+    // OLD WAY
+    else if ( USE_CHANGE_DAY 
+         && !isAllDay
+         && USE_UTC ) {
+
+        // CHANGE-DAY to UTC: modify monthOfYear / dayOfMonth / dayOfWeekMask.
+        // All-day event and tasks don't need conversions.
+        
+        changeDay(L"UTC");
+    }
+
+    //
+    // Read all exceptions.
+    //
+/*    appExceptions.clear();
+    numRecursions = 0;
+    int numExceptions = getExceptionsCountOnClient();
+    ClientAppException* exc = NULL;
+    for (int i=0; i<numExceptions; i++) {
+        exc = getExceptionOnClient(i);
+        if (exc) {
+            appExceptions.push_back(*exc);
+            delete exc;
+            exc = NULL;
+        }
+    }
+*/
+
+    isUpdated = true;
+    return 0;
+}
+
+/**
 * It converts the string time and the timezone information into a local time.
 * The server could send the data in local time when the timezone is specified.
 * At least for vcalendar format
