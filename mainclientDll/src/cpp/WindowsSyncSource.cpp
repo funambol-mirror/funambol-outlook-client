@@ -146,6 +146,12 @@ int WindowsSyncSource::beginSync() {
         goto error;
     }
 
+    if ( strcmp(getConfig().getName(), "appointment")== 0 && getSyncMode() == SYNC_SLOW ){
+            DateFilter& f = getDateFilter();
+            filterDirection = (int)(f.getDirection());
+            f.setDirection(DateFilter::DIR_INOUT);
+    }
+
     // Update the filters.
     // Some filters can change, based on the current config (time..)
     updateFilters();
@@ -193,6 +199,11 @@ error:
  */
 int WindowsSyncSource::endSync() {
     checkAbortedSync();
+
+    if ( strcmp(getConfig().getName(), "appointment")== 0 && getSyncMode() == SYNC_SLOW ){
+            DateFilter& filter = getDateFilter();
+            filter.setDirection(((DateFilter::FilterDirection)filterDirection));
+    }
 
     int ret = 0;
     WCHAR* oldItemsPath = readDataPath(getName());
@@ -776,7 +787,7 @@ errorSave:
 filteredItem:
     // Don't set the source error, it can happen often.
     LOG.debug(ERR_INPUT_ITEM_FILTERED, getName(), getSafeItemName(cItem).c_str());
-    ret = STC_COMMAND_FAILED;   // correct? or a fake STC_ITEM_ADDED?
+    ret = STC_PERMISSION_DENIED; //STC_COMMAND_FAILED;   // correct? or a fake STC_ITEM_ADDED?
     goto finally;
 
 finally:
@@ -1283,10 +1294,16 @@ bool WindowsSyncSource::filterClientItem(ClientItem* item,
                     // Incoming items: if recurring, we MUST save the recPattern
                     // otherwise the recPattern will result non-updated.
                     ClientRecurrence* cRec = cApp->getRecPattern();
-                    if (cRec) cRec->save();
+                    // Forcing a read after the save to have the values inside
+                    // cRec updated to the item just sent from the server
+                    if (cRec){
+                        cRec->save();
+                        cRec->refresh();
+                    }
                 }
                 // Incoming items: the COMPtr for recPattern is not yet valid (it will
                 // be ok once item saved) so we check the ClientItem members (strings).
+
                 return filter.execute(item);
             }
             else {

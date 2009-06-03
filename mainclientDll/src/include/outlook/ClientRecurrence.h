@@ -163,6 +163,14 @@ public:
      * @return  0 if no errors
      */
     int read();
+    
+    /**
+     * Refresh the values of the internal reference with the data
+     * sent from the server.
+     *
+     * @return  0 if no errors
+     */
+    int refresh();
 
     /**
      * Save all the properties to Outlook.

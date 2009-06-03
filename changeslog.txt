@@ -1,3 +1,6 @@
+2009-06-03
+   - teo: added for appointments source filter also in the incoming data to avoid dupes during the slowsync. The filter on Incoming data is enabled only during the slowsync.
+
 Funambol Outlook Sync Client 8.0.1
 ---------------------------------------
 2009-05-21
