@@ -1,4 +1,10 @@
+2009-06-22
+Funambol Outlook Sync Client 8.0.3 (v8 RC1, built on SDK C++ 8.0.3)
+-------------------------------------------------------------------
+
 2009-06-03
+Funambol Outlook Sync Client 8.0.2
+---------------------------------------
    - teo: added for appointments source filter also in the incoming data to avoid dupes during the slowsync. The filter on Incoming data is enabled only during the slowsync.
 
 Funambol Outlook Sync Client 8.0.1
