@@ -1,3 +1,8 @@
+2009-06-29
+Funambol Outlook Sync Client 8.0.4 (v8 RC2, built on SDK C++ 8.0.4)
+-------------------------------------------------------------------
+    - toccy: updated link to Client's UserGuide v8
+
 2009-06-22
 Funambol Outlook Sync Client 8.0.3 (v8 RC1, built on SDK C++ 8.0.3)
 -------------------------------------------------------------------
