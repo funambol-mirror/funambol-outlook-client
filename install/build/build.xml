@@ -80,7 +80,7 @@ Forge file for Funambol Outlook Sync Client
     
     <target name="release"        depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, build-install-cared"/>                                                                                                                                                                     
     <target name="release-nodocs" depends="init, clean, build, register-dll, checkout-src, forge-src, compile, forge, build-install, build-install-cared"/> 
-    <target name="docs "          depends="init, clean, build, checkout-src, create-docs, forge-src"/>
+    <target name="docs"          depends="init, clean, build, checkout-src, create-docs, forge-src"/>
     
     
     <!-- These execute on working dir (for dev purpose) -->  
