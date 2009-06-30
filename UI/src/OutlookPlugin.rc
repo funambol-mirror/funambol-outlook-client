@@ -655,7 +655,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_VIEW_GUIDE           "Open %s Outlook Sync Client User Guide"
+    ID_VIEW_GUIDE           "Open Outlook Sync Client User Guide"
 END
 
 STRINGTABLE 
@@ -749,7 +749,7 @@ BEGIN
     IDS_CODE_DROPPED_ITEMS  "Warning: some items were not correctly saved in Outlook."
     IDS_TEXT_CHECKING       "Checking"
     IDS_FINISHED_SENDING    "Waiting for Server data..."
-    IDS_GUIDE_LINK          "http://funambol.com/docs/v71/funambol-outlook-sync-client-v7.1-user-guide.pdf"
+    IDS_GUIDE_LINK          "http://funambol.com/docs/v80/funambol-outlook-sync-client-user-guide.pdf"
     IDS_ERR_SERVER_TIMOUT   "Server returned timeout error: current session has expired.\nPlease retry later."
     IDS_CODE_SERVER_BUSY    "Server is busy, please retry later."
 END
