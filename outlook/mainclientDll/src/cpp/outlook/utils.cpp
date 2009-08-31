@@ -139,6 +139,10 @@ const wstring getNameFromVersion(wstring version) {
     wstring name = EMPTY_WSTRING;
 
     switch (majorVersion) {
+        case 14: {
+            name = OUTLOOK_2010;
+            break;
+        }
         case 12: {
             name = OUTLOOK_2007;
             break;
@@ -176,8 +180,10 @@ const wstring getNameFromVersion(wstring version) {
     return name;
 
 error:
-    setErrorF(getLastErrorCode(), ERR_OUTLOOK_INVALID_VERSION, version.c_str());
-    throwClientFatalException(getLastErrorMsg());
+    // don't want to be so strict...
+    //setErrorF(getLastErrorCode(), ERR_OUTLOOK_INVALID_VERSION, version.c_str());
+    //throwClientFatalException(getLastErrorMsg());
+    LOG.info(ERR_OUTLOOK_INVALID_VERSION, version.c_str());
     return NULL;
 }
 

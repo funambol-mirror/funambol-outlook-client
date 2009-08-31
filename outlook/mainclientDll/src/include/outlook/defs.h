@@ -64,6 +64,7 @@
 #define RED_SAFETASK                        "Redemption.SafeTaskItem"
 #define RED_SAFENOTE                        "Redemption.SafeNoteItem"
 
+#define OUTLOOK_2010                       L"Outlook 2010"
 #define OUTLOOK_2007                       L"Outlook 2007"
 #define OUTLOOK_2003                       L"Outlook 2003"
 #define OUTLOOK_XP                         L"Outlook XP (2002)"
@@ -113,7 +114,7 @@
 #define ERR_OUTLOOK_IDITEM_NOT_FOUND        "Could not find item: ID = %ls."
 #define ERR_OUTLOOK_ITEMS_COUNT             "Error retrieving the number of Items from folder %ls."
 
-#define ERR_OUTLOOK_INVALID_VERSION         "Outlook version not supported: %ls"
+#define ERR_OUTLOOK_INVALID_VERSION         "Warning: Outlook version not supported: %ls"
 #define ERR_OUTLOOK_BAD_FOLDER_TYPE         "Selected folder is not a %ls folder."
 #define ERR_OUTLOOK_BAD_ITEMTYPE            "Invalid item type: %ls."
 #define ERR_OUTLOOK_BAD_OLTYPE              "Invalid Outlook item type: %d."
