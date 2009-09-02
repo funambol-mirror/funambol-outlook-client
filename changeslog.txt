@@ -1,3 +1,6 @@
+2009-09-02
+   - toccy: fixed bug #1132 on the About window title
+
 2009-08-31
    - toccy: fixed check to support Outlook 2010
    - toccy: updated trunk version to "8.2.0"
