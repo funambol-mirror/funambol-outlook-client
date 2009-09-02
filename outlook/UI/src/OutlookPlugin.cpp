@@ -150,9 +150,9 @@ BOOL CAboutDlg::OnInitDialog(){
 
     CString s1("");
     CString s2("");
-    //s1.LoadString(IDS_ABOUT_TITLE);
-    s1.FormatMessage(IDS_ABOUT_TITLE, APP_NAME);
-    SetWindowText(s1); s1 = "";
+    s1.FormatMessage(IDS_ABOUT_TITLE, _T(APP_NAME));
+    SetWindowText(s1); 
+    s1 = "";
     CDialog::OnInitDialog();
 
     // Set fonts
@@ -184,7 +184,7 @@ BOOL CAboutDlg::OnInitDialog(){
     SetDlgItemText(IDC_ABOUT_LINK, s1);
 
     // Licence text
-    s1 = licence;
+        s1 = licence;
     SetDlgItemText(IDC_ABOUT_LICENCE, s1);
     GetDlgItem(IDC_ABOUT_LICENCE)->SetFont(&fontSmall);
 
