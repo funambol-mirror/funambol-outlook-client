@@ -173,7 +173,7 @@ BEGIN
     IDS_MAIN_NOTES          "Notes"
     IDS_ERROR_SET_CONNECTION
                             "You must enter your account information before attempting a sync."
-    IDS_ABOUT_TITLE         "About %s Outlook Sync Client"
+    IDS_ABOUT_TITLE         "About %1 Outlook Sync Client"
     IDS_MAIN_LAST_SYNC_FAILED "Last sync failed"
     IDS_MAIN_LAST_SYNC_CANCELED "Last sync canceled"
     IDS_CODE_HTTP_NOT_FOUND_2060
@@ -1305,7 +1305,7 @@ BEGIN
     IDS_MAIN_NOTES          "Notes"
     IDS_ERROR_SET_CONNECTION
                             "You must enter your account information before attempting a sync."
-    IDS_ABOUT_TITLE         "About %s Outlook Sync Client"
+    IDS_ABOUT_TITLE         "About %1 Outlook Sync Client"
     IDS_MAIN_LAST_SYNC_FAILED "Last sync failed"
     IDS_MAIN_LAST_SYNC_CANCELED "Last sync canceled"
     IDS_CODE_HTTP_NOT_FOUND_2060
