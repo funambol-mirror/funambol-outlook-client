@@ -1,3 +1,14 @@
+2009-09-03
+Funambol Outlook Sync Client 8.0.5 (v8 SP1, built on SDK C++ 8.0.5)
+-------------------------------------------------------------------
+
+   - toccy: fixed bug #7794:  (APIs) sync fails when server sends multipart item + another item in one message
+            Fixed the SyncML parser (Parser::getCommonCommandList) in order to process commands from the Server 
+            in the same order the Server sent them.
+
+2009-09-02
+   - toccy: fixed bug #1132 on the About window title
+
 2009-06-29
 Funambol Outlook Sync Client 8.0.4 (v8 RC2, built on SDK C++ 8.0.4)
 -------------------------------------------------------------------
