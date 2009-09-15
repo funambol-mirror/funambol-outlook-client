@@ -64,10 +64,6 @@
 #define PROPERTY_SP                             "portal"
 #define PROPERTY_INSTALLDIR                     "installDir"
 
-/// Path in DMTree
-#define APPLICATION_URI                         "Funambol/OutlookClient"
-
-
 #define TIMEZONE_CONTEXT                       L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones"
 
 // it must be in the format

@@ -63,7 +63,7 @@ OutlookConfig* OutlookConfig::pinstance = NULL;
  */
 OutlookConfig* OutlookConfig::getInstance() {
     if (pinstance == NULL) {
-        PlatformAdapter::init(APPLICATION_URI);
+        PlatformAdapter::init(PLUGIN_ROOT_CONTEXT);
         pinstance = new OutlookConfig;
     }
     return pinstance;
@@ -76,7 +76,7 @@ bool OutlookConfig::isInstantiated() {
 
 
 /// Constructor
-//OutlookConfig::OutlookConfig() : DMTClientConfig(APPLICATION_URI) {
+//OutlookConfig::OutlookConfig() : DMTClientConfig(PLUGIN_ROOT_CONTEXT) {
 OutlookConfig::OutlookConfig() {
     
     DMTClientConfig::initialize();
@@ -176,7 +176,7 @@ bool OutlookConfig::read() {
 
 
     // Current working dir: read 'installDir' from HKLM
-    char* installPath = readPropertyValue(APPLICATION_URI, PROPERTY_INSTALLDIR, HKEY_LOCAL_MACHINE);
+    char* installPath = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_INSTALLDIR, HKEY_LOCAL_MACHINE);
     if (!installPath || strlen(installPath) == 0) {
         LOG.error(ERR_INSTALL_DIR);
         char msg[100];
@@ -576,7 +576,7 @@ void OutlookConfig::saveBeginSync() {
     char buf[32];
 
     // Get node.
-    sprintf(context, "%s%s%s", APPLICATION_URI, CONTEXT_SPDS_SYNCML, CONTEXT_EXT);
+    sprintf(context, "%s%s%s", PLUGIN_ROOT_CONTEXT, CONTEXT_SPDS_SYNCML, CONTEXT_EXT);
     dmt = DMTreeFactory::getDMTree(context);
     if (!dmt)   goto finally;
     node = dmt->readManagementNode(context);
@@ -811,9 +811,9 @@ void OutlookConfig::setScheduledSync(const bool v) {
     sprintf(value, "%d", v);
 
     // Save value.
-    dmt = DMTreeFactory::getDMTree(APPLICATION_URI);
+    dmt = DMTreeFactory::getDMTree(PLUGIN_ROOT_CONTEXT);
     if (!dmt) return;
-    node = dmt->readManagementNode(APPLICATION_URI);
+    node = dmt->readManagementNode(PLUGIN_ROOT_CONTEXT);
     if (!node) return;
     node->setPropertyValue(PROPERTY_SCHEDULED_SYNC, value);
 
@@ -829,9 +829,9 @@ const bool OutlookConfig::getScheduledSync() const {
     ManagementNode* node = NULL;
 
     // Get value.
-    dmt = DMTreeFactory::getDMTree(APPLICATION_URI);
+    dmt = DMTreeFactory::getDMTree(PLUGIN_ROOT_CONTEXT);
     if (!dmt)   return false;
-    node = dmt->readManagementNode(APPLICATION_URI);
+    node = dmt->readManagementNode(PLUGIN_ROOT_CONTEXT);
     if (!node)  return false;
     char* value = node->readPropertyValue(PROPERTY_SCHEDULED_SYNC);
     delete dmt;
@@ -935,7 +935,7 @@ void OutlookConfig::createDefaultConfig() {
 
 
     // Current working dir: read 'installDir' from HKLM
-    char* installPath = readPropertyValue(APPLICATION_URI, PROPERTY_INSTALLDIR, HKEY_LOCAL_MACHINE);
+    char* installPath = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_INSTALLDIR, HKEY_LOCAL_MACHINE);
     if (!installPath || strlen(installPath) == 0) {
         LOG.error(ERR_INSTALL_DIR);
         return;
@@ -1132,7 +1132,7 @@ int OutlookConfig::getOldSwv() {
  * Returns a new allocated buffer, must be deleted by the caller.
  */
 char* OutlookConfig::readCurrentSwv() {
-    return readPropertyValue(APPLICATION_URI, PROPERTY_SOFTWARE_VERSION, HKEY_LOCAL_MACHINE);
+    return readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_SOFTWARE_VERSION, HKEY_LOCAL_MACHINE);
 }
 
 
@@ -1326,7 +1326,7 @@ bool OutlookConfig::checkPortalBuild() {
     
     bool ret = false;
 
-    char* portal = readPropertyValue(APPLICATION_URI, PROPERTY_SP, HKEY_LOCAL_MACHINE);
+    char* portal = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_SP, HKEY_LOCAL_MACHINE);
     if (portal && *portal == '1') {
         ret = true;
     }

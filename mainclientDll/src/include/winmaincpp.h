@@ -42,15 +42,8 @@
 
 // ------------------------------- Definitions ------------------------------
 // Program parameters:
-#define PROGRAM_NAME_EXE                    "OutlookPlugin.exe"
 #define SYNC_MUTEX_NAME                     "fol-SyncInProgress"
-#define ASK_SLOW_TIMEOUT                    25                          /**< 25 seconds    */
-#define SCHED_DEFAULT_REPEAT_MINS           15                          /**< 15 minutes    */
-#define SCHED_DURATION_DAYS                 1                           /**< 1 day         */
-#define SYNC_TIMEOUT                        120                         /**< 120 minutes   */
-#define MAX_LOG_SIZE                        10000000                    /**< 10 MB         */
 #define EMPTY_WSTRING                      L""
-#define DISPLAY_SLOWSYNC_WARNING            0         /**< 1 to display a timed-msgbox if Server requests a SLOW SYNC */
 
 
 // Default remote names:
@@ -64,8 +57,6 @@
 #define SIFT_DEFAULT_NAME                  L"stask"
 #define SIFN_DEFAULT_NAME                  L"snote"
 
-
-//#define OLPLUGIN_DIR_NAME                  L"OutlookClient" // the same as the PlatformAdapter
 #define MAX_PATH_LENGTH                     512
 
 //
