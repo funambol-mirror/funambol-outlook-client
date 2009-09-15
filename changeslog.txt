@@ -1,3 +1,13 @@
+2009-09-15
+   - toccy: improvements for customization and branding purposes
+            * added defines in customization.h to customize the about screen
+            * removed custom params from resource.rc and OutlookPlugin.cpp
+            * moved defines from addin.h, OutlookConfig.h and winmaincpp.h to customization.h
+            * fixed addin removal: to clear also Funambol menu that could be left
+            * fixed installer: moved custom definitions to an external file "customization.ini"
+            * replaced "funambol.url" with "website.url", fixed url label in installer
+            * added the possibility to hide the AGPL license and readme.txt from the istallation process
+
 2009-09-02
    - toccy: fixed bug #1132 on the About window title
 
