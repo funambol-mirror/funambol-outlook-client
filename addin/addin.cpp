@@ -256,7 +256,7 @@ STDMETHODIMP Caddin::OnStartupComplete(LPSAFEARRAY* custom) {
     //         -> force "uninstalling" if state is "installed"
     //
     char* oldSwv = NULL;
-    char* swv = readPropertyValueFromHKLM(PLUGIN_CONTEXT, PROPERTY_SW_VERSION);
+    char* swv = readPropertyValueFromHKLM(PLUGIN_ROOT_CONTEXT, PROPERTY_SW_VERSION);
     if (swv && strcmp(swv, "")) {
         //
         // Plugin is installed.
@@ -407,7 +407,7 @@ STDMETHODIMP Caddin::OnStartupComplete(LPSAFEARRAY* custom) {
         spCmdCtrls = spCmdBars->ActiveMenuBar->GetControls();
         ATLASSERT(spCmdCtrls);
 
-        hr = spCmdCtrls->get_Item(CComVariant(FUNAMBOL), &spCmdCtrl);
+        hr = spCmdCtrls->get_Item(CComVariant(ADDIN_MENU_LABEL), &spCmdCtrl);
         // Add new menu bar
         if (FAILED(hr)) {
             LOG.debug("MenuBar does not exist -> create it...");
@@ -422,7 +422,7 @@ STDMETHODIMP Caddin::OnStartupComplete(LPSAFEARRAY* custom) {
         else {
             LOG.debug("MenuBar already exist -> use it.");
             CommandBarPopupPtr pMenuItem;
-            pMenuItem  = spCmdBars->ActiveMenuBar->Controls->GetItem(FUNAMBOL);
+            pMenuItem  = spCmdBars->ActiveMenuBar->Controls->GetItem(ADDIN_MENU_LABEL);
             pFunSync   = pMenuItem->Controls->GetItem(BUTTON_SYNCHRONIZE);
             pFunGoto   = pMenuItem->Controls->GetItem(BUTTON_GOTO_PLUGIN);
             pFunConfig = pMenuItem->Controls->GetItem(BUTTON_CONFIGURATION);
@@ -517,7 +517,7 @@ void Caddin::openLog() {
     if (hFind != INVALID_HANDLE_VALUE) {
         DWORD logSize = FindFileData.nFileSizeLow;
         FindClose(hFind);
-        resetLog = (logSize > MAX_LOG_SIZE)? TRUE : FALSE;
+        resetLog = (logSize > MAX_ADDIN_LOG_SIZE)? TRUE : FALSE;
     }
 
     // Initialize log.
@@ -692,7 +692,7 @@ HRESULT Caddin::AddNewMenubar(_CommandBars* pCmdBars) {
 
         // Set menu caption.
         LOG.debug("MenuBar -> set Menu caption...");
-        spPopup->PutCaption(FUNAMBOL);
+        spPopup->PutCaption(ADDIN_MENU_LABEL);
         spPopup->PutVisible(VARIANT_TRUE);
 
         // now add a menu item to the menubar
@@ -850,7 +850,7 @@ HRESULT Caddin::AddNewCommandBar(_CommandBars* pCmdBars) {
 
         LOG.debug("CommandBar -> set props...");
         spCmdButton->PutVisible    (VARIANT_TRUE);
-        spCmdButton->PutCaption    (CAPTION);
+        spCmdButton->PutCaption    (ADDIN_COMMAND_BAR_CAPTION);
         spCmdButton->PutEnabled    (VARIANT_TRUE);
         spCmdButton->PutTooltipText(TOOLTIP);
         spCmdButton->PutTag        (TEXT(FUN));
@@ -1094,7 +1094,7 @@ HRESULT Caddin::removeAddin() {
         // Get and remove Funambol Command Bar
         //
         LOG.debug("Removing Funambol CommandBar...");
-        variant.bstrVal = SysAllocString(CAPTION);
+        variant.bstrVal = SysAllocString(ADDIN_COMMAND_BAR_CAPTION);
         hr = spCmdBars->get_Item(variant, &spCmdBar);
         //VariantClear(&variant);
         if (SUCCEEDED(hr)) {
@@ -1121,9 +1121,9 @@ HRESULT Caddin::removeAddin() {
         // Get and remove Funambol menu
         //
         LOG.debug("removing Funambol Menu...");
-        hr = spCmdCtrls->get_Item(CComVariant(FUNAMBOL), &spCmdCtrl);
+        hr = spCmdCtrls->get_Item(CComVariant(ADDIN_MENU_LABEL), &spCmdCtrl);
         if (SUCCEEDED(hr)) {
-            pMenuItem = spCmdBars->ActiveMenuBar->Controls->GetItem(FUNAMBOL);
+            pMenuItem = spCmdBars->ActiveMenuBar->Controls->GetItem(ADDIN_MENU_LABEL);
             hr = pMenuItem->Delete(vtMissing);
             if (SUCCEEDED(hr)) {
                 LOG.debug("deleted.");
@@ -1154,10 +1154,10 @@ HRESULT Caddin::removeAddin() {
         }
 
         //
-        // Also get and remove Sync4j bar/menu that could be left :)
+        // Safe check: remove standard Funambol bar/menu that could be left
         //
-        LOG.debug("removing any old Sync4j Bar/Menu...");
-        variant.bstrVal = SysAllocString(CAPTION_S4J);
+        LOG.debug("removing any standard Funambol Bar/Menu...");
+        variant.bstrVal = SysAllocString(ADDIN_COMMAND_BAR_CAPTION_FUNAMBOL);
         hr = spCmdBars->get_Item(variant, &spCmdBar);
         VariantClear(&variant);
         if (SUCCEEDED(hr)) {
@@ -1168,9 +1168,9 @@ HRESULT Caddin::removeAddin() {
             LOG.debug("bar not found.");
         }
 
-        hr = spCmdCtrls->get_Item(CComVariant(AMP_SYNC4J), &spCmdCtrl);
+        hr = spCmdCtrls->get_Item(CComVariant(ADDIN_MENU_LABEL_FUNAMBOL), &spCmdCtrl);
         if (SUCCEEDED(hr)) {
-            pMenuItem = spCmdBars->ActiveMenuBar->Controls->GetItem(AMP_SYNC4J);
+            pMenuItem = spCmdBars->ActiveMenuBar->Controls->GetItem(ADDIN_MENU_LABEL_FUNAMBOL);
             pMenuItem->Delete(vtMissing);
             LOG.debug("menu deleted.");
         }
@@ -1352,7 +1352,7 @@ int Caddin::setCurrentSwv() {
     ManagementNode* node = NULL;
 
     // Read current swv from HKLM plugin keys.
-    char* swv = readPropertyValueFromHKLM(PLUGIN_CONTEXT, PROPERTY_SW_VERSION);
+    char* swv = readPropertyValueFromHKLM(PLUGIN_ROOT_CONTEXT, PROPERTY_SW_VERSION);
     if (swv && strcmp(swv, "")) {
 
         // Save value to HKCU addin keys.

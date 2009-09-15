@@ -42,7 +42,6 @@
 #include "customization.h"
 
 // ----------------------- definitions -------------------------------
-#define PROGRAM_NAME_EXE                    "OutlookPlugin.exe"             // The application to run
 #define PLUGIN_UI_CLASSNAME                 "FunambolApp"                   // The UI windows classname
 #define FUN                                 "FUN"
 #define PARAM_OUTLOOK_SYNC                  "sync"                          // The command-line parameter passed to PROGRAM_NAME_EXE application
@@ -62,18 +61,11 @@
 // HKLM keys -> general (read only) settings
 // HKCU keys -> current user settings
 //
-//                                          // The path in win registry to store Addin state (installed-installing...)
-#define ADDIN_CONTEXT                       "Microsoft/Office/Outlook/Addins/FunambolAddin.Addin"
-                                            // The path in win registry for plugin settings
-#define PLUGIN_CONTEXT                      "Funambol/OutlookClient"
 #define PROPERTY_STATE                      "State"                     // The state of addin
 #define PROPERTY_PATH                       "installDir"                // The path of application
 #define PROPERTY_NUM_INSTANCES              "numInstances"              // #instances of Addin for different users
 #define PROPERTY_SW_VERSION                 "swv"                       // Software version
 
-                                                                        // **** change this value when addin need to be reinstalled ****
-#define LAST_COMPATIBLE_VERSION             70104                       // "7.1.4" is the latest version compatible with this addin
-                                                                        // *************************************************************
 
 // Possible addin states:
 #define ADDIN_STATE_OK                      "ok"
@@ -86,11 +78,14 @@
 #define LOG_FILENAME                        "FunambolAddin.log"
 #define LOG_DEFAULT_PATH                    "C:"                // Normally not used, see openlog()
 #define TEMP_ENV                            "TEMP"
-#define MAX_LOG_SIZE                        1000000                     // 1 MB
+#define MAX_ADDIN_LOG_SIZE                  1000000                     // 1 MB
 
-// Still used to remove Sync4j menu that could be left for error...
-#define AMP_SYNC4J                         L"&Sync4j"
-#define CAPTION_S4J                        L"Sync4j Outlook Client"
+// These are the standard Funambol product label and caption.
+// It's used to double-check if a Funambol addin menu is still there (it may happen
+// if the current addin has a customized label and a standard Funambol addin was istalled before)
+// DON'T CHANGE these unless the standard product defines have changed!
+#define ADDIN_MENU_LABEL_FUNAMBOL           L"Funa&mbol"
+#define ADDIN_COMMAND_BAR_CAPTION_FUNAMBOL  L"Funambol Outlook Sync Client"
 
 
 // Error messages:
