@@ -150,7 +150,7 @@ BOOL CAboutDlg::OnInitDialog(){
 
     CString s1("");
     CString s2("");
-    s1.FormatMessage(IDS_ABOUT_TITLE, _T(APP_NAME));
+    s1.FormatMessage(IDS_ABOUT_TITLE, _T(PROGRAM_NAME));
     SetWindowText(s1); 
     s1 = "";
     CDialog::OnInitDialog();
@@ -175,19 +175,39 @@ BOOL CAboutDlg::OnInitDialog(){
     GetDlgItem(IDC_ABOUT_MAIN)->SetFont(&fontBold);
 
     // Copyright
-    s1.LoadString(IDS_ABOUT_COPYRIGHT); 
-    SetDlgItemText(IDC_ABOUT_COPYRIGHT, s1);
+    if (ABOUT_SCREEN_SHOW_COPYRIGHT) {
+        s1 = ABOUT_SCREEN_TEXT_COPYRIGHT;
+        SetDlgItemText(IDC_ABOUT_COPYRIGHT, s1);
+    }
+    else {
+        GetDlgItem(IDC_ABOUT_COPYRIGHT)->ShowWindow(SW_HIDE);
+    }
+    
 
     // Link site
-    linkSite.init();
-    s1.LoadString(IDS_FUNAMBOL_LINK); 
-    SetDlgItemText(IDC_ABOUT_LINK, s1);
+    if (ABOUT_SCREEN_SHOW_MAIN_WEB_SITE) {
+        linkSite.init();
+        s1 = ABOUT_SCREEN_TEXT_MAIN_WEB_SITE; 
+        SetDlgItemText(IDC_ABOUT_LINK, s1);
+    }
+    else {
+        linkSite.ShowWindow(SW_HIDE);
+    }
 
-    // Licence text
+    // License text OR "Powered by Funambol"
+    // TODO: show them together?
+    s1 = "";
+    if (ABOUT_SCREEN_SHOW_POWERED_BY) {
+        s1 = ABOUT_SCREEN_TEXT_POWERED_BY;
+    } else if (ABOUT_SCREEN_SHOW_LICENSE) {
         s1 = licence;
+    }
     SetDlgItemText(IDC_ABOUT_LICENCE, s1);
     GetDlgItem(IDC_ABOUT_LICENCE)->SetFont(&fontSmall);
 
+    //
+    // TODO: fix window height dinamically
+    //
 
     brush.CreateSolidBrush(RGB(255,255,255));
 
@@ -451,9 +471,17 @@ void CAboutDlg::OnStnClickedAboutLink()
     SHELLEXECUTEINFO lpExecInfo;
     memset(&lpExecInfo, 0, sizeof(SHELLEXECUTEINFO));
     lpExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+    
+    CString site;
+    StringBuffer address(ABOUT_SCREEN_TEXT_MAIN_WEB_SITE);
+    if (address.find("http://") != StringBuffer::npos) {
+        site = address.c_str();
+    }
+    else {
+        site = "http://"; 
+        site += ABOUT_SCREEN_TEXT_MAIN_WEB_SITE;
+    }
 
-    CString site("http://"), s1; s1.LoadString(IDS_FUNAMBOL_LINK);
-    site += s1;
     lpExecInfo.lpFile = site;
     lpExecInfo.nShow = SW_SHOWNORMAL;
     lpExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;

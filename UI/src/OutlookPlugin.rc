@@ -45,7 +45,7 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 // String Table
 //
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDR_MAINFRAME           "OutlookPlugin\n\\OutlookPlugin\n\n\\OutlookPlugin.Document\\OutlookPlugin Document"
     IDS_SYNCTYPE1           "Two-way"
@@ -65,13 +65,13 @@ BEGIN
     IDS_OUTLOOK_FOLDER      "Outlook Folder:"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
-    AFX_IDS_APP_TITLE       "Funambol"
+    AFX_IDS_APP_TITLE       "[Funambol]"
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_INDICATOR_EXT        "EXT"
     ID_INDICATOR_CAPS       "CAP"
@@ -81,18 +81,18 @@ BEGIN
     ID_INDICATOR_REC        "REC"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
     ID_APP_EXIT             "Quit the application\nExit"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_VIEW_GUIDE           "Open Outlook Sync Client User Guide"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_FILE_CONFIGURATION   "Configuration Options"
     ID_FILE_SYNCHRONIZE     "Perform the sync"
@@ -100,7 +100,7 @@ BEGIN
     ID_TOOLS_SETLOGLEVEL    "Set log level"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_INCLUDE_SUBFOLDERS  "I&nclude sub-folders"
     IDS_SELECT_FOLDER       "C&hange..."
@@ -120,7 +120,7 @@ BEGIN
     IDS_TASKS               "&Tasks"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_SYNCHRONIZE         "Synchronize"
     IDS_LOG_LEVEL           "Log Level"
@@ -129,7 +129,7 @@ BEGIN
     IDS_LOG_DEBUG           "Debug"
     IDS_ADVANCED_NOTES      "Notes Advanced Settings"
     IDS_ADVANCED_TASKS      "Advanced Tasks Settings "
-    IDS_ERROR_CANNOT_CHANGE_SETTINGS
+    IDS_ERROR_CANNOT_CHANGE_SETTINGS 
                             "Sync is in progress. Cannot change the settings."
     IDS_ERROR_SET_URL       "Please set the url"
     IDS_ERROR_SET_USERNAME  "Please set the user name"
@@ -141,21 +141,21 @@ BEGIN
     IDS_MINUTES             "minutes"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_CODE_NOSOURCE_10    "No sources to sync"
     IDS_CODE_SYNC_STOPPED   "Synchronization terminated by the user"
     IDS_CODE_AUTH_EXPIRED_402 "Error: account expired."
     IDS_CODE_NOTFOUND_404   "Can't recognize remote name. Correct remote name in Sync Options."
-    IDS_CODE_INVALID_CREDENTIALS_401
+    IDS_CODE_INVALID_CREDENTIALS_401 
                             "Can't access your account. Correct your server location, username or password."
-    IDS_CODE_ERROR_CONNECT_2001
+    IDS_CODE_ERROR_CONNECT_2001 
                             "Can't access the server. Check your network connectivity and your account's server location."
-    IDS_CODE_ERROR_READING_CONTENT_2002
+    IDS_CODE_ERROR_READING_CONTENT_2002 
                             "Error reading content. Server unavailable."
-    IDS_CODE_SERVER_NOT_FOUND_2003
+    IDS_CODE_SERVER_NOT_FOUND_2003 
                             "Error: server not found. Check server uri."
-    IDS_CODE_INTERNET_CONNECTION_MISSING_2005
+    IDS_CODE_INTERNET_CONNECTION_MISSING_2005 
                             "Error: Cannot establish an internet connection."
     IDS_CODE_NETWORK_ERROR_2007 "Sync not completed. Network error."
     IDS_ERROR_SYNC_NOT_COMPLETED "Sync not completed. See log for details"
@@ -166,17 +166,17 @@ BEGIN
     IDS_TEXT_SENDING        "Sending"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_MAIN_CONTACTS       "Contacts"
     IDS_MAIN_TASKS          "Tasks"
     IDS_MAIN_NOTES          "Notes"
-    IDS_ERROR_SET_CONNECTION
+    IDS_ERROR_SET_CONNECTION 
                             "You must enter your account information before attempting a sync."
-    IDS_ABOUT_TITLE         "About %1 Outlook Sync Client"
+    IDS_ABOUT_TITLE         "About %1"
     IDS_MAIN_LAST_SYNC_FAILED "Last sync failed"
     IDS_MAIN_LAST_SYNC_CANCELED "Last sync canceled"
-    IDS_CODE_HTTP_NOT_FOUND_2060
+    IDS_CODE_HTTP_NOT_FOUND_2060 
                             "Error 404: resource not found. Please check your credentials."
     IDS_UNEXPECTED_EXCEPTION "An unexpected exception has occurred!"
     IDS_SYNCALL             "Sync All"
@@ -188,7 +188,7 @@ BEGIN
     IDS_CODE_SERVER_BUSY    "Server is busy, please retry later."
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_TEXT_RECEIVING      "Receiving"
     IDS_TEXT_SYNC_ENDED     "Sync ended"
@@ -208,31 +208,30 @@ BEGIN
     IDS_LEFTVIEW_TASKS      "Tasks"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_LEFTVIEW_NOTES      "Notes"
     IDS_SCHEDULER           "Scheduler"
     IDS_LEFTVIEW_LOG        "Log"
     IDS_DAYS                "days"
-    IDS_MSG_CLOSE_SYNC_IN_PROGRESS
+    IDS_MSG_CLOSE_SYNC_IN_PROGRESS 
                             "Synchronization in progress. Please wait or cancel it."
-    IDS_ABOUT_COPYRIGHT     "Copyright © 2003 - 2009 Funambol, Inc.\nAll rights reserved."
-    IDS_TEXT_SYNC_ALREADY_RUNNING
+    IDS_TEXT_SYNC_ALREADY_RUNNING 
                             "Sync already in progress.\nPlease wait until the sync is finished."
-    IDS_SYNC_ABORTED_AVOID_FULLSYNC
+    IDS_SYNC_ABORTED_AVOID_FULLSYNC 
                             "Sync aborted by the user to avoid full-sync"
     IDS_TEXT_SYNC_IN_PROGRESS "A scheduled sync is currently in progress."
     IDS_DETAILS             "&Details..."
     IDS_SYNC_SETTINGS       "Synchronization Settings"
     IDS_APPLY               "&Apply"
-    IDS_ERROR_SYNC_TERMINATED
+    IDS_ERROR_SYNC_TERMINATED 
                             "Sync process could not be terminated correctly.\nOutlook Sync Client will now be closed."
     IDS_TEXT_CANCELING_SYNC "Canceling sync, please wait..."
     IDS_MAIN_PRESS_TO_SYNC  "Sync All"
     IDS_MAIN_PRESS_TO_CANCEL "Cancel Sync"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_DONE                "Done"
     IDS_SERVER              "Server"
@@ -252,7 +251,7 @@ BEGIN
     IDS_USE_VCAL            "vCalendar"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_TASKS_DETAILS       "Tasks Details"
     IDS_TASKS_FOLDER        "Tasks &Folder"
@@ -266,18 +265,17 @@ BEGIN
     IDS_RECOVER             "Recover"
     IDS_LOGGING             "Logging"
     IDS_NOT_SYNCHRONIZED    "Not synchronized"
-    IDS_FUNAMBOL_LINK       "www.funambol.com"
     IDS_SYNCHRONIZED        "Last sync:"
     IDS_AT                  "at"
     IDS_MAIN_CALENDAR       "Calendar"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
-    IDS_CODE_SERVER_BUSY_SYNC
+    IDS_CODE_SERVER_BUSY_SYNC 
                             "The server is busy. It is possible that another sync is in progress for this account on another device. Please try later."
     IDS_CODE_SERVER_ERROR_2052 "Sync not completed: Server failure."
-    IDS_CODE_DROPPED_ITEMS_SERVER
+    IDS_CODE_DROPPED_ITEMS_SERVER 
                             "Warning: some items were not correctly transferred on Server."
     IDS_CODE_NO_SOURCES     "No sources to sync.\nPlease select at least one source from Sync Options panel."
     IDS_HOUR                "hour"
@@ -294,7 +292,7 @@ BEGIN
     IDS_DATE_FILTER_ALL     "All"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_DATE_FILTER_LAST_2_WEEKS "Since last 2 weeks"
     IDS_PICTURES            "&Pictures"
@@ -332,10 +330,10 @@ FONT 8, "MS Shell Dlg", 400, 0, 0xEE
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,93,248,57,14,WS_GROUP
     CONTROL         141,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,0,229,89
-    CTEXT           "Funambol Outlook Sync Client\nv.x.y.z",IDC_ABOUT_MAIN,7,88,229,18
-    CTEXT           "www.funambol.com",IDC_ABOUT_LINK,7,129,229,8,SS_NOTIFY
-    CTEXT           "This program is provided AS IS...\n...\n...\n...",IDC_ABOUT_LICENCE,7,142,229,104
-    CTEXT           "Copyright © 2003 - 2007 Funambol, Inc.\nAll rights reserved.",IDC_ABOUT_COPYRIGHT,7,108,229,17
+    CTEXT           "[Outlook Sync Client]\nv.x.y.z",IDC_ABOUT_MAIN,7,88,229,18
+    CTEXT           "[web_address_link]",IDC_ABOUT_LINK,7,129,229,8,SS_NOTIFY
+    CTEXT           "[This program is provided AS IS...]\n...\n...\n...",IDC_ABOUT_LICENCE,7,142,229,104
+    CTEXT           "[Copyright © 2003 - 2007 Funambol, Inc.]\n[All rights reserved.]",IDC_ABOUT_COPYRIGHT,7,108,229,17
 END
 
 IDD_FORM_LEFT DIALOGEX 0, 0, 65, 246
@@ -575,7 +573,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -687,18 +685,18 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"
@@ -789,7 +787,7 @@ END
 // Menu
 //
 
-IDR_MAINFRAME MENU
+IDR_MAINFRAME MENU 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -808,16 +806,16 @@ BEGIN
     BEGIN
         MENUITEM "&View User Guide\tCTRL+U",    ID_VIEW_GUIDE
         MENUITEM SEPARATOR
-        MENUITEM "&About Funambol Outlook Sync Client...\tCtrl+H", ID_APP_ABOUT
+        MENUITEM "&About...\tCtrl+H",           ID_APP_ABOUT
     END
 END
 
-IDR_NULLMENU MENU
+IDR_NULLMENU MENU 
 BEGIN
     MENUITEM "",                            IDM_NULLMENU, GRAYED
 END
 
-IDR_MAINFRAME_DISABLED MENU
+IDR_MAINFRAME_DISABLED MENU 
 BEGIN
     POPUP "&File", GRAYED
     BEGIN
@@ -833,7 +831,7 @@ BEGIN
     END
     POPUP "&Help", GRAYED
     BEGIN
-        MENUITEM "&About Outlook Sync Client...", ID_APP_ABOUT
+        MENUITEM "&About...",                   ID_APP_ABOUT
     END
 END
 
@@ -843,7 +841,7 @@ END
 // Accelerator
 //
 
-IDR_MAINFRAME ACCELERATORS
+IDR_MAINFRAME ACCELERATORS 
 BEGIN
     "H",            ID_APP_ABOUT,           VIRTKEY, CONTROL, NOINVERT
     "T",            ID_FILE_CONFIGURATION,  VIRTKEY, CONTROL, NOINVERT
@@ -856,49 +854,10 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "000904b0"
-        BEGIN
-            VALUE "CompanyName", "Funambol"
-            VALUE "FileDescription", "Funambol Outlook Sync Client"
-            VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "InternalName", "OutlookPlugin"
-            VALUE "LegalCopyright", "Copyright (C) 2006 Funambol"
-            VALUE "OriginalFilename", "OutlookPlugin.EXE"
-            VALUE "ProductName", "OutlookPlugin"
-            VALUE "ProductVersion", "1, 0, 0, 1"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x9, 1200
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // String Table
 //
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDR_MAINFRAME           "OutlookPlugin\n\\OutlookPlugin\n\n\\OutlookPlugin.Document\\OutlookPlugin Document"
     IDS_SYNCTYPE1           "Two-way"
@@ -918,13 +877,13 @@ BEGIN
     IDS_OUTLOOK_FOLDER      "Outlook Folder:"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
-    AFX_IDS_APP_TITLE       "Funambol"
+    AFX_IDS_APP_TITLE       "[Funambol]"
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_INDICATOR_EXT        "EXT"
     ID_INDICATOR_CAPS       "CAP"
@@ -934,18 +893,18 @@ BEGIN
     ID_INDICATOR_REC        "REC"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
     ID_APP_EXIT             "Quit the application\nExit"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_VIEW_GUIDE           "Open Outlook Sync Client User Guide"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_FILE_CONFIGURATION   "Configuration Options"
     ID_FILE_SYNCHRONIZE     "Perform the sync"
@@ -953,7 +912,7 @@ BEGIN
     ID_TOOLS_SETLOGLEVEL    "Set log level"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_INCLUDE_SUBFOLDERS  "I&nclude sub-folders"
     IDS_SELECT_FOLDER       "C&hange..."
@@ -973,7 +932,7 @@ BEGIN
     IDS_TASKS               "&Tasks"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_SYNCHRONIZE         "Synchronize"
     IDS_LOG_LEVEL           "Log Level"
@@ -982,7 +941,7 @@ BEGIN
     IDS_LOG_DEBUG           "Debug"
     IDS_ADVANCED_NOTES      "Notes Advanced Settings"
     IDS_ADVANCED_TASKS      "Advanced Tasks Settings "
-    IDS_ERROR_CANNOT_CHANGE_SETTINGS
+    IDS_ERROR_CANNOT_CHANGE_SETTINGS 
                             "Sync is in progress. Cannot change the settings."
     IDS_ERROR_SET_URL       "Please set the url"
     IDS_ERROR_SET_USERNAME  "Please set the user name"
@@ -994,21 +953,21 @@ BEGIN
     IDS_MINUTES             "minutes"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_CODE_NOSOURCE_10    "No sources to sync"
     IDS_CODE_SYNC_STOPPED   "Synchronization terminated by the user"
     IDS_CODE_AUTH_EXPIRED_402 "Error: account expired."
     IDS_CODE_NOTFOUND_404   "Can't recognize remote name. Correct remote name in Sync Options."
-    IDS_CODE_INVALID_CREDENTIALS_401
+    IDS_CODE_INVALID_CREDENTIALS_401 
                             "Can't access your account. Correct your server location, username or password."
-    IDS_CODE_ERROR_CONNECT_2001
+    IDS_CODE_ERROR_CONNECT_2001 
                             "Can't access the server. Check your network connectivity and your account's server location."
-    IDS_CODE_ERROR_READING_CONTENT_2002
+    IDS_CODE_ERROR_READING_CONTENT_2002 
                             "Error reading content. Server unavailable."
-    IDS_CODE_SERVER_NOT_FOUND_2003
+    IDS_CODE_SERVER_NOT_FOUND_2003 
                             "Error: server not found. Check server uri."
-    IDS_CODE_INTERNET_CONNECTION_MISSING_2005
+    IDS_CODE_INTERNET_CONNECTION_MISSING_2005 
                             "Error: Cannot establish an internet connection."
     IDS_CODE_NETWORK_ERROR_2007 "Sync not completed. Network error."
     IDS_ERROR_SYNC_NOT_COMPLETED "Sync not completed. See log for details"
@@ -1019,17 +978,17 @@ BEGIN
     IDS_TEXT_SENDING        "Sending"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_MAIN_CONTACTS       "Contacts"
     IDS_MAIN_TASKS          "Tasks"
     IDS_MAIN_NOTES          "Notes"
-    IDS_ERROR_SET_CONNECTION
+    IDS_ERROR_SET_CONNECTION 
                             "You must enter your account information before attempting a sync."
-    IDS_ABOUT_TITLE         "About Funambol Outlook Sync Client"
+    IDS_ABOUT_TITLE         "About %1"
     IDS_MAIN_LAST_SYNC_FAILED "Last sync failed"
     IDS_MAIN_LAST_SYNC_CANCELED "Last sync canceled"
-    IDS_CODE_HTTP_NOT_FOUND_2060
+    IDS_CODE_HTTP_NOT_FOUND_2060 
                             "Error 404: resource not found. Please check your credentials."
     IDS_UNEXPECTED_EXCEPTION "An unexpected exception has occurred!"
     IDS_SYNCALL             "Sync All"
@@ -1041,7 +1000,7 @@ BEGIN
     IDS_CODE_SERVER_BUSY    "Server is busy, please retry later."
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_TEXT_RECEIVING      "Receiving"
     IDS_TEXT_SYNC_ENDED     "Sync ended"
@@ -1061,31 +1020,30 @@ BEGIN
     IDS_LEFTVIEW_TASKS      "Tasks"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_LEFTVIEW_NOTES      "Notes"
     IDS_SCHEDULER           "Scheduler"
     IDS_LEFTVIEW_LOG        "Log"
     IDS_DAYS                "days"
-    IDS_MSG_CLOSE_SYNC_IN_PROGRESS
+    IDS_MSG_CLOSE_SYNC_IN_PROGRESS 
                             "Synchronization in progress. Please wait or cancel it."
-    IDS_ABOUT_COPYRIGHT     "Copyright © 2003 - 2009 Funambol, Inc.\nAll rights reserved."
-    IDS_TEXT_SYNC_ALREADY_RUNNING
+    IDS_TEXT_SYNC_ALREADY_RUNNING 
                             "Sync already in progress.\nPlease wait until the sync is finished."
-    IDS_SYNC_ABORTED_AVOID_FULLSYNC
+    IDS_SYNC_ABORTED_AVOID_FULLSYNC 
                             "Sync aborted by the user to avoid full-sync"
     IDS_TEXT_SYNC_IN_PROGRESS "A scheduled sync is currently in progress."
     IDS_DETAILS             "&Details..."
     IDS_SYNC_SETTINGS       "Synchronization Settings"
     IDS_APPLY               "&Apply"
-    IDS_ERROR_SYNC_TERMINATED
+    IDS_ERROR_SYNC_TERMINATED 
                             "Sync process could not be terminated correctly.\nOutlook Sync Client will now be closed."
     IDS_TEXT_CANCELING_SYNC "Canceling sync, please wait..."
     IDS_MAIN_PRESS_TO_SYNC  "Sync All"
     IDS_MAIN_PRESS_TO_CANCEL "Cancel Sync"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_DONE                "Done"
     IDS_SERVER              "Server"
@@ -1105,7 +1063,7 @@ BEGIN
     IDS_USE_VCAL            "vCalendar"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_TASKS_DETAILS       "Tasks Details"
     IDS_TASKS_FOLDER        "Tasks &Folder"
@@ -1119,18 +1077,17 @@ BEGIN
     IDS_RECOVER             "Recover"
     IDS_LOGGING             "Logging"
     IDS_NOT_SYNCHRONIZED    "Not synchronized"
-    IDS_FUNAMBOL_LINK       "www.funambol.com"
     IDS_SYNCHRONIZED        "Last sync:"
     IDS_AT                  "at"
     IDS_MAIN_CALENDAR       "Calendar"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
-    IDS_CODE_SERVER_BUSY_SYNC
+    IDS_CODE_SERVER_BUSY_SYNC 
                             "The server is busy. It is possible that another sync is in progress for this account on another device. Please try later."
     IDS_CODE_SERVER_ERROR_2052 "Sync not completed: Server failure."
-    IDS_CODE_DROPPED_ITEMS_SERVER
+    IDS_CODE_DROPPED_ITEMS_SERVER 
                             "Warning: some items were not correctly transferred on Server."
     IDS_CODE_NO_SOURCES     "No sources to sync.\nPlease select at least one source from Sync Options panel."
     IDS_HOUR                "hour"
@@ -1147,7 +1104,7 @@ BEGIN
     IDS_DATE_FILTER_ALL     "All"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_DATE_FILTER_LAST_2_WEEKS "Since last 2 weeks"
     IDS_PICTURES            "&Pictures"
@@ -1177,7 +1134,7 @@ LANGUAGE LANG_ITALIAN, SUBLANG_ITALIAN
 // String Table
 //
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDR_MAINFRAME           "OutlookPlugin\n\\OutlookPlugin\n\n\\OutlookPlugin.Document\\OutlookPlugin Document"
     IDS_SYNCTYPE1           "Two-way"
@@ -1197,13 +1154,13 @@ BEGIN
     IDS_OUTLOOK_FOLDER      "Outlook Folder:"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
-    AFX_IDS_APP_TITLE       "Funambol"
+    AFX_IDS_APP_TITLE       "[Funambol]"
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_INDICATOR_EXT        "EXT"
     ID_INDICATOR_CAPS       "CAP"
@@ -1213,18 +1170,18 @@ BEGIN
     ID_INDICATOR_REC        "REC"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
     ID_APP_EXIT             "Quit the application\nExit"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_VIEW_GUIDE           "Open Outlook Sync Client User Guide"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     ID_FILE_CONFIGURATION   "Configuration Options"
     ID_FILE_SYNCHRONIZE     "Perform the sync"
@@ -1232,7 +1189,7 @@ BEGIN
     ID_TOOLS_SETLOGLEVEL    "Set log level"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_INCLUDE_SUBFOLDERS  "I&nclude sub-folders"
     IDS_SELECT_FOLDER       "C&hange..."
@@ -1252,7 +1209,7 @@ BEGIN
     IDS_TASKS               "&Tasks"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_SYNCHRONIZE         "Synchronize"
     IDS_LOG_LEVEL           "Log Level"
@@ -1261,7 +1218,7 @@ BEGIN
     IDS_LOG_DEBUG           "Debug"
     IDS_ADVANCED_NOTES      "Notes Advanced Settings"
     IDS_ADVANCED_TASKS      "Advanced Tasks Settings "
-    IDS_ERROR_CANNOT_CHANGE_SETTINGS
+    IDS_ERROR_CANNOT_CHANGE_SETTINGS 
                             "Sync is in progress. Cannot change the settings."
     IDS_ERROR_SET_URL       "Please set the url"
     IDS_ERROR_SET_USERNAME  "Please set the user name"
@@ -1273,21 +1230,21 @@ BEGIN
     IDS_MINUTES             "minutes"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_CODE_NOSOURCE_10    "No sources to sync"
     IDS_CODE_SYNC_STOPPED   "Synchronization terminated by the user"
     IDS_CODE_AUTH_EXPIRED_402 "Error: account expired."
     IDS_CODE_NOTFOUND_404   "Can't recognize remote name. Correct remote name in Sync Options."
-    IDS_CODE_INVALID_CREDENTIALS_401
+    IDS_CODE_INVALID_CREDENTIALS_401 
                             "Can't access your account. Correct your server location, username or password."
-    IDS_CODE_ERROR_CONNECT_2001
+    IDS_CODE_ERROR_CONNECT_2001 
                             "Can't access the server. Check your network connectivity and your account's server location."
-    IDS_CODE_ERROR_READING_CONTENT_2002
+    IDS_CODE_ERROR_READING_CONTENT_2002 
                             "Error reading content. Server unavailable."
-    IDS_CODE_SERVER_NOT_FOUND_2003
+    IDS_CODE_SERVER_NOT_FOUND_2003 
                             "Error: server not found. Check server uri."
-    IDS_CODE_INTERNET_CONNECTION_MISSING_2005
+    IDS_CODE_INTERNET_CONNECTION_MISSING_2005 
                             "Error: Cannot establish an internet connection."
     IDS_CODE_NETWORK_ERROR_2007 "Sync not completed. Network error."
     IDS_ERROR_SYNC_NOT_COMPLETED "Sync not completed. See log for details"
@@ -1298,17 +1255,17 @@ BEGIN
     IDS_TEXT_SENDING        "Sending"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_MAIN_CONTACTS       "Contacts"
     IDS_MAIN_TASKS          "Tasks"
     IDS_MAIN_NOTES          "Notes"
-    IDS_ERROR_SET_CONNECTION
+    IDS_ERROR_SET_CONNECTION 
                             "You must enter your account information before attempting a sync."
-    IDS_ABOUT_TITLE         "About %1 Outlook Sync Client"
+    IDS_ABOUT_TITLE         "About %1"
     IDS_MAIN_LAST_SYNC_FAILED "Last sync failed"
     IDS_MAIN_LAST_SYNC_CANCELED "Last sync canceled"
-    IDS_CODE_HTTP_NOT_FOUND_2060
+    IDS_CODE_HTTP_NOT_FOUND_2060 
                             "Error 404: resource not found. Please check your credentials."
     IDS_UNEXPECTED_EXCEPTION "An unexpected exception has occurred!"
     IDS_SYNCALL             "Sync All"
@@ -1320,7 +1277,7 @@ BEGIN
     IDS_CODE_SERVER_BUSY    "Server is busy, please retry later."
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_TEXT_RECEIVING      "Receiving"
     IDS_TEXT_SYNC_ENDED     "Sync ended"
@@ -1340,31 +1297,30 @@ BEGIN
     IDS_LEFTVIEW_TASKS      "Tasks"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_LEFTVIEW_NOTES      "Notes"
     IDS_SCHEDULER           "Scheduler"
     IDS_LEFTVIEW_LOG        "Log"
     IDS_DAYS                "days"
-    IDS_MSG_CLOSE_SYNC_IN_PROGRESS
+    IDS_MSG_CLOSE_SYNC_IN_PROGRESS 
                             "Synchronization in progress. Please wait or cancel it."
-    IDS_ABOUT_COPYRIGHT     "Copyright © 2003 - 2009 Funambol, Inc.\nAll rights reserved."
-    IDS_TEXT_SYNC_ALREADY_RUNNING
+    IDS_TEXT_SYNC_ALREADY_RUNNING 
                             "Sync already in progress.\nPlease wait until the sync is finished."
-    IDS_SYNC_ABORTED_AVOID_FULLSYNC
+    IDS_SYNC_ABORTED_AVOID_FULLSYNC 
                             "Sync aborted by the user to avoid full-sync"
     IDS_TEXT_SYNC_IN_PROGRESS "A scheduled sync is currently in progress."
     IDS_DETAILS             "&Details..."
     IDS_SYNC_SETTINGS       "Synchronization Settings"
     IDS_APPLY               "&Apply"
-    IDS_ERROR_SYNC_TERMINATED
+    IDS_ERROR_SYNC_TERMINATED 
                             "Sync process could not be terminated correctly.\nOutlook Sync Client will now be closed."
     IDS_TEXT_CANCELING_SYNC "Canceling sync, please wait..."
     IDS_MAIN_PRESS_TO_SYNC  "Sync All"
     IDS_MAIN_PRESS_TO_CANCEL "Cancel Sync"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_DONE                "Done"
     IDS_SERVER              "Server"
@@ -1384,7 +1340,7 @@ BEGIN
     IDS_USE_VCAL            "vCalendar"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_TASKS_DETAILS       "Tasks Details"
     IDS_TASKS_FOLDER        "Tasks &Folder"
@@ -1398,18 +1354,17 @@ BEGIN
     IDS_RECOVER             "Recover"
     IDS_LOGGING             "Logging"
     IDS_NOT_SYNCHRONIZED    "Not synchronized"
-    IDS_FUNAMBOL_LINK       "www.funambol.com"
     IDS_SYNCHRONIZED        "Last sync:"
     IDS_AT                  "at"
     IDS_MAIN_CALENDAR       "Calendar"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
-    IDS_CODE_SERVER_BUSY_SYNC
+    IDS_CODE_SERVER_BUSY_SYNC 
                             "The server is busy. It is possible that another sync is in progress for this account on another device. Please try later."
     IDS_CODE_SERVER_ERROR_2052 "Sync not completed: Server failure."
-    IDS_CODE_DROPPED_ITEMS_SERVER
+    IDS_CODE_DROPPED_ITEMS_SERVER 
                             "Warning: some items were not correctly transferred on Server."
     IDS_CODE_NO_SOURCES     "No sources to sync.\nPlease select at least one source from Sync Options panel."
     IDS_HOUR                "hour"
@@ -1426,7 +1381,7 @@ BEGIN
     IDS_DATE_FILTER_ALL     "All"
 END
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_DATE_FILTER_LAST_2_WEEKS "Since last 2 weeks"
     IDS_PICTURES            "&Pictures"
