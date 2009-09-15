@@ -123,7 +123,6 @@
 #define IDS_DAYS                        211
 #define IDS_MSG_CLOSE_SYNC_IN_PROGRESS  212
 #define IDS_ABOUT_MAIN_TEXT             213
-#define IDS_ABOUT_COPYRIGHT             213
 #define IDS_TEXT_SYNC_ALREADY_RUNNING   214
 #define IDS_SYNC_ABORTED_AVOID_FULLSYNC 215
 #define IDS_TEXT_SYNC_IN_PROGRESS       216
@@ -164,7 +163,6 @@
 #define IDS_LOGGING                     250
 #define IDB_BITMAP3                     250
 #define IDS_NOT_SYNCHRONIZED            251
-#define IDS_FUNAMBOL_LINK               252
 #define IDB_BITMAP4                     252
 #define IDS_SYNCHRONIZED                253
 #define IDS_AT                          254
