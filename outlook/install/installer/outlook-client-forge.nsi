@@ -33,19 +33,14 @@
  ; the words "Powered by Funambol".
  ;
 
+; customization params
+!include "customization.ini"
+
 ; ------ defines ------
-!define PRODUCT_NAME                            "Funambol Outlook Sync Client"
 !define PRODUCT_NAME_EXE                        "OutlookPlugin.exe"
-!define PRODUCT_PUBLISHER                       "Funambol"
-!define PRODUCT_WEB_SITE                        "http://www.funambol.com"
-!define STARTMENU_CONTEXT                       "Funambol\Outlook Sync Client"
-!define INSTALLDIR_CONTEXT                      "Funambol\Outlook Client"
-!define DATAFILES_CONTEXT                       "Funambol\OutlookClient"
 !define MICROSOFT_OUTLOOK                       "Microsoft Outlook"
 !define MICROSOFT_OUTLOOK_CLASS_NAME            "rctrl_renwnd32"
 !define PLUGIN_UI_CLASS_NAME                    "FunambolApp"
-!define PLUGIN_UI_TITLE                         "Funambol Outlook Sync Client"
-!define PRODUCT_WELCOME_BMP                     "Logo-Startup.bmp"
 
 !define PRODUCT_UNINST_ROOT_KEY                 "HKLM"
 !define PRODUCT_STARTMENU_REGVAL                "NSIS:StartMenuDir"
@@ -84,8 +79,10 @@
 !insertmacro MUI_PAGE_WELCOME
 
 ; License page
-!define MUI_LICENSEPAGE_CHECKBOX
-!insertmacro MUI_PAGE_LICENSE                   "fileset\LICENSES\License.txt"
+!ifdef SHOW_LICENSE
+    !define MUI_LICENSEPAGE_CHECKBOX
+    !insertmacro MUI_PAGE_LICENSE                   "fileset\LICENSES\License.txt"
+!endif
 
 ; Directory page, the first two define check if the install dir is correct
 !define MUI_DIRECTORYPAGE_VERIFYONLEAVE
@@ -104,8 +101,10 @@ var ICONS_GROUP
 
 ; Finish page
 !define MUI_FINISHPAGE_RUN                      "$INSTDIR\${PRODUCT_NAME_EXE}"
-!define MUI_FINISHPAGE_SHOWREADME               "$INSTDIR\Readme.txt"
-!define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
+!ifdef FINISHPAGE_SHOW_README
+    !define MUI_FINISHPAGE_SHOWREADME               "$INSTDIR\Readme.txt"
+    !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
+!endif
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -579,11 +578,11 @@ Section "MainSection" SEC01
       SetShellVarContext all
       !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
       CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
-      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\${PRODUCT_NAME}.lnk"   "$INSTDIR\${PRODUCT_NAME_EXE}" "" "" "" "" "" "Launch $(^Name)"
-      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"         "$INSTDIR\uninst.exe"          "" "" "" "" "" "Uninstall $(^Name)"
-      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\Readme.lnk"            "$INSTDIR\Readme.txt"          "" "" "" "" "" "${PRODUCT_NAME} Readme"
-      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\User Guide.lnk"        "$INSTDIR\userguide.url"       "" "" "" "" "" "${PRODUCT_NAME} User Guide"
-      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\Funambol Web Site.lnk" "$INSTDIR\funambol.url"        "" "" "" "" "" "Funambol Web Site"
+      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\${PRODUCT_NAME}.lnk"               "$INSTDIR\${PRODUCT_NAME_EXE}" "" "" "" "" "" "Launch $(^Name)"
+      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"                     "$INSTDIR\uninst.exe"          "" "" "" "" "" "Uninstall $(^Name)"
+      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\Readme.lnk"                        "$INSTDIR\Readme.txt"          "" "" "" "" "" "${PRODUCT_NAME} Readme"
+      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\User Guide.lnk"                    "$INSTDIR\userguide.url"       "" "" "" "" "" "${PRODUCT_NAME} User Guide"
+      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\${PRODUCT_PUBLISHER} Web Site.lnk" "$INSTDIR\website.url"         "" "" "" "" "" "${PRODUCT_PUBLISHER} Web Site"
       !insertmacro MUI_STARTMENU_WRITE_END
 
 
