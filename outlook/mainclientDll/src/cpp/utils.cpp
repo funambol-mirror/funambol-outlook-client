@@ -503,7 +503,7 @@ string getSyncMutexName() {
     string ret = SYNC_MUTEX_NAME;      // By default.
 
     char context[DIM_MANAGEMENT_PATH];
-    sprintf(context, "%s%s%s", APPLICATION_URI, CONTEXT_SPDS_SYNCML, CONTEXT_EXT);
+    sprintf(context, "%s%s%s", PLUGIN_ROOT_CONTEXT, CONTEXT_SPDS_SYNCML, CONTEXT_EXT);
 
     // Get value.
     dmt = DMTreeFactory::getDMTree(context);
