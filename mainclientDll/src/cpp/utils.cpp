@@ -1019,6 +1019,17 @@ bool isSourceVisible(const WCHAR* sourceName)
     return false;
 }
 
+bool isSourceVisibleA(const char* sourceName)
+{
+    for (int i=0; itemTypesUsed[i]; i++) {
+        StringBuffer name;
+        name.convert(itemTypesUsed[i]);
+        if (name == sourceName) {
+            return true;
+        }
+    }
+    return false;
+}
 
 
 
