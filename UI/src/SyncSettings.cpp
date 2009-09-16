@@ -48,6 +48,7 @@
 #include "NotesSettings.h"
 #include "TaskSettings.h"
 
+#include "customization.h"
 #include "winmaincpp.h"
 #include "utils.h"
 #include "OutlookPlugin.h"
@@ -188,7 +189,8 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     s1.LoadString(IDS_CANCEL); SetDlgItemText(IDC_SYNC_CANCEL, s1);
 
     // Scheduler: add strings to the comboBox
-    s1.LoadString(IDS_SYNC_SYNCHRONIZE_EVERY); SetDlgItemText(IDC_SCHEDULER_CHECK_ENABLED, s1);
+    s1.LoadString(IDS_SYNC_SYNCHRONIZE_EVERY); 
+    SetDlgItemText(IDC_SCHEDULER_CHECK_ENABLED, s1);
     CString sched;
     s1.LoadString(IDS_MINUTES);
     for (int i=0; schedMinutes[i]; i++) {
@@ -204,45 +206,89 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
         comboSchedulerValue.AddString(sched);
     }
 
-
-    s1.LoadString(IDS_SECURITY);   SetDlgItemText(IDC_SYNC_GROUP_SECURITY, s1);
+    s1.LoadString(IDS_SECURITY);                 SetDlgItemText(IDC_SYNC_GROUP_SECURITY, s1);
     s1.LoadString(IDS_SYNC_ENABLE_ENCRYPTION);   SetDlgItemText(IDC_SYNC_CHECK_ENCRYPTION, s1);
 
+    //
     // enable/disable controls, depending of what sources are set to none
-    WindowsSyncSourceConfig* ssc = getConfig()->getSyncSourceConfig(CONTACT_);
-    if (!ssc->isEnabled()) {
-        checkContacts.SetCheck(BST_UNCHECKED);
-        butContacts.EnableWindow(FALSE);
+    //
+    WindowsSyncSourceConfig* ssc = NULL;
+    // CONTACTS
+    if (isSourceVisible(CONTACT)) {
+        saveSyncTypeContacts = true;
+        ssc = getConfig()->getSyncSourceConfig(CONTACT_);
+        if (!ssc->isEnabled()) {
+            checkContacts.SetCheck(BST_UNCHECKED);
+            butContacts.EnableWindow(FALSE);
+        }
+        else{
+            checkContacts.SetCheck(BST_CHECKED);
+        }
     }
-    else{
-        checkContacts.SetCheck(BST_CHECKED);
-    }
-
-    ssc = getConfig()->getSyncSourceConfig(APPOINTMENT_);
-    if (!ssc->isEnabled()) {
-        checkCalendar.SetCheck(BST_UNCHECKED);
-        butCalendar.EnableWindow(FALSE);
-    }
-    else{
-        checkCalendar.SetCheck(BST_CHECKED);
-    }
-
-    ssc = getConfig()->getSyncSourceConfig(TASK_);
-    if (!ssc->isEnabled()) {
-        checkTasks.SetCheck(BST_UNCHECKED);
-        butTasks.EnableWindow(FALSE);
-    }
-    else{
-        checkTasks.SetCheck(BST_CHECKED);
+    else {
+        checkContacts.ShowWindow(SW_HIDE);
+        butContacts.ShowWindow(SW_HIDE);
+        saveSyncTypeContacts = false;
+        GetDlgItem(IDC_SEPARATOR_1)->ShowWindow(SW_HIDE);
     }
 
-    ssc = getConfig()->getSyncSourceConfig(NOTE_);
-    if (!ssc->isEnabled()) {
-        checkNotes.SetCheck(BST_UNCHECKED);
-        butNotes.EnableWindow(FALSE);
+    // CALENDAR
+    if (isSourceVisible(APPOINTMENT)) {
+        saveSyncTypeCalendar = true;
+        ssc = getConfig()->getSyncSourceConfig(APPOINTMENT_);
+        if (!ssc->isEnabled()) {
+            checkCalendar.SetCheck(BST_UNCHECKED);
+            butCalendar.EnableWindow(FALSE);
+        }
+        else{
+            checkCalendar.SetCheck(BST_CHECKED);
+        }
     }
-    else{
-        checkNotes.SetCheck(BST_CHECKED);
+    else {
+        checkCalendar.ShowWindow(SW_HIDE);
+        butCalendar.ShowWindow(SW_HIDE);
+        saveSyncTypeCalendar = false;
+        GetDlgItem(IDC_SEPARATOR_1)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_SEPARATOR_2)->ShowWindow(SW_HIDE);
+    }
+
+    // TASKS
+    if (isSourceVisible(TASK)) {
+        saveSyncTypeTasks = true;
+        ssc = getConfig()->getSyncSourceConfig(TASK_);
+        if (!ssc->isEnabled()) {
+            checkTasks.SetCheck(BST_UNCHECKED);
+            butTasks.EnableWindow(FALSE);
+        }
+        else{
+            checkTasks.SetCheck(BST_CHECKED);
+        }
+    }
+    else {
+        checkTasks.ShowWindow(SW_HIDE);
+        butTasks.ShowWindow(SW_HIDE);
+        saveSyncTypeTasks = false;
+        GetDlgItem(IDC_SEPARATOR_2)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_SEPARATOR_3)->ShowWindow(SW_HIDE);
+    }
+
+    // NOTES
+    if (isSourceVisible(TASK)) {
+        saveSyncTypeNotes = true;
+        ssc = getConfig()->getSyncSourceConfig(NOTE_);
+        if (!ssc->isEnabled()) {
+            checkNotes.SetCheck(BST_UNCHECKED);
+            butNotes.EnableWindow(FALSE);
+        }
+        else{
+            checkNotes.SetCheck(BST_CHECKED);
+        }
+    }
+    else {
+        checkNotes.ShowWindow(SW_HIDE);
+        butNotes.ShowWindow(SW_HIDE);
+        saveSyncTypeNotes = false;
+        GetDlgItem(IDC_SEPARATOR_3)->ShowWindow(SW_HIDE);
     }
 
     
@@ -251,7 +297,7 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     if(! getScheduler(&minutes)){
         checkEnabled.SetCheck(BST_UNCHECKED);
         comboSchedulerValue.EnableWindow(FALSE);
-        int pos = getSchedulerPosition(SCHEDULER_DEFAULT_MINUTES);      // Default = 15 min
+        int pos = getSchedulerPosition(SCHED_DEFAULT_REPEAT_MINS);
         comboSchedulerValue.SetCurSel(pos);
     }
     else{
@@ -275,23 +321,13 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     else
         checkEncryption.SetCheck(BST_UNCHECKED);
 
-    // Portal build: disable notes and encryption
-    //if(getConfig()->checkPortalBuild()) {
-    //    checkNotes.EnableWindow(FALSE);
-    //    butNotes.EnableWindow(FALSE);
-    //    saveSyncTypeNotes = false;
-
-    //    checkEncryption.SetCheck(BST_UNCHECKED);
-    //    checkEncryption.EnableWindow(FALSE);
-    //}
-    //else{
-        saveSyncTypeNotes = true;
-    //}
-
-    saveSyncTypeContacts = true;    
-    saveSyncTypeCalendar = true;
-    saveSyncTypeTasks = true;
-
+    //
+    // Enable/disable encryption check
+    //
+    if (!ENABLE_ENCRYPTION_SETTINGS) {
+        checkEncryption.SetCheck(BST_UNCHECKED);
+        checkEncryption.EnableWindow(FALSE);
+    }
 
     // disable windows xp theme, otherwise any color setting for groupbox
     // will be overriden by the theme settings
@@ -484,7 +520,7 @@ void CSyncSettings::OnBnClickedSchedulerCheckEnabled()
     }
     else{
         comboSchedulerValue.EnableWindow(TRUE);
-        int pos = getSchedulerPosition(SCHEDULER_DEFAULT_MINUTES);
+        int pos = getSchedulerPosition(SCHED_DEFAULT_REPEAT_MINS);
         comboSchedulerValue.SetCurSel(pos);
     }
 

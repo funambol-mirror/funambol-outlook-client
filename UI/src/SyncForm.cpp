@@ -598,21 +598,33 @@ void CSyncForm::refreshSource( int sourceId )
 
     if (sourceId == SYNCSOURCE_CONTACTS) {
         unsigned long lastSyncContacts=0;
-
         iconStatusContacts.StopAnim();
-        bool enabled = getConfig()->getSyncSourceConfig(CONTACT_)->isEnabled();
-        GetDlgItem(IDC_MAIN_STATIC_CONTACTS)->EnableWindow(enabled);
-        GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->EnableWindow(enabled);
-        if(enabled) {
-            paneContacts.ShowWindow(SW_NORMAL);
-            paneContacts.state = STATE_NORMAL;
-            iconContacts.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CONTACTS)));
+        
+        if (isSourceVisible(CONTACT)) {
+            // source visible
+            bool enabled = getConfig()->getSyncSourceConfig(CONTACT_)->isEnabled();
+            GetDlgItem(IDC_MAIN_STATIC_CONTACTS)->EnableWindow(enabled);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->EnableWindow(enabled);
+            if(enabled) {
+                paneContacts.ShowWindow(SW_NORMAL);
+                paneContacts.state = STATE_NORMAL;
+                iconContacts.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CONTACTS)));
+            }
+            else {
+                paneContacts.ShowWindow(SW_HIDE);
+                iconContacts.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CONTACTS_GREY)));
+            }
+            iconContacts.EnableWindow(enabled);
         }
         else {
+            // source not visible: we hide the controls
+            iconContacts.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CONTACTS)));
+            iconContacts.ShowWindow(SW_HIDE); 
+            GetDlgItem(IDC_MAIN_STATIC_CONTACTS)->ShowWindow(SW_HIDE);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->ShowWindow(SW_HIDE);
             paneContacts.ShowWindow(SW_HIDE);
-            iconContacts.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CONTACTS_GREY)));
         }
-        iconContacts.EnableWindow(enabled);
+
         lastSyncContacts = getConfig()->getSyncSourceConfig(CONTACT_)->getEndTimestamp();
 
 
@@ -646,24 +658,35 @@ void CSyncForm::refreshSource( int sourceId )
 
     else if (sourceId == SYNCSOURCE_CALENDAR) {
         unsigned long lastSyncCalendar=0;
-
         iconStatusCalendar.StopAnim();
-        bool enabled = getConfig()->getSyncSourceConfig(APPOINTMENT_)->isEnabled();
-        iconStatusCalendar.EnableWindow(enabled);
-        GetDlgItem(IDC_MAIN_STATIC_CALENDAR)->EnableWindow(enabled);
-        GetDlgItem(IDC_MAIN_STATIC_STATUS_CALENDAR)->EnableWindow(enabled);
-        if(enabled) {
-            paneCalendar.ShowWindow(SW_NORMAL);
-            paneCalendar.state = STATE_NORMAL;
-            iconCalendar.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CALENDAR)));
+        
+        if (isSourceVisible(APPOINTMENT)) {
+            // source visible
+            bool enabled = getConfig()->getSyncSourceConfig(APPOINTMENT_)->isEnabled();
+            iconStatusCalendar.EnableWindow(enabled);
+            GetDlgItem(IDC_MAIN_STATIC_CALENDAR)->EnableWindow(enabled);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_CALENDAR)->EnableWindow(enabled);
+            if(enabled) {
+                paneCalendar.ShowWindow(SW_NORMAL);
+                paneCalendar.state = STATE_NORMAL;
+                iconCalendar.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CALENDAR)));
+            }
+            else {
+                paneCalendar.ShowWindow(SW_HIDE);
+                iconCalendar.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CALENDAR_GREY)));
+            }
+            iconCalendar.EnableWindow(enabled);
         }
         else {
+            // source not visible: we hide the controls
+            iconCalendar.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CALENDAR)));
+            iconCalendar.ShowWindow(SW_HIDE); 
+            GetDlgItem(IDC_MAIN_STATIC_CALENDAR)->ShowWindow(SW_HIDE);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_CALENDAR)->ShowWindow(SW_HIDE);
             paneCalendar.ShowWindow(SW_HIDE);
-            iconCalendar.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CALENDAR_GREY)));
         }
-        iconCalendar.EnableWindow(enabled);
-        lastSyncCalendar = getConfig()->getSyncSourceConfig(APPOINTMENT_)->getEndTimestamp();
 
+        lastSyncCalendar = getConfig()->getSyncSourceConfig(APPOINTMENT_)->getEndTimestamp();
 
         // check if the last sync failed
         if(syncSourceCalendarState == SYNCSOURCE_STATE_NOT_SYNCED){
@@ -694,21 +717,33 @@ void CSyncForm::refreshSource( int sourceId )
 
     else if (sourceId == SYNCSOURCE_TASKS) {
         unsigned long lastSyncTasks=0;
-
         iconStatusTasks.StopAnim();
-        bool enabled = getConfig()->getSyncSourceConfig(TASK_)->isEnabled();
-        GetDlgItem(IDC_MAIN_STATIC_TASKS)->EnableWindow(enabled);
-        GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->EnableWindow(enabled);
-        if(enabled) {
-            paneTasks.ShowWindow(SW_NORMAL);
-            paneTasks.state = STATE_NORMAL;
-            iconTasks.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TASKS)));
+        
+        if (isSourceVisible(TASK)) {
+            // source visible
+            bool enabled = getConfig()->getSyncSourceConfig(TASK_)->isEnabled();
+            GetDlgItem(IDC_MAIN_STATIC_TASKS)->EnableWindow(enabled);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->EnableWindow(enabled);
+            if(enabled) {
+                paneTasks.ShowWindow(SW_NORMAL);
+                paneTasks.state = STATE_NORMAL;
+                iconTasks.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TASKS)));
+            }
+            else {
+                paneTasks.ShowWindow(SW_HIDE);
+                iconTasks.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TASKS_GREY)));
+            }
+            iconTasks.EnableWindow(enabled);
         }
         else {
+            // source not visible: we hide the controls
+            iconTasks.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TASKS)));
+            iconTasks.ShowWindow(SW_HIDE); 
+            GetDlgItem(IDC_MAIN_STATIC_TASKS)->ShowWindow(SW_HIDE);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->ShowWindow(SW_HIDE);
             paneTasks.ShowWindow(SW_HIDE);
-            iconTasks.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TASKS_GREY)));
         }
-        iconTasks.EnableWindow(enabled);
+
         lastSyncTasks = getConfig()->getSyncSourceConfig(TASK_)->getEndTimestamp();
 
 
@@ -744,36 +779,32 @@ void CSyncForm::refreshSource( int sourceId )
         unsigned long lastSyncNotes=0;
         iconStatusNotes.StopAnim();
 
-        // removed portal check
-        //if(!getConfig()->checkPortalBuild()){
-            // Normal build.
-        bool enabled = getConfig()->getSyncSourceConfig(NOTE_)->isEnabled();
-        GetDlgItem(IDC_MAIN_STATIC_NOTES)->EnableWindow(enabled);
-        GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->EnableWindow(enabled);
-        if(enabled) {
-            paneNotes.ShowWindow(SW_NORMAL);
-            paneNotes.state = STATE_NORMAL;
-            iconNotes.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_NOTES)));
+        if (isSourceVisible(NOTE)) {
+            // source visible
+            bool enabled = getConfig()->getSyncSourceConfig(NOTE_)->isEnabled();
+            GetDlgItem(IDC_MAIN_STATIC_NOTES)->EnableWindow(enabled);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->EnableWindow(enabled);
+            if(enabled) {
+                paneNotes.ShowWindow(SW_NORMAL);
+                paneNotes.state = STATE_NORMAL;
+                iconNotes.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_NOTES)));
+            }
+            else {
+                paneNotes.ShowWindow(SW_HIDE);
+                iconNotes.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_NOTES_GREY)));
+            }
+            iconNotes.EnableWindow(enabled);
         }
         else {
-            paneNotes.ShowWindow(SW_HIDE);
-            iconNotes.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_NOTES_GREY)));
-        }
-        iconNotes.EnableWindow(enabled);
-        
-        /*}
-        else{
-            // Portal build: we hide the controls
+            // source not visible: we hide the controls
             iconNotes.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_NOTES)));
             iconNotes.ShowWindow(SW_HIDE); 
             GetDlgItem(IDC_MAIN_STATIC_NOTES)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->ShowWindow(SW_HIDE);
             paneNotes.ShowWindow(SW_HIDE);
         }
-        */
 
         lastSyncNotes = getConfig()->getSyncSourceConfig(NOTE_)->getEndTimestamp();
-
 
         // check if the last sync failed
         if(syncSourceNoteState == SYNCSOURCE_STATE_NOT_SYNCED){

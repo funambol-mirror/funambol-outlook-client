@@ -35,6 +35,7 @@
 
 #include "base/util/utils.h"
 #include "winmaincpp.h"
+#include "customization.h"
 #include "DefaultWinConfigFactory.h"
 #include "DateFilter.h"
 #include <string>
