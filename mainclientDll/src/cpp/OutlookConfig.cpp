@@ -43,6 +43,7 @@
 #include "winmaincpp.h"
 #include "utils.h"
 #include "DateFilter.h"
+#include "customization.h"
 
 #include "outlook/ClientApplication.h"
 #include "outlook/ClientException.h"

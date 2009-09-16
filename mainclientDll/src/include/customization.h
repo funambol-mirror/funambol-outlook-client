@@ -36,6 +36,8 @@
 #ifndef INCL_CUSTOMIZATION
 #define INCL_CUSTOMIZATION
 
+#include "winmaincpp.h"
+
 // The application name
 #define APP_NAME                            "Funambol"
 
@@ -92,5 +94,17 @@
 #define SCHED_DURATION_DAYS                 1                           /**< 1 day         */
 #define SYNC_TIMEOUT                        120                         /**< 120 minutes   */
 #define MAX_LOG_SIZE                        10000000                    /**< 10 MB         */
+
+/// Order is important: sources will be executed with this order.
+/// Sources not existing in this array will not be used/synchronized.
+/// TODO: read array from config, like WM.
+static WCHAR* itemTypesUsed[] = {
+    {CONTACT            },
+    {APPOINTMENT        },
+    {TASK               },
+    {NOTE               },
+    //{PICTURE          },
+    {NULL}
+};
 
 #endif
