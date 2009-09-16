@@ -101,6 +101,7 @@ StringBuffer syncSourceIndexToName(const int sourceID);
  * It checks the itemTypesUsed[] array.
  */
 bool isSourceVisible(const WCHAR* sourceName);
+bool isSourceVisibleA(const char* sourceName);
 
 
 /**
