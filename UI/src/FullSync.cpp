@@ -33,19 +33,15 @@
  * the words "Powered by Funambol".
  */
 
-// FullSync.cpp : implementation file
-//
 
 #include "stdafx.h"
 #include "FullSync.h"
 #include "MainSyncFrm.h"
 #include "SyncForm.h"
 #include "ClientUtil.h"
-
+#include "utils.h"
 #include "winmaincpp.h"
 
-
-// CFullSync dialog
 
 IMPLEMENT_DYNAMIC(CFullSync, CDialog)
 
@@ -83,34 +79,45 @@ BEGIN_MESSAGE_MAP(CFullSync, CDialog)
     ON_BN_CLICKED(IDC_FULLSYNC_CHECK_NOTES, &CFullSync::OnBnClickedFullsyncCheckNotes)
 END_MESSAGE_MAP()
 
-BOOL CFullSync::OnInitDialog(){
+BOOL CFullSync::OnInitDialog() {
+
     CString s1;
     s1.LoadString(IDS_RECOVER); SetWindowText(s1);
     CDialog::OnInitDialog();
 
-    s1.LoadString(IDS_FULLSYNC_SYNCTYPE1); SetDlgItemText(IDC_FULLSYNC_RADIO1, s1);
-    s1.LoadString(IDS_FULLSYNC_SYNCTYPE2); SetDlgItemText(IDC_FULLSYNC_RADIO2, s1);
-    s1.LoadString(IDS_FULLSYNC_SYNCTYPE3); SetDlgItemText(IDC_FULLSYNC_RADIO3, s1);
-    s1.LoadString(IDS_RECOVER_PERFORMS); SetDlgItemText(IDC_FULLSYNC_STATIC_RECOVER, s1);
-    s1.LoadString(IDS_ITEMS); SetDlgItemText(IDC_FULLSYNC_GROUP_ITEMS, s1);
-    s1.LoadString(IDS_DIRECTION); SetDlgItemText(IDC_FULLSYNC_GROUP_DIRECTION, s1);
-    s1.LoadString(IDS_CONTACTS); SetDlgItemText(IDC_FULLSYNC_CHECK_CONTACTS, s1);
-    s1.LoadString(IDS_CALENDAR); SetDlgItemText(IDC_FULLSYNC_CHECK_CALENDAR, s1);
-    s1.LoadString(IDS_NOTES); SetDlgItemText(IDC_FULLSYNC_CHECK_NOTES, s1);
-    s1.LoadString(IDS_TASKS); SetDlgItemText(IDC_FULLSYNC_CHECK_TASKS, s1);
-
-    s1.LoadString(IDS_RECOVER); SetDlgItemText(IDOK, s1);
-    s1.LoadString(IDS_CANCEL); SetDlgItemText(IDCANCEL, s1);
+    s1.LoadString(IDS_FULLSYNC_SYNCTYPE1);  SetDlgItemText(IDC_FULLSYNC_RADIO1, s1);
+    s1.LoadString(IDS_FULLSYNC_SYNCTYPE2);  SetDlgItemText(IDC_FULLSYNC_RADIO2, s1);
+    s1.LoadString(IDS_FULLSYNC_SYNCTYPE3);  SetDlgItemText(IDC_FULLSYNC_RADIO3, s1);
+    s1.LoadString(IDS_RECOVER_PERFORMS);    SetDlgItemText(IDC_FULLSYNC_STATIC_RECOVER, s1);
+    s1.LoadString(IDS_ITEMS);               SetDlgItemText(IDC_FULLSYNC_GROUP_ITEMS, s1);
+    s1.LoadString(IDS_DIRECTION);           SetDlgItemText(IDC_FULLSYNC_GROUP_DIRECTION, s1);
+    s1.LoadString(IDS_CONTACTS);            SetDlgItemText(IDC_FULLSYNC_CHECK_CONTACTS, s1);
+    s1.LoadString(IDS_CALENDAR);            SetDlgItemText(IDC_FULLSYNC_CHECK_CALENDAR, s1);
+    s1.LoadString(IDS_NOTES);               SetDlgItemText(IDC_FULLSYNC_CHECK_NOTES, s1);
+    s1.LoadString(IDS_TASKS);               SetDlgItemText(IDC_FULLSYNC_CHECK_TASKS, s1);
+    s1.LoadString(IDS_RECOVER);             SetDlgItemText(IDOK, s1);
+    s1.LoadString(IDS_CANCEL);              SetDlgItemText(IDCANCEL, s1);
     
-    // settings
+
+    // Show/hide checkboxes
+    if (!isSourceVisible(CONTACT)) {
+        checkContacts.ShowWindow(SW_HIDE);
+    }
+    if (!isSourceVisible(APPOINTMENT)) {
+        checkCalendar.ShowWindow(SW_HIDE);
+    }
+    if (!isSourceVisible(TASK)) {
+        checkTasks.ShowWindow(SW_HIDE);
+    }
+    if (!isSourceVisible(NOTE)) {
+        checkNotes.ShowWindow(SW_HIDE);
+    }
+
     checkContacts.EnableWindow(TRUE);
     checkCalendar.EnableWindow(TRUE);
-    //if (getConfig()->checkPortalBuild()) {
-    //    checkNotes.EnableWindow(FALSE);
-    //}
-    //else {
-        checkNotes.EnableWindow(TRUE);
-    //}
+    checkTasks.EnableWindow(TRUE);
+    checkNotes.EnableWindow(TRUE);
+
     
     // Refresh from Client is the default
     radio3.SetCheck(BST_CHECKED);
