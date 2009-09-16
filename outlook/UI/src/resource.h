@@ -461,6 +461,9 @@
 #define IDC_TASKS_RADIO_VTODO           1203
 #define IDC_MAIN_ICON_STATUS_PICTURES   1203
 #define IDC_NOTES_RADIO_VNOTE           1204
+#define IDC_SEPARATOR_1                 1205
+#define IDC_SEPARATOR_2                 1206
+#define IDC_SEPARATOR_3                 1207
 #define ID_FILE_CONFIGURATION           32771
 #define ID_FILE_ZZZZ                    32772
 #define ID_FILE_SYNCHRONIZE             32773
@@ -475,7 +478,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        271
 #define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1205
+#define _APS_NEXT_CONTROL_VALUE         1208
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
