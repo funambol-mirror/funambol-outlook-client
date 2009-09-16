@@ -1,3 +1,7 @@
+2009-09-16
+   - toccy: added ENABLE_ENCRYPTION_SETTINGS param in customization.h
+   - toccy: fixed UI main / settings / recover dialogs, to show dynamically sources from itemTypesUsed[] array
+
 2009-09-15
    - toccy: improvements for customization and branding purposes
             * added defines in customization.h to customize the about screen

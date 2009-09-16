@@ -39,7 +39,6 @@
 
 #include "DateFilter.h"
 
-#define SCHEDULER_DEFAULT_MINUTES 15
 #define SYNC_DEFAULT_TOTAL_ITEMS  20
 
 // Default dimensions of frames (in case of 96dpi)
