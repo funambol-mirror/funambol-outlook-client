@@ -56,6 +56,7 @@
 #include "OutlookConfig.h"
 #include "utils.h"
 #include "PicturesSyncSource.h"
+#include "customization.h"
 
 #include "base/adapter/PlatformAdapter.h"
 

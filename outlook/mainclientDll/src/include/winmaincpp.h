@@ -32,7 +32,7 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by Funambol".
  */
-#include "customization.h"
+
 #ifndef WINMAINCPP
 #define WINMAINCPP
 
@@ -83,17 +83,6 @@
 #define POST_                              "post"
 #define DISTRIBUTION_LIST_                 "distribution list"
 
-/// Order is important: sources will be executed with this order.
-/// Sources not existing in this array will not be used/synchronized.
-/// TODO: use a enum of IDs only here, and util methods to get char/wchar
-static WCHAR* itemTypesUsed[] = {
-    {CONTACT            },
-    {APPOINTMENT        },
-    {TASK               },
-    {NOTE               },
-    //{PICTURE            },
-    {NULL}
-};
 
 /// Name of file to store 'forced' modified appointments
 #define APPOINTMENT_FORCED_MODIFIED        L"appointment_modified"

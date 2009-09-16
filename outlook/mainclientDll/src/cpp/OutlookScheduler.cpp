@@ -42,6 +42,7 @@
 #include "utils.h"
 #include "winmaincpp.h"
 #include "OutlookConfig.h"
+#include "customization.h"
 
 #include <string>
 using namespace std;
