@@ -1,40 +1,40 @@
 <!--
 /*
- * Funambol is a mobile platform developed by Funambol, Inc. 
+ * Funambol is a mobile platform developed by Funambol, Inc.
  * Copyright (C) 2003 - 2007 Funambol, Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
- * the Free Software Foundation with the addition of the following permission 
+ * the Free Software Foundation with the addition of the following permission
  * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
- * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE 
+ * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT  OF THIRD PARTY RIGHTS.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  * details.
- * 
- * You should have received a copy of the GNU Affero General Public License 
+ *
+ * You should have received a copy of the GNU Affero General Public License
  * along with this program; if not, see http://www.gnu.org/licenses or write to
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301 USA.
- * 
- * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite 
+ *
+ * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite
  * 305, Redwood City, CA 94063, USA, or at email address info@funambol.com.
- * 
+ *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
  * Section 5 of the GNU Affero General Public License version 3.
- * 
+ *
  * In accordance with Section 7(b) of the GNU Affero General Public License
  * version 3, these Appropriate Legal Notices must retain the display of the
- * "Powered by Funambol" logo. If the display of the logo is not reasonably 
+ * "Powered by Funambol" logo. If the display of the logo is not reasonably
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by Funambol".
  */
  -->
- 
+
 <?html version="1.0" enconding="UTF-8"?>
 
 <!-- $Id: build.xml,v 1.28 2008-07-02 16:16:05 magi Exp $
@@ -46,7 +46,7 @@ Forge file for Funambol Outlook Sync Client
 
 <project basedir=".." default="all" name="FunambolOutlookSyncClient">
 
-
+<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
     <!--
     ========================================================================
       ALL
@@ -55,56 +55,56 @@ Forge file for Funambol Outlook Sync Client
     <target name="all">
         <antcall target="usage"/>
     </target>
-    
-    <target name="usage">            
-       <echo message="Usage: ant [options]"/>      
-       <echo message=""/> 
-       <echo message="where options is"/> 
-       <echo message="release         : to regdll + checkout + build + forge + generate docs. Both for comed and cared"/>      
-       <echo message="release-nodocs  : to regdll + checkout + build + forge. Both for comed and cared"/>  
-       <echo message="docs            : to checkout + forge + generate docs"/> 
-       <echo message=""/> 
-       <echo message="work-all        : clean, build the installer, no checkout (build from dev working dirs). Both for comed and cared"/> 
-       <echo message="work-all-noreg  : clean, build the installer, no checkout (build from dev working dirs), no reg DLL. Both for comed and cared"/> 
-       <echo message="work-dev        : no clean, build the installer, no checkout (build from dev working dirs). Comed"/> 
-       <echo message="work-cared-dev  : no clean, build the installer, no checkout (build from dev working dirs). Cared"/> 
-       <echo message="docs-dev        : clean, to only generate doxygen docs, no checkout (build from dev working dirs)"/> 
+
+    <target name="usage">
+       <echo message="Usage: ant [options]"/>
+       <echo message=""/>
+       <echo message="where options is"/>
+       <echo message="release         : to regdll + checkout + build + forge + generate docs. Both for comed and cared"/>
+       <echo message="release-nodocs  : to regdll + checkout + build + forge. Both for comed and cared"/>
+       <echo message="docs            : to checkout + forge + generate docs"/>
+       <echo message=""/>
+       <echo message="work-all        : clean, build the installer, no checkout (build from dev working dirs). Both for comed and cared"/>
+       <echo message="work-all-noreg  : clean, build the installer, no checkout (build from dev working dirs), no reg DLL. Both for comed and cared"/>
+       <echo message="work-dev        : no clean, build the installer, no checkout (build from dev working dirs). Comed"/>
+       <echo message="work-cared-dev  : no clean, build the installer, no checkout (build from dev working dirs). Cared"/>
+       <echo message="docs-dev        : clean, to only generate doxygen docs, no checkout (build from dev working dirs)"/>
     </target>
-    
+
     <!--target name="release"         depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, build-install-sp"/-->
-    <!--target name="release"         depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, 
+    <!--target name="release"         depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install,
                                                                                         set-portal-password-key,
                                                                                         compile-outlook-client,
                                                                                         restore-empty-password-key,
                                                                                         build-install-sp"/-->
-    
-    <target name="release"        depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, build-install-cared"/>                                                                                                                                                                     
-    <target name="release-nodocs" depends="init, clean, build, register-dll, checkout-src, forge-src, compile, forge, build-install, build-install-cared"/> 
+
+    <target name="release"        depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, build-install-cared, generate-update-info"/>
+    <target name="release-nodocs" depends="init, clean, build, register-dll, checkout-src, forge-src, compile, forge, build-install, build-install-cared, generate-update-info"/>
     <target name="docs "          depends="init, clean, build, checkout-src, create-docs, forge-src"/>
-    
-    
-    <!-- These execute on working dir (for dev purpose) -->  
+
+
+    <!-- These execute on working dir (for dev purpose) -->
     <target name="work-all">
         <antcall target="clean"/>
         <antcall target="work-dev"/>
         <antcall target="work-cared-dev"/>
     </target>
-    <target name="work-dev"       depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install"/>    
-    <target name="work-cared-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install-cared"/>
-    
+    <target name="work-dev"       depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install, generate-update-info"/>
+    <target name="work-cared-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install-cared, generate-update-info"/>
+
     <target name="work-all-noreg">
         <antcall target="clean"/>
         <antcall target="work-dev-noreg"/>
         <antcall target="work-cared-dev-noreg"/>
     </target>
-    <target name="work-dev-noreg"       depends="init, build, compile-no-checkout, forge-no-checkout, build-install"/>    
-    <target name="work-cared-dev-noreg" depends="init, build, compile-no-checkout, forge-no-checkout, build-install-cared"/> 
-    
+    <target name="work-dev-noreg"       depends="init, build, compile-no-checkout, forge-no-checkout, build-install, generate-update-info"/>
+    <target name="work-cared-dev-noreg" depends="init, build, compile-no-checkout, forge-no-checkout, build-install-cared, generate-update-info"/>
+
     <target name="docs-dev"       depends="init, clean, build, create-docs-no-checkout"/>
     <!-- old sp version. no more used... -->
-    <!--target name="work-sp-dev"    depends="init, build, register-dll, set-portal-password-key-dev, forge-no-checkout, restore-empty-password-key-dev, build-install-sp"/-->   
-                                                              
-    
+    <!--target name="work-sp-dev"    depends="init, build, register-dll, set-portal-password-key-dev, forge-no-checkout, restore-empty-password-key-dev, build-install-sp"/-->
+
+
     <!--
     ========================================================================
       INIT: Setting variables
@@ -121,33 +121,34 @@ Forge file for Funambol Outlook Sync Client
         <property name="dir.presetup"             value="${dir.distribution}/installer/presetup"/>
         <property name="dir.redemptionLib"        value="${dir.distribution}/installer/Redemption_Lib"/>
         <property name="dir.redemptionLibRedist"  value="${dir.distribution}/installer/Redemption_Lib/enterprise"/>
-        
+
         <!-- Dirs to read src from (no-checkout build) -->
         <property name="dir.src"            value="funambol-outlook-sync-client-src-"/>
         <property name="dir.outlook"        value="${dir.distribution}/.."/>
     	<property name="dir.ui"             value="${dir.outlook}/UI"/>
-    	<property name="dir.mainclientdll"  value="${dir.outlook}/mainclientDll"/>	
+    	<property name="dir.mainclientdll"  value="${dir.outlook}/mainclientDll"/>
     	<property name="dir.outlookaddin"   value="${dir.outlook}/Addin"/>
     	<property name="dir.design"         value="${dir.outlook}/docs"/>
     	<property name="dir.native_api"     value="${dir.outlook}/cpp-sdk"/>
     	<property name="dir.zlib"           value="${dir.native_api}/tools/zlib"/>
     	<property name="dir.presetup"       value="${dir.outlook}/install/installer/presetup"/>
-	
+
     	<!-- Log files -->
     	<property name="log.SVN"            value="${dir.output}/SVN_export.log"/>
     	<property name="log.client"         value="${dir.output}/build_client.log"/>
         <property name="log.NSIS"           value="${dir.output}/build_NSIS.log"/>
         <property name="log.NSIS_sp"        value="${dir.output}/build_NSIS_SP.log"/>
         <property name="log.doxygen"        value="${dir.output}/build_doxygen.log"/>
-	
+        <property file="${dir.output}/ol-upd-info"/>
+
 	<property file="build/funambol-outlook-client-forge.properties"/>
 	<property file="build/extra.properties"/>
-	
+
 	<!-- Property TODAY contains the formatted date, like "14 November 2008" -->
 	<tstamp>
 	    <format property="TODAY" pattern="d MMMM yyyy" locale="en,UK"/>
 	</tstamp>
-        
+
         <!-- it defaults the wm.pass.key if not defines in other parts -->
         <property name="wm.pass.key" value="NULL"/>
 
@@ -160,7 +161,7 @@ Forge file for Funambol Outlook Sync Client
     ========================================================================
     -->
     <target name="build" depends="init">
-    
+
         <!-- Update the build date automatically, build number is manually set -->
         <propertyfile file  = "${dir.distribution}/build/release.properties" comment = "Funambol Outlook Sync Client" >
             <entry key="build.date" type="date" value="now" pattern="yyyyMMdd"/>
@@ -171,8 +172,8 @@ Forge file for Funambol Outlook Sync Client
         <echo message="*********************" />
         <echo message="Build release: ${release.major}.${release.minor}.${build.number}" />
         <echo message="*********************" />
-        
-        
+
+
 	<!-- Output dirs for src files -->
 	<property name="dir.output_src"               value="${dir.output}/${dir.src}${release.major}.${release.minor}.${build.number}"/>
 	<property name="dir.output_src.home"          value="${dir.output_src}/Funambol/Outlook Sync Client"/>
@@ -184,7 +185,7 @@ Forge file for Funambol Outlook Sync Client
 	<property name="dir.output_src.outlookaddin"  value="${dir.output_src.outlook}/Addin"/>
 	<property name="dir.output_src.design"        value="${dir.output_src.outlook}/docs"/>
 	<property name="dir.output_src.install"       value="${dir.output_src.outlook}/install"/>
-        
+
     </target>
 
 
@@ -198,12 +199,12 @@ Forge file for Funambol Outlook Sync Client
 
         <mkdir dir="${dir.export.SVN}"/>
 
-        <!-- 
+        <!--
         Checkout files from SVN.
         -->
         <echo message="Checkout source files from SVN (tag = ${module.src.tag})..."/>
         <echo message="output to file: ${log.SVN}"/>
-        
+
         <echo message="svn export --username guest --force ${svn.url}/${module.src.tag} ${dir.export.SVN}"/>
         <exec dir="${dir.export.SVN}" executable="svn" failonerror="true" output="${log.SVN}" >
              <arg line="export --username guest --force ${svn.url}/${module.src.tag} ${dir.export.SVN}"/>
@@ -222,7 +223,7 @@ Forge file for Funambol Outlook Sync Client
     <target name="register-dll" depends="init">
 
         <echo message="Registering Redemption DLL..."/>
-        <exec dir="${dir.redemptionLib}" executable="regsvr32">        
+        <exec dir="${dir.redemptionLib}" executable="regsvr32">
             <arg line="/s Redemption.dll"/>
         </exec>
 
@@ -235,7 +236,7 @@ Forge file for Funambol Outlook Sync Client
     ========================================================================
     -->
     <target name="forge-src" depends="init,build,checkout-src">
-    
+
         <!-- Copy source files under 'funambol-outlook-sync-client-src-x.y.z' and zip them -->
         <mkdir dir="${dir.output_src.home}"/>
         <copy todir="${dir.output_src.home}" >
@@ -245,31 +246,31 @@ Forge file for Funambol Outlook Sync Client
         <zip destfile="${dir.output_src}.zip">
             <fileset dir="${dir.output_src}"/>
         </zip>
-        
+
     </target>
 
-    
-    
-    
+
+
+
     <!--
     ========================================================================
       COMPILE
     ========================================================================
     -->
-    <target name="compile" depends="init,checkout-src"> 
+    <target name="compile" depends="init,checkout-src">
         <mkdir dir="${dir.output}"/>
-                
+
         <echo message="Compiling Outlook Client..."/>
         <exec dir="${dir.output_src.outlook}" executable="${vs2005.devenv}/devenv" failonerror="true">
             <arg line="OutlookClient.sln /Out ${log.client} /Build ${client.targetbuild}"/>
         </exec>
 
-        
+
         <!-- Open log and continue -->
         <exec dir="${dir.output}" executable="notepad" spawn="true">
             <arg line="${log.client}"/>
         </exec>
-      
+
     </target>
 
 
@@ -280,19 +281,19 @@ Forge file for Funambol Outlook Sync Client
     -->
     <target name="compile-no-checkout" depends="init">
         <mkdir dir="${dir.output}"/>
-    
+
         <!-- Note: compile from dev working dirs -->
-        
+
         <echo message="Compiling Outlook Client..."/>
         <exec dir="${dir.outlook}" executable="${vs2005.devenv}/devenv" failonerror="true">
             <arg line="OutlookClient.sln /Out ${log.client} /Build ${client.targetbuild}"/>
         </exec>
-        
+
         <!-- Open log and continue -->
         <exec executable="notepad" spawn="true">
             <arg line="${log.client}"/>
         </exec>
-      
+
     </target>
 
 
@@ -317,7 +318,7 @@ Forge file for Funambol Outlook Sync Client
         <copy todir="${dir.fileset}" >
             <fileset dir="${dir.output_src.install}/installer/presetup"/>
         </copy>
-        
+
         <!-- Update the Readme.txt file automatically: version and release date -->
         <replace file="${dir.fileset}/Readme.txt" token="Version:" value="Version: ${release.major}.${release.minor}.${build.number}"/>
         <replace file="${dir.fileset}/Readme.txt" token="Release date:" value="Release date: ${TODAY}" />
@@ -329,23 +330,23 @@ Forge file for Funambol Outlook Sync Client
 
         <!--
         Copy DLLs and needed files into fileset dir
-        -->        
+        -->
 	<copy todir="${dir.fileset}" overwrite="TRUE">
 	    <fileset dir="${dir.output_src.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
 	    <fileset dir="${dir.output_src.UI}/build/Release"                  includes="OutlookPlugin.exe"/>
 	    <fileset dir="${dir.output_src.install}/installer/Redemption_Lib"  includes="Redemption.dll"/>
 	    <fileset dir="${dir.output_src.outlookaddin}/ReleaseMinDependency" includes="FunambolAddin.dll"/>
         </copy>
-        
+
         <copy todir="${dir.fileset}/images" overwrite="TRUE">
             <fileset dir="${dir.output_src.UI}/src/res" includes="OutlookPlugin.ico"/>
         </copy>
 
-	
+
 	<!-- These are DLLs required to run VC++ software -->
         <copy todir="${dir.fileset}/redist" overwrite="TRUE">
             <fileset dir="${dir.VCpp2005Lib}" includes="**/Microsoft.VC80.ATL/, **/Microsoft.VC80.CRT/, **/Microsoft.VC80.MFC/" />
-        </copy> 
+        </copy>
 
     </target>
 
@@ -356,7 +357,7 @@ Forge file for Funambol Outlook Sync Client
     ========================================================================
     -->
     <target name="forge-no-checkout" depends="init,build,compile-no-checkout">
-        
+
         <!-- Note: files are copied from dev working dirs -->
         <echo message="Forge files from ${dir.outlook}..." />
 
@@ -372,35 +373,35 @@ Forge file for Funambol Outlook Sync Client
         <copy todir="${dir.fileset}" >
             <fileset dir="${dir.presetup}" excludes="**/*.bak, **/*.my, **/.#*, **/.svn/" />
         </copy>
-        
+
         <!-- Update the Readme.txt file automatically: version and release date -->
         <replace file="${dir.fileset}/Readme.txt" token="Version:" value="Version: ${release.major}.${release.minor}.${build.number}"/>
         <replace file="${dir.fileset}/Readme.txt" token="Release date:" value="Release date: ${TODAY}" />
         <fixcrlf file="${dir.fileset}/Readme.txt"/>
-        
+
         <!-- Copy release.properties -->
         <copy file="${dir.distribution}/build/release.properties" todir="${dir.fileset}/docs"/>
 
 
         <!--
         Copy DLLs and needed files into fileset dir
-        -->        
+        -->
 	<copy todir="${dir.fileset}" overwrite="TRUE">
 	    <fileset dir="${dir.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
 	    <fileset dir="${dir.ui}/build/Release"                  includes="OutlookPlugin.exe"/>
 	    <fileset dir="${dir.redemptionLib}"                     includes="Redemption.dll"/>
 	    <fileset dir="${dir.outlookaddin}/ReleaseMinDependency" includes="FunambolAddin.dll"/>
         </copy>
-        
+
         <copy todir="${dir.fileset}/images" overwrite="TRUE">
             <fileset dir="${dir.ui}/src/res" includes="OutlookPlugin.ico"/>
         </copy>
 
-	
+
 	<!-- These are DLLs required to run VC++ software -->
         <copy todir="${dir.fileset}/redist" overwrite="TRUE">
             <fileset dir="${dir.VCpp2005Lib}" includes="**/Microsoft.VC80.ATL/, **/Microsoft.VC80.CRT/, **/Microsoft.VC80.MFC/" />
-        </copy> 
+        </copy>
 
     </target>
 
@@ -412,10 +413,10 @@ Forge file for Funambol Outlook Sync Client
     -->
     <target name="build-install" depends="init" >
         <mkdir dir="${dir.output}"/>
-    
+
         <echo message="${install-builder.nsi}" />
         <echo message="output to: ${log.NSIS}" />
-        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS}">        
+        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS}">
             <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
 	                   /DFILE_NAME=${fileName} ${script.nsi} "/>
         </exec>
@@ -428,23 +429,23 @@ Forge file for Funambol Outlook Sync Client
     -->
     <target name="build-install-sp" depends="init" >
         <mkdir dir="${dir.output}"/>
-        
+
         <!-- Portal version is builded with the REDIST REDEMPTION.DLL -->
         <echo message="Replace Redemption.dll with the redistributable one..." />
 	    <copy todir="${dir.fileset}" overwrite="TRUE">
             <fileset dir="${dir.redemptionLibRedist}" includes="Redemption.dll"/>
         </copy>
-        
-        
+
+
         <echo message="${install-builder.nsi} ${sp}" />
         <echo message="output to: ${log.NSIS_sp}" />
-        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}">        
+        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}">
             <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
                        /DFILE_NAME=${fileNameSp}
                        /DSP  ${script.nsi} " />
         </exec>
     </target>
-    
+
      <!--
     ========================================================================
     BUILD-INSTALL_FOR_CARED
@@ -452,23 +453,23 @@ Forge file for Funambol Outlook Sync Client
     -->
     <target name="build-install-cared" depends="init" >
         <mkdir dir="${dir.output}"/>
-        
+
         <!-- Portal version is builded with the REDIST REDEMPTION.DLL -->
         <echo message="Replace Redemption.dll with the redistributable one..." />
 	    <copy todir="${dir.fileset}" overwrite="TRUE">
             <fileset dir="${dir.redemptionLibRedist}" includes="Redemption.dll"/>
         </copy>
-        
-        
+
+
         <echo message="${install-builder.nsi} ${sp}" />
         <echo message="output to: ${log.NSIS_sp}" />
-        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}">        
+        <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}">
             <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
                        /DFILE_NAME=${fileNameCared} ${script.nsi} " />
         </exec>
     </target>
-    
-   
+
+
     <!--
     ========================================================================
     CLEAN
@@ -487,7 +488,7 @@ Forge file for Funambol Outlook Sync Client
     ========================================================================
     -->
     <target name="create-docs" depends="init,checkout-src">
-        
+
         <mkdir dir="${dir.output}"/>
         <property name="doxyfile"      value="${dir.distribution}/doxygen/Doxyfile"/>
         <property name="olclient.root" value="output/export"/>
@@ -509,10 +510,10 @@ Forge file for Funambol Outlook Sync Client
     ========================================================================
     CREATE DOCS - NO CHECKOUT
     ========================================================================
-    -->   
+    -->
     <target name="create-docs-no-checkout" depends="init">
         <!-- Create doxygen docs from working env -->
-        
+
         <mkdir dir="${dir.output}"/>
         <property name="doxyfile"      value="${dir.distribution}/doxygen/Doxyfile"/>
         <property name="olclient.root" value="${dir.outlook}"   />
@@ -530,69 +531,115 @@ Forge file for Funambol Outlook Sync Client
     </target>
 
 
-    
+
     <!--
     ========================================================================
     Replace the pass-key with the value for the portal
     ========================================================================
     -->
-    
+
      <!-- used only for the portal version. It changes the password for the cared release in the
           local directory (not in the one with server checkout-->
-   <target name="set-portal-password-key-dev" depends="init">      
-     <echo message="${wm.pass.key}" />         
-     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h" 
+   <target name="set-portal-password-key-dev" depends="init">
+     <echo message="${wm.pass.key}" />
+     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h"
             token='#define PASS_KEY    NULL'
-            value='#define PASS_KEY    ${wm.pass.key}' summary="true">            
-     </replace>     
+            value='#define PASS_KEY    ${wm.pass.key}' summary="true">
+     </replace>
    </target>
-   
-   <target name="restore-empty-password-key-dev" depends="init">      
-     <echo message="${wm.pass.key}" />         
-     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h" 
+
+   <target name="restore-empty-password-key-dev" depends="init">
+     <echo message="${wm.pass.key}" />
+     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h"
             token='#define PASS_KEY    ${wm.pass.key}'
-            value='#define PASS_KEY    NULL' summary="true">              
-     </replace>     
+            value='#define PASS_KEY    NULL' summary="true">
+     </replace>
    </target>
-    
-    <!-- used only for the portal version. It changes the password for the cared release 
-         FOR THE RELEASE WITH CHECKOUT -->          
-    <target name="set-portal-password-key" depends="init">      
-     <echo message="${wm.pass.key}" />         
-     <replace file="${dir.output_src.mainclientdll}/src/include/OutlookConfig.h" 
+
+    <!-- used only for the portal version. It changes the password for the cared release
+         FOR THE RELEASE WITH CHECKOUT -->
+    <target name="set-portal-password-key" depends="init">
+     <echo message="${wm.pass.key}" />
+     <replace file="${dir.output_src.mainclientdll}/src/include/OutlookConfig.h"
             token='#define PASS_KEY    NULL'
-            value='#define PASS_KEY    ${wm.pass.key}' summary="true">            
-     </replace>     
+            value='#define PASS_KEY    ${wm.pass.key}' summary="true">
+     </replace>
    </target>
-   
-   <target name="restore-empty-password-key" depends="init">      
-     <echo message="${wm.pass.key}" />         
-     <replace file="${dir.output_src.mainclientdll}/src/include/OutlookConfig.h" 
+
+   <target name="restore-empty-password-key" depends="init">
+     <echo message="${wm.pass.key}" />
+     <replace file="${dir.output_src.mainclientdll}/src/include/OutlookConfig.h"
             token='#define PASS_KEY    ${wm.pass.key}'
-            value='#define PASS_KEY    NULL' summary="true">              
-     </replace>     
+            value='#define PASS_KEY    NULL' summary="true">
+     </replace>
    </target>
-    
+
     <!--
     ========================================================================
     REPLACE THE CARED_KEY TO TRUE WHEN THE BUILD IS FOR THE CARED VERSION (PASS_KEY CUSTOMIZED)
     ========================================================================
-    -->    
-    <target name="set-cared-key-true-dev" depends="init">      
-     <echo message="set CARED_KEY to true" />         
-     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h" 
+    -->
+    <target name="set-cared-key-true-dev" depends="init">
+     <echo message="set CARED_KEY to true" />
+     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h"
             token='#define CARED_KEY    false'
-            value='#define CARED_KEY    true' summary="true">            
-     </replace>     
+            value='#define CARED_KEY    true' summary="true">
+     </replace>
    </target>
-   
-   <target name="set-cared-key-false-dev" depends="init">      
-     <echo message="set CARED_KEY to false" />         
-     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h" 
+
+   <target name="set-cared-key-false-dev" depends="init">
+     <echo message="set CARED_KEY to false" />
+     <replace file="${dir.mainclientdll}/src/include/OutlookConfig.h"
             token='#define CARED_KEY    true'
-            value='#define CARED_KEY    false' summary="true">              
-     </replace>     
+            value='#define CARED_KEY    false' summary="true">
+     </replace>
    </target>
+
+    <!--
+    ========================================================================
+    GENERATE UPDATE INFO
+    ========================================================================
+    -->
+
+<target name="generate-update-info">
+
+	<exec executable="touch" >
+	 <arg line=" ${dir.output}/ol-upd-info"/>
+	 </exec>
+
+	 <if>
+	  <equals arg1="${build.number}" arg2="${build.date}" />
+	  <then>
+	   <property name="sis.build.number" value="0"/>
+	   </then>
+	  <else>
+	  <property name="sis.build.number" value="${build.number}"/>
+	   </else>
+      </if>
+
+	<echo message="#File Descriptor" file="${dir.output}/ol-upd-info" append="false" />
+
+    <exec executable="date" outputproperty="zipTimeStamp"/>
+
+	 <exec executable="stat" outputproperty="duSize">
+	    <arg line=" -c %s ${dir.output}/${fileName}-${release.major}.${release.minor}.${build.number}.exe"/>
+	</exec>
+
+	<echo message="#File Descriptor${line.separator}" file="${dir.output}/ol-upd-info" append="false"/>
+	<echo message="#${zipTimeStamp}${line.separator}${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
+	<echo message="# The latest version available for update${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
+	<echo message="version=${release.major}.${release.minor}.${sis.build.number}${line.separator}${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
+	<echo message="# The activation date expressed in the format YYYYMMDD${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
+	<echo message="activation-date=19810221${line.separator}${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
+
+	<echo message="# The file size expressed in bytes${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
+
+	<echo message="size=${duSize}${line.separator}${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
+
+	<echo message="# The update type: optional, recommended, mandatory${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
+	<echo message="type=mandatory" file="${dir.output}/ol-upd-info" append="true"/>
+
+    </target>
 
 
 </project>
