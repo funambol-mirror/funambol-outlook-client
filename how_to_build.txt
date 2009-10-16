@@ -40,7 +40,9 @@ How to build the Funambol Outlook Sync Client
        - redefine the path of the directory 'redist\x86' of Visual Studio 2005 if necessary 
        - redefine the path of NSIS (makensis.exe) if necessary 
     3) Open file 'install\build\release.properties' and set the release version number desired.
-    4) From directory 'install\build', type 'ant work-all'. 
+    4) If you wish to build a "cared" version of Outlook Client, you need to create the folder 'install\installer\Redemption_Lib\enterprise' and
+       copy there the distributable version of Redemption.dll (it's not free, can be purchsed from http://www.dimastr.com/redemption/download.htm).
+    5) From directory 'install\build', type 'ant work-all'. 
        This procedure will build the installer, doing the following: 
        - register Redemption library
        - create the doxygen documentation 
