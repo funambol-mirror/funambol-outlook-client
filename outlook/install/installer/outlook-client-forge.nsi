@@ -44,7 +44,7 @@
 
 !define PRODUCT_UNINST_ROOT_KEY                 "HKLM"
 !define PRODUCT_STARTMENU_REGVAL                "NSIS:StartMenuDir"
-!define PLUGIN_REGKEY_CONTEXT                   "Software\Funambol\OutlookClient"
+!define PLUGIN_REGKEY_CONTEXT                   "Software\${PLUGIN_ROOT_CONTEXT}"
 !define ADDIN_REGKEY_CONTEXT                    "Software\Microsoft\Office\Outlook\Addins\FunambolAddin.Addin"
 !define PRODUCT_DIR_REGKEY                      "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_NAME_EXE}"
 !define PRODUCT_UNINST_KEY                      "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
