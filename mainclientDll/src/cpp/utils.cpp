@@ -1006,6 +1006,11 @@ int getBuildNumberFromVersion(const char* swv) {
         return 0;
     }
     sscanf(swv, "%d.%d.%d", &major, &minor, &build);
+    
+    if (build > 1000) {
+        // Fix for build numbers like "20091022" = date of today :)
+        build = 0;
+    }
     return (major*10000 + minor*100 + build);
 }
 

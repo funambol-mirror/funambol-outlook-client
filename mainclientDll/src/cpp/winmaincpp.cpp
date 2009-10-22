@@ -120,8 +120,8 @@ int initializeClient(bool isScheduled) {
         config->save();
 
         // Execute actions to upgrade the plugin from old version.
-        upgradePlugin(config->getOldSwv());
-        sprintf(logText, INFO_SWV_UPGRADED, config->getClientConfig().getSwv());
+        upgradePlugin(config->getOldSwv(), config->getOldFunambolSwv());
+        sprintf(logText, INFO_SWV_UPGRADED, config->getSwv(), config->getFunambolSwv().c_str());
     }
 
     // Simply save to public var.
@@ -921,14 +921,14 @@ const int getClientLastErrorCode() {
  * Operations to upgrade the plugin from 'oldVersion' to this version.
  * Should be called only once during plugin first start.
  */
-void upgradePlugin(int oldVersion) {
+void upgradePlugin(const int oldVersion, const int oldFunambolVersion) {
 
-    if (oldVersion < 60000) {
+    if (oldFunambolVersion < 60000) {
         return;
     }
 
     // Old version < 6.0.10: remove the old scheduled task (now per-user jobs)
-    if (oldVersion < 60010) {
+    if (oldFunambolVersion < 60010) {
         char tmp[MAX_PATH_LENGTH];
         GetWindowsDirectoryA(tmp, MAX_PATH_LENGTH);
 
@@ -939,7 +939,7 @@ void upgradePlugin(int oldVersion) {
     }
 
     // Old version < 6.0.9: delete the old logfile (now .txt)
-    if (oldVersion < 60009) {
+    if (oldFunambolVersion < 60009) {
         OutlookConfig* config = OutlookConfig::getInstance();
         string oldLogPath = config->getLogDir();
         oldLogPath += "\\OLPlugin.log";
@@ -951,7 +951,7 @@ void upgradePlugin(int oldVersion) {
     //   1. move cache files and delete old folder
     //   2. remove old cache dir
     //   3. rename scheduler task if existing
-    if (oldVersion < 70104) {
+    if (oldFunambolVersion < 70104) {
 
         makeDataDirs();
 
