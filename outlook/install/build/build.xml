@@ -89,16 +89,16 @@ Forge file for Funambol Outlook Sync Client
         <antcall target="work-dev"/>
         <antcall target="work-cared-dev"/>
     </target>
-    <target name="work-dev"       depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install, generate-update-info"/>
-    <target name="work-cared-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install-cared, generate-update-info"/>
+    <target name="work-dev"       depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install"/>
+    <target name="work-cared-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install-cared"/>
 
     <target name="work-all-noreg">
         <antcall target="clean"/>
         <antcall target="work-dev-noreg"/>
         <antcall target="work-cared-dev-noreg"/>
     </target>
-    <target name="work-dev-noreg"       depends="init, build, compile-no-checkout, forge-no-checkout, build-install, generate-update-info"/>
-    <target name="work-cared-dev-noreg" depends="init, build, compile-no-checkout, forge-no-checkout, build-install-cared, generate-update-info"/>
+    <target name="work-dev-noreg"       depends="init, build, compile-no-checkout, forge-no-checkout, build-install"/>
+    <target name="work-cared-dev-noreg" depends="init, build, compile-no-checkout, forge-no-checkout, build-install-cared"/>
 
     <target name="docs-dev"       depends="init, clean, build, create-docs-no-checkout"/>
     <!-- old sp version. no more used... -->
@@ -149,8 +149,8 @@ Forge file for Funambol Outlook Sync Client
 	    <format property="TODAY" pattern="d MMMM yyyy" locale="en,UK"/>
 	</tstamp>
 
-        <!-- it defaults the wm.pass.key if not defines in other parts -->
-        <property name="wm.pass.key" value="NULL"/>
+    <!-- it defaults the wm.pass.key if not defines in other parts -->
+    <property name="wm.pass.key" value="NULL"/>
 
     </target>
 
@@ -185,9 +185,19 @@ Forge file for Funambol Outlook Sync Client
 	<property name="dir.output_src.outlookaddin"  value="${dir.output_src.outlook}/Addin"/>
 	<property name="dir.output_src.design"        value="${dir.output_src.outlook}/docs"/>
 	<property name="dir.output_src.install"       value="${dir.output_src.outlook}/install"/>
+    
+    <!-- 
+      Set the 'funambol.swv' value, to be passed at the NSIS installer.
+      For default builds, the funambol.swv is the same.
+      For branded buids, these properies have already been set.
+    -->
+    <property name="funambol.release.major" value="${release.major}"/>
+    <property name="funambol.release.minor" value="${release.minor}"/>
+    <property name="funambol.build.number"  value="${build.number}" />
+    <property name="funambol.swv"  value="${release.major}.${release.minor}.${build.number}" />
+    <echo message="Funambol product version: ${funambol.swv}" />
 
     </target>
-
 
 
     <!--
@@ -418,7 +428,8 @@ Forge file for Funambol Outlook Sync Client
         <echo message="output to: ${log.NSIS}" />
         <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS}">
             <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
-	                   /DFILE_NAME=${fileName} ${script.nsi} "/>
+	                   /DFILE_NAME=${fileName} 
+                       /DFUNAMBOL_SWV=${funambol.swv} ${script.nsi} "/>
         </exec>
     </target>
 
@@ -442,6 +453,7 @@ Forge file for Funambol Outlook Sync Client
         <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}">
             <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
                        /DFILE_NAME=${fileNameSp}
+                       /DFUNAMBOL_SWV=${funambol.swv}
                        /DSP  ${script.nsi} " />
         </exec>
     </target>
@@ -465,7 +477,8 @@ Forge file for Funambol Outlook Sync Client
         <echo message="output to: ${log.NSIS_sp}" />
         <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}">
             <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
-                       /DFILE_NAME=${fileNameCared} ${script.nsi} " />
+                       /DFILE_NAME=${fileNameCared}
+                       /DFUNAMBOL_SWV=${funambol.swv} ${script.nsi} " />
         </exec>
     </target>
 

@@ -56,6 +56,7 @@
 !define PROPERTY_SP                             "portal"
 !define PROPERTY_CUSTOMER                       "Customer"
 !define PROPERTY_DESCRIPTION                    "Description"
+!define PROPERTY_FUNAMBOL_SWV                   "funambol_swv"
 
 ; Before v.7.1.4 the product name was "Funambol Outlook Plug-in"
 ; We want to be able to upgrade the Client from versions < 7.1.4.
@@ -794,12 +795,12 @@ Function writeRegistry
      WriteRegStr  HKLM      "${ADDIN_REGKEY_CONTEXT}"            "${PROPERTY_PATH}"              "$INSTDIR"
      WriteRegStr  HKLM      "${ADDIN_REGKEY_CONTEXT}"            "${PROPERTY_ADDIN_NAME}"        "FunambolAddin.dll"
      
-     ; swv = Software version: it's important for the upgrade process!
+     ; funambol_swv = Funambol Software version: it's important for the upgrade process!
      WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_SWV}"               "${PRODUCT_VERSION}"
      WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_PATH}"              "$INSTDIR"
      WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_DESCRIPTION}"       "${PRODUCT_NAME} v.${PRODUCT_VERSION}"
-     
-     WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_CUSTOMER}"       "${CUSTOMER}"
+     WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_CUSTOMER}"          "${CUSTOMER}"
+     WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_FUNAMBOL_SWV}"      "${FUNAMBOL_SWV}"
      
      ; Standard/portal build (SP passed as parameter by build.xml).
   !ifdef SP

@@ -1,4 +1,12 @@
+2009-10-22
+*** Funambol Outlook Sync Client v.8.2.2 (linked to SDK C++ v.8.2.1) ***
+
+   - toccy: Added "funambol_swv" property in config (HKLM key in registry set by the installer)
+            It's used to distinguish between the swv and the funambol swv (can be different in customers builds)
+
 2009-09-16
+*** Funambol Outlook Sync Client v.8.2.1 (linked to SDK C++ v.8.2.1) ***
+
    - toccy: added ENABLE_ENCRYPTION_SETTINGS param in customization.h
    - toccy: fixed UI main / settings / recover dialogs, to show dynamically sources from itemTypesUsed[] array
 
