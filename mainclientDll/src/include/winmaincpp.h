@@ -212,7 +212,7 @@
 #define INFO_GET_NEW_ITEM                   "Retrieved new %ls item: \"%ls\""
 #define INFO_GET_UPDATED_ITEM               "Retrieved updated %ls item: \"%ls\""
 #define INFO_CONFIG_GENERATED               "Configuration not found: default configuration will be used."
-#define INFO_SWV_UPGRADED                   "Configuration upgraded to new software version: %s"
+#define INFO_SWV_UPGRADED                   "Configuration upgraded to new software version: v.%s (Funambol v.%s)"
 #define INFO_CONFIG_DEVID_SAVED             "Set configuration deviceID = %s"
 #define INFO_OLD_ITEMS_NOT_FOUND            "Cannot find list of items from previous sync. All items will be sent as modified."
 #define INFO_SYNC_COMPLETED                 "Syncronization process completed."
@@ -298,7 +298,7 @@ void softTerminateSync  ();
 int  hardTerminateSync  (HANDLE hSyncThread);
 int  exitSyncThread     (int code);
 void endSync();
-void upgradePlugin      (int oldVersion);
+void upgradePlugin      (const int oldVersion, const int oldFunambolVersion);
 
 
 // Configuration:

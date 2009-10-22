@@ -430,6 +430,9 @@ bool OutlookConfig::save(SyncReport* report) {
     // If asked, we need to return clear data...
     decryptPrivateData();
 
+    // Saves the Funambol sw version
+    saveFunambolSwv();
+
 
     //
     // Sources management node
@@ -566,31 +569,40 @@ void OutlookConfig::saveSyncModes() {
 }
 
 
-/**
- * Save only "beginSync" property to win registry.
- */
-void OutlookConfig::saveBeginSync() {
 
-    DMTree* dmt          = NULL;
+void OutlookConfig::savePropertyValue(const StringBuffer& context, const StringBuffer& name, const StringBuffer& value) {
+
     ManagementNode* node = NULL;
-    char context[DIM_MANAGEMENT_PATH];
-    char buf[32];
+    DMTree* dmt = DMTreeFactory::getDMTree(PLUGIN_ROOT_CONTEXT);
+    if (!dmt) goto finally;
 
-    // Get node.
-    sprintf(context, "%s%s%s", PLUGIN_ROOT_CONTEXT, CONTEXT_SPDS_SYNCML, CONTEXT_EXT);
-    dmt = DMTreeFactory::getDMTree(context);
-    if (!dmt)   goto finally;
-    node = dmt->readManagementNode(context);
-    if (!node)  goto finally;
+    node = dmt->readManagementNode(context.c_str());
+    if (!node) goto finally;
 
-    // Set value.
-    timestampToAnchor(getAccessConfig().getBeginSync(), buf);
-    node->setPropertyValue(PROPERTY_SYNC_BEGIN, buf);
+    node->setPropertyValue(name.c_str(), value.c_str());
 
 finally:
     if (dmt)   delete dmt;
     if (node)  delete node;
     return;
+}
+
+
+void OutlookConfig::saveBeginSync() {
+
+    char buf[32];
+    timestampToAnchor(getAccessConfig().getBeginSync(), buf);
+
+    StringBuffer context;
+    context.sprintf("%s%s%s", PLUGIN_ROOT_CONTEXT, CONTEXT_SPDS_SYNCML, CONTEXT_EXT);
+    savePropertyValue(context, PROPERTY_SYNC_BEGIN, buf);
+}
+
+void OutlookConfig::saveFunambolSwv() {
+
+    StringBuffer context;
+    context.sprintf("%s%s%s", PLUGIN_ROOT_CONTEXT, CONTEXT_SPDS_SYNCML, CONTEXT_DEV_DETAIL);
+    savePropertyValue(context, PROPERTY_FUNAMBOL_SWV, funambolSwv);
 }
 
 
@@ -799,6 +811,31 @@ const bool OutlookConfig::getFullSync() const {
     return fullSync;
 }
 
+void OutlookConfig::setFunambolSwv(const StringBuffer& v) {
+    funambolSwv = v;
+}
+
+/// If not found this value is = swv for Funambol builds, it's '8.0.0' for customer builds.
+const StringBuffer& OutlookConfig::getFunambolSwv() {
+
+    if (funambolSwv.empty()) {
+        // this is the default value if the 'funambol_swv' is not found.
+        funambolSwv = getSwv();
+
+        // 'funambol_swv' is not found
+        const char* customer = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_CUSTOMER, HKEY_LOCAL_MACHINE);
+        if (customer && strlen(customer)>0) {
+            // Use 8.0.0 is an acceptable value for customers builds (swv could be 1.0.0 for example)
+            LOG.debug("Customer = %s", customer);
+            funambolSwv = "8.0.0";
+        }
+        delete [] customer;
+    }
+
+    return funambolSwv;
+}
+
+
 /**
  * Save the value to win registry (HKCU), because it can 
  * be required from a different instance of plugin.
@@ -954,8 +991,6 @@ void OutlookConfig::createDefaultConfig() {
     setLogDir(logPath);
 
 
-
-
     //
     // Also upgrade the config (swv / userAgent).
     //
@@ -966,7 +1001,6 @@ void OutlookConfig::createDefaultConfig() {
     if (logPath)     delete [] logPath;
     if (wlogPath)    delete [] wlogPath;
 }
-
 
 
 
@@ -999,12 +1033,16 @@ bool OutlookConfig::checkToUpgrade() {
  */
 void OutlookConfig::upgradeConfig() {
 
-    // Backup old Swv.
+    // Backup old Swv and save the new one.
     oldSwv = getBuildNumberFromVersion(getClientConfig().getSwv());
-
-    // Set the new Swv.
     const char* newSwv = readCurrentSwv();
     getClientConfig().setSwv(newSwv);
+
+    // Backup old Funambol product Swv and save the new one.
+    oldFunambolSwv = getBuildNumberFromVersion(getFunambolSwv().c_str());
+    StringBuffer funambolNewSwv = readFunambolSwv();
+    setFunambolSwv(funambolNewSwv);
+
 
     // Set the new User Agent = "Funambol Outlook Sync Client v. x.y.z"
     char* userAgent = new char[strlen(PROGRAM_NAME) + strlen(newSwv) + 5];
@@ -1014,7 +1052,7 @@ void OutlookConfig::upgradeConfig() {
 
     // Old version < 6.6.0: upgrade supportedTypes and version for each source.
     //  vTodo and vNote are supported, SIF version has been added.
-    if (oldSwv < 60600) {
+    if (oldFunambolSwv < 60600) {
         WindowsSyncSourceConfig* ssc = getSyncSourceConfig(CONTACT_);
         if (ssc) {
             ssc->setSupportedTypes("text/x-s4j-sifc:1.0,text/x-vcard:2.1");
@@ -1046,7 +1084,7 @@ void OutlookConfig::upgradeConfig() {
     }
 
     // Old version < 7.1.1: add default filtering to events.
-    if (oldSwv < 70101) {
+    if (oldFunambolSwv < 70101) {
         WindowsSyncSourceConfig* ssc = getSyncSourceConfig(APPOINTMENT_);
         if (ssc) {
             DateFilter& filter = ssc->getDateFilter();
@@ -1057,7 +1095,7 @@ void OutlookConfig::upgradeConfig() {
     }
 
     // Old version < 7.1.2: only vCard is used for contacts.
-    if (oldSwv < 70102) {
+    if (oldFunambolSwv < 70102) {
         WindowsSyncSourceConfig* ssc = getSyncSourceConfig(CONTACT_);
         if (ssc) {
 			// Don't change the source URI. If we were using "scard", it will be preserved during
@@ -1070,14 +1108,14 @@ void OutlookConfig::upgradeConfig() {
     }
 
     // Old version < 7.1.4: Client name has changed.
-    if (oldSwv < 70104) {
+    if (oldFunambolSwv < 70104) {
         DeviceConfig& dc = getClientConfig();
         dc.setMod(PROGRAM_NAME);
     }
 
 
     // Old version < 8.2.0
-    if (oldSwv < 80200) {
+    if (oldFunambolSwv < 80200) {
 
         // Pictures source added.
         if (!addWindowsSyncSourceConfig(PICTURE)) {
@@ -1106,8 +1144,8 @@ void OutlookConfig::upgradeConfig() {
     // Set the flag to specify that config has been upgraded.
     upgraded = true;
     
-    if (newSwv)    delete [] newSwv;
-    if (userAgent) delete [] userAgent;
+    delete [] newSwv;
+    delete [] userAgent;
 }
 
 
@@ -1126,6 +1164,10 @@ int OutlookConfig::getOldSwv() {
     return oldSwv;
 }
 
+int OutlookConfig::getOldFunambolSwv() {
+    return oldFunambolSwv;
+}
+
 
 /**
  * Returns the current software version, read it from HKLM registry.
@@ -1136,6 +1178,18 @@ char* OutlookConfig::readCurrentSwv() {
     return readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_SOFTWARE_VERSION, HKEY_LOCAL_MACHINE);
 }
 
+StringBuffer OutlookConfig::readFunambolSwv() {
+
+    // this is the default value if the 'funambol_swv' is not found.
+    StringBuffer ret(getSwv());
+
+    const char* value = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_FUNAMBOL_SWV, HKEY_LOCAL_MACHINE);
+    if (value && strlen(value)>0) {
+        ret = value;
+    }
+    delete [] value;
+    return ret;
+}
 
 
 
@@ -1349,17 +1403,16 @@ bool OutlookConfig::checkPortalBuild() {
 int OutlookConfig::decryptPrivateData() {
 
     // Check if previous version is < 6.0.9.
-    const char* installedSwv = getClientConfig().getSwv();
-    int version = getBuildNumberFromVersion(installedSwv);
+    int funambolVersion = getBuildNumberFromVersion(getFunambolSwv().c_str());
     
     // to handle the new upgrade to the new key with the new password for portal
     // if it is empty then do nothing, otherwise it rewrites the values 
     // This modification is introduced in the 7.0.1 version    
     StringBuffer pass_key = PASS_KEY;    
-    if (version < 60009) {
+    if (funambolVersion < 60009) {
         // No decryption is necessary.
         return 1;
-    } else if (version < 70001 && (checkPortalBuild() || CARED_KEY)) {
+    } else if (funambolVersion < 70001 && (checkPortalBuild() || CARED_KEY)) {
         pass_key = NULL;        
     }
 

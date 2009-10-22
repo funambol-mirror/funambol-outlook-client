@@ -63,6 +63,8 @@
 /// This is stored in HKLM during install
 #define PROPERTY_SP                             "portal"
 #define PROPERTY_INSTALLDIR                     "installDir"
+#define PROPERTY_FUNAMBOL_SWV                   "funambol_swv"
+#define PROPERTY_CUSTOMER                       "Customer"
 
 #define TIMEZONE_CONTEXT                       L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones"
 
@@ -113,6 +115,8 @@ private:
     bool  abortSync;                            // set to true when we want to (soft) abort the current sync
     bool  upgraded;                             // Flag to specify that we have upgraded the config.
     int   oldSwv;                               // Value of old software version installed (used during upgrades).
+    StringBuffer funambolSwv;                   // The Funambol product sw version (can be different in branded clients).
+    int   oldFunambolSwv;                       // The old Funambol product sw version value in case of upgrade.
 
     /// The structure with current timezone informations.
     TimeZoneInformation currentTimezone;
@@ -138,6 +142,14 @@ private:
     void encryptPrivateData();
 
     int readCurrentTimezone();
+
+    /**
+     * Used to save a generic property into config (win registry, under HKCU node).
+     * @param context  the full context (i.e. "Software/Funambol/OutlookClient/spds/syncml/DevDetail")
+     * @param name     the property name
+     * @param value    the property value to set
+     */
+    void savePropertyValue(const StringBuffer& context, const StringBuffer& name, const StringBuffer& value);
 
 
 protected:
@@ -194,12 +206,15 @@ public:
     void setFullSync     (const  bool v);
     void setScheduledSync(const  bool v);
     void setAbortSync    (const  bool v);
+    void setFunambolSwv  (const StringBuffer& v);
 
     const bool  getScheduledSync() const;
     const bool  getAbortSync()     const;
     _declspec(dllexport) const char* getWorkingDir()    const;
     _declspec(dllexport) const char* getLogDir()        const;
     _declspec(dllexport) const bool  getFullSync()      const;
+    const StringBuffer& getFunambolSwv();
+
 
     const TimeZoneInformation* getCurrentTimezone() const;
 
@@ -218,9 +233,18 @@ public:
 
     /// Returns the old installed swv (for upgrades). '0' if not an upgrade.
     int getOldSwv();
+    int getOldFunambolSwv();
 
     /// Returns the current software version, read it from HKLM registry.
     char* readCurrentSwv();
+
+    /**
+     * Returns the funambol product software version, read it from HKLM registry.
+     * This value is set and updated ONLY by installer.
+     * For Funambol builds, this value is = swv.
+     * Returns a new allocated buffer, must be deleted by the caller.
+     */
+    StringBuffer readFunambolSwv();
 
     ///Creates and set a unique 'devID' property for current configuration.
     int setUniqueDevID();
@@ -230,9 +254,13 @@ public:
 
     /// Save only "beginSync" property to win registry.
     void saveBeginSync();
+
+    /// Save the Funambol sw version to config ("_root_/syncML/devDetail/funambol_swv" key)
+    void OutlookConfig::saveFunambolSwv();
     
     /// Save only "sync" properties of each source, to win registry.
     void saveSyncModes();
+
     /// Reads only "sync" properties of each source, to win registry.
     _declspec(dllexport) void readSyncModes();
 };
