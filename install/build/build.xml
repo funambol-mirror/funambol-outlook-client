@@ -233,8 +233,8 @@ Forge file for Funambol Outlook Sync Client
     <target name="register-dll" depends="init">
 
         <echo message="Registering Redemption DLL..."/>
-        <chmod file="${dir.redemptionLib}/Redemption.dll" perm="700"/>
-        <exec dir="${dir.redemptionLib}" executable="regsvr32" failonerror="true" >
+        <copy file="${dir.redemptionLib}/Redemption.dll" todir="${dir.distribution}"/>
+        <exec dir="${dir.distribution}" executable="regsvr32" failonerror="true" >
             <arg line="/s Redemption.dll"/>
         </exec>
 
