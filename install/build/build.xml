@@ -194,7 +194,7 @@ Forge file for Funambol Outlook Sync Client
     <property name="funambol.release.major" value="${release.major}"/>
     <property name="funambol.release.minor" value="${release.minor}"/>
     <property name="funambol.build.number"  value="${build.number}" />
-    <property name="funambol.swv"  value="${release.major}.${release.minor}.${build.number}" />
+    <property name="funambol.swv"  value="${funambol.release.major}.${funambol.release.minor}.${funambol.build.number}" />
     <echo message="Funambol product version: ${funambol.swv}" />
 
     </target>
