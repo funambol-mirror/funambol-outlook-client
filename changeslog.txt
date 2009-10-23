@@ -1,3 +1,8 @@
+2009-10-23
+   - toccy: * fixed registration of Redemption.dll in build.xml
+            * cleaned up build.xml: removed obsolete targets, removed SP define and passkey (unused)
+            * fixed build.xml to load the 'Program Files' dir
+
 2009-10-22
 *** Funambol Outlook Sync Client v.8.2.2 (linked to SDK C++ v.8.2.1) ***
 
