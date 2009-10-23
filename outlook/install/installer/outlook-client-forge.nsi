@@ -801,13 +801,6 @@ Function writeRegistry
      WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_DESCRIPTION}"       "${PRODUCT_NAME} v.${PRODUCT_VERSION}"
      WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_CUSTOMER}"          "${CUSTOMER}"
      WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_FUNAMBOL_SWV}"      "${FUNAMBOL_SWV}"
-     
-     ; Standard/portal build (SP passed as parameter by build.xml).
-  !ifdef SP
-     WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_SP}"                "1"
-  !else
-     WriteRegStr  HKLM      "${PLUGIN_REGKEY_CONTEXT}"           "${PROPERTY_SP}"                "0"
-  !endif
 
 FunctionEnd
 
