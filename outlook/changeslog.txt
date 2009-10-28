@@ -1,3 +1,9 @@
+2009-10-28
+*** Funambol Outlook Sync Client v.8.2.3 (linked to SDK C++ v.8.2.1) ***
+
+   - toccy: fixed some UI titles on error/warning messages, to load string from resources
+   - toccy: added important comment about the Client's root context in customization.x
+
 2009-10-23
    - toccy: * fixed registration of Redemption.dll in build.xml
             * cleaned up build.xml: removed obsolete targets, removed SP define and passkey (unused)
