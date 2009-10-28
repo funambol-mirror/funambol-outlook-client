@@ -279,7 +279,7 @@ bool CCalendarSettings::saveSettings(bool saveToDisk)
     if(remoteName == ""){
         // remote name is empty
         s1.LoadString(IDS_ERROR_SET_REMOTE_NAME);
-        MessageBox(s1);
+        wsafeMessageBox(s1);
         return false;
     }
 
