@@ -451,7 +451,7 @@ bool CSyncSettings::saveSettings(bool saveToDisk)
             // save scheduler settings
             if(setScheduler(true, minutes) != 0){
                 msg.LoadString(IDS_SCHEDULER_CANNOT_SCHEDULE);
-                MessageBox(msg);
+                wsafeMessageBox(msg);
             }
         }
     }

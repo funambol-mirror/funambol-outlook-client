@@ -445,7 +445,7 @@ void CSyncForm::OnStnClickedMainBkSync()
         if (getConfig()->getScheduledSync()) {
             // It's running a scheduled sync -> error msg.
             s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
-            MessageBox(s1);
+            wsafeMessageBox(s1);
         }
         else {
             // It's running a normal sync -> CancelSync.
@@ -467,7 +467,7 @@ void CSyncForm::OnStnClickedMainBkContacts()
         // It's running a sync -> error msg.
         CString s1;
         s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
-        MessageBox(s1);
+        wsafeMessageBox(s1);
     }
     else {
         // Start Sync of a single source
@@ -494,7 +494,7 @@ void CSyncForm::OnStnClickedMainBkCalendar()
         // It's running a sync -> error msg.
         CString s1;
         s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
-        MessageBox(s1);
+        wsafeMessageBox(s1);
     }
     else {
         // Start Sync of a single source
@@ -522,7 +522,7 @@ void CSyncForm::OnStnClickedMainBkTasks()
         // It's running a sync -> error msg.
         CString s1;
         s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
-        MessageBox(s1);
+        wsafeMessageBox(s1);
     }
     else {
         // Start Sync of a single source
@@ -549,7 +549,7 @@ void CSyncForm::OnStnClickedMainBkNotes()
         // It's running a sync -> error msg.
         CString s1;
         s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
-        MessageBox(s1);
+        wsafeMessageBox(s1);
     }
     else {
         // Start Sync of a single source
@@ -577,7 +577,7 @@ void CSyncForm::OnStnClickedMainBkPictures()
         // It's running a sync -> error msg.
         CString s1;
         s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
-        MessageBox(s1);
+        wsafeMessageBox(s1);
     }
     else {
         // Start Sync of a single source
@@ -846,7 +846,7 @@ void CSyncForm::refreshSource( int sourceId )
             if (!ssc) {
                 printLog("configuration not found for source picture", "ERROR");
                 // TODO: use string resources
-                MessageBox(L"Configuration error: please reinstall the application.");
+                wsafeMessageBox(L"Configuration error: please reinstall the application.");
                 exit(1);
                 return;
             }

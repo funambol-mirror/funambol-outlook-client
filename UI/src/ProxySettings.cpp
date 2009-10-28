@@ -41,6 +41,7 @@
 #include "ProxySettings.h"
 #include "ClientUtil.h"
 #include "winmaincpp.h"
+#include "utils.h"
 
 
 // CProxySettings dialog
@@ -194,13 +195,13 @@ void CProxySettings::OnOK(){
     if( (checkEnable.GetCheck() == BST_CHECKED) && (checkAuth.GetCheck() == BST_CHECKED)){
         if (proxyUser == ""){
             s1.LoadString(IDS_ERROR_PROXY_USERNAME);
-            MessageBox(s1);
+            wsafeMessageBox(s1);
             cancelSave = true;
             goto finally;
         };
         if (proxyPassword == ""){
             s1.LoadString(IDS_ERROR_PROXY_PASSWORD);
-            MessageBox(s1);
+            wsafeMessageBox(s1);
             cancelSave = true;
             goto finally;
         };

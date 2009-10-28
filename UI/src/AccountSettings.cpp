@@ -184,17 +184,17 @@ bool CAccountSettings::saveSettings(bool saveToDisk)
 
     if(url == ""){
         s1.LoadString(IDS_ERROR_SET_URL);
-        MessageBox(s1);
+        wsafeMessageBox(s1);
         return false;
     };
     if(username == ""){
         s1.LoadString(IDS_ERROR_SET_USERNAME);
-        MessageBox(s1);
+        wsafeMessageBox(s1);
         return false;
     };
     if(password == ""){
         s1.LoadString(IDS_ERROR_SET_PASSWORD);
-        MessageBox(s1);
+        wsafeMessageBox(s1);
         return false;
     };
 

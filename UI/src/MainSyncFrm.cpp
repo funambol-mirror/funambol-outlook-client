@@ -315,7 +315,7 @@ void CMainSyncFrame::OnToolsFullSync()
     if(checkSyncInProgress()){
         CString s1;
         s1.LoadString(IDS_ERROR_CANNOT_CHANGE_SETTINGS);
-        AfxMessageBox(s1);
+        wsafeMessageBox(s1);
         return;
     }
 
@@ -425,7 +425,7 @@ void CMainSyncFrame::OnFileSynchronize() {
         if (getConfig()->getScheduledSync()) {
             // It's running a scheduled sync -> error msg.
             s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
-            MessageBox(s1);
+            wsafeMessageBox(s1);
         }
     }
 }
@@ -441,7 +441,7 @@ void CMainSyncFrame::showSettingsWindow(const int paneToDisplay){
     if(checkSyncInProgress()){
         CString s1;
         s1.LoadString(IDS_ERROR_CANNOT_CHANGE_SETTINGS);
-        AfxMessageBox(s1);
+        wsafeMessageBox(s1);
         return;
     }
 
@@ -1166,14 +1166,14 @@ void CMainSyncFrame::StartSync(){
     // Check on sync in progress.
     if (checkSyncInProgress()) {
         s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
-        MessageBox(s1);
+        wsafeMessageBox(s1);
         return;
     }
 
     // Check if connection settings are valid.
     if(! checkConnectionSettings()) {
         s1.LoadString(IDS_ERROR_SET_CONNECTION);
-        AfxMessageBox(s1);
+        wsafeMessageBox(s1);
         showSettingsWindow(0);          // 0 = 'Account Settings' pane.
         return;
     }
@@ -1253,7 +1253,7 @@ void CMainSyncFrame::StartSync(){
     if (hSyncThread == NULL) {
         DWORD errorCode = GetLastError();
         CString s1 = "Thread error: syncThread";
-        AfxMessageBox(s1);
+        wsafeMessageBox(s1);
         return;
     }
 }
@@ -1268,7 +1268,7 @@ int CMainSyncFrame::CancelSync(){
     // This will avoid clicking 2 times on cancel sync.
     if (cancelingSync) {
         s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
-        MessageBox(s1);
+        wsafeMessageBox(s1);
         return ret;
     }
 
