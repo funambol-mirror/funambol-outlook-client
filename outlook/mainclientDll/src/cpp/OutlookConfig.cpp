@@ -815,7 +815,7 @@ void OutlookConfig::setFunambolSwv(const StringBuffer& v) {
     funambolSwv = v;
 }
 
-/// If not found this value is = swv for Funambol builds, it's '8.0.0' for customer builds.
+/// If not found this value is = swv for Funambol builds, it's the new installed funambol_swv for customer builds.
 const StringBuffer& OutlookConfig::getFunambolSwv() {
 
     if (funambolSwv.empty()) {
@@ -825,9 +825,9 @@ const StringBuffer& OutlookConfig::getFunambolSwv() {
         // 'funambol_swv' is not found
         const char* customer = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_CUSTOMER, HKEY_LOCAL_MACHINE);
         if (customer && strlen(customer)>0) {
-            // Use 8.0.0 is an acceptable value for customers builds (swv could be 1.0.0 for example)
+            // current funambol_swv is an acceptable value for customers builds (swv could be 1.0.0 for example)
             LOG.debug("Customer = %s", customer);
-            funambolSwv = "8.0.0";
+            funambolSwv = readFunambolSwv();
         }
         delete [] customer;
     }
