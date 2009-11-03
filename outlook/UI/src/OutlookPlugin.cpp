@@ -261,8 +261,7 @@ void COutlookPluginApp::OnViewGuide() {
     memset(&lpExecInfo, 0, sizeof(SHELLEXECUTEINFO));
     lpExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 
-    CString guide;
-    guide.LoadString(IDS_GUIDE_LINK); 
+    CString guide = USER_GUIDE_LINK;
     lpExecInfo.lpFile = guide;
     lpExecInfo.nShow = SW_SHOWNORMAL;
     lpExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;

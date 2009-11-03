@@ -201,7 +201,6 @@
 #define IDI_NOTES_GREY1                 268
 #define IDI_PICTURES_GREY               268
 #define IDB_SEPARATOR                   269
-#define IDS_GUIDE_LINK                  269
 #define IDS_ERR_SERVER_TIMOUT           270
 #define IDS_CODE_SERVER_BUSY            271
 #define IDS_CODE_SERVER_BUSY_SYNC       272
