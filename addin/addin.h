@@ -80,12 +80,16 @@
 #define TEMP_ENV                            "TEMP"
 #define MAX_ADDIN_LOG_SIZE                  1000000                     // 1 MB
 
-// These are the standard Funambol product label and caption.
+// These is the standard Funambol product label.
 // It's used to double-check if a Funambol addin menu is still there (it may happen
 // if the current addin has a customized label and a standard Funambol addin was istalled before)
 // DON'T CHANGE these unless the standard product defines have changed!
 #define ADDIN_MENU_LABEL_FUNAMBOL           L"Funa&mbol"
-#define ADDIN_COMMAND_BAR_CAPTION_FUNAMBOL  L"Funambol Outlook Sync Client"
+
+// This is the commandbar icon caption. It's used to create/retrieve the addin icon, 
+// from the Outlook toolbar. THIS VALUE IS NOT VISIBLE TO THE USER, so it's not necessary
+// to change/customize it (reccomended: don't change it, to ensure a correct uninstall).
+#define ADDIN_COMMAND_BAR_CAPTION           L"Funambol Outlook Sync Client"
 
 
 // Error messages:

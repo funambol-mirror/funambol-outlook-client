@@ -1,10 +1,10 @@
 2009-11-03
 *** Funambol Outlook Sync Client v.8.2.4 (linked to SDK C++ v.8.2.1) ***
-
-   - toccy: NSIS installer -> added customization defines for website & userguide links, and for website link label
-                              website and usergide links are now created dynamically.
-            Client DLL     -> added customization for userguide link (removed from resources)
-
+   - toccy: * NSIS installer -> added customization defines for website & userguide links, and for website link label
+                                website and usergide links are now created dynamically.
+            * Client DLL     -> added customization for userguide link (removed from resources)
+            * Addin          -> fixed tollbar icon caption: it's not visible so keep the same value (no customization)
+            
    - toccy: added special syncmode for pictures source ("smart-one-way-from-server" = code 251)
 
 2009-10-28
