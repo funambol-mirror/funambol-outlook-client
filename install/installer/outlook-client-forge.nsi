@@ -574,6 +574,13 @@ Section "MainSection" SEC01
       Delete "$WINDIR\OutlookAddin.dll"
       Delete "$WINDIR\OutlookAddinRemover.dll"
 
+      ; Write the URL of userguide.url and website.url
+      FileOpen $2 "$INSTDIR\userguide.url" w
+      FileWrite $2 "[InternetShortcut]$\r$\nURL=${USER_GUIDE_LINK}"
+      FileClose $2
+      FileOpen $2 "$INSTDIR\website.url" w
+      FileWrite $2 "[InternetShortcut]$\r$\nURL=${PRODUCT_WEB_SITE}"
+      FileClose $2
 
       ; --- StartMenu shortcuts ---
       SetShellVarContext all
@@ -583,7 +590,7 @@ Section "MainSection" SEC01
       CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"                     "$INSTDIR\uninst.exe"          "" "" "" "" "" "Uninstall $(^Name)"
       CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\Readme.lnk"                        "$INSTDIR\Readme.txt"          "" "" "" "" "" "${PRODUCT_NAME} Readme"
       CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\User Guide.lnk"                    "$INSTDIR\userguide.url"       "" "" "" "" "" "${PRODUCT_NAME} User Guide"
-      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\${PRODUCT_PUBLISHER} Web Site.lnk" "$INSTDIR\website.url"         "" "" "" "" "" "${PRODUCT_PUBLISHER} Web Site"
+      CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\${WEB_SITE_LINK_TITLE}.lnk"        "$INSTDIR\website.url"         "" "" "" "" "" "${WEB_SITE_LINK_TITLE}"
       !insertmacro MUI_STARTMENU_WRITE_END
 
 
