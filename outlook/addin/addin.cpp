@@ -1154,20 +1154,9 @@ HRESULT Caddin::removeAddin() {
         }
 
         //
-        // Safe check: remove standard Funambol bar/menu that could be left
-        //
-        LOG.debug("removing any standard Funambol Bar/Menu...");
-        variant.bstrVal = SysAllocString(ADDIN_COMMAND_BAR_CAPTION_FUNAMBOL);
-        hr = spCmdBars->get_Item(variant, &spCmdBar);
-        VariantClear(&variant);
-        if (SUCCEEDED(hr)) {
-            hr = spCmdBar->Delete();
-            LOG.debug("bar deleted.");
-        }
-        else {
-            LOG.debug("bar not found.");
-        }
-
+        // Safe check: remove standard Funambol menu that could be left
+        // (note: the icon caption is always the same)
+        LOG.debug("removing any standard Funambol Menu...");
         hr = spCmdCtrls->get_Item(CComVariant(ADDIN_MENU_LABEL_FUNAMBOL), &spCmdCtrl);
         if (SUCCEEDED(hr)) {
             pMenuItem = spCmdBars->ActiveMenuBar->Controls->GetItem(ADDIN_MENU_LABEL_FUNAMBOL);
