@@ -84,6 +84,7 @@
 
 
 // Others
+#define USER_GUIDE_LINK                     "http://funambol.com/docs/v80/funambol-outlook-sync-client-user-guide.pdf"
 #define PROGRAM_NAME_EXE                    "OutlookPlugin.exe"             // The application to run
 #define SCHED_COMMENT                       TEXT(PROGRAM_NAME) TEXT(" scheduler")
 #define OL_PLUGIN_LOG_NAME                  "outlook-client-log.txt"
