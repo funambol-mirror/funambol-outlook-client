@@ -65,7 +65,12 @@
 #define PROPERTY_PATH                       "installDir"                // The path of application
 #define PROPERTY_NUM_INSTANCES              "numInstances"              // #instances of Addin for different users
 #define PROPERTY_SW_VERSION                 "swv"                       // Software version
+#define PROPERTY_MENUBAR_LABEL              "menuLabel"                 // The menubar label, saved when the addin is created (to safely remove during uninstall)
 
+// The addin context under HKCU/HKLM. 
+// This value is NOT intended to be changed, it should be the same for all versions
+// so that the addin can be installed / uninstalled correctly.
+#define ADDIN_CONTEXT                       "Microsoft/Office/Outlook/Addins/FunambolAddin.Addin"
 
 // Possible addin states:
 #define ADDIN_STATE_OK                      "ok"
@@ -86,11 +91,14 @@
 // DON'T CHANGE these unless the standard product defines have changed!
 #define ADDIN_MENU_LABEL_FUNAMBOL           L"Funa&mbol"
 
-// This is the commandbar icon caption. It's used to create/retrieve the addin icon, 
+// This is the commandbar icon name. It's used to create/retrieve the addin icon, 
 // from the Outlook toolbar. THIS VALUE IS NOT VISIBLE TO THE USER, so it's not necessary
 // to change/customize it (reccomended: don't change it, to ensure a correct uninstall).
-#define ADDIN_COMMAND_BAR_CAPTION           L"Funambol Outlook Sync Client"
+#define ADDIN_COMMAND_BAR_NAME              "Funambol Outlook Sync Client"
 
+// Old name for commandbar icon (before v.7.1). To cleanup things in case of updates
+// from a very old version (may be removed in future).
+#define ADDIN_COMMAND_BAR_NAME_OLD          "Funambol Outlook Plug-in"
 
 // Error messages:
 #define ERR_OPEN_EXPLORER                   "Error opening Outlook UI."
@@ -202,6 +210,20 @@ public:
     int   setCurrentSwv();
     char* readAddinSwv();
     bool  swvNotCompatible(const char* currentVersion, const char* oldVersion);
+
+    /**
+     * Reads the Addin generic property 'propertyName' from HKCU keys (under ADDIN_CONTEXT).
+     * Returns a (new allocated) buffer with value read.
+     */
+    char* readPropertyValue(const char* propertyName);
+
+    /**
+     * Saves the Addin generic property 'propertyName' with value 'propertyValue' 
+     * to HKCU addin keys (under ADDIN_CONTEXT).
+     */
+    void setPropertyValue(const char* propertyName, const char* propertyValue);
+
+    bool removeMenuBar(CommandBarControlsPtr commandBar, const WCHAR* menuBarName);
 
     HRESULT removeAddin();
     bool    isAddinInstalled();
