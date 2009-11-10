@@ -67,7 +67,6 @@
 // Win registry root contexts
 // (note: must keep the "/OutlookClient" in the root context! Just change "Funambol" in case)
 #define PLUGIN_ROOT_CONTEXT                 "Funambol/OutlookClient"
-#define ADDIN_CONTEXT                       "Microsoft/Office/Outlook/Addins/FunambolAddin.Addin"
 
 
 // About screen customization
