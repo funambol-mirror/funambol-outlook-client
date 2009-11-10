@@ -369,7 +369,7 @@ STDMETHODIMP Caddin::OnStartupComplete(LPSAFEARRAY* custom) {
         //
         // Verify if CommandBar already exists
         //
-        hr = spCmdBars->get_Item(CComVariant(PROGRAM_NAME), &spCmdBar);
+        hr = spCmdBars->get_Item(CComVariant(ADDIN_COMMAND_BAR_NAME), &spCmdBar);
         if (SUCCEEDED(hr)) {
             LOG.debug("CommandBar already exist -> use it.");
             commandBarControlPtr = spCmdBar->FindControl(CComVariant(msoControlButton), vtEmpty, 
@@ -781,6 +781,13 @@ HRESULT Caddin::AddNewMenubar(_CommandBars* pCmdBars) {
         goto error;
     }
 
+    // If here, we created the menuBar OK.
+    // Let's save its label in the registry, so that it can be correctly found&removed even
+    // by a different version/customization of this addin.
+    const char* menuLabel = toMultibyte(ADDIN_MENU_LABEL);
+    setPropertyValue(PROPERTY_MENUBAR_LABEL, menuLabel);
+    delete [] menuLabel;
+
     return S_OK;
 
 error:
@@ -812,7 +819,7 @@ HRESULT Caddin::AddNewCommandBar(_CommandBars* pCmdBars) {
     CommandBarControlPtr   spNewBar;
     CommandBarControlPtr   spNewBarConfig;
 
-    CComVariant  vName     (PROGRAM_NAME);
+    CComVariant  vName     (ADDIN_COMMAND_BAR_NAME);
     CComVariant  vPos      (1);
     CComVariant  vtFalse   (VARIANT_FALSE);
     CComVariant  vtEmpty   (DISP_E_PARAMNOTFOUND, VT_ERROR);
@@ -850,7 +857,7 @@ HRESULT Caddin::AddNewCommandBar(_CommandBars* pCmdBars) {
 
         LOG.debug("CommandBar -> set props...");
         spCmdButton->PutVisible    (VARIANT_TRUE);
-        spCmdButton->PutCaption    (ADDIN_COMMAND_BAR_CAPTION);
+        spCmdButton->PutCaption    (ADDIN_COMMAND_BAR_NAME);
         spCmdButton->PutEnabled    (VARIANT_TRUE);
         spCmdButton->PutTooltipText(TOOLTIP);
         spCmdButton->PutTag        (TEXT(FUN));
@@ -1073,8 +1080,6 @@ HRESULT Caddin::removeAddin() {
     CommandBarControlsPtr  spCmdCtrls;
     CommandBarControlPtr   spCmdCtrl;
 
-    VARIANT variant;
-    variant.vt = VT_BSTR;
     HRESULT hr = S_OK;
     bool deletedCommandBar = false;
     bool deletedMenuBar    = false;
@@ -1091,22 +1096,42 @@ HRESULT Caddin::removeAddin() {
         }
 
         //
-        // Get and remove Funambol Command Bar
+        // *** Get and remove Funambol Command Bar ***
+        // It has always the same name in all products: 'ADDIN_COMMAND_BAR_NAME'
         //
-        LOG.debug("Removing Funambol CommandBar...");
-        variant.bstrVal = SysAllocString(ADDIN_COMMAND_BAR_CAPTION);
-        hr = spCmdBars->get_Item(variant, &spCmdBar);
-        //VariantClear(&variant);
+        LOG.debug("Removing CommandBar (with name '%s')...", ADDIN_COMMAND_BAR_NAME);
+        hr = spCmdBars->get_Item(CComVariant(ADDIN_COMMAND_BAR_NAME), &spCmdBar);
         if (SUCCEEDED(hr)) {
             hr = spCmdBar->Delete();
             if (SUCCEEDED(hr)) {
-                LOG.debug("deleted.");
+                LOG.debug("removed.");
                 deletedCommandBar = true;
             }
         }
         else {
             LOG.debug("not found.");
         }
+
+        // Try to remove old Funambol Command Bar (before v.7.1.4 its name was "Funambol Outlook Plug-in")
+        // Better would be to check the oldSwv, and see if < 7.1.4. But to be sure, we can do it anyway.
+        LOG.debug("Removing any old Funambol CommandBar (with name '%s')...", ADDIN_COMMAND_BAR_NAME_OLD);
+        hr = spCmdBars->get_Item(CComVariant(ADDIN_COMMAND_BAR_NAME_OLD), &spCmdBar);
+        if (SUCCEEDED(hr)) {
+            hr = spCmdBar->Delete();
+            if (SUCCEEDED(hr)) {
+                LOG.debug("removed.");
+                deletedCommandBar = true;
+            }
+        }
+        else {
+            LOG.debug("not found. (OK)");
+        }
+
+
+
+        //
+        // *** Get and remove Funambol menu ***
+        //
 
         // get CommandBar that is Outlook's main menu
         hr = spCmdBars->get_ActiveMenuBar(&spCmdBar);
@@ -1117,54 +1142,31 @@ HRESULT Caddin::removeAddin() {
         spCmdCtrls = spCmdBar->GetControls();
         ATLASSERT(spCmdCtrls);
 
-        //
-        // Get and remove Funambol menu
-        //
-        LOG.debug("removing Funambol Menu...");
-        hr = spCmdCtrls->get_Item(CComVariant(ADDIN_MENU_LABEL), &spCmdCtrl);
-        if (SUCCEEDED(hr)) {
-            pMenuItem = spCmdBars->ActiveMenuBar->Controls->GetItem(ADDIN_MENU_LABEL);
-            hr = pMenuItem->Delete(vtMissing);
-            if (SUCCEEDED(hr)) {
-                LOG.debug("deleted.");
+
+        // 1. Remove the standard one
+        if (removeMenuBar(spCmdCtrls, ADDIN_MENU_LABEL)) {
+            deletedMenuBar = true;
+        }
+        
+        // 2. Safe: try to remove the munu label loaded from the registry (if existing)
+        // This value is written since v.8.2.5, when the addin is created.
+        const char* menuLabel = readPropertyValue(PROPERTY_MENUBAR_LABEL);
+        if (menuLabel && strlen(menuLabel) > 0) {
+            const WCHAR* wmenuLabel = toWideChar(menuLabel);
+            if (wcscmp(wmenuLabel, ADDIN_MENU_LABEL) != 0) {
+                if (removeMenuBar(spCmdCtrls, wmenuLabel)) {
+                    deletedMenuBar = true;
+                }
+            }
+            delete [] wmenuLabel;
+        }
+        delete [] menuLabel;
+
+        // 3. Safe: try to remove standard Funambol menu that could be left
+        if (wcscmp(ADDIN_MENU_LABEL, ADDIN_MENU_LABEL_FUNAMBOL) != 0) {
+            if (removeMenuBar(spCmdCtrls, ADDIN_MENU_LABEL_FUNAMBOL)) {
                 deletedMenuBar = true;
             }
-        }
-        else {
-            LOG.debug("not found.");
-        }
-
-
-        //
-        // Try to remove old Funambol Command Bar (before v.7.1.4 its name was "Funambol Outlook Plug-in")
-        // Better would be to check the oldSwv, and see if < 7.1.4. But to be sure, we can do it anyway.
-        //
-        LOG.debug("Removing any old Funambol CommandBar...");
-        variant.bstrVal = SysAllocString(L"Funambol Outlook Plug-in");
-        hr = spCmdBars->get_Item(variant, &spCmdBar);
-        if (SUCCEEDED(hr)) {
-            hr = spCmdBar->Delete();
-            if (SUCCEEDED(hr)) {
-                LOG.debug("deleted.");
-                deletedCommandBar = true;
-            }
-        }
-        else {
-            LOG.debug("not found.");
-        }
-
-        //
-        // Safe check: remove standard Funambol menu that could be left
-        // (note: the icon caption is always the same)
-        LOG.debug("removing any standard Funambol Menu...");
-        hr = spCmdCtrls->get_Item(CComVariant(ADDIN_MENU_LABEL_FUNAMBOL), &spCmdCtrl);
-        if (SUCCEEDED(hr)) {
-            pMenuItem = spCmdBars->ActiveMenuBar->Controls->GetItem(ADDIN_MENU_LABEL_FUNAMBOL);
-            pMenuItem->Delete(vtMissing);
-            LOG.debug("menu deleted.");
-        }
-        else {
-            LOG.debug("menu not found.");
         }
     }
 
@@ -1177,7 +1179,7 @@ HRESULT Caddin::removeAddin() {
 
     // Also decrement #instances of Addin.
     if (deletedCommandBar && deletedMenuBar) {
-        LOG.info("Outlook Addin removed.");
+        LOG.info("Outlook Addin removed successfully!");
         updateAddinInstances(false);
     }
 
@@ -1185,9 +1187,36 @@ HRESULT Caddin::removeAddin() {
 }
 
 
+bool Caddin::removeMenuBar(CommandBarControlsPtr commandBar, const WCHAR* menuBarName) {
+
+    if (!commandBar || !menuBarName) {
+        return false;
+    }
+
+    CommandBarControlPtr spCmdCtrl;
+    HRESULT hr = commandBar->get_Item(CComVariant(menuBarName), &spCmdCtrl);
+    if (SUCCEEDED(hr)) {
+        hr = spCmdCtrl->Delete(vtMissing);
+        if (SUCCEEDED(hr)) {
+            LOG.debug("menu bar '%ls' removed successfully.", menuBarName);
+            return true;
+        }
+    }
+    else {
+        LOG.debug("menu bar '%ls' not found.", menuBarName);
+    }
+
+    return false;
+}
+
+
+
+
+
+
 /**
  * Returns true if the addin is currently installed.
- * Checks the commandBar 'PROGRAM_NAME' to know if plugin is installed.
+ * Checks the commandBar 'ADDIN_COMMAND_BAR_NAME' to know if plugin is installed.
  */
 bool Caddin::isAddinInstalled() {
 
@@ -1212,7 +1241,7 @@ bool Caddin::isAddinInstalled() {
         }
 
         // Get Funambol CommandBar
-        hr = spCmdBars->get_Item(CComVariant(PROGRAM_NAME), &spCmdBar);
+        hr = spCmdBars->get_Item(CComVariant(ADDIN_COMMAND_BAR_NAME), &spCmdBar);
         if (SUCCEEDED(hr)) {
             // found!
             return true;
@@ -1234,18 +1263,10 @@ bool Caddin::isAddinInstalled() {
 bool Caddin::checkErrorsLastTime() {
 
     bool ret = true;
-    char* state = NULL;
-    DMTree* dmt = NULL;
-    ManagementNode* node = NULL;
 
     // Get state from reg key
-    dmt = DMTreeFactory::getDMTree(ADDIN_CONTEXT);
-    if (!dmt)   goto finally;
-    node = dmt->readManagementNode(ADDIN_CONTEXT);
-    if (!node)  goto finally;
-    state = node->readPropertyValue(PROPERTY_STATE);
+    char* state = readPropertyValue(PROPERTY_STATE);
     if (!state) goto finally;
-
 
     // No errors only if state = "ok" or "installing"
     if (!strcmp(state, ADDIN_STATE_OK) || !strcmp(state, ADDIN_STATE_INSTALLING)) {
@@ -1256,39 +1277,9 @@ bool Caddin::checkErrorsLastTime() {
     }
 
 finally:
-    if (state) delete [] state;
-    if (node)  delete node;
-
+    delete [] state;
     return ret;
 }
-
-
-
-/**
- * Saves addin state in win registry (HKCU, key = STATE_CONTEXT)
- */
-int Caddin::saveAddinState(char* state) {
-
-    DMTree* dmt = NULL;
-    ManagementNode* node = NULL;
-
-    if (!state) {
-        return 1;
-    }
-
-    // Save value
-    LOG.debug("Saving addin state = %s", state);
-    dmt = DMTreeFactory::getDMTree(ADDIN_CONTEXT);
-    if (!dmt) return 1;
-    node = dmt->readManagementNode(ADDIN_CONTEXT);
-    if (!node) return 1;
-    node->setPropertyValue(PROPERTY_STATE, state); 
-    delete node;
-
-    return 0;
-}
-
-
 
 
 
@@ -1305,28 +1296,66 @@ void Caddin::manageComErrors(_com_error &e) {
 
 
 
+char* Caddin::readPropertyValue(const char* propertyName) {
+
+    char* ret = NULL;
+    ManagementNode* node = NULL;
+    DMTree* dmt = DMTreeFactory::getDMTree(ADDIN_CONTEXT);
+    if (!dmt) goto finally;
+
+    node = dmt->readManagementNode(ADDIN_CONTEXT);
+    if (!node) goto finally;
+
+    // new allocated char* is returned
+    ret = node->readPropertyValue(propertyName);
+
+finally:
+    if (dmt)   delete dmt;
+    if (node)  delete node;
+    return ret;
+}
+
+
+void Caddin::setPropertyValue(const char* propertyName, const char* propertyValue) {
+    
+    ManagementNode* node = NULL;
+    DMTree* dmt = DMTreeFactory::getDMTree(ADDIN_CONTEXT);
+    if (!dmt) goto finally;
+
+    node = dmt->readManagementNode(ADDIN_CONTEXT);
+    if (!node) goto finally;
+
+    LOG.debug("Saving addin key: %s = %s", propertyName, propertyValue);
+    node->setPropertyValue(propertyName, propertyValue);
+
+finally:
+    if (dmt)   delete dmt;
+    if (node)  delete node;
+    return;
+}
+
+
+
+/**
+ * Saves addin state in win registry (HKCU, key = STATE_CONTEXT)
+ */
+int Caddin::saveAddinState(char* state) {
+    
+    if (!state) {
+        return 1;
+    }
+    setPropertyValue(PROPERTY_STATE, state);
+    return 0;
+}
+
+
 
 /**
  * Reads Addin property 'swv' from HKCU keys.
  * Returns a (new allocated) buffer with value read.
  */
 char* Caddin::readAddinSwv() {
-
-    int value = -1;
-    char* swv = NULL;
-    DMTree* dmt = NULL;
-    ManagementNode* node = NULL;
-
-    // Get state from reg key
-    dmt = DMTreeFactory::getDMTree(ADDIN_CONTEXT);
-    if (!dmt)   goto finally;
-    node = dmt->readManagementNode(ADDIN_CONTEXT);
-    if (!node)  goto finally;
-    swv = node->readPropertyValue(PROPERTY_SW_VERSION);
-    delete node;
-
-finally:
-    return swv;
+    return readPropertyValue(PROPERTY_SW_VERSION);
 }
 
 
@@ -1336,37 +1365,17 @@ finally:
  */
 int Caddin::setCurrentSwv() {
 
-    int ret = 0;
-    DMTree* dmt = NULL;
-    ManagementNode* node = NULL;
+    int ret = 1;
 
     // Read current swv from HKLM plugin keys.
     char* swv = readPropertyValueFromHKLM(PLUGIN_ROOT_CONTEXT, PROPERTY_SW_VERSION);
     if (swv && strcmp(swv, "")) {
-
         // Save value to HKCU addin keys.
-        dmt = DMTreeFactory::getDMTree(ADDIN_CONTEXT);
-        if (!dmt) {
-            ret = -1;
-            goto finally;
-        }
-        node = dmt->readManagementNode(ADDIN_CONTEXT);
-        if (!node) {
-            ret = -1;
-            goto finally;
-        }
-        node->setPropertyValue(PROPERTY_SW_VERSION, swv);
-        delete node;
+        setPropertyValue(PROPERTY_SW_VERSION, swv);
         ret = 0; 
     }
-    else {
-        ret = 1;
-    }
 
-finally:
-    if (swv) {
-        delete[] swv;
-    }
+    delete[] swv;
     return ret;
 }
 
