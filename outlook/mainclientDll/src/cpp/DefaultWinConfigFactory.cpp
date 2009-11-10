@@ -155,7 +155,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setVersion          ("");
         sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
         sc->setSupportedTypes   ("application/vnd.omads-file+xml:,application/*:");
-        sc->setSync             ("smart-one-way-from-server");           // special syncmode for pictures
+        sc->setSync             ("one-way-from-server");                // FIXED for pictures
     }
 
     if (name) delete [] name;
