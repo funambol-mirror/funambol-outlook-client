@@ -64,11 +64,6 @@
 // The program folder
 #define FUNAMBOL_DIR_NAME                   TEXT("Funambol")
 
-// Win registry root contexts
-// (note: must keep the "/OutlookClient" in the root context! Just change "Funambol" in case)
-#define PLUGIN_ROOT_CONTEXT                 "Funambol/OutlookClient"
-
-
 // About screen customization
 #define ABOUT_SCREEN_SHOW_COPYRIGHT         1                       /**< if 1, will show the copyright text below */
 #define ABOUT_SCREEN_TEXT_COPYRIGHT         "Copyright © 2003 - 2009 Funambol, Inc.\nAll rights reserved."
@@ -106,5 +101,12 @@ static WCHAR* itemTypesUsed[] = {
     //{PICTURE          },
     {NULL}
 };
+
+// Win registry root context.
+// This is NOT intended to be customized: we need to use the same registry keys to ensure correct checks
+// between different versions of the client (i.e. avoid installing 2 plugins, addin cleanup)
+// Note: in case of change, please make sure at least one "/" exist.
+#define PLUGIN_ROOT_CONTEXT                 "Funambol/OutlookClient"
+
 
 #endif
