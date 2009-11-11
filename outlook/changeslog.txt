@@ -1,3 +1,6 @@
+2009-11-11
+*** Funambol Outlook Sync Client v.8.2.5 (linked to SDK C++ v.8.2.1) ***
+
 2009-11-10
    - toccy: fixed Outlook addin (bug #8033):
             * the commandBar was not detected by its name but by its caption (wrong)
