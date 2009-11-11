@@ -301,12 +301,17 @@ FunctionEnd
 ;
 Function CheckAppInstalled
 
+       ; Check if the CUSTOMER name is the same of the one found on registry.
+       ; In case of Funambol product, this value is empty.
+       ; Note: the PLUGIN_REGKEY_CONTEXT must be the same also in branded clients, to make this check work!
        ReadRegStr $R8 HKLM "${PLUGIN_REGKEY_CONTEXT}" "${PROPERTY_CUSTOMER}"
-       ReadRegStr $R7 HKLM "${PLUGIN_REGKEY_CONTEXT}" "${PROPERTY_SWV}"
-       
-       StrCmp $R8 "" +1 +2 ;if empty we control the swv field to check if no app installed
-       StrCmp $R7 "" +2 +1
        StrCmp $R8 "${CUSTOMER}" +1 customerAbort
+       
+       ;
+       ; Now check the software version
+       ;
+       ReadRegStr $R7 HKLM "${PLUGIN_REGKEY_CONTEXT}" "${PROPERTY_SWV}"
+       StrCmp $R7 "" +2 +1
 
        ReadRegStr $R0 HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
        StrCmp $R0 "" +3
