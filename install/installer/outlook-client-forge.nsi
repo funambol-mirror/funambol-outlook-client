@@ -846,7 +846,7 @@ Function un.deleteUsersRegistry
      StrCmp $R1 "" done                                  ; empty string when finished
 
      DeleteRegKey  HKU  "$R1\${PLUGIN_REGKEY_CONTEXT}"   ; Delete users keys (concatenate strings) - plugin user's settings.
-     DeleteRegKey  HKU  "$R1\${ADDIN_REGKEY_CONTEXT}"    ; addin user's settings.
+     ; Note: addin user's settings are NOT removed! The addin still need to be loaded to cleanup commandbar & menu.
 
      IntOp $R0 $R0 + 1
      Goto loop
