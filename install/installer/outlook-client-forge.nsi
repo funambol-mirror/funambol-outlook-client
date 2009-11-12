@@ -592,9 +592,15 @@ Section "MainSection" SEC01
       CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
       CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\${PRODUCT_NAME}.lnk"               "$INSTDIR\${PRODUCT_NAME_EXE}" "" "" "" "" "" "Launch $(^Name)"
       CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"                     "$INSTDIR\uninst.exe"          "" "" "" "" "" "Uninstall $(^Name)"
+!ifdef SHOW_STARTMENU_README
       CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\Readme.lnk"                        "$INSTDIR\Readme.txt"          "" "" "" "" "" "${PRODUCT_NAME} Readme"
+!endif
+!ifdef SHOW_STARTMENU_USER_GUIDE
       CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\User Guide.lnk"                    "$INSTDIR\userguide.url"       "" "" "" "" "" "${PRODUCT_NAME} User Guide"
+!endif
+!ifdef SHOW_STARTMENU_WEBSITE
       CreateShortCut  "$SMPROGRAMS\$ICONS_GROUP\${WEB_SITE_LINK_TITLE}.lnk"        "$INSTDIR\website.url"         "" "" "" "" "" "${WEB_SITE_LINK_TITLE}"
+!endif
       !insertmacro MUI_STARTMENU_WRITE_END
 
 
