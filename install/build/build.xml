@@ -463,7 +463,7 @@ Forge file for Funambol Outlook Sync Client
         </copy>
 
 
-        <echo message="${install-builder.nsi} ${sp}" />
+        <echo message="${install-builder.nsi}" />
         <echo message="output to: ${log.NSIS_sp}" />
         <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS_sp}">
             <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
