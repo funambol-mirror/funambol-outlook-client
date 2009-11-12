@@ -1,4 +1,4 @@
-2009-11-11
+2009-11-12
 *** Funambol Outlook Sync Client v.8.2.5 (linked to SDK C++ v.8.2.1) ***
 
    - toccy: fixed installer check for a different version of Outlook already installed (check on CUSTOMER param)
