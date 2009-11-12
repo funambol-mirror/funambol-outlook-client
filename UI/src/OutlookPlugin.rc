@@ -157,8 +157,10 @@ BEGIN
                             "Fehler: Server konnte nicht gefunden werden. Bitte URL überprüfen."
     IDS_CODE_INTERNET_CONNECTION_MISSING_2005 
                             "Fehler: Es konnte keine Internet-Verbindung hergestellt werden."
-    IDS_CODE_NETWORK_ERROR_2007 "Synchronisation konnte aufgrund eines Netzwerkfehlers nicht abgeschlossen werden."
-    IDS_ERROR_SYNC_NOT_COMPLETED "Synchronisation konnte nicht abgeschlossen werden. Details können der Log-Datei entnommen werden."
+    IDS_CODE_NETWORK_ERROR_2007 
+                            "Synchronisation konnte aufgrund eines Netzwerkfehlers nicht abgeschlossen werden."
+    IDS_ERROR_SYNC_NOT_COMPLETED 
+                            "Synchronisation konnte nicht abgeschlossen werden. Details können der Log-Datei entnommen werden."
     IDS_TEXT_APPOINTMENTS   "Termine"
     IDS_TEXT_CONTACTS       "Kontakte"
     IDS_TEXT_NOTES          "Notizen"
@@ -219,7 +221,8 @@ BEGIN
                             "Synchronisation wird gerade ausgeführt.\nBitte warten Sie, bis die Synchronisation beendet ist."
     IDS_SYNC_ABORTED_AVOID_FULLSYNC 
                             "Die Synchronisation wurde vom Benutzer abgebrochen, um eine vollständige Synchronisation zu verhindern."
-    IDS_TEXT_SYNC_IN_PROGRESS "Eine geplante Synchronisation wird gerade ausgeführt."
+    IDS_TEXT_SYNC_IN_PROGRESS 
+                            "Eine geplante Synchronisation wird gerade ausgeführt."
     IDS_DETAILS             "&Details..."
     IDS_SYNC_SETTINGS       "Synchronisationseinstellungen"
     IDS_APPLY               "&Akzeptieren"
@@ -273,7 +276,8 @@ STRINGTABLE
 BEGIN
     IDS_CODE_SERVER_BUSY_SYNC 
                             "Der Server ist überlastet. Es ist möglich, dass eine andere Synchronisation für dieses Benutzerkonto in Arbeit ist. Bitte versuchen Sie es später."
-    IDS_CODE_SERVER_ERROR_2052 "Synchroniation unterbrochen: Keine Verbindung zum Server."
+    IDS_CODE_SERVER_ERROR_2052 
+                            "Synchroniation unterbrochen: Keine Verbindung zum Server."
     IDS_CODE_DROPPED_ITEMS_SERVER 
                             "Warnung: Einige Daten konnten nicht korrekt zum Server transferiert werden."
     IDS_CODE_NO_SOURCES     "Keine Quelle für die Synchronisation angegeben.\nBitte geben Sie mindestens eine Quelle an."
@@ -289,8 +293,11 @@ BEGIN
     IDS_DATE_FILTER_LAST_3_MONTHS "Seit den letzten 3 Monaten"
     IDS_DATE_FILTER_LAST_6_MONTHS "Seit den letzten 6 Monaten"
     IDS_DATE_FILTER_ALL     "Alle"
-    IDS_DATE_FILTER_LAST_2_WEEKS "Seit der letzten 2 Wochen"
+END
 
+STRINGTABLE 
+BEGIN
+    IDS_DATE_FILTER_LAST_2_WEEKS "Seit der letzten 2 Wochen"
     IDS_PICTURES            "&Pictures"
     IDS_ADVANCED_PICTURES   "Pictures Advanced Settings"
     IDS_TEXT_PICTURES       "pictures"
@@ -396,10 +403,10 @@ IDD_SYNC DIALOGEX 0, 0, 250, 206
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Contacts",IDC_SYNC_CHECK_CONTACTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,21,70,10
-    CONTROL         "Calendar",IDC_SYNC_CHECK_CALENDAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,42,44,10
-    CONTROL         "Tasks",IDC_SYNC_CHECK_TASKS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,63,40,10
-    CONTROL         "Notes",IDC_SYNC_CHECK_NOTES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,87,43,10
+    CONTROL         "Contacts",IDC_SYNC_CHECK_CONTACTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,21,108,10
+    CONTROL         "Calendar",IDC_SYNC_CHECK_CALENDAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,42,101,10
+    CONTROL         "Tasks",IDC_SYNC_CHECK_TASKS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,63,101,10
+    CONTROL         "Notes",IDC_SYNC_CHECK_NOTES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,87,101,10
     PUSHBUTTON      "Details...",IDC_SYNC_BUT_CONTACTS,173,17,47,14
     PUSHBUTTON      "Details",IDC_SYNC_BUT_CALENDAR,173,40,47,14
     PUSHBUTTON      "Details",IDC_SYNC_BUT_TASKS,173,63,47,14
@@ -611,6 +618,7 @@ BEGIN
     BEGIN
         VERTGUIDE, 8
         VERTGUIDE, 18
+        VERTGUIDE, 119
         VERTGUIDE, 173
         VERTGUIDE, 220
         VERTGUIDE, 232
@@ -1097,8 +1105,11 @@ BEGIN
     IDS_DATE_FILTER_LAST_3_MONTHS "Since last 3 months"
     IDS_DATE_FILTER_LAST_6_MONTHS "Since last 6 months"
     IDS_DATE_FILTER_ALL     "All"
-    IDS_DATE_FILTER_LAST_2_WEEKS "Since last 2 weeks"
+END
 
+STRINGTABLE 
+BEGIN
+    IDS_DATE_FILTER_LAST_2_WEEKS "Since last 2 weeks"
     IDS_PICTURES            "&Pictures"
     IDS_ADVANCED_PICTURES   "Pictures Advanced Settings"
     IDS_TEXT_PICTURES       "pictures"
