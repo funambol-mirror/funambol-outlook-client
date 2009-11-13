@@ -289,11 +289,8 @@ Forge file for Funambol Outlook Sync Client
             <arg line="OutlookClient.sln /Out ${log.client} /Build ${client.targetbuild}"/>
         </exec>
 
-
         <!-- Open log and continue -->
-        <exec dir="${dir.output}" executable="notepad" spawn="true">
-            <arg line="${log.client}"/>
-        </exec>
+        <!-- <exec dir="${dir.output}" executable="notepad" spawn="true"> <arg line="${log.client}"/> </exec> -->
 
     </target>
 
@@ -314,9 +311,7 @@ Forge file for Funambol Outlook Sync Client
         </exec>
 
         <!-- Open log and continue -->
-        <exec executable="notepad" spawn="true">
-            <arg line="${log.client}"/>
-        </exec>
+        <!-- <exec dir="${dir.output}" executable="notepad" spawn="true"> <arg line="${log.client}"/> </exec> -->
 
     </target>
 
