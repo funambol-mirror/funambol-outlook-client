@@ -1,7 +1,10 @@
-2009-11-12
+2009-11-13
 *** Funambol Outlook Sync Client v.8.2.6 (linked to SDK C++ v.8.2.1) ***
-   - toccy: added ability to show/hide the readme/userguide/website from the startmenu, at build time
+   - toccy: fixed upgrade process for branded/unbranded versions of the Client
+
+2009-11-12
    - toccy: added German translation in VS resources (TODO: translate pictures related labels)
+   - toccy: added ability to show/hide the readme/userguide/website from the startmenu, at build time
 
 *** Funambol Outlook Sync Client v.8.2.5 (linked to SDK C++ v.8.2.1) ***
    - toccy: fixed installer check for a different version of Outlook already installed (check on CUSTOMER param)

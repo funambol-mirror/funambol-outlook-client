@@ -145,6 +145,10 @@ bool OutlookConfig::read() {
         }
     }
 
+    // This param is not read by DMT (it's Client defined).
+    // It's defaulted to "8.0.0" in case it's not found.
+    funambolSwv = readFunambolSwv(HKEY_CURRENT_USER);
+
     // Username/Password are stored encrypted (new since 6.0.9).
     decryptPrivateData();
 
@@ -815,23 +819,8 @@ void OutlookConfig::setFunambolSwv(const StringBuffer& v) {
     funambolSwv = v;
 }
 
-/// If not found this value is = swv for Funambol builds, it's the new installed funambol_swv for customer builds.
+
 const StringBuffer& OutlookConfig::getFunambolSwv() {
-
-    if (funambolSwv.empty()) {
-        // this is the default value if the 'funambol_swv' is not found.
-        funambolSwv = getSwv();
-
-        // 'funambol_swv' is not found
-        const char* customer = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_CUSTOMER, HKEY_LOCAL_MACHINE);
-        if (customer && strlen(customer)>0) {
-            // current funambol_swv is an acceptable value for customers builds (swv could be 1.0.0 for example)
-            LOG.debug("Customer = %s", customer);
-            funambolSwv = readFunambolSwv();
-        }
-        delete [] customer;
-    }
-
     return funambolSwv;
 }
 
@@ -1040,7 +1029,7 @@ void OutlookConfig::upgradeConfig() {
 
     // Backup old Funambol product Swv and save the new one.
     oldFunambolSwv = getBuildNumberFromVersion(getFunambolSwv().c_str());
-    StringBuffer funambolNewSwv = readFunambolSwv();
+    StringBuffer funambolNewSwv = readFunambolSwv(HKEY_LOCAL_MACHINE);
     setFunambolSwv(funambolNewSwv);
 
 
@@ -1178,12 +1167,33 @@ char* OutlookConfig::readCurrentSwv() {
     return readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_SOFTWARE_VERSION, HKEY_LOCAL_MACHINE);
 }
 
-StringBuffer OutlookConfig::readFunambolSwv() {
+StringBuffer OutlookConfig::readFunambolSwv(HKEY rootKey) {
 
-    // this is the default value if the 'funambol_swv' is not found.
-    StringBuffer ret(getSwv());
+    StringBuffer ret;
+    const char* value = NULL;
 
-    const char* value = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_FUNAMBOL_SWV, HKEY_LOCAL_MACHINE);
+    if (rootKey == HKEY_CURRENT_USER) {
+        StringBuffer context;
+        context.sprintf("%s%s%s", PLUGIN_ROOT_CONTEXT, CONTEXT_SPDS_SYNCML, CONTEXT_DEV_DETAIL);
+        value = readPropertyValue(context, PROPERTY_FUNAMBOL_SWV, HKEY_CURRENT_USER);
+        if (!value || strlen(value)==0) {
+            // 'funambol_swv' is not found
+            const char* customer = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_CUSTOMER, HKEY_LOCAL_MACHINE);
+            if (customer && strlen(customer)>0) {
+                // current funambol_swv is an acceptable value for customers builds (swv could be 1.0.0 for example)
+                LOG.debug("Customer = %s", customer);
+                ret = "8.0.0";
+            }
+            delete [] customer;
+        }
+    }
+
+    else if (rootKey == HKEY_LOCAL_MACHINE) {
+        // this is the default value if the 'funambol_swv' is not found.
+        ret = getSwv();
+        value = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_FUNAMBOL_SWV, rootKey);
+    }
+
     if (value && strlen(value)>0) {
         ret = value;
     }
