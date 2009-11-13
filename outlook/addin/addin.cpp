@@ -873,6 +873,11 @@ HRESULT Caddin::AddNewCommandBar(_CommandBars* pCmdBars) {
         goto error;
     }
 
+    // If here, we created the CommandBar OK.
+    // Let's save its name in the registry, so that it can be correctly found&removed even
+    // by a different version/customization of this addin.
+    setPropertyValue(PROPERTY_COMMANDBAR_NAME, ADDIN_COMMAND_BAR_NAME);
+
     LOG.debug("CommandBar -> finished!");
     return S_OK;
 
@@ -1074,9 +1079,7 @@ HRESULT Caddin::removeAddin() {
 
     _ExplorerPtr           spExplorer;
     _CommandBarsPtr        spCmdBars;
-    CommandBarControlPtr   commandBarControlPtr;
     CommandBarPtr          spCmdBar;
-    CommandBarPopupPtr     pMenuItem;
     CommandBarControlsPtr  spCmdCtrls;
     CommandBarControlPtr   spCmdCtrl;
 
@@ -1087,6 +1090,11 @@ HRESULT Caddin::removeAddin() {
     LOG.info("Removing existing Outlook Addin...");
 
     try {
+
+        //
+        // *** Get and remove Funambol Command Bar ***
+        //
+
         // Get Outlook Command Bars
         applicationPtr->ActiveExplorer(&spExplorer);
         hr = spExplorer->get_CommandBars(&spCmdBars);
@@ -1095,38 +1103,36 @@ HRESULT Caddin::removeAddin() {
             return hr;
         }
 
-        //
-        // *** Get and remove Funambol Command Bar ***
-        // It has always the same name in all products: 'ADDIN_COMMAND_BAR_NAME'
-        //
-        LOG.debug("Removing CommandBar (with name '%s')...", ADDIN_COMMAND_BAR_NAME);
-        hr = spCmdBars->get_Item(CComVariant(ADDIN_COMMAND_BAR_NAME), &spCmdBar);
-        if (SUCCEEDED(hr)) {
-            hr = spCmdBar->Delete();
-            if (SUCCEEDED(hr)) {
-                LOG.debug("removed.");
+        // 1. Remove the standard one
+        if (removeCommandBar(spCmdBars, ADDIN_COMMAND_BAR_NAME)) {
+            deletedCommandBar = true;
+        }
+
+        // 2. Safe: try to remove the commandbar name loaded from the registry (if existing)
+        // This value is written since v.8.2.6, when the addin is created.
+        const char* commandBarName = readPropertyValue(PROPERTY_COMMANDBAR_NAME);
+        if (commandBarName && strlen(commandBarName) > 0) {
+            if (strcmp(commandBarName, ADDIN_COMMAND_BAR_NAME) != 0) {
+                if (removeCommandBar(spCmdBars, commandBarName)) {
+                    deletedCommandBar = true;
+                }
+            }
+        }
+        delete [] commandBarName;
+
+        // 3. Safe: try to remove standard Funambol commandBar that could be left
+        if (strcmp(ADDIN_COMMAND_BAR_NAME, ADDIN_COMMAND_BAR_NAME_FUNAMBOL) != 0) {
+            if (removeCommandBar(spCmdBars, ADDIN_COMMAND_BAR_NAME_FUNAMBOL)) {
                 deletedCommandBar = true;
             }
         }
-        else {
-            LOG.debug("not found.");
-        }
 
-        // Try to remove old Funambol Command Bar (before v.7.1.4 its name was "Funambol Outlook Plug-in")
-        // Better would be to check the oldSwv, and see if < 7.1.4. But to be sure, we can do it anyway.
-        LOG.debug("Removing any old Funambol CommandBar (with name '%s')...", ADDIN_COMMAND_BAR_NAME_OLD);
-        hr = spCmdBars->get_Item(CComVariant(ADDIN_COMMAND_BAR_NAME_OLD), &spCmdBar);
-        if (SUCCEEDED(hr)) {
-            hr = spCmdBar->Delete();
-            if (SUCCEEDED(hr)) {
-                LOG.debug("removed.");
+        // 4. Safe: try to remove standard Funambol commandBar that could be left
+        if (strcmp(ADDIN_COMMAND_BAR_NAME, ADDIN_COMMAND_BAR_NAME_OLD) != 0) {
+            if (removeCommandBar(spCmdBars, ADDIN_COMMAND_BAR_NAME_OLD)) {
                 deletedCommandBar = true;
             }
         }
-        else {
-            LOG.debug("not found. (OK)");
-        }
-
 
 
         //
@@ -1184,6 +1190,29 @@ HRESULT Caddin::removeAddin() {
     }
 
     return S_OK;
+}
+
+
+bool Caddin::removeCommandBar(_CommandBarsPtr commandBars, const char* commandBarName) {
+
+    if (!commandBars || !commandBarName) {
+        return false;
+    }
+
+    CommandBarPtr spCmdBar;
+    HRESULT hr = commandBars->get_Item(CComVariant(commandBarName), &spCmdBar);
+    if (SUCCEEDED(hr)) {
+        hr = spCmdBar->Delete();
+        if (SUCCEEDED(hr)) {
+            LOG.debug("CommandBar '%s' removed successfully.", commandBarName);
+            return true;
+        }
+    }
+    else {
+        LOG.debug("CommandBar '%s' not found.", commandBarName);
+    }
+
+    return false;
 }
 
 
