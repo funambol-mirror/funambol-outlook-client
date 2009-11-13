@@ -1,6 +1,7 @@
 2009-11-13
 *** Funambol Outlook Sync Client v.8.2.6 (linked to SDK C++ v.8.2.1) ***
    - toccy: fixed upgrade process for branded/unbranded versions of the Client
+   - toccy: fixed addin commandBar name: it's stored in the registry (like the menubar label) for a correct cleanup during uninstall
 
 2009-11-12
    - toccy: added German translation in VS resources (TODO: translate pictures related labels)

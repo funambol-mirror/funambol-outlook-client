@@ -59,7 +59,7 @@
 // Addin customization
 // This macro is used into the Outlook menu. The & is the value used to create a shortcut to open the client
 #define ADDIN_MENU_LABEL                    L"Funa&mbol"
-#define LAST_COMPATIBLE_VERSION             80200                       /**< "8.2.0" is the latest version compatible with this addin - change this value when addin need to be reinstalled */
+#define LAST_COMPATIBLE_VERSION             80206                       /**< "8.2.6" is the latest version compatible with this addin - change this value when addin need to be reinstalled */
 
 // The program folder
 #define FUNAMBOL_DIR_NAME                   TEXT("Funambol")
