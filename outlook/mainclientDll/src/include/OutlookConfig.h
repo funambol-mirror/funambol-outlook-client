@@ -239,12 +239,10 @@ public:
     char* readCurrentSwv();
 
     /**
-     * Returns the funambol product software version, read it from HKLM registry.
-     * This value is set and updated ONLY by installer.
+     * Returns the funambol product software version, read it from HKLM or HKCU registry.
      * For Funambol builds, this value is = swv.
-     * Returns a new allocated buffer, must be deleted by the caller.
      */
-    StringBuffer readFunambolSwv();
+    StringBuffer readFunambolSwv(HKEY rootKey);
 
     ///Creates and set a unique 'devID' property for current configuration.
     int setUniqueDevID();
