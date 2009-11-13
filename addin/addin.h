@@ -66,6 +66,8 @@
 #define PROPERTY_NUM_INSTANCES              "numInstances"              // #instances of Addin for different users
 #define PROPERTY_SW_VERSION                 "swv"                       // Software version
 #define PROPERTY_MENUBAR_LABEL              "menuLabel"                 // The menubar label, saved when the addin is created (to safely remove during uninstall)
+#define PROPERTY_COMMANDBAR_NAME            "commandBarName"            // The commandbar name, saved when the addin is created (to safely remove during uninstall)
+
 
 // The addin context under HKCU/HKLM. 
 // This value is NOT intended to be changed, it should be the same for all versions
@@ -91,10 +93,12 @@
 // DON'T CHANGE these unless the standard product defines have changed!
 #define ADDIN_MENU_LABEL_FUNAMBOL           L"Funa&mbol"
 
-// This is the commandbar icon name. It's used to create/retrieve the addin icon, 
-// from the Outlook toolbar. THIS VALUE IS NOT VISIBLE TO THE USER, so it's not necessary
-// to change/customize it (reccomended: don't change it, to ensure a correct uninstall).
-#define ADDIN_COMMAND_BAR_NAME              "Funambol Outlook Sync Client"
+// This is the commandbar icon name = Program name.
+#define ADDIN_COMMAND_BAR_NAME              PROGRAM_NAME
+
+// This is the Funambol commandbar icon name. It's the standard name used with this addin
+// before its value was stored in the win registry (v.8.2.6)
+#define ADDIN_COMMAND_BAR_NAME_FUNAMBOL     "Funambol Outlook Sync Client"
 
 // Old name for commandbar icon (before v.7.1). To cleanup things in case of updates
 // from a very old version (may be removed in future).
@@ -223,6 +227,7 @@ public:
      */
     void setPropertyValue(const char* propertyName, const char* propertyValue);
 
+    bool removeCommandBar(_CommandBarsPtr commandBars, const char* commandBarName);
     bool removeMenuBar(CommandBarControlsPtr commandBar, const WCHAR* menuBarName);
 
     HRESULT removeAddin();
