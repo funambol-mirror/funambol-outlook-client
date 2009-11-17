@@ -21,7 +21,6 @@ How to build the Funambol Outlook Sync Client
     To build the installer, you need to download and install the following: 
     - Apache Ant (http://ant.apache.org/) 
     - NSIS (http://nsis.sourceforge.net) 
-    - NSIS processwork plugin (http://www.esanu.name/software/wp-content/uploads/2008/06/processwork.rar). Extract 'processwork.dll' inside the 'Plugins' folder under the NSIS installation directory (this library will be used building the installer). 
     - Doxygen (http://www.stack.nl/~dimitri/doxygen/download.html) 
     - [optional] Graphviz (to generate graphs in doxygen doc, http://www.graphviz.org/Download..php)
 

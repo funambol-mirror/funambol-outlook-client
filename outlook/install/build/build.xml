@@ -147,7 +147,7 @@ Forge file for Funambol Outlook Sync Client
                 <!-- If running under cygwin -->
                 <property name="vs2005.devenv"       value = "${env.PROGRAMFILES}\Microsoft Visual Studio 8\Common7\IDE"/>
                 <property name="dir.VCpp2005Lib"     value = "${env.PROGRAMFILES}\Microsoft Visual Studio 8\VC\redist\x86"/>
-                <property name="install-builder.nsi" value = "${env.PROGRAMFILES}\NSIS\makensis.exe"/>
+                <property name="install-builder.dir" value = "${env.PROGRAMFILES}\NSIS"/>
             </then>
         <elseif>
             <isset property="env.ProgramFiles"/>
@@ -155,10 +155,11 @@ Forge file for Funambol Outlook Sync Client
                 <!-- If running from cmd.exe  -->
                 <property name="vs2005.devenv"       value = "${env.ProgramFiles}\Microsoft Visual Studio 8\Common7\IDE"/>
                 <property name="dir.VCpp2005Lib"     value = "${env.ProgramFiles}\Microsoft Visual Studio 8\VC\redist\x86"/>
-                <property name="install-builder.nsi" value = "${env.ProgramFiles}\NSIS\makensis.exe"/>
+                <property name="install-builder.dir" value = "${env.ProgramFiles}\NSIS"/>
             </then>        
         </elseif>
         </if>
+        <property name="install-builder.nsi" value = "${install-builder.dir}\makensis.exe"/>
         <echo message="vs2005.devenv       = ${vs2005.devenv}" />
         <echo message="dir.VCpp2005Lib     = ${dir.VCpp2005Lib}" />
         <echo message="install-builder.nsi = ${install-builder.nsi}" />
@@ -350,11 +351,11 @@ Forge file for Funambol Outlook Sync Client
         <!--
         Copy DLLs and needed files into fileset dir
         -->
-	<copy todir="${dir.fileset}" overwrite="TRUE">
-	    <fileset dir="${dir.output_src.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
-	    <fileset dir="${dir.output_src.UI}/build/Release"                  includes="OutlookPlugin.exe"/>
-	    <fileset dir="${dir.output_src.install}/installer/Redemption_Lib"  includes="Redemption.dll"/>
-	    <fileset dir="${dir.output_src.outlookaddin}/ReleaseMinDependency" includes="FunambolAddin.dll"/>
+	      <copy todir="${dir.fileset}" overwrite="TRUE">
+	           <fileset dir="${dir.output_src.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
+	           <fileset dir="${dir.output_src.UI}/build/Release"                  includes="OutlookPlugin.exe"/>
+	           <fileset dir="${dir.output_src.install}/installer/Redemption_Lib"  includes="Redemption.dll"/>
+	           <fileset dir="${dir.output_src.outlookaddin}/ReleaseMinDependency" includes="FunambolAddin.dll"/>
         </copy>
 
         <copy todir="${dir.fileset}/images" overwrite="TRUE">
@@ -405,11 +406,11 @@ Forge file for Funambol Outlook Sync Client
         <!--
         Copy DLLs and needed files into fileset dir
         -->
-	<copy todir="${dir.fileset}" overwrite="TRUE">
-	    <fileset dir="${dir.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
-	    <fileset dir="${dir.ui}/build/Release"                  includes="OutlookPlugin.exe"/>
-	    <fileset dir="${dir.redemptionLib}"                     includes="Redemption.dll"/>
-	    <fileset dir="${dir.outlookaddin}/ReleaseMinDependency" includes="FunambolAddin.dll"/>
+        <copy todir="${dir.fileset}" overwrite="TRUE">
+	          <fileset dir="${dir.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
+            <fileset dir="${dir.ui}/build/Release"                  includes="OutlookPlugin.exe"/>
+            <fileset dir="${dir.redemptionLib}"                     includes="Redemption.dll"/>
+            <fileset dir="${dir.outlookaddin}/ReleaseMinDependency" includes="FunambolAddin.dll"/>
         </copy>
 
         <copy todir="${dir.fileset}/images" overwrite="TRUE">
@@ -430,7 +431,7 @@ Forge file for Funambol Outlook Sync Client
     BUILD-INSTALL
     ========================================================================
     -->
-    <target name="build-install" depends="init" >
+    <target name="build-install" depends="init,copy-processwork-dll" >
         <mkdir dir="${dir.output}"/>
 
         <echo message="${install-builder.nsi}" />
@@ -448,7 +449,7 @@ Forge file for Funambol Outlook Sync Client
     BUILD-INSTALL_FOR_CARED
     ========================================================================
     -->
-    <target name="build-install-cared" depends="init" >
+    <target name="build-install-cared" depends="init,copy-processwork-dll" >
         <mkdir dir="${dir.output}"/>
 
         <!-- Portal version is builded with the REDIST REDEMPTION.DLL -->
@@ -465,6 +466,17 @@ Forge file for Funambol Outlook Sync Client
                        /DFILE_NAME=${fileNameCared}
                        /DFUNAMBOL_SWV=${funambol.swv} ${script.nsi} " />
         </exec>
+    </target>
+
+
+    <!--
+    ========================================================================
+    COPY-PROCESSWORK-DLL
+    ========================================================================
+    -->
+    <target name="copy-processwork-dll" depends="init" >
+        <echo message="copying processwork.dll to NSIS plugins dir..." />
+        <copy file="${dir.outlook}/install/installer/processwork.dll" todir="${install-builder.dir}/Plugins" overwrite="TRUE"/>
     </target>
 
 
