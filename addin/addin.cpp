@@ -244,6 +244,7 @@ STDMETHODIMP Caddin::OnStartupComplete(LPSAFEARRAY* custom) {
     else {
         addinState = 3;                 // addin "uninstalled"
     }
+    LOG.debug("addin state = %d", addinState);
 
 
     //
@@ -303,7 +304,7 @@ STDMETHODIMP Caddin::OnStartupComplete(LPSAFEARRAY* custom) {
         delete[] oldSwv; oldSwv = NULL;
     }
 
-
+    LOG.debug("addin state = %d", addinState);
     saveAddinState(ADDIN_STATE_IN_PROGRESS);
 
 
@@ -1254,11 +1255,14 @@ bool Caddin::isAddinInstalled() {
     CommandBarPtr   spCmdBar;
     HRESULT hr = S_OK;
 
+    LOG.debug("Looking for commandBar with name = '%s'...", ADDIN_COMMAND_BAR_NAME);
+
     try {
         // Get Outlook Command Bars
         applicationPtr->ActiveExplorer(&spExplorer);
         hr = spExplorer->get_CommandBars(&spCmdBars);
         if(FAILED(hr)) {
+            LOG.debug("  not found");
             LOG.error(ERR_GET_COMMANDBARS);
             return false;
         }
@@ -1266,6 +1270,7 @@ bool Caddin::isAddinInstalled() {
         // Get CommandBars
         hr = spExplorer->get_CommandBars(&spCmdBars);
         if (FAILED(hr)) {
+            LOG.debug("  not found");
             return false;
         }
 
@@ -1273,13 +1278,16 @@ bool Caddin::isAddinInstalled() {
         hr = spCmdBars->get_Item(CComVariant(ADDIN_COMMAND_BAR_NAME), &spCmdBar);
         if (SUCCEEDED(hr)) {
             // found!
+            LOG.debug("  found!");
             return true;
         }
     }
     catch(_com_error &) {
+        LOG.debug("  not found");
         return false;
     }
 
+    LOG.debug("  not found");
     return false;
 }
 
@@ -1327,6 +1335,10 @@ void Caddin::manageComErrors(_com_error &e) {
 
 char* Caddin::readPropertyValue(const char* propertyName) {
 
+    if (propertyName) {
+        LOG.debug("read from HKCU: context='%s', prop='%s'", ADDIN_CONTEXT, propertyName);
+    }
+
     char* ret = NULL;
     ManagementNode* node = NULL;
     DMTree* dmt = DMTreeFactory::getDMTree(ADDIN_CONTEXT);
@@ -1341,6 +1353,8 @@ char* Caddin::readPropertyValue(const char* propertyName) {
 finally:
     if (dmt)   delete dmt;
     if (node)  delete node;
+
+    if (ret) LOG.debug("  value = '%s'", ret);
     return ret;
 }
 
@@ -1462,6 +1476,10 @@ bool Caddin::swvNotCompatible(const char* currentVersion, const char* oldVersion
  * @param prop    - the property name
  */
 char* Caddin::readPropertyValueFromHKLM(const char* context, const char* prop) {
+
+    if (context && prop) {
+        LOG.debug("read from HKLM: context='%s', prop='%s'", context, prop);
+    }
     
     DWORD res = 0;  	
     long  err = 0;
@@ -1531,6 +1549,7 @@ finally:
     if (key != 0) {
         RegCloseKey(key);
     }
+    if (ret) LOG.debug("  value = '%s'", ret);
     return ret;
 }
 
