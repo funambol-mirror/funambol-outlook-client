@@ -335,7 +335,7 @@ Forge file for Funambol Outlook Sync Client
 
 
         <!--Copy ALL files from 'presetup' to 'fileset' -->
-        <copy todir="${dir.fileset}" >
+        <copy todir="${dir.fileset}" overwrite="TRUE">
             <fileset dir="${dir.output_src.install}/installer/presetup"/>
         </copy>
 
@@ -390,7 +390,7 @@ Forge file for Funambol Outlook Sync Client
 
 
         <!--Copy all files from 'presetup' to 'fileset' -->
-        <copy todir="${dir.fileset}" >
+        <copy todir="${dir.fileset}" overwrite="TRUE">
             <fileset dir="${dir.presetup}" excludes="**/*.bak, **/*.my, **/.#*, **/.svn/" />
         </copy>
 
