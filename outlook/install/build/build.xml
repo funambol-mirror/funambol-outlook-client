@@ -244,11 +244,22 @@ Forge file for Funambol Outlook Sync Client
     -->
     <target name="register-dll" depends="init">
 
+        <!-- If redist DLL exists, use it (will not show the popup)
+             DLL is copied because sometimes the dll attribute is not executable -->
+        <available file="${dir.redemptionLibRedist}/Redemption.dll" property="redemption.redist.exists"/>
+        <if>
+            <isset property="redemption.redist.exists"/>
+            <then>
+                <echo message="Copying Redist Redemption.dll"/>
+                <copy file="${dir.redemptionLibRedist}/Redemption.dll" todir="${dir.output}" overwrite="TRUE"/>
+            </then>
+            <else>
+                <echo message="Copying free Redemption.dll"/>
+                <copy file="${dir.redemptionLib}/Redemption.dll"       todir="${dir.output}" overwrite="TRUE"/>
+            </else>
+        </if>
+
         <echo message="Registering Redemption DLL..."/>
-        
-        <!-- it's copied because sometimes the dll attribute is not executable -->
-        <copy file="${dir.redemptionLib}/Redemption.dll" todir="${dir.output}"/>
-        
         <exec dir="${dir.output}" executable="regsvr32" failonerror="true" >
             <arg line="/s Redemption.dll"/>
         </exec>
