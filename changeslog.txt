@@ -1,5 +1,8 @@
-2009-11-19
+2009-11-24
 *** Funambol Outlook Sync Client v.8.2.6 (linked to SDK C++ v.8.2.1) ***
+   - toccy: Client's menu translated in German (added German resources for menu and accelerator)
+
+2009-11-19
    - toccy: fixed "Status" <-> vCal STATUS property mappings, for tasks (in APIs, under vocl/winObjects)
 
 2009-11-17
