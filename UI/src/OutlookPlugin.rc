@@ -42,6 +42,51 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Menu
+//
+
+IDR_MAINFRAME MENU 
+BEGIN
+    POPUP "&Datei"
+    BEGIN
+        MENUITEM "&Synchronisieren\tCtrl+S",    ID_FILE_SYNCHRONIZE
+        MENUITEM SEPARATOR
+        MENUITEM "&Beenden\tAlt+F4",            ID_APP_EXIT
+    END
+    POPUP "&Extras"
+    BEGIN
+        MENUITEM "&Optionen...\tCtrl+O",        ID_FILE_CONFIGURATION
+        MENUITEM SEPARATOR
+        MENUITEM "&Wiederherstellen...\tCtrl+W", ID_TOOLS_FULLSYNC
+        MENUITEM "&Logging...\tCtrl+L",         ID_TOOLS_SETLOGLEVEL
+    END
+    POPUP "&Hilfe"
+    BEGIN
+        MENUITEM "&Anleitung\tCTRL+A",          ID_VIEW_GUIDE
+        MENUITEM SEPARATOR
+        MENUITEM "&Info...\tCtrl+I",            ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS 
+BEGIN
+    "I",            ID_APP_ABOUT,           VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_FILE_CONFIGURATION,  VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SYNCHRONIZE,    VIRTKEY, CONTROL, NOINVERT
+    "W",            ID_TOOLS_FULLSYNC,      VIRTKEY, CONTROL, NOINVERT
+    "L",            ID_TOOLS_SETLOGLEVEL,   VIRTKEY, CONTROL, NOINVERT
+    "A",            ID_VIEW_GUIDE,          VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
@@ -319,6 +364,35 @@ END
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Synchronize\tCtrl+S",        ID_FILE_SYNCHRONIZE
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit\tAlt+F4",               ID_APP_EXIT
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "Op&tions...\tCtrl+T",         ID_FILE_CONFIGURATION
+        MENUITEM SEPARATOR
+        MENUITEM "&Recover...\tCtrl+R",         ID_TOOLS_FULLSYNC
+        MENUITEM "&Logging...\tCtrl+L",         ID_TOOLS_SETLOGLEVEL
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&View User Guide\tCTRL+U",    ID_VIEW_GUIDE
+        MENUITEM SEPARATOR
+        MENUITEM "&About...\tCtrl+H",           ID_APP_ABOUT
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -788,60 +862,6 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Menu
-//
-
-IDR_MAINFRAME MENU 
-BEGIN
-    POPUP "&File"
-    BEGIN
-        MENUITEM "&Synchronize\tCtrl+S",        ID_FILE_SYNCHRONIZE
-        MENUITEM SEPARATOR
-        MENUITEM "E&xit\tAlt+F4",               ID_APP_EXIT
-    END
-    POPUP "&Tools"
-    BEGIN
-        MENUITEM "Op&tions...\tCtrl+T",         ID_FILE_CONFIGURATION
-        MENUITEM SEPARATOR
-        MENUITEM "&Recover...\tCtrl+R",         ID_TOOLS_FULLSYNC
-        MENUITEM "&Logging...\tCtrl+L",         ID_TOOLS_SETLOGLEVEL
-    END
-    POPUP "&Help"
-    BEGIN
-        MENUITEM "&View User Guide\tCTRL+U",    ID_VIEW_GUIDE
-        MENUITEM SEPARATOR
-        MENUITEM "&About...\tCtrl+H",           ID_APP_ABOUT
-    END
-END
-
-IDR_NULLMENU MENU 
-BEGIN
-    MENUITEM "",                            IDM_NULLMENU, GRAYED
-END
-
-IDR_MAINFRAME_DISABLED MENU 
-BEGIN
-    POPUP "&File", GRAYED
-    BEGIN
-        MENUITEM "&Synchronize",                ID_FILE_SYNCHRONIZE
-        MENUITEM "&Options...",                 ID_FILE_CONFIGURATION
-        MENUITEM SEPARATOR
-        MENUITEM "E&xit",                       ID_APP_EXIT
-    END
-    POPUP "&Tools", GRAYED
-    BEGIN
-        MENUITEM "&Full Sync...",               ID_TOOLS_FULLSYNC
-        MENUITEM "&Set Log Level...",           ID_TOOLS_SETLOGLEVEL
-    END
-    POPUP "&Help", GRAYED
-    BEGIN
-        MENUITEM "&About...",                   ID_APP_ABOUT
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Accelerator
 //
 
@@ -1131,6 +1151,51 @@ END
 LANGUAGE LANG_ITALIAN, SUBLANG_ITALIAN
 #pragma code_page(1252)
 #endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Synchronize\tCtrl+S",        ID_FILE_SYNCHRONIZE
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit\tAlt+F4",               ID_APP_EXIT
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "Op&tions...\tCtrl+T",         ID_FILE_CONFIGURATION
+        MENUITEM SEPARATOR
+        MENUITEM "&Recover...\tCtrl+R",         ID_TOOLS_FULLSYNC
+        MENUITEM "&Logging...\tCtrl+L",         ID_TOOLS_SETLOGLEVEL
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&View User Guide\tCTRL+U",    ID_VIEW_GUIDE
+        MENUITEM SEPARATOR
+        MENUITEM "&About...\tCtrl+H",           ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS 
+BEGIN
+    "H",            ID_APP_ABOUT,           VIRTKEY, CONTROL, NOINVERT
+    "T",            ID_FILE_CONFIGURATION,  VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SYNCHRONIZE,    VIRTKEY, CONTROL, NOINVERT
+    "R",            ID_TOOLS_FULLSYNC,      VIRTKEY, CONTROL, NOINVERT
+    "L",            ID_TOOLS_SETLOGLEVEL,   VIRTKEY, CONTROL, NOINVERT
+    "U",            ID_VIEW_GUIDE,          VIRTKEY, CONTROL, NOINVERT
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

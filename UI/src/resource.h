@@ -4,11 +4,8 @@
 //
 #define IDD_ABOUTBOX                    100
 #define IDD_SYNC_FORM                   101
-#define IDM_NULLMENU                    127
-#define IDR_NULLMENU                    127
 #define IDR_MAINFRAME                   128
 #define IDS_SYNCTYPE1                   129
-#define IDR_MAINFRAME_DISABLED          129
 #define IDS_SYNCTYPE2                   130
 #define IDD_FORM_LEFT                   131
 #define IDS_SYNCTYPE3                   131
@@ -475,7 +472,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        271
+#define _APS_NEXT_RESOURCE_VALUE        272
 #define _APS_NEXT_COMMAND_VALUE         32785
 #define _APS_NEXT_CONTROL_VALUE         1208
 #define _APS_NEXT_SYMED_VALUE           101
