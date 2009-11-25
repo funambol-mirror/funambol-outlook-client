@@ -72,11 +72,11 @@ AccessConfig* DefaultWinConfigFactory::getAccessConfig() {
     ac->setServerID             ("funambol");
     ac->setServerNonce          ("");
     ac->setClientNonce          ("");
-    ac->setMaxMsgSize           (250000);                               // 250kB is large enough for ~90 contacts
+    ac->setMaxMsgSize           (MAX_SYNCML_MSG_SIZE);                  // 125kB = ~50 contacts
     ac->setReadBufferSize       (0);
     ac->setUserAgent            (PROGRAM_NAME);                         // This is replaced during config.upgradeConfig()
     ac->setCheckConn            (FALSE);
-    ac->setResponseTimeout      (600);                                  // [seconds] timeout on server = 10 min
+    ac->setResponseTimeout      (RESPONSE_TIMEOUT);                     // [seconds] timeout on server = 15 min
 
     return ac;
 }
