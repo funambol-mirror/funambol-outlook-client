@@ -89,6 +89,8 @@
 #define SCHED_DURATION_DAYS                 1                           /**< 1 day         */
 #define SYNC_TIMEOUT                        120                         /**< 120 minutes   */
 #define MAX_LOG_SIZE                        10000000                    /**< 10 MB         */
+#define MAX_SYNCML_MSG_SIZE                 125000                      /**< [bytes], the max syncML message size. default = 125KB */
+#define RESPONSE_TIMEOUT                    900                         /**< [seconds], the HTTP timeout on Server response. default = 15 minutes */
 
 /// Order is important: sources will be executed with this order.
 /// Sources not existing in this array will not be used/synchronized.

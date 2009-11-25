@@ -1129,6 +1129,12 @@ void OutlookConfig::upgradeConfig() {
         }
     }
 
+    // Old version < 8.2.7
+    if (oldFunambolSwv < 80207) {
+        getAccessConfig().setMaxMsgSize(MAX_SYNCML_MSG_SIZE);       // from 250K to 125K
+        getAccessConfig().setResponseTimeout(RESPONSE_TIMEOUT);     // from 10min to 15min
+    }
+
         
     // Set the flag to specify that config has been upgraded.
     upgraded = true;
