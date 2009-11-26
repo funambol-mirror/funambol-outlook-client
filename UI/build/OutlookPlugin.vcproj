@@ -359,6 +359,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\PicturesSettings.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\ProxySettings.cpp"
 				>
 			</File>
@@ -499,6 +503,10 @@
 			</File>
 			<File
 				RelativePath="..\src\OutlookPluginMainDoc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\PicturesSettings.h"
 				>
 			</File>
 			<File

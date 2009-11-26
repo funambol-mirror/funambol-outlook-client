@@ -89,14 +89,19 @@ public:
     CButton checkCalendar;
     CButton checkTasks;
     CButton checkNotes;
+    CButton checkPictures;
+
     CButton butContacts;
     CButton butCalendar;
     CButton butTasks;
     CButton butNotes;
+    CButton butPictures;
+
     bool saveSyncTypeContacts;
     bool saveSyncTypeCalendar;
     bool saveSyncTypeTasks;
     bool saveSyncTypeNotes;
+    bool saveSyncTypePictures;
     bool saveScheduler; // true if scheduler settings have changed
 
     // scheduler
@@ -113,12 +118,14 @@ public:
     afx_msg void OnBnClickedSyncCheckCalendar();
     afx_msg void OnBnClickedSyncCheckTasks();
     afx_msg void OnBnClickedSyncCheckNotes();
+    afx_msg void OnBnClickedSyncCheckPictures();
     afx_msg void OnBnClickedSyncOk();
     afx_msg void OnBnClickedSyncCancel();
     afx_msg void OnBnClickedSyncButContacts();
     afx_msg void OnBnClickedSyncButCalendar();
     afx_msg void OnBnClickedSyncButTasks();
     afx_msg void OnBnClickedSyncButNotes();
+    afx_msg void OnBnClickedSyncButPictures();
     afx_msg void OnNcPaint();   
   
     afx_msg void OnBnClickedSchedulerCheckEnabled();

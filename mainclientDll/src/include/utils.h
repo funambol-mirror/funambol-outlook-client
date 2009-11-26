@@ -81,6 +81,12 @@ int    makeDataDirs    ();
 int    getWindowsUser  (std::wstring& userName);
 int    getWindowsUserEx(std::wstring& userName);
 
+/**
+ * Returns the default path to store pictures 
+ * (shell folder 'pictures' for this user)
+ */
+StringBuffer getDefaultPicturesPath();
+
 std::wstring readFromFile          (const std::wstring& filePath);
 int          writeToFile           (const std::wstring& content, const std::wstring& filePath, const WCHAR* mode = L"w");
 int          writeToFile           (const std::string&  content, const std::string&  filePath, const char*  mode = "w");

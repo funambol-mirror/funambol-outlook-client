@@ -189,9 +189,9 @@ BOOL CNotesSettings::OnInitDialog(){
     }
     
     //
-    // Hide Advanced settings for portal build
+    // Hide Advanced settings (remote URI) if defined in customization.h
     //
-    if(getConfig()->checkPortalBuild()) {
+    if(!SHOW_ADVANCED_SETTINGS) {
         groupAdvanced.ShowWindow(SW_HIDE);
         editRemote.ShowWindow(SW_HIDE);
         GetDlgItem(IDC_NOTES_STATIC_REMOTE)->ShowWindow(SW_HIDE);

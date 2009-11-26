@@ -36,6 +36,7 @@
 
 #include "PicturesSyncSource.h"
 #include "winmaincpp.h"
+#include "utils.h"
 
 
 using namespace std;
@@ -49,12 +50,8 @@ PicturesSyncSource::PicturesSyncSource(const WCHAR* name, WindowsSyncSourceConfi
     StringBuffer path = picturesConfig.getFolderPath();
     if (path.empty()) {
         // If empty, set the default path for pictures (shell folder)
-        WCHAR buf[MAX_PATH];
-        SHGetSpecialFolderPath(NULL, buf, CSIDL_MYPICTURES, 0); 
-        if (buf && wcslen(buf) > 0) {
-            path.convert(buf);
-            picturesConfig.setFolderPath(path.c_str());
-        }
+        path = getDefaultPicturesPath();
+        picturesConfig.setFolderPath(path.c_str());
     }
     
     // "folderPath" is the one read from config, stored in registry.
