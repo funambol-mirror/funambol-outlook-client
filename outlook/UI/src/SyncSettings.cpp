@@ -47,6 +47,7 @@
 #include "CalendarSettings.h"
 #include "NotesSettings.h"
 #include "TaskSettings.h"
+#include "PicturesSettings.h"
 
 #include "customization.h"
 #include "winmaincpp.h"
@@ -113,35 +114,40 @@ void CSyncSettings::DoDataExchange(CDataExchange* pDX)
     CFormView::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_SYNC_CHECK_CONTACTS, checkContacts);
     DDX_Control(pDX, IDC_SYNC_CHECK_CALENDAR, checkCalendar);
-    DDX_Control(pDX, IDC_SYNC_CHECK_TASKS, checkTasks);
-    DDX_Control(pDX, IDC_SYNC_CHECK_NOTES, checkNotes);
+    DDX_Control(pDX, IDC_SYNC_CHECK_TASKS,    checkTasks);
+    DDX_Control(pDX, IDC_SYNC_CHECK_NOTES,    checkNotes);
+    DDX_Control(pDX, IDC_SYNC_CHECK_PICTURES, checkPictures);
+
     DDX_Control(pDX, IDC_SYNC_BUT_CONTACTS, butContacts);
     DDX_Control(pDX, IDC_SYNC_BUT_CALENDAR, butCalendar);
-    DDX_Control(pDX, IDC_SYNC_BUT_TASKS, butTasks);
-    DDX_Control(pDX, IDC_SYNC_BUT_NOTES, butNotes);
+    DDX_Control(pDX, IDC_SYNC_BUT_TASKS,    butTasks);
+    DDX_Control(pDX, IDC_SYNC_BUT_NOTES,    butNotes);
+    DDX_Control(pDX, IDC_SYNC_BUT_PICTURES, butPictures);
 
     DDX_Control(pDX, IDC_SCHEDULER_CHECK_ENABLED, checkEnabled);
-    DDX_Control(pDX, IDC_SCHEDULER_COMBO_VALUE, comboSchedulerValue);
-    DDX_Control(pDX, IDC_SYNC_CHECK_ENCRYPTION, checkEncryption);
-    DDX_Control(pDX, IDC_SYNC_GROUP_ITEMS, groupItems);
-    DDX_Control(pDX, IDC_SCHEDULER_GROUP, groupScheduler);
-    DDX_Control(pDX, IDC_SYNC_GROUP_SECURITY, groupSecurity);
+    DDX_Control(pDX, IDC_SCHEDULER_COMBO_VALUE,   comboSchedulerValue);
+    DDX_Control(pDX, IDC_SYNC_CHECK_ENCRYPTION,   checkEncryption);
+    DDX_Control(pDX, IDC_SYNC_GROUP_ITEMS,        groupItems);
+    DDX_Control(pDX, IDC_SCHEDULER_GROUP,         groupScheduler);
+    DDX_Control(pDX, IDC_SYNC_GROUP_SECURITY,     groupSecurity);
 }
 
 BEGIN_MESSAGE_MAP(CSyncSettings, CFormView)
     ON_MESSAGE( WM_INITDIALOG, OnInitForm ) 
-    ON_BN_CLICKED(IDC_SYNC_CHECK_CONTACTS, &CSyncSettings::OnBnClickedSyncCheckContacts)
-    ON_BN_CLICKED(IDC_SYNC_CHECK_CALENDAR, &CSyncSettings::OnBnClickedSyncCheckCalendar)
-    ON_BN_CLICKED(IDC_SYNC_CHECK_TASKS, &CSyncSettings::OnBnClickedSyncCheckTasks)
-    ON_BN_CLICKED(IDC_SYNC_CHECK_NOTES, &CSyncSettings::OnBnClickedSyncCheckNotes)
-    ON_BN_CLICKED(IDC_SYNC_OK, &CSyncSettings::OnBnClickedSyncOk)
-    ON_BN_CLICKED(IDC_SYNC_CANCEL, &CSyncSettings::OnBnClickedSyncCancel)
-    ON_BN_CLICKED(IDC_SYNC_BUT_CONTACTS, &CSyncSettings::OnBnClickedSyncButContacts)
-    ON_BN_CLICKED(IDC_SYNC_BUT_CALENDAR, &CSyncSettings::OnBnClickedSyncButCalendar)
-    ON_BN_CLICKED(IDC_SYNC_BUT_TASKS, &CSyncSettings::OnBnClickedSyncButTasks)
-    ON_BN_CLICKED(IDC_SYNC_BUT_NOTES, &CSyncSettings::OnBnClickedSyncButNotes)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_CONTACTS,  &CSyncSettings::OnBnClickedSyncCheckContacts)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_CALENDAR,  &CSyncSettings::OnBnClickedSyncCheckCalendar)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_TASKS,     &CSyncSettings::OnBnClickedSyncCheckTasks)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_NOTES,     &CSyncSettings::OnBnClickedSyncCheckNotes)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_PICTURES,  &CSyncSettings::OnBnClickedSyncCheckPictures)
+    ON_BN_CLICKED(IDC_SYNC_OK,              &CSyncSettings::OnBnClickedSyncOk)
+    ON_BN_CLICKED(IDC_SYNC_CANCEL,          &CSyncSettings::OnBnClickedSyncCancel)
+    ON_BN_CLICKED(IDC_SYNC_BUT_CONTACTS,    &CSyncSettings::OnBnClickedSyncButContacts)
+    ON_BN_CLICKED(IDC_SYNC_BUT_CALENDAR,    &CSyncSettings::OnBnClickedSyncButCalendar)
+    ON_BN_CLICKED(IDC_SYNC_BUT_TASKS,       &CSyncSettings::OnBnClickedSyncButTasks)
+    ON_BN_CLICKED(IDC_SYNC_BUT_NOTES,       &CSyncSettings::OnBnClickedSyncButNotes)
+    ON_BN_CLICKED(IDC_SYNC_BUT_PICTURES,    &CSyncSettings::OnBnClickedSyncButPictures)
     ON_WM_NCPAINT()
-    ON_BN_CLICKED(IDC_SCHEDULER_CHECK_ENABLED, &CSyncSettings::OnBnClickedSchedulerCheckEnabled)
+    ON_BN_CLICKED(IDC_SCHEDULER_CHECK_ENABLED,  &CSyncSettings::OnBnClickedSchedulerCheckEnabled)
     ON_CBN_SELCHANGE(IDC_SCHEDULER_COMBO_VALUE, &CSyncSettings::OnCbnSelchangeSchedulerComboValue)
 END_MESSAGE_MAP()
 
@@ -169,23 +175,22 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     CString s1;
     int minutes = 0;
     
-    s1.LoadString(IDS_ITEMS); SetDlgItemText(IDC_SYNC_GROUP_ITEMS,s1);
-    s1.LoadString(IDS_SCHEDULER); SetDlgItemText(IDC_SCHEDULER_GROUP,s1);
-    s1.LoadString(IDS_CONTACTS); SetDlgItemText(IDC_SYNC_STATIC_CONTACTS,s1);
-    s1.LoadString(IDS_CALENDAR); SetDlgItemText(IDC_SYNC_STATIC_CALENDAR,s1);
-    s1.LoadString(IDS_TASKS); SetDlgItemText(IDC_SYNC_STATIC_TASKS,s1);
-    s1.LoadString(IDS_NOTES); SetDlgItemText(IDC_SYNC_STATIC_NOTES,s1);
+    s1.LoadString(IDS_ITEMS);       SetDlgItemText(IDC_SYNC_GROUP_ITEMS,    s1);
+    s1.LoadString(IDS_SCHEDULER);   SetDlgItemText(IDC_SCHEDULER_GROUP,     s1);
+    s1.LoadString(IDS_CONTACTS);    SetDlgItemText(IDC_SYNC_CHECK_CONTACTS, s1);
+    s1.LoadString(IDS_CALENDAR);    SetDlgItemText(IDC_SYNC_CHECK_CALENDAR, s1);
+    s1.LoadString(IDS_TASKS);       SetDlgItemText(IDC_SYNC_CHECK_TASKS,    s1);
+    s1.LoadString(IDS_NOTES);       SetDlgItemText(IDC_SYNC_CHECK_NOTES,    s1);
+    s1.LoadString(IDS_PICTURES);    SetDlgItemText(IDC_SYNC_CHECK_PICTURES, s1);
     
-    s1.LoadString(IDS_DETAILS);  
-    SetDlgItemText(IDC_SYNC_BUT_CONTACTS,s1); SetDlgItemText(IDC_SYNC_BUT_CALENDAR,s1);
-    SetDlgItemText(IDC_SYNC_BUT_NOTES,s1); SetDlgItemText(IDC_SYNC_BUT_TASKS,s1);
+    s1.LoadString(IDS_DETAILS);
+    SetDlgItemText(IDC_SYNC_BUT_CONTACTS, s1);
+    SetDlgItemText(IDC_SYNC_BUT_CALENDAR, s1);
+    SetDlgItemText(IDC_SYNC_BUT_TASKS,    s1);
+    SetDlgItemText(IDC_SYNC_BUT_NOTES,    s1);
+    SetDlgItemText(IDC_SYNC_BUT_PICTURES, s1);
 
-    s1.LoadString(IDS_CONTACTS); SetDlgItemText(IDC_SYNC_CHECK_CONTACTS, s1);
-    s1.LoadString(IDS_CALENDAR); SetDlgItemText(IDC_SYNC_CHECK_CALENDAR, s1);
-    s1.LoadString(IDS_TASKS); SetDlgItemText(IDC_SYNC_CHECK_TASKS, s1);
-    s1.LoadString(IDS_NOTES); SetDlgItemText(IDC_SYNC_CHECK_NOTES, s1);
-
-    s1.LoadString(IDS_OK); SetDlgItemText(IDC_SYNC_OK, s1);
+    s1.LoadString(IDS_OK);     SetDlgItemText(IDC_SYNC_OK,     s1);
     s1.LoadString(IDS_CANCEL); SetDlgItemText(IDC_SYNC_CANCEL, s1);
 
     // Scheduler: add strings to the comboBox
@@ -206,8 +211,9 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
         comboSchedulerValue.AddString(sched);
     }
 
-    s1.LoadString(IDS_SECURITY);                 SetDlgItemText(IDC_SYNC_GROUP_SECURITY, s1);
+    s1.LoadString(IDS_SECURITY);                 SetDlgItemText(IDC_SYNC_GROUP_SECURITY,  s1);
     s1.LoadString(IDS_SYNC_ENABLE_ENCRYPTION);   SetDlgItemText(IDC_SYNC_CHECK_ENCRYPTION, s1);
+
 
     //
     // enable/disable controls, depending of what sources are set to none
@@ -273,7 +279,7 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     }
 
     // NOTES
-    if (isSourceVisible(TASK)) {
+    if (isSourceVisible(NOTE)) {
         saveSyncTypeNotes = true;
         ssc = getConfig()->getSyncSourceConfig(NOTE_);
         if (!ssc->isEnabled()) {
@@ -289,6 +295,38 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
         butNotes.ShowWindow(SW_HIDE);
         saveSyncTypeNotes = false;
         GetDlgItem(IDC_SEPARATOR_3)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_SEPARATOR_4)->ShowWindow(SW_HIDE);
+    }
+
+    // PICTURES
+    if (isSourceVisible(PICTURE)) {
+        saveSyncTypePictures = true;
+        ssc = getConfig()->getSyncSourceConfig(PICTURE_);
+        if (!ssc->isEnabled()) {
+            checkPictures.SetCheck(BST_UNCHECKED);
+            butPictures.EnableWindow(FALSE);
+        }
+        else{
+            checkPictures.SetCheck(BST_CHECKED);
+        }
+
+        // Fix the source groupbox height (TODO: should be calculated dinamically)
+        CRect sep3Rect, sep4Rect, sourceGroupBoxRect;
+        GetDlgItem(IDC_SEPARATOR_3)->GetWindowRect(&sep3Rect);
+        GetDlgItem(IDC_SEPARATOR_4)->GetWindowRect(&sep4Rect);
+        int offset = sep4Rect.BottomRight().y - sep3Rect.BottomRight().y;
+        
+        CWnd* sourceGroupBox = GetDlgItem(IDC_SYNC_GROUP_ITEMS);
+        GetDlgItem(IDC_SYNC_GROUP_ITEMS)->GetWindowRect(&sourceGroupBoxRect);
+        sourceGroupBox->SetWindowPos(&CWnd::wndTop, 0, 0, 
+                                     sourceGroupBoxRect.Width(), sourceGroupBoxRect.Height() + offset, 
+                                     SWP_SHOWWINDOW | SWP_NOMOVE);
+    }
+    else {
+        checkPictures.ShowWindow(SW_HIDE);
+        butPictures.ShowWindow(SW_HIDE);
+        saveSyncTypePictures = false;
+        GetDlgItem(IDC_SEPARATOR_4)->ShowWindow(SW_HIDE);
     }
 
     
@@ -350,7 +388,6 @@ void CSyncSettings::OnBnClickedSyncCheckContacts()
     else{
         butContacts.EnableWindow(TRUE);
     }
-
     saveSyncTypeContacts = true;
 }
 
@@ -372,7 +409,7 @@ void CSyncSettings::OnBnClickedSyncCheckTasks()
     }
     else{
         butTasks.EnableWindow(TRUE);
-    };
+    }
     saveSyncTypeTasks = true;
 }
 
@@ -384,6 +421,16 @@ void CSyncSettings::OnBnClickedSyncCheckNotes()
         butNotes.EnableWindow(TRUE);
 
     saveSyncTypeNotes = true;
+}
+
+void CSyncSettings::OnBnClickedSyncCheckPictures()
+{
+    if(checkPictures.GetCheck() == BST_UNCHECKED)
+        butPictures.EnableWindow(FALSE);
+    else
+        butPictures.EnableWindow(TRUE);
+
+    saveSyncTypePictures = true;
 }
 
 void CSyncSettings::OnBnClickedSyncOk()
@@ -429,10 +476,17 @@ void CSyncSettings::OnBnClickedSyncButNotes()
     saveSyncTypeNotes = (result != IDOK);
 }
 
+void CSyncSettings::OnBnClickedSyncButPictures()
+{
+    CPicturesSettings wndPictures;
+    INT_PTR result = wndPictures.DoModal();
+    saveSyncTypePictures = (result != IDOK);
+}
+
 
 bool CSyncSettings::saveSettings(bool saveToDisk)
 {    
-    CString s1,s2,msg;
+    CString s1, s2, msg;
     _bstr_t bst;
     int minutes=0, hours=0;
 
@@ -473,8 +527,13 @@ bool CSyncSettings::saveSettings(bool saveToDisk)
         bool enabled = (checkNotes.GetCheck() == BST_CHECKED)? true:false;
         getConfig()->getSyncSourceConfig(NOTE_)->setIsEnabled(enabled);
     }
+    if (saveSyncTypePictures) {
+        bool enabled = (checkPictures.GetCheck() == BST_CHECKED)? true:false;
+        getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(enabled);
+    }
 
-    // save encryption, global property
+    // save encryption, global property 
+    // NOTE: pictures excluded: cannot DES a largeObject read chunk by chunk via input stream
     if(checkEncryption.GetCheck()){
         getConfig()->getSyncSourceConfig(CONTACT_)->setEncryption("des");
         getConfig()->getSyncSourceConfig(APPOINTMENT_)->setEncryption("des");

@@ -43,6 +43,7 @@
 #define IDS_USE_SIF                     151
 #define IDD_PROXY                       151
 #define IDS_USE_VCARD                   152
+#define IDD_PICTURES                    152
 #define IDS_ENCRYPTION                  153
 #define IDS_ADVANCED_CONTACTS           154
 #define IDS_FULLSYNC_PERFORM            155
@@ -120,6 +121,7 @@
 #define IDS_DAYS                        211
 #define IDS_MSG_CLOSE_SYNC_IN_PROGRESS  212
 #define IDS_ABOUT_MAIN_TEXT             213
+#define IDS_SELECT_PICTURES_FOLDER      213
 #define IDS_TEXT_SYNC_ALREADY_RUNNING   214
 #define IDS_SYNC_ABORTED_AVOID_FULLSYNC 215
 #define IDS_TEXT_SYNC_IN_PROGRESS       216
@@ -161,6 +163,7 @@
 #define IDB_BITMAP3                     250
 #define IDS_NOT_SYNCHRONIZED            251
 #define IDB_BITMAP4                     252
+#define IDS_PICTURES_OMA_FILEDATA       252
 #define IDS_SYNCHRONIZED                253
 #define IDS_AT                          254
 #define IDS_MAIN_CALENDAR               255
@@ -198,6 +201,7 @@
 #define IDI_NOTES_GREY1                 268
 #define IDI_PICTURES_GREY               268
 #define IDB_SEPARATOR                   269
+#define IDS_PICTURES_RAW_FILEDATA       269
 #define IDS_ERR_SERVER_TIMOUT           270
 #define IDS_CODE_SERVER_BUSY            271
 #define IDS_CODE_SERVER_BUSY_SYNC       272
@@ -277,7 +281,6 @@
 #define IDC_SPIN1                       1022
 #define IDC_SYNC_COMBO_TASKS            1022
 #define IDC_LOG_RADIO_INFO              1022
-#define IDC_SYNC_STATIC_NOTES           1022
 #define IDC_FULLSYNC_RADIO2             1022
 #define IDC_BUTTON5                     1023
 #define IDC_LIST1                       1023
@@ -294,6 +297,8 @@
 #define IDC_SYNC_BUT_NOTES              1025
 #define IDC_ACCOUNT_STATIC_USERNAME     1026
 #define IDC_SCHEDULER_SPIN2             1026
+#define IDC_SYNC_BUT_NOTES2             1026
+#define IDC_SYNC_BUT_PICTURES           1026
 #define IDC_CALENDAR_COMBO_SYNCTYPE     1032
 #define IDC_CALENDAR_EDIT_FOLDER        1033
 #define IDC_CALENDAR_CHECK_INCLUDE      1034
@@ -329,6 +334,7 @@
 #define IDC_SYNC_CHECK_TASKS            1070
 #define IDC_SYNC_CHECK_NOTES            1071
 #define IDC_SYNC_COMBO_CONTACTS         1072
+#define IDC_SYNC_CHECK_PICTURES         1072
 #define IDC_ACCOUNT_BUT_CANCEL          1073
 #define IDC_CALENDAR_BUTOK              1074
 #define IDC_CALENDAR_BUTCANCEL          1075
@@ -355,9 +361,6 @@
 #define IDC_SYNC_PROGRESS_CALENDAR      1099
 #define IDC_SYNC_PROGRESS_NOTES         1100
 #define IDC_SYNC_PROGRESS_TASKS         1101
-#define IDC_SYNC_STATIC_CONTACTS        1102
-#define IDC_SYNC_STATIC_CALENDAR        1103
-#define IDC_SYNC_STATIC_TASKS           1104
 #define IDC_SYNC_ICON_CONTACTS          1105
 #define IDC_SYNC_ICON_CALENDAR          1106
 #define IDC_SYNC_ICON_TASKS             1107
@@ -460,6 +463,20 @@
 #define IDC_SEPARATOR_1                 1205
 #define IDC_SEPARATOR_2                 1206
 #define IDC_SEPARATOR_3                 1207
+#define IDC_SEPARATOR_4                 1208
+#define IDC_PICTURES_GROUP_DIRECTION    1208
+#define IDC_PICTURES_STATIC_FOLDER      1209
+#define IDC_PICTURES_EDIT_FOLDER        1210
+#define IDC_PICTURES_BUT_SELECT         1211
+#define IDC_PICTURES_GROUP_FOLDER       1212
+#define IDC_PICTURES_GROUP_ADVANCED     1213
+#define IDC_PICTURES_STATIC_REMOTE      1214
+#define IDC_PICTURES_EDIT_REMOTE        1215
+#define IDC_PICTURES_STATIC_DATAFORMAT  1216
+#define IDC_PICTURES_MIME_TYPE          1217
+#define IDC_PICTURES_OK                 1218
+#define IDC_PICTURES_CANCEL             1219
+#define IDC_PICTURES_EDIT_SYNCTYPE      1220
 #define ID_FILE_CONFIGURATION           32771
 #define ID_FILE_ZZZZ                    32772
 #define ID_FILE_SYNCHRONIZE             32773
@@ -474,7 +491,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        272
 #define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1208
+#define _APS_NEXT_CONTROL_VALUE         1220
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

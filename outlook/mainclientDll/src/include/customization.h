@@ -81,7 +81,8 @@
 #define PROGRAM_NAME_EXE                    "OutlookPlugin.exe"             // The application to run
 #define SCHED_COMMENT                       TEXT(PROGRAM_NAME) TEXT(" scheduler")
 #define OL_PLUGIN_LOG_NAME                  "outlook-client-log.txt"
-#define ENABLE_ENCRYPTION_SETTINGS          1                           /**< 0 to hide the encryption UI check in the Settings screen*/
+#define ENABLE_ENCRYPTION_SETTINGS          1                           /**< 0 to hide the encryption UI check in the Settings screen */
+#define SHOW_ADVANCED_SETTINGS              1                           /**< 0 to hide the advanced source settings (remote URIs) */
 #define DISPLAY_SLOWSYNC_WARNING            0                           /**< 1 to display a timed-msgbox if Server requests a SLOW SYNC */
 #define ASK_SLOW_TIMEOUT                    25                          /**< 25 seconds    */
 #define TIME_OUT_ABORT                      8                           /**< 8  seconds    */
@@ -100,7 +101,7 @@ static WCHAR* itemTypesUsed[] = {
     {APPOINTMENT        },
     {TASK               },
     {NOTE               },
-    //{PICTURE          },
+    {PICTURE            },
     {NULL}
 };
 

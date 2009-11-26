@@ -1,3 +1,9 @@
+2009-11-26
+   - toccy: merged from US1660 to trunk: pictures settings
+            * added dialog for pictures settings (browse destination folder, remote URI)
+            * added SHOW_ADVANCED_SETTINGS in customization.h (default = 1)  
+            * Pictures source is now enabled by default                    
+
 2009-11-25
 *** Funambol Outlook Sync Client v.8.2.7 (linked to SDK C++ v.8.2.1) ***
    - toccy: changed default HTTP response timeout = 15min (was 10 min)
