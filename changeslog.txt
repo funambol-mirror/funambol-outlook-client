@@ -1,3 +1,8 @@
+2009-11-27
+*** Funambol Outlook Sync Client v.8.2.7 (linked to SDK C++ v.8.2.1) ***
+   - toccy: fixed bug #8033: uninstall needs to copy CRT DLLs into Windir, in order to correctly
+            load the Funambol addin after when Outlook is opened after the uninstall, to cleanup bar/menu.
+
 2009-11-26
    - toccy: merged from US1660 to trunk: pictures settings
             * added dialog for pictures settings (browse destination folder, remote URI)
@@ -5,7 +10,6 @@
             * Pictures source is now enabled by default                    
 
 2009-11-25
-*** Funambol Outlook Sync Client v.8.2.7 (linked to SDK C++ v.8.2.1) ***
    - toccy: changed default HTTP response timeout = 15min (was 10 min)
             changed default maxMsgSize = 125KB (was 250KB)
             added MAX_SYNCML_MSG_SIZE and RESPONSE_TIMEOUT into customization.h
