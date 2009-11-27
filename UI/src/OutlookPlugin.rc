@@ -230,6 +230,7 @@ BEGIN
     IDS_CODE_DROPPED_ITEMS  "Warnung: Einige Einträge konnten nicht korrekt in Outlook übernommen werden."
     IDS_TEXT_CHECKING       "Überprüfen"
     IDS_FINISHED_SENDING    "Es werden auf die Severdaten gewartet..."
+    IDS_PICTURES_RAW_FILEDATA "Raw file data"
     IDS_ERR_SERVER_TIMOUT   "Server Time-out: die aktuelle Session wurde abgebrochen.\nBitte versuchen Sie es später."
     IDS_CODE_SERVER_BUSY    "Server ist überlastet. Bitte versuchen Sie es später."
 END
@@ -262,6 +263,8 @@ BEGIN
     IDS_DAYS                "Tage"
     IDS_MSG_CLOSE_SYNC_IN_PROGRESS 
                             "Synchronisation wird gerade ausgeführt. Bitte warten Sie oder brechen Sie die Synchronisation ab."
+    IDS_SELECT_PICTURES_FOLDER 
+                            "Please select the destination folder for pictures:"
     IDS_TEXT_SYNC_ALREADY_RUNNING 
                             "Synchronisation wird gerade ausgeführt.\nBitte warten Sie, bis die Synchronisation beendet ist."
     IDS_SYNC_ABORTED_AVOID_FULLSYNC 
@@ -312,6 +315,7 @@ BEGIN
     IDS_RECOVER             "Wiederherstellen"
     IDS_LOGGING             "Logging"
     IDS_NOT_SYNCHRONIZED    "Nicht synchronisiert"
+    IDS_PICTURES_OMA_FILEDATA "OMA File Data Object"
     IDS_SYNCHRONIZED        "Letzte Sychronisation:"
     IDS_AT                  "um"
     IDS_MAIN_CALENDAR       "Kalender"
@@ -457,7 +461,7 @@ BEGIN
     ICON            "",IDC_MAIN_ICON_STATUS_PICTURES,196,170,21,20
 END
 
-IDD_ACCOUNT DIALOGEX 0, 0, 252, 206
+IDD_ACCOUNT DIALOGEX 0, 0, 252, 234
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0xEE
 BEGIN
@@ -467,36 +471,39 @@ BEGIN
     EDITTEXT        IDC_ACCOUNT_EDIT_USERNAME,68,43,151,14,ES_AUTOHSCROLL
     LTEXT           "[Password:]",IDC_ACCOUNT_STATIC_PASSWORD,23,70,51,8
     EDITTEXT        IDC_ACCOUNT_EDIT_PASSWORD,68,67,151,14,ES_PASSWORD | ES_AUTOHSCROLL
-    PUSHBUTTON      "[Proxy Settings...]",IDC_ACCOUNT_BUT_PROXY,149,102,84,14
-    DEFPUSHBUTTON   "&OK",IDC_ACCOUNT_BUTOK,123,184,50,14
-    PUSHBUTTON      "&Cancel",IDC_ACCOUNT_BUT_CANCEL,183,184,50,14
+    PUSHBUTTON      "[Proxy Settings...]",IDC_ACCOUNT_BUT_PROXY,149,105,84,14
+    DEFPUSHBUTTON   "&OK",IDC_ACCOUNT_BUTOK,123,208,50,14
+    PUSHBUTTON      "&Cancel",IDC_ACCOUNT_BUT_CANCEL,183,208,50,14
     GROUPBOX        "[Server]",IDC_ACCOUNT_GROUP_SERVER,9,6,224,85,BS_NOTIFY
 END
 
-IDD_SYNC DIALOGEX 0, 0, 250, 206
+IDD_SYNC DIALOGEX 0, 0, 250, 230
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Contacts",IDC_SYNC_CHECK_CONTACTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,21,108,10
+    CONTROL         "Contacts",IDC_SYNC_CHECK_CONTACTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,20,108,10
     CONTROL         "Calendar",IDC_SYNC_CHECK_CALENDAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,42,101,10
-    CONTROL         "Tasks",IDC_SYNC_CHECK_TASKS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,63,101,10
+    CONTROL         "Tasks",IDC_SYNC_CHECK_TASKS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,64,101,10
     CONTROL         "Notes",IDC_SYNC_CHECK_NOTES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,87,101,10
     PUSHBUTTON      "Details...",IDC_SYNC_BUT_CONTACTS,173,17,47,14
     PUSHBUTTON      "Details",IDC_SYNC_BUT_CALENDAR,173,40,47,14
     PUSHBUTTON      "Details",IDC_SYNC_BUT_TASKS,173,63,47,14
     PUSHBUTTON      "Details",IDC_SYNC_BUT_NOTES,173,86,47,14
     CONTROL         "[Synchronize every:]",IDC_SCHEDULER_CHECK_ENABLED,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,120,80,15
-    GROUPBOX        "[Scheduler]",IDC_SCHEDULER_GROUP,8,109,224,33
-    GROUPBOX        "[Items]",IDC_SYNC_GROUP_ITEMS,8,7,224,98
-    GROUPBOX        "[&Security]",IDC_SYNC_GROUP_SECURITY,8,146,224,30
-    CONTROL         "[Enable Encryption]",IDC_SYNC_CHECK_ENCRYPTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,159,79,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,144,80,15
+    GROUPBOX        "[Scheduler]",IDC_SCHEDULER_GROUP,8,133,224,33
+    GROUPBOX        "[Items]",IDC_SYNC_GROUP_ITEMS,8,7,224,99
+    GROUPBOX        "[&Security]",IDC_SYNC_GROUP_SECURITY,8,171,224,30
+    CONTROL         "[Enable Encryption]",IDC_SYNC_CHECK_ENCRYPTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,184,79,10
     CONTROL         "",IDC_SEPARATOR_1,"Static",SS_ETCHEDHORZ | SS_SUNKEN,22,35,190,1
     CONTROL         "",IDC_SEPARATOR_2,"Static",SS_ETCHEDHORZ | SS_SUNKEN,21,58,190,1
     CONTROL         "",IDC_SEPARATOR_3,"Static",SS_ETCHEDHORZ | SS_SUNKEN,21,81,190,1
-    DEFPUSHBUTTON   "&OK",IDC_SYNC_OK,123,184,50,14
-    PUSHBUTTON      "&Cancel",IDC_SYNC_CANCEL,183,184,50,14
-    COMBOBOX        IDC_SCHEDULER_COMBO_VALUE,119,121,101,12,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "&OK",IDC_SYNC_OK,123,208,50,14
+    PUSHBUTTON      "&Cancel",IDC_SYNC_CANCEL,183,208,50,14
+    COMBOBOX        IDC_SCHEDULER_COMBO_VALUE,119,145,101,12,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Pictures",IDC_SYNC_CHECK_PICTURES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,110,101,10
+    CONTROL         "",IDC_SEPARATOR_4,"Static",SS_ETCHEDHORZ | SS_SUNKEN,21,104,190,1
+    PUSHBUTTON      "Details",IDC_SYNC_BUT_PICTURES,173,109,47,14
 END
 
 IDD_CONTACTS DIALOGEX 0, 0, 299, 198
@@ -643,6 +650,26 @@ BEGIN
     EDITTEXT        IDC_PROXY_EDIT_USER,92,40,133,14,ES_AUTOHSCROLL
 END
 
+IDD_PICTURES DIALOGEX 0, 0, 299, 187
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "[Pictures Settings]"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    LTEXT           "[Current:]",IDC_PICTURES_STATIC_FOLDER,17,67,55,8
+    EDITTEXT        IDC_PICTURES_EDIT_FOLDER,72,65,144,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "[Change...]",IDC_PICTURES_BUT_SELECT,226,65,50,15,BS_MULTILINE
+    LTEXT           "Remote name:",IDC_PICTURES_STATIC_REMOTE,18,115,47,8
+    EDITTEXT        IDC_PICTURES_EDIT_REMOTE,72,113,144,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDC_PICTURES_OK,180,165,50,14
+    PUSHBUTTON      "&Cancel",IDC_PICTURES_CANCEL,239,165,50,14
+    GROUPBOX        "[Sync Direction:]",IDC_PICTURES_GROUP_DIRECTION,7,3,282,39
+    GROUPBOX        "[Pictures Folder:]",IDC_PICTURES_GROUP_FOLDER,7,49,282,42
+    GROUPBOX        "[Advanced:]",IDC_PICTURES_GROUP_ADVANCED,7,99,282,55
+    LTEXT           "Data Format:",IDC_PICTURES_STATIC_DATAFORMAT,17,135,55,15
+    LTEXT           "[OMA File Data Object]",IDC_PICTURES_MIME_TYPE,75,135,207,11
+    LTEXT           "Server to Client only",IDC_PICTURES_EDIT_SYNCTYPE,17,20,199,11
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -686,6 +713,7 @@ BEGIN
         VERTGUIDE, 68
         VERTGUIDE, 219
         VERTGUIDE, 233
+        BOTTOMMARGIN, 206
     END
 
     IDD_SYNC, DIALOG
@@ -696,6 +724,7 @@ BEGIN
         VERTGUIDE, 173
         VERTGUIDE, 220
         VERTGUIDE, 232
+        BOTTOMMARGIN, 206
     END
 
     IDD_CONTACTS, DIALOG
@@ -752,6 +781,15 @@ BEGIN
         VERTGUIDE, 92
         VERTGUIDE, 225
         BOTTOMMARGIN, 95
+    END
+
+    IDD_PICTURES, DIALOG
+    BEGIN
+        VERTGUIDE, 7
+        VERTGUIDE, 72
+        VERTGUIDE, 216
+        VERTGUIDE, 289
+        BOTTOMMARGIN, 186
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -1019,6 +1057,7 @@ BEGIN
     IDS_CODE_DROPPED_ITEMS  "Warning: some items were not correctly saved in Outlook."
     IDS_TEXT_CHECKING       "Checking"
     IDS_FINISHED_SENDING    "Waiting for Server data..."
+    IDS_PICTURES_RAW_FILEDATA "Raw file data"
     IDS_ERR_SERVER_TIMOUT   "Server returned timeout error: current session has expired.\nPlease retry later."
     IDS_CODE_SERVER_BUSY    "Server is busy, please retry later."
 END
@@ -1051,6 +1090,8 @@ BEGIN
     IDS_DAYS                "days"
     IDS_MSG_CLOSE_SYNC_IN_PROGRESS 
                             "Synchronization in progress. Please wait or cancel it."
+    IDS_SELECT_PICTURES_FOLDER 
+                            "Please select the destination folder for pictures:"
     IDS_TEXT_SYNC_ALREADY_RUNNING 
                             "Sync already in progress.\nPlease wait until the sync is finished."
     IDS_SYNC_ABORTED_AVOID_FULLSYNC 
@@ -1100,6 +1141,7 @@ BEGIN
     IDS_RECOVER             "Recover"
     IDS_LOGGING             "Logging"
     IDS_NOT_SYNCHRONIZED    "Not synchronized"
+    IDS_PICTURES_OMA_FILEDATA "OMA File Data Object"
     IDS_SYNCHRONIZED        "Last sync:"
     IDS_AT                  "at"
     IDS_MAIN_CALENDAR       "Calendar"
@@ -1340,6 +1382,7 @@ BEGIN
     IDS_CODE_DROPPED_ITEMS  "Warning: some items were not correctly saved in Outlook."
     IDS_TEXT_CHECKING       "Checking"
     IDS_FINISHED_SENDING    "Waiting for Server data..."
+    IDS_PICTURES_RAW_FILEDATA "Raw file data"
     IDS_ERR_SERVER_TIMOUT   "Server returned timeout error: current session has expired.\nPlease retry later."
     IDS_CODE_SERVER_BUSY    "Server is busy, please retry later."
 END
@@ -1372,6 +1415,8 @@ BEGIN
     IDS_DAYS                "days"
     IDS_MSG_CLOSE_SYNC_IN_PROGRESS 
                             "Synchronization in progress. Please wait or cancel it."
+    IDS_SELECT_PICTURES_FOLDER 
+                            "Please select the destination folder for pictures:"
     IDS_TEXT_SYNC_ALREADY_RUNNING 
                             "Sync already in progress.\nPlease wait until the sync is finished."
     IDS_SYNC_ABORTED_AVOID_FULLSYNC 
@@ -1421,6 +1466,7 @@ BEGIN
     IDS_RECOVER             "Recover"
     IDS_LOGGING             "Logging"
     IDS_NOT_SYNCHRONIZED    "Not synchronized"
+    IDS_PICTURES_OMA_FILEDATA "OMA File Data Object"
     IDS_SYNCHRONIZED        "Last sync:"
     IDS_AT                  "at"
     IDS_MAIN_CALENDAR       "Calendar"

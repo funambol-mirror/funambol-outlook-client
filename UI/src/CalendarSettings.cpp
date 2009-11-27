@@ -199,9 +199,9 @@ BOOL CCalendarSettings::OnInitDialog(){
 
 
     //
-    // Hide Advanced settings for portal build
+    // Hide Advanced settings (remote URI) if defined in customization.h
     //
-    if(getConfig()->checkPortalBuild()) {
+    if(!SHOW_ADVANCED_SETTINGS) {
         groupAdvanced.ShowWindow(SW_HIDE);
         editRemote.ShowWindow(SW_HIDE);
         radioSif.ShowWindow(SW_HIDE);

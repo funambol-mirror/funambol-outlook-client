@@ -322,6 +322,19 @@ WCHAR* readDataPath(const WCHAR* itemType) {
 }
 
 
+StringBuffer getDefaultPicturesPath() {
+
+    StringBuffer path;
+    WCHAR buf[MAX_PATH];
+
+    SHGetSpecialFolderPath(NULL, buf, CSIDL_MYPICTURES, 0); 
+    if (buf && wcslen(buf) > 0) {
+        path.convert(buf);
+    }
+    return path;
+}
+
+
 
 /**
  * Reads a file from filesystem and write its content into a string.
