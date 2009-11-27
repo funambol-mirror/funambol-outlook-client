@@ -635,16 +635,22 @@ Section Uninstall
      ; Delete "$WINDIR\Tasks\${PRODUCT_NAME}.job"
 
      ; Unregister DLLs.
+     ClearErrors
+     SetOutPath "$INSTDIR"
      UnRegDLL "$INSTDIR\Redemption.dll"
+     IfErrors errorDLL1
      UnRegDLL "$INSTDIR\FunambolAddin.dll"
+     IfErrors errorDLL2
 
      ; Copy Addin to WinDir and register it.
      ; (MUST keep it after uninstall, to be loaded at next Outlook startup
      ; and clean up buttons/bars - then it will unregister itself).
      CopyFiles /SILENT "$INSTDIR\FunambolAddin.dll" "$WINDIR\FunambolAddin.dll"
-     ; MUST copy also ATL library to WINDIR! (could not be installed).
-     CopyFiles /SILENT "$INSTDIR\Microsoft.VC80.ATL" "$WINDIR"
+     CopyFiles /SILENT "$INSTDIR\Microsoft.VC80.ATL" "$WINDIR"          ; MUST copy also ATL library to WINDIR! (could not be installed).
+     CopyFiles /SILENT "$INSTDIR\Microsoft.VC80.MFC" "$WINDIR"          ; this should not be necessary, but...
+     CopyFiles /SILENT "$INSTDIR\Microsoft.VC80.CRT" "$WINDIR"          ; CRT is also required!
      RegDLL "$WINDIR\FunambolAddin.dll"
+     IfErrors errorDLL3
 
 
      ; Delete files from installDir.
@@ -686,6 +692,19 @@ Section Uninstall
      Call un.deleteRegistry
      
      SetAutoClose true
+     Return
+     
+  errorDLL1:
+      MessageBox MB_OK "Could not unregister Redemption.dll. Ubìninstallation failed."
+      Return
+
+  errorDLL2:
+      MessageBox MB_OK "Could not unregister FunambolAddin.dll. Uninstallation failed."
+      Return
+
+  errorDLL3:
+      MessageBox MB_OK "Could not register FunambolAddin.dll. Uninstallation failed."
+      Return
      
 SectionEnd
 
@@ -833,10 +852,6 @@ Function un.deleteRegistry
      ; Delete application registered from System
      DeleteRegKey HKLM "${PRODUCT_UNINST_KEY}"
      DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
-
-     ; Delete HKLM keys created during install procedure (NOT the ones created by regDLL!)
-     DeleteRegKey HKLM  "${ADDIN_REGKEY_CONTEXT}\${PROPERTY_PATH}"
-     DeleteRegKey HKLM  "${ADDIN_REGKEY_CONTEXT}\${PROPERTY_ADDIN_NAME}"
 
 FunctionEnd
 
