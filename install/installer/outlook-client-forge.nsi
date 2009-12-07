@@ -444,6 +444,12 @@ Function uninstForUpgrade
      RMDir  "$SMPROGRAMS\${OLD_STARTMENU_CONTEXT}"
      
 
+     ; Delete startMenu shortcut to userguide (no more needed)
+!ifndef SHOW_STARTMENU_USER_GUIDE
+     SetShellVarContext all
+     Delete "$SMPROGRAMS\$ICONS_GROUP\User Guide.lnk"
+!endif
+
 
      ; NOTE:
      ; $R1 is the installed product version.
@@ -695,7 +701,7 @@ Section Uninstall
      Return
      
   errorDLL1:
-      MessageBox MB_OK "Could not unregister Redemption.dll. Ubìninstallation failed."
+      MessageBox MB_OK "Could not unregister Redemption.dll. Uninstallation failed."
       Return
 
   errorDLL2:
