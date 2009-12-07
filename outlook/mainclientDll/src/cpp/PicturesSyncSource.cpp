@@ -145,13 +145,9 @@ int PicturesSyncSource::removeItem(SyncItem& item)
 
 int PicturesSyncSource::removeAllItems() 
 {
+    LOG.info("Removing ALL pictures from folder: '%s'", dir.c_str());
     checkAbortedSync();
-    LOG.debug("PicturesSyncSource::removeAllItems -> pictures on Client cannot be deleted");
 
-    // nothing to do
-    return 0;
+    return FileSyncSource::removeAllItems();
 }
-
-
-
 
