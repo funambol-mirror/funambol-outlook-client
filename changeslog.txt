@@ -1,4 +1,6 @@
 2009-12-07
+   - toccy: added the Recover option for Pictures (only refresh-from-server is available)
+            some refactoring of FullSync class
    - toccy: User Guide is now hidden by default (can be enabled/disabled from customization.x):
             * startmenu link is shown/hidden by the installer
             * UI menu is dynamically adjusted at runtime

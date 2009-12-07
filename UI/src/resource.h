@@ -256,6 +256,7 @@
 #define IDC_SYNC_APPLY                  1015
 #define IDC_LOG_VIEWLOG                 1015
 #define IDC_ACCOUNT_BUT_PROXY           1015
+#define IDC_FULLSYNC_CHECK_PICTURES     1015
 #define IDC_BUTTON2                     1016
 #define IDC_TASKS_CANCEL                1016
 #define IDC_SYNC_DETAILS                1016

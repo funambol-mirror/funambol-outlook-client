@@ -60,6 +60,17 @@ public:
 // Dialog Data
 	enum { IDD = IDD_FULLSYNC };
 
+private:
+
+    /**
+     * Resize/move dynamically the source checkboxes, based on the number of
+     * sources visible.
+     */
+    void adjustCheckboxes();
+
+    /// Returns true if at least one source checkbox is checked.
+    bool isAtLeastOneSourceChecked();
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
@@ -70,6 +81,7 @@ public:
     CButton checkCalendar;
     CButton checkTasks;
     CButton checkNotes;
+    CButton checkPictures;
     CButton radio1;
     CButton radio2;
     CButton radio3;
@@ -78,10 +90,15 @@ public:
     
     afx_msg void OnBnClickedOk();
     afx_msg void OnBnClickedCancel();
-    afx_msg void OnBnClickedFullsyncCheckContacts();
-    afx_msg void OnBnClickedFullsyncCheckCalendar();
-    afx_msg void OnBnClickedFullsyncCheckTasks();
-    afx_msg void OnBnClickedFullsyncCheckNotes();
+
+    /// Enable/disable the 'Recover' button, checking if at least one source is selected.
+    afx_msg void OnBnClickedSourceCheckBox();
+
+    /// Disables and unchecks the 'picture' source checkbox.
+    afx_msg void OnBnClickedRefreshC2S();
+
+    /// Enables the 'picture' source checkbox.
+    afx_msg void OnBnClickedRefreshS2C();
 };
 
 /** @} */

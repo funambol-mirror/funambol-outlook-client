@@ -109,6 +109,12 @@ StringBuffer syncSourceIndexToName(const int sourceID);
 bool isSourceVisible(const WCHAR* sourceName);
 bool isSourceVisibleA(const char* sourceName);
 
+/**
+ * Used to check the total number of sources visible.
+ * It checks the itemTypesUsed[] array.
+ */
+int countSourceVisible();
+
 
 /**
  * Is the given status code an error status code? Error codes are the ones

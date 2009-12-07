@@ -45,38 +45,36 @@
 
 IMPLEMENT_DYNAMIC(CFullSync, CDialog)
 
-CFullSync::CFullSync(CWnd* pParent /*=NULL*/)
-	: CDialog(CFullSync::IDD, pParent)
-{
+CFullSync::CFullSync(CWnd* pParent /*=NULL*/) : CDialog(CFullSync::IDD, pParent) {}
 
-}
-
-CFullSync::~CFullSync()
-{
-}
+CFullSync::~CFullSync() {}
 
 void CFullSync::DoDataExchange(CDataExchange* pDX)
 {
     CDialog::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_FULLSYNC_CHECK_CONTACTS, checkContacts);
-    DDX_Control(pDX, IDC_FULLSYNC_CHECK_CALENDAR, checkCalendar);
-    DDX_Control(pDX, IDC_FULLSYNC_CHECK_TASKS, checkTasks);
-    DDX_Control(pDX, IDC_FULLSYNC_CHECK_NOTES, checkNotes);
-    DDX_Control(pDX, IDC_FULLSYNC_RADIO1, radio1);
-    DDX_Control(pDX, IDC_FULLSYNC_RADIO2, radio2);
-    DDX_Control(pDX, IDC_FULLSYNC_RADIO3, radio3);
+    DDX_Control(pDX, IDC_FULLSYNC_CHECK_CONTACTS,  checkContacts);
+    DDX_Control(pDX, IDC_FULLSYNC_CHECK_CALENDAR,  checkCalendar);
+    DDX_Control(pDX, IDC_FULLSYNC_CHECK_TASKS,     checkTasks);
+    DDX_Control(pDX, IDC_FULLSYNC_CHECK_NOTES,     checkNotes);
+    DDX_Control(pDX, IDC_FULLSYNC_CHECK_PICTURES,  checkPictures);
+    DDX_Control(pDX, IDC_FULLSYNC_RADIO1,          radio1);
+    DDX_Control(pDX, IDC_FULLSYNC_RADIO2,          radio2);
+    DDX_Control(pDX, IDC_FULLSYNC_RADIO3,          radio3);
     DDX_Control(pDX, IDC_FULLSYNC_GROUP_DIRECTION, groupDirection);
-    DDX_Control(pDX, IDC_FULLSYNC_GROUP_ITEMS, groupItems);
+    DDX_Control(pDX, IDC_FULLSYNC_GROUP_ITEMS,     groupItems);
 }
 
 
 BEGIN_MESSAGE_MAP(CFullSync, CDialog)
-    ON_BN_CLICKED(IDOK, &CFullSync::OnBnClickedOk)
-    ON_BN_CLICKED(IDCANCEL, &CFullSync::OnBnClickedCancel)
-    ON_BN_CLICKED(IDC_FULLSYNC_CHECK_CONTACTS, &CFullSync::OnBnClickedFullsyncCheckContacts)
-    ON_BN_CLICKED(IDC_FULLSYNC_CHECK_CALENDAR, &CFullSync::OnBnClickedFullsyncCheckCalendar)
-    ON_BN_CLICKED(IDC_FULLSYNC_CHECK_TASKS, &CFullSync::OnBnClickedFullsyncCheckTasks)
-    ON_BN_CLICKED(IDC_FULLSYNC_CHECK_NOTES, &CFullSync::OnBnClickedFullsyncCheckNotes)
+    ON_BN_CLICKED(IDOK,                        &CFullSync::OnBnClickedOk)
+    ON_BN_CLICKED(IDCANCEL,                    &CFullSync::OnBnClickedCancel)
+    ON_BN_CLICKED(IDC_FULLSYNC_CHECK_CONTACTS, &CFullSync::OnBnClickedSourceCheckBox)
+    ON_BN_CLICKED(IDC_FULLSYNC_CHECK_CALENDAR, &CFullSync::OnBnClickedSourceCheckBox)
+    ON_BN_CLICKED(IDC_FULLSYNC_CHECK_TASKS,    &CFullSync::OnBnClickedSourceCheckBox)
+    ON_BN_CLICKED(IDC_FULLSYNC_CHECK_NOTES,    &CFullSync::OnBnClickedSourceCheckBox)
+    ON_BN_CLICKED(IDC_FULLSYNC_CHECK_PICTURES, &CFullSync::OnBnClickedSourceCheckBox)
+    ON_BN_CLICKED(IDC_FULLSYNC_RADIO3,         &CFullSync::OnBnClickedRefreshC2S)
+    ON_BN_CLICKED(IDC_FULLSYNC_RADIO2,         &CFullSync::OnBnClickedRefreshS2C)
 END_MESSAGE_MAP()
 
 BOOL CFullSync::OnInitDialog() {
@@ -95,6 +93,7 @@ BOOL CFullSync::OnInitDialog() {
     s1.LoadString(IDS_CALENDAR);            SetDlgItemText(IDC_FULLSYNC_CHECK_CALENDAR, s1);
     s1.LoadString(IDS_NOTES);               SetDlgItemText(IDC_FULLSYNC_CHECK_NOTES, s1);
     s1.LoadString(IDS_TASKS);               SetDlgItemText(IDC_FULLSYNC_CHECK_TASKS, s1);
+    s1.LoadString(IDS_PICTURES);            SetDlgItemText(IDC_FULLSYNC_CHECK_PICTURES, s1);
     s1.LoadString(IDS_RECOVER);             SetDlgItemText(IDOK, s1);
     s1.LoadString(IDS_CANCEL);              SetDlgItemText(IDCANCEL, s1);
     
@@ -112,16 +111,23 @@ BOOL CFullSync::OnInitDialog() {
     if (!isSourceVisible(NOTE)) {
         checkNotes.ShowWindow(SW_HIDE);
     }
+    if (!isSourceVisible(PICTURE)) {
+        checkPictures.ShowWindow(SW_HIDE);
+    }
 
-    checkContacts.EnableWindow(TRUE);
-    checkCalendar.EnableWindow(TRUE);
-    checkTasks.EnableWindow(TRUE);
-    checkNotes.EnableWindow(TRUE);
 
-    
     // Refresh from Client is the default
     radio3.SetCheck(BST_CHECKED);
     radio3.SetFocus();
+
+    checkContacts.EnableWindow(TRUE);
+    checkCalendar.EnableWindow(TRUE);
+    checkTasks.EnableWindow   (TRUE);
+    checkNotes.EnableWindow   (TRUE);
+    checkPictures.EnableWindow(FALSE);  // C2S not available for pictures!
+
+    // resize/move dynamically the source checkboxes
+    adjustCheckboxes();
 
     GetDlgItem(IDOK)->EnableWindow(FALSE);
 
@@ -166,39 +172,43 @@ void CFullSync::OnBnClickedOk() {
 
 
     getConfig()->read();
+    const char* fullSyncMode = getFullSyncTypeName(pos);
 
     // enable the checked sources, disable the unchecked ones
     if(checkContacts.GetCheck() == BST_CHECKED) {
-        getConfig()->getSyncSourceConfig(CONTACT_)->setSync(getFullSyncTypeName(pos));
+        getConfig()->getSyncSourceConfig(CONTACT_)->setSync(fullSyncMode);
     }
     else {
         getConfig()->getSyncSourceConfig(CONTACT_)->setIsEnabled(false);
     }
 
     if(checkCalendar.GetCheck() == BST_CHECKED) {
-        getConfig()->getSyncSourceConfig(APPOINTMENT_)->setSync(getFullSyncTypeName(pos));
+        getConfig()->getSyncSourceConfig(APPOINTMENT_)->setSync(fullSyncMode);
     }
     else {
         getConfig()->getSyncSourceConfig(APPOINTMENT_)->setIsEnabled(false);
     }
 
     if(checkTasks.GetCheck() == BST_CHECKED) {
-        getConfig()->getSyncSourceConfig(TASK_)->setSync(getFullSyncTypeName(pos));
+        getConfig()->getSyncSourceConfig(TASK_)->setSync(fullSyncMode);
     }
     else {
         getConfig()->getSyncSourceConfig(TASK_)->setIsEnabled(false);
     }
 
     if(checkNotes.GetCheck() == BST_CHECKED) {
-        getConfig()->getSyncSourceConfig(NOTE_)->setSync(getFullSyncTypeName(pos));
+        getConfig()->getSyncSourceConfig(NOTE_)->setSync(fullSyncMode);
     }
     else {
         getConfig()->getSyncSourceConfig(NOTE_)->setIsEnabled(false);
     }
 
-    // TODO: add check for pictures
-    getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(false);
-
+    if(checkPictures.GetCheck() == BST_CHECKED) {
+        getConfig()->getSyncSourceConfig(PICTURE_)->setSync(fullSyncMode);
+    }
+    else {
+        getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(false);
+    }
 
     getConfig()->setFullSync(true);
 
@@ -208,55 +218,92 @@ void CFullSync::OnBnClickedOk() {
     OnOK();
 }
 
-void CFullSync::OnBnClickedCancel(){
+void CFullSync::OnBnClickedCancel() {
     OnCancel();
 }
 
-void CFullSync::OnBnClickedFullsyncCheckContacts()
-{
-    if( (checkContacts.GetCheck() == BST_UNCHECKED) && (checkCalendar.GetCheck() == BST_UNCHECKED) &&
-        (checkNotes.GetCheck() == BST_UNCHECKED) && (checkTasks.GetCheck() == BST_UNCHECKED) ){
-           
-        GetDlgItem(IDOK)->EnableWindow(FALSE);
-    }
-    else{
+void CFullSync::OnBnClickedSourceCheckBox() {
+
+    if (isAtLeastOneSourceChecked()) {
         GetDlgItem(IDOK)->EnableWindow(TRUE);
+    } 
+    else{
+        GetDlgItem(IDOK)->EnableWindow(FALSE);
     }
 }
 
-void CFullSync::OnBnClickedFullsyncCheckCalendar()
-{
-    if( (checkContacts.GetCheck() == BST_UNCHECKED) && (checkCalendar.GetCheck() == BST_UNCHECKED) &&
-        (checkNotes.GetCheck() == BST_UNCHECKED) && (checkTasks.GetCheck() == BST_UNCHECKED) ){
+void CFullSync::OnBnClickedRefreshC2S() {
 
-        GetDlgItem(IDOK)->EnableWindow(FALSE);
+    checkPictures.EnableWindow(FALSE);
+    checkPictures.SetCheck(BST_UNCHECKED);
+    OnBnClickedSourceCheckBox();
+}
+
+void CFullSync::OnBnClickedRefreshS2C() {
+
+    checkPictures.EnableWindow(TRUE);
+}
+
+
+bool CFullSync::isAtLeastOneSourceChecked() {
+
+    if ( (checkContacts.GetCheck() == BST_CHECKED) || 
+         (checkCalendar.GetCheck() == BST_CHECKED) ||
+         (checkTasks.GetCheck()    == BST_CHECKED) || 
+         (checkNotes.GetCheck()    == BST_CHECKED) ||
+         (checkPictures.GetCheck() == BST_CHECKED) ) {
+        return true;
     }
-    else{
-        GetDlgItem(IDOK)->EnableWindow(TRUE);
+    else {
+        return false;
     }
 }
 
-void CFullSync::OnBnClickedFullsyncCheckTasks()
-{
-    if( (checkContacts.GetCheck() == BST_UNCHECKED) && (checkCalendar.GetCheck() == BST_UNCHECKED) &&
-        (checkNotes.GetCheck() == BST_UNCHECKED) && (checkTasks.GetCheck() == BST_UNCHECKED) ){
-            
-            GetDlgItem(IDOK)->EnableWindow(FALSE);
-    }
-    else{
-        GetDlgItem(IDOK)->EnableWindow(TRUE);
-    }
-}
 
-void CFullSync::OnBnClickedFullsyncCheckNotes()
-{
-    if( (checkContacts.GetCheck() == BST_UNCHECKED) && (checkCalendar.GetCheck() == BST_UNCHECKED) &&
-        (checkNotes.GetCheck() == BST_UNCHECKED) && (checkTasks.GetCheck() == BST_UNCHECKED) ){
+void CFullSync::adjustCheckboxes() {
 
-        GetDlgItem(IDOK)->EnableWindow(FALSE);
-    }        
-    else{
-        GetDlgItem(IDOK)->EnableWindow(TRUE);
-    }
+    int numSources = countSourceVisible();
+
+    // Get the groupbox 'Items'
+    CWnd* group = GetDlgItem(IDC_FULLSYNC_GROUP_ITEMS);
+    CRect rectGroup;
+    group->GetClientRect(&rectGroup);
+    CPoint posGroup = getRelativePosition(group, this);
+    
+    CRect contactsRect;
+    checkContacts.GetClientRect(&contactsRect);
+    CPoint posContacts = getRelativePosition(&checkContacts, this);
+
+    int offset1 = posGroup.x;                           // between left border <-> groupbox       
+    int offset2 = posContacts.x - offset1;              // between groupbox <-> first checkbox
+    int someSpace = 2;                                  // between checkboxes, to avoid overlapping!
+    int totalWidth = rectGroup.Width();                 // The groupbox total width
+    int width = (totalWidth - offset2) / numSources;    // The width of each checkbox
+
+    int x  = posContacts.x;
+    int y  = posContacts.y;
+    int cx = width - someSpace;
+    int cy = contactsRect.Height();
+    
+    //
+    // TODO: once the sources are dynamically loaded, just cycle on
+    //       the sources visible and SetWindowsPos on each one, like the last 2.
+    // TODO: add minCx = 60 px
+    //
+    checkContacts.SetWindowPos(&CWnd::wndTop, x, y, cx, cy, SWP_SHOWWINDOW);
+    x = x + width;
+    checkCalendar.SetWindowPos(&CWnd::wndTop, x, y, cx, cy, SWP_SHOWWINDOW);
+    x = x + width;
+    checkTasks.SetWindowPos   (&CWnd::wndTop, x, y, cx, cy, SWP_SHOWWINDOW);
+    x = x + width;
+
+    int maxCx = offset1 + (totalWidth - x) - someSpace;
+    cx = min(cx, maxCx);
+    checkNotes.SetWindowPos   (&CWnd::wndTop, x, y, cx, cy, SWP_SHOWWINDOW);
+    x = x + width;
+
+    maxCx = offset1 + (totalWidth - x) - someSpace;
+    cx = min(cx, maxCx);
+    checkPictures.SetWindowPos(&CWnd::wndTop, x, y, cx, cy, SWP_SHOWWINDOW);
 }
 

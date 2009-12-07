@@ -1050,6 +1050,15 @@ bool isSourceVisibleA(const char* sourceName)
     return false;
 }
 
+int countSourceVisible() 
+{
+    int i=0;
+    while (itemTypesUsed[i]) {
+        i++;
+    }
+    return i;
+}
+
 
 
 //
