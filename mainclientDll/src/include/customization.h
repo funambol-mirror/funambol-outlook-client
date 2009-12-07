@@ -77,6 +77,7 @@
 
 
 // Others
+#define VIEW_USER_GUIDE_LINK                0                           /**< 1 to display the 'view userguide' in the UI menu (hidden by default) */
 #define USER_GUIDE_LINK                     "http://funambol.com/docs/v80/funambol-outlook-sync-client-user-guide.pdf"
 #define PROGRAM_NAME_EXE                    "OutlookPlugin.exe"             // The application to run
 #define SCHED_COMMENT                       TEXT(PROGRAM_NAME) TEXT(" scheduler")

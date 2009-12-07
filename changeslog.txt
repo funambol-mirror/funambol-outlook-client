@@ -1,3 +1,8 @@
+2009-12-07
+   - toccy: User Guide is now hidden by default (can be enabled/disabled from customization.x):
+            * startmenu link is shown/hidden by the installer
+            * UI menu is dynamically adjusted at runtime
+
 2009-11-27
 *** Funambol Outlook Sync Client v.8.2.7 (linked to SDK C++ v.8.2.1) ***
    - toccy: fixed bug #8033: uninstall needs to copy CRT DLLs into Windir, in order to correctly
