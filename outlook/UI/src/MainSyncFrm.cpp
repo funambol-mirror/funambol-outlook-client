@@ -70,6 +70,7 @@ BEGIN_MESSAGE_MAP(CMainSyncFrame, CFrameWnd)
     ON_WM_CREATE()
     ON_WM_NCACTIVATE()
     ON_WM_CLOSE()
+    ON_WM_INITMENUPOPUP()
 
     ON_MESSAGE(ID_MYMSG_SYNC_BEGIN,             &CMainSyncFrame::OnMsgSyncBegin)
     ON_MESSAGE(ID_MYMSG_SYNC_END,               &CMainSyncFrame::OnMsgSyncEnd)
@@ -217,6 +218,32 @@ int CMainSyncFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	return 0;
 }
+
+
+void CMainSyncFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu) {
+
+    if (!pPopupMenu) {
+        goto finally;
+    }
+
+    if (!VIEW_USER_GUIDE_LINK) {
+        //
+        // Menu index: 0 = File, 1 = Tools, 2 = Help
+        //
+        if (nIndex == 2) {
+            UINT firstItemID = pPopupMenu->GetMenuItemID(0);
+            if (firstItemID == ID_VIEW_GUIDE) {
+                // remove view User guide & separator
+                pPopupMenu->RemoveMenu(0, MF_BYCOMMAND  | MF_BYPOSITION);
+                pPopupMenu->RemoveMenu(0, MF_BYPOSITION | MF_SEPARATOR);
+            }
+        }
+    }
+
+finally:
+    CFrameWnd::OnInitMenuPopup(pPopupMenu, nIndex, bSysMenu);
+}
+
 
 BOOL CMainSyncFrame::PreCreateWindow(CREATESTRUCT& cs)
 {

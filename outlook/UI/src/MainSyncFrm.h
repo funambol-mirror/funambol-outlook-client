@@ -114,7 +114,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
-
+    
+    /// Overrided to dynamically remove the 'view User Guide' button & separator.
+    afx_msg void OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
 
 public:
 
