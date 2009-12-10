@@ -146,7 +146,7 @@ bool OutlookConfig::read() {
     }
 
     // This param is not read by DMT (it's Client defined).
-    // It's defaulted to "8.0.0" in case it's not found.
+    // It's defaulted to swv in case it's not found.
     funambolSwv = readFunambolSwv(HKEY_CURRENT_USER);
 
     // Username/Password are stored encrypted (new since 6.0.9).
@@ -1183,12 +1183,17 @@ StringBuffer OutlookConfig::readFunambolSwv(HKEY rootKey) {
         context.sprintf("%s%s%s", PLUGIN_ROOT_CONTEXT, CONTEXT_SPDS_SYNCML, CONTEXT_DEV_DETAIL);
         value = readPropertyValue(context, PROPERTY_FUNAMBOL_SWV, HKEY_CURRENT_USER);
         if (!value || strlen(value)==0) {
+
             // 'funambol_swv' is not found
             const char* customer = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_CUSTOMER, HKEY_LOCAL_MACHINE);
             if (customer && strlen(customer)>0) {
                 // current funambol_swv is an acceptable value for customers builds (swv could be 1.0.0 for example)
                 LOG.debug("Customer = %s", customer);
                 ret = "8.0.0";
+            }
+            else {
+                // It's an old Funambol build: use the swv.
+                value = readPropertyValue(context, PROPERTY_SOFTWARE_VERSION, HKEY_CURRENT_USER);
             }
             delete [] customer;
         }
