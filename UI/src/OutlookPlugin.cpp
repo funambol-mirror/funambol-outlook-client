@@ -257,6 +257,11 @@ void COutlookPluginApp::OnAppAbout()
 // App command to run the dialog
 void COutlookPluginApp::OnViewGuide() {
 
+    // Check: this method could be called from the shortcut (accelerator) too.
+    if (!VIEW_USER_GUIDE_LINK) {
+        return;
+    }
+
     SHELLEXECUTEINFO lpExecInfo;
     memset(&lpExecInfo, 0, sizeof(SHELLEXECUTEINFO));
     lpExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
