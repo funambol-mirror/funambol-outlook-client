@@ -1,3 +1,6 @@
+2009-12-10
+   - toccy: fixed bug#8280: fixed upgrade procedure from Funambol versions < v.8.2
+
 2009-12-07
    - toccy: added the Recover option for Pictures (only refresh-from-server is available)
             some refactoring of FullSync class
