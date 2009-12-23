@@ -1,3 +1,6 @@
+2009-12-23
+   - toccy: fixed bug #8419: trapped ClientException that can be thrown when filling an item
+
 2009-12-10
    - toccy: fixed bug#8280: fixed upgrade procedure from Funambol versions < v.8.2
    - toccy: fixed bug#8279: catch shortcut for View-user-guide: return if the UG is disabled.
