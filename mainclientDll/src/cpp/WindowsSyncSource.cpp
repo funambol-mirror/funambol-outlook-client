@@ -722,8 +722,14 @@ int WindowsSyncSource::addItem(SyncItem& item) {
     //
     // Filter incoming items: only if direction INPUT is enabled.
     //
-    if (!filterClientItem(cItem, DateFilter::DIR_IN, COMMAND_ADD)) {
-        goto filteredItem;
+    try {
+        if (!filterClientItem(cItem, DateFilter::DIR_IN, COMMAND_ADD)) {
+            goto filteredItem;
+        }
+    }
+    catch (ClientException* e) {
+        manageClientException(e);
+        goto errorFillItem;
     }
 
     //
