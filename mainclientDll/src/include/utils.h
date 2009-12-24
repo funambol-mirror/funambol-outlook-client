@@ -45,6 +45,7 @@
 #include "spds/SyncReport.h"
 #include "WindowsSyncSource.h"
 #include "outlook/ClientRecurrence.h"
+#include "winmaincpp.h"
 
 #include <string>
 
@@ -102,16 +103,22 @@ long         variantTimeToTimeStamp   (const double vTime);
 int          syncSourceNameToIndex(const StringBuffer& sourceName);
 StringBuffer syncSourceIndexToName(const int sourceID);
 
+
 /**
  * Used to quicky check if a specific source is visible or not.
- * It checks the itemTypesUsed[] array.
+ * It checks the sourcesVisible array.
  */
-bool isSourceVisible(const WCHAR* sourceName);
 bool isSourceVisibleA(const char* sourceName);
 
 /**
+ * Used to quicky check if a specific source is visible or not (WCHAR version).
+ * It checks the sourcesVisible array.
+ */
+bool isSourceVisible(const WCHAR* sourceName);
+
+/**
  * Used to check the total number of sources visible.
- * It checks the itemTypesUsed[] array.
+ * It checks the sourcesVisible array.
  */
 int countSourceVisible();
 

@@ -69,6 +69,9 @@ private:
     // true if the UI buttons are locked
     bool lockedUI;
 
+    /// The current number of panes displayed (4 or 5)
+    int panesCount;
+
     // Buffers for source panes status labels
     CString contactsStatusLabel;
     CString calendarStatusLabel;

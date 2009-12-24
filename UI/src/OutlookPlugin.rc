@@ -354,6 +354,7 @@ BEGIN
     IDS_PICTURES_DETAILS    "Pictures Details"
     IDS_PICTURES_FOLDER     "Pictures &Folder"
     IDS_MAIN_PICTURES       "Pictures"
+    IDS_ENDING_SYNC         "Beende..."
 END
 
 #endif    // German (Germany) resources
@@ -1181,6 +1182,7 @@ BEGIN
     IDS_PICTURES_DETAILS    "Pictures Details"
     IDS_PICTURES_FOLDER     "Pictures &Folder"
     IDS_MAIN_PICTURES       "Pictures"
+    IDS_ENDING_SYNC         "Ending..."
 END
 
 #endif    // English (U.S.) resources
@@ -1506,6 +1508,7 @@ BEGIN
     IDS_PICTURES_DETAILS    "Pictures Details"
     IDS_PICTURES_FOLDER     "Pictures &Folder"
     IDS_MAIN_PICTURES       "Pictures"
+    IDS_ENDING_SYNC         "Ending..."
 END
 
 #endif    // Italian (Italy) resources

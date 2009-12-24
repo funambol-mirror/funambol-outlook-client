@@ -54,6 +54,7 @@
 #define PROPERTY_USE_SUBFOLDERS                 "useSubfolders"
 #define PROPERTY_FOLDER_PATH                    "folderPath"
 #define PROPERTY_SCHEDULED_SYNC                 "isScheduled"
+#define PROPERTY_SOURCE_ORDER                   "sourceOrder"
 
 /// Filtering properties
 #define PROPERTY_FILTER_DATE_LOWER              "filterDateLower"
@@ -128,6 +129,12 @@ private:
     /// (internal use, should be equal to 'sourceConfigsCount' member)
     unsigned int winSourceConfigsCount;
 
+    /**
+     * The list of sources visible in the Client's UI. Sources not listed
+     * here are hidden to the user.
+     * NOTE: "contact, calendar, task, note" cannot be hidden   *** TODO ***
+     */
+    ArrayList sourcesVisible;
 
 
     void readWinSourceConfig(unsigned int i);
@@ -142,6 +149,20 @@ private:
     void encryptPrivateData();
 
     int readCurrentTimezone();
+
+    /**
+     * Reads the 'sourceOrder' registry key and populates the sourcesVisible array.
+     * The 'sourceOrder' value is a comma separated string of source names.
+     * @param rootKey [OPTIONAL] the rootkey, default is HKEY_CURRENT_USER
+     * @note  contacts,calendar,tasks,notes cannot be hidden for now
+     */
+    void readSourcesVisible(HKEY rootKey = HKEY_CURRENT_USER);
+
+    /**
+     * Reads the sourcesVisible array and saves the 'sourceOrder' registry key.
+     * The 'sourceOrder' value is a comma separated string of source names.
+     */
+    void saveSourcesVisible();
 
     /**
      * Used to save a generic property into config (win registry, under HKCU node).
@@ -171,7 +192,7 @@ public:
     static bool isInstantiated();
 
     /// Destructor
-    ~OutlookConfig();
+    virtual ~OutlookConfig();
 
 
     // Override read/save methods of DMT (use specific winSourceConfig)
@@ -182,6 +203,10 @@ public:
 
     /// Read all sources timestamps from win registry.
     void readSourcesTimestamps();
+
+
+    /// Returns the ArrayList of sources visible.
+    const ArrayList& getSourcesVisible();
 
 
     /// Replace getSyncSourceConfig() of DMT (return specific winSourceConfig)
@@ -198,6 +223,19 @@ public:
      * @return true if no errors
      */
     bool addWindowsSyncSourceConfig(const std::wstring& sourceName);
+
+    /**
+     * Adds the passed source name to the sourcesVisible array, safely:
+     * the source is not added if already exists in the array.
+     * @return true if the element is added, false if not found
+     */
+    bool safeAddSourceVisible(const char* sourceName);
+
+    /**
+     * Removes the passed source name from the sourcesVisible array.
+     * @return true if the source was found and removed, false if not found
+     */
+    bool removeSourceVisible(const char* sourceName);
 
 
     // get/set of internal members

@@ -374,7 +374,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib Wininet.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib Wininet.lib  shlwapi.lib"
 				OutputFile=".\ReleaseMinDependency\FunambolAddin.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -574,7 +574,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib Wininet.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib Wininet.lib  shlwapi.lib"
 				OutputFile=".\Debug/FunambolAddin.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"

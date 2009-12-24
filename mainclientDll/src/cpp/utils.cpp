@@ -1028,37 +1028,31 @@ int getBuildNumberFromVersion(const char* swv) {
 }
 
 
-bool isSourceVisible(const WCHAR* sourceName)
-{
-    for (int i=0; itemTypesUsed[i]; i++) {
-        if (!wcscmp(itemTypesUsed[i], sourceName)) {
+bool isSourceVisibleA(const char* sourceName) {
+
+    const ArrayList& sourcesVisible = getConfig()->getSourcesVisible();
+
+    for (int i=0; i<sourcesVisible.size(); i++) {
+        StringBuffer* name = (StringBuffer*)sourcesVisible.get(i);
+        if (*name == sourceName) {
             return true;
         }
     }
     return false;
 }
 
-bool isSourceVisibleA(const char* sourceName)
-{
-    for (int i=0; itemTypesUsed[i]; i++) {
-        StringBuffer name;
-        name.convert(itemTypesUsed[i]);
-        if (name == sourceName) {
-            return true;
-        }
-    }
-    return false;
+bool isSourceVisible(const WCHAR* sourceName) {
+
+    StringBuffer name;
+    name.convert(sourceName);
+    return isSourceVisibleA(name.c_str());
 }
 
-int countSourceVisible() 
-{
-    int i=0;
-    while (itemTypesUsed[i]) {
-        i++;
-    }
-    return i;
-}
 
+int countSourceVisible() {
+    const ArrayList& sourcesVisible = getConfig()->getSourcesVisible();
+    return sourcesVisible.size();
+}
 
 
 //

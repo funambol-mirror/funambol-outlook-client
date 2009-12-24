@@ -54,6 +54,7 @@
 #define ID_MYMSG_SOURCE_STATE         (WM_APP+11)
 #define ID_MYMSG_SYNC_STARTSYNC_BEGIN (WM_APP+12)
 #define ID_MYMSG_UNLOCK_BUTTONS       (WM_APP+13)
+#define ID_MYMSG_LOCK_BUTTONS         (WM_APP+14)
 /** @endcond */
 
 #define PLUGIN_UI_CLASSNAME         _T("FunambolApp")

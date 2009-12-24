@@ -293,27 +293,27 @@ int startSync() {
     // 4. "Notes"
     // 5. "Pictures"
     int j=0;
-    while (itemTypesUsed[j]) {
+    const ArrayList& sourcesOrder = config->getSourcesVisible();
+    for (int j=0; j<sourcesOrder.size(); j++) {
         for (int i=0; i<sourcesCount; i++) {
             const bool enabled = config->getSyncSourceConfig(i)->isEnabled();
             if (enabled) {
-                wname = toWideChar(config->getSyncSourceConfig(i)->getName());
-                if (!wcscmp(wname, itemTypesUsed[j])) {
-
+                StringBuffer* name = (StringBuffer*)sourcesOrder.get(j);
+                if (*name == config->getSyncSourceConfig(i)->getName()) {
                     // Here the right SyncSource is added to the source array.
                     // The source is created passing the right SSConfig.
-                    if (wcscmp(wname, PICTURE) == 0) {
-                        sources[sourcesActive] = new PicturesSyncSource(wname, config->getSyncSourceConfig(i));
+                    WString wname;
+                    wname = *name;
+                    if (wname == PICTURE) {
+                        sources[sourcesActive] = new PicturesSyncSource(wname.c_str(), config->getSyncSourceConfig(i));
                     }
                     else {
-                        sources[sourcesActive] = new WindowsSyncSource(wname, config->getSyncSourceConfig(i));
+                        sources[sourcesActive] = new WindowsSyncSource(wname.c_str(), config->getSyncSourceConfig(i));
                     }
                     sourcesActive++;
                 }
-                delete [] wname;
             }
         }
-        j++;
     }
     sources[sourcesActive] = NULL;
 
@@ -381,9 +381,27 @@ int startSync() {
 
 
     //
+    // enable/disable pictures source (check Server datastores)
+    // The source name and the preferred data type must match.
+    //
+    bool removedPictures = false;
+    if (DYNAMICALLY_SHOW_PICTURES) {
+        DataStore* dataStore = config->getServerDataStore(PICTURE_);
+        if ( dataStore && !strcmp(dataStore->getRxPref()->getCTType(), OMA_MIME_TYPE) ) {
+            config->safeAddSourceVisible(PICTURE_);
+        }
+        else {
+            removedPictures = config->removeSourceVisible(PICTURE_);
+        }
+    }
+
+    //
     // Save configuration to win registry. (TBD: manage dirty flag!)
     // Note: source configs will not be saved if not successfull...
+    // Note: we MUST lock the buttons during the save(), to avoid users to cancel sync.
     //
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_REFRESH_STATUSBAR, NULL, (LPARAM)SBAR_ENDING_SYNC);
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_LOCK_BUTTONS,      NULL, NULL);
     LOG.debug("Saving configuration to winRegistry");
     config->save(report);
 
@@ -419,6 +437,10 @@ finally:
                         PicturesSyncSource* pss = (PicturesSyncSource*)sources[i];
                         if ((ssReport->getState() != SOURCE_ERROR) && pss->getIsSynced()) {
                             sourceState = SYNCSOURCE_STATE_OK;
+                        } else if (removedPictures && (ret == STC_NOT_FOUND)) {
+                            // Hide the UI warning, if 'picture' source not found. 
+                            sourceState = SYNCSOURCE_STATE_OK;
+                            ret = 0;
                         }
                     }
                     else {
@@ -457,6 +479,8 @@ finally:
     else
         LOG.info(INFO_SYNC_COMPLETED_ERRORS, ret);
 
+    // Finally: unlock buttons
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_UNLOCK_BUTTONS, NULL, NULL);
     return ret;
 }
 

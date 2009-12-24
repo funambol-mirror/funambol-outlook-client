@@ -165,6 +165,7 @@ public:
     afx_msg LRESULT OnMsgRefreshStatusBar(WPARAM, LPARAM);
     afx_msg LRESULT OnMsgSyncSourceState(WPARAM, LPARAM);
     afx_msg LRESULT OnMsgUnlockButtons  (WPARAM, LPARAM);
+    afx_msg LRESULT OnMsgLockButtons    (WPARAM, LPARAM);
 
     afx_msg void OnFileConfiguration();
     afx_msg void OnToolsFullSync();

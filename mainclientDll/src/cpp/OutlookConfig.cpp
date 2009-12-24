@@ -111,6 +111,10 @@ OutlookConfig::~OutlookConfig() {
 }
 
 
+const ArrayList& OutlookConfig::getSourcesVisible() {
+    return sourcesVisible;
+}
+
 
 // ------------------------- Read properties from win registry -------------------------
 /**
@@ -177,8 +181,9 @@ bool OutlookConfig::read() {
         // Read specific properties
         readWinSourceConfig(i);
     }
-    close();
 
+    // Reads the list of sources visible.
+    readSourcesVisible();
 
     // Current working dir: read 'installDir' from HKLM
     char* installPath = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_INSTALLDIR, HKEY_LOCAL_MACHINE);
@@ -280,7 +285,6 @@ void OutlookConfig::readSourcesTimestamps() {
         }
     }
 
-    close();
 }
 
 
@@ -305,8 +309,6 @@ void OutlookConfig::readSyncModes() {
             delete [] tmp;
         }
     }
-
-    close();
 }
 
 
@@ -398,6 +400,68 @@ int OutlookConfig::readCurrentTimezone() {
 }
 
 
+void OutlookConfig::readSourcesVisible(HKEY rootKey) {
+
+    sourcesVisible.clear();
+
+    // Read the (comma separated) source names
+    const char* tmp = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_SOURCE_ORDER, rootKey);
+    StringBuffer sources(tmp);
+    delete [] tmp;
+
+    // Get the source names, and add them to the sourceVisible array
+    if (!sources.empty()) {
+        ArrayList tokens;
+        sources.split(tokens, ",");
+
+        for (int i=0; i<tokens.size(); i++) {
+            StringBuffer* token = (StringBuffer*)tokens.get(i);
+            safeAddSourceVisible(*token);
+        }
+    }
+
+    // Anyway contacts,calendar,tasks,notes MUST be visible!
+    // --- TODO: remove when all sources are dynamically visible ---
+    safeAddSourceVisible(CONTACT_);
+    safeAddSourceVisible(APPOINTMENT_);
+    safeAddSourceVisible(TASK_);
+    safeAddSourceVisible(NOTE_);
+}
+
+
+bool OutlookConfig::safeAddSourceVisible(const char* sourceName) {
+
+    for (int i=0; i<sourcesVisible.size(); i++) {
+        StringBuffer* element = (StringBuffer*)sourcesVisible.get(i);
+        if (*element == sourceName) {
+            // found: don't add
+            return false;
+        }
+    }
+
+    // not found: add
+    StringBuffer source(sourceName);
+    sourcesVisible.add(source);
+    return true;
+}
+
+
+bool OutlookConfig::removeSourceVisible(const char* sourceName) {
+
+    for (int i=0; i<sourcesVisible.size(); i++) {
+        StringBuffer* element = (StringBuffer*)sourcesVisible.get(i);
+        if (*element == sourceName) {
+            // found: remove
+            sourcesVisible.removeElementAt(i);
+            return true;
+        }
+    }
+
+    // not found
+    return false;
+}
+
+
 
 // ---------------------------- Save properties to win registry ----------------------------
 /**
@@ -437,6 +501,8 @@ bool OutlookConfig::save(SyncReport* report) {
     // Saves the Funambol sw version
     saveFunambolSwv();
 
+    // Saves the list of sources visible.
+    saveSourcesVisible();
 
     //
     // Sources management node
@@ -458,7 +524,6 @@ bool OutlookConfig::save(SyncReport* report) {
     resetError();
     ret = (getLastErrorCode() != 0);
 
-    close();
     return ret;
 }
 
@@ -498,7 +563,7 @@ void OutlookConfig::saveWinSourceConfig(unsigned int i) {
         //LOG.debug(INFO_CONFIG_NODE_CREATED, nodeName);
     }
     else {
-        node = (ManagementNode*)sourcesNode->getChild(i)->clone();
+        node = (ManagementNode*)sourcesNode->getChild(winSourceConfigs[i].getName())->clone();
     }
 
 
@@ -568,8 +633,6 @@ void OutlookConfig::saveSyncModes() {
         }
         node = NULL;
     }
-
-    close();
 }
 
 
@@ -607,6 +670,17 @@ void OutlookConfig::saveFunambolSwv() {
     StringBuffer context;
     context.sprintf("%s%s%s", PLUGIN_ROOT_CONTEXT, CONTEXT_SPDS_SYNCML, CONTEXT_DEV_DETAIL);
     savePropertyValue(context, PROPERTY_FUNAMBOL_SWV, funambolSwv);
+}
+
+
+void OutlookConfig::saveSourcesVisible() {
+
+    // Joins all the source names in a comma separated string
+    StringBuffer sources;
+    sources.join(sourcesVisible, ",");
+
+    // Saves to registry
+    savePropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_SOURCE_ORDER, sources);
 }
 
 
@@ -715,6 +789,8 @@ bool OutlookConfig::addWindowsSyncSourceConfig(const wstring& sourceName)
             for (unsigned int i=0; i<sourceConfigsCount; i++) {
                 // Link internal pointer to sourceConfigs array
                 winSourceConfigs[i].setCommonConfig(DMTClientConfig::getSyncSourceConfig(i));
+                // Read specific properties
+                readWinSourceConfig(i);
             }
         }
 
@@ -960,6 +1036,9 @@ void OutlookConfig::createDefaultConfig() {
     fullSync  = false;
     abortSync = false;
 
+    // Read the sources visible list (if specified from HKLM keys: customers builds)
+    readSourcesVisible(HKEY_LOCAL_MACHINE);
+    
 
     // Current working dir: read 'installDir' from HKLM
     char* installPath = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_INSTALLDIR, HKEY_LOCAL_MACHINE);
@@ -1133,6 +1212,10 @@ void OutlookConfig::upgradeConfig() {
     if (oldFunambolSwv < 80207) {
         getAccessConfig().setMaxMsgSize(MAX_SYNCML_MSG_SIZE);       // from 250K to 125K
         getAccessConfig().setResponseTimeout(RESPONSE_TIMEOUT);     // from 10min to 15min
+
+        // Force the GET of Server capabilities at next sync.
+        // (we need the Server dataStores, to enable/disable source picture)
+        setServerLastSyncURL("");
     }
 
         

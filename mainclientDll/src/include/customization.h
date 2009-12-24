@@ -93,18 +93,8 @@
 #define MAX_LOG_SIZE                        10000000                    /**< 10 MB         */
 #define MAX_SYNCML_MSG_SIZE                 125000                      /**< [bytes], the max syncML message size. default = 125KB */
 #define RESPONSE_TIMEOUT                    900                         /**< [seconds], the HTTP timeout on Server response. default = 15 minutes */
+#define DYNAMICALLY_SHOW_PICTURES           1                           /**< if 1, will automatically show/hide the pictures panel, at the end of sync */
 
-/// Order is important: sources will be executed with this order.
-/// Sources not existing in this array will not be used/synchronized.
-/// TODO: read array from config, like WM.
-static WCHAR* itemTypesUsed[] = {
-    {CONTACT            },
-    {APPOINTMENT        },
-    {TASK               },
-    {NOTE               },
-    {PICTURE            },
-    {NULL}
-};
 
 // Win registry root context.
 // This is NOT intended to be customized: we need to use the same registry keys to ensure correct checks

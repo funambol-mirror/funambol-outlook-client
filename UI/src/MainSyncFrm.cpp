@@ -82,6 +82,7 @@ BEGIN_MESSAGE_MAP(CMainSyncFrame, CFrameWnd)
     ON_MESSAGE(ID_MYMSG_STARTSYNC_ENDED,        &CMainSyncFrame::OnMsgStartsyncEnded) 
     ON_MESSAGE(ID_MYMSG_REFRESH_STATUSBAR,      &CMainSyncFrame::OnMsgRefreshStatusBar) 
     ON_MESSAGE(ID_MYMSG_SOURCE_STATE,           &CMainSyncFrame::OnMsgSyncSourceState) 
+    ON_MESSAGE(ID_MYMSG_LOCK_BUTTONS,           &CMainSyncFrame::OnMsgLockButtons)
     ON_MESSAGE(ID_MYMSG_UNLOCK_BUTTONS,         &CMainSyncFrame::OnMsgUnlockButtons)
     ON_COMMAND(ID_FILE_CONFIGURATION,           &CMainSyncFrame::OnFileConfiguration)
     ON_COMMAND(ID_TOOLS_FULLSYNC,               &CMainSyncFrame::OnToolsFullSync)
@@ -258,20 +259,10 @@ BOOL CMainSyncFrame::PreCreateWindow(CREATESTRUCT& cs)
     dpiY = ::GetDeviceCaps(hdc,LOGPIXELSY);
     ::ReleaseDC(0,hdc);
 
-    //
-    // TODO: set the window size dynamically based on the source number
-    //
-    int sizeX = FRAME_MAIN_X;
-    int sizeY = FRAME_MAIN_Y;
-    if (isSourceVisible(PICTURE)) {
-        sizeY += SOURCE_PANE_SIZE_Y;
-    }
-
-    double dx = sizeX * ((double)dpiX/96);      // default DPI = 96
-    double dy = sizeY * ((double)dpiY/96);      // default DPI = 96
-    cs.cy = (int)dy;
-    cs.cx = (int)dx;
-
+    // Get the size dynamically (checks the sources number).
+    CPoint size = getMainWindowSize();
+    cs.cx = size.x;
+    cs.cy = size.y;
 
     // Center window
     cs.x = (GetSystemMetrics(SM_CXSCREEN) - cs.cx)/2;
@@ -636,11 +627,6 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
     }
 
 
-    if (currentSource == SYNCSOURCE_PICTURES) {
-
-    }
-
-
     //
     // change text on labels to reflect sync status
     //
@@ -816,8 +802,6 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceEnd( WPARAM , LPARAM lParam) {
          break;
     }
 
-    // Invalidating the currentSource, here it's finished.
-    currentSource = 0;
     return 0;
 }
 
@@ -918,6 +902,7 @@ LRESULT CMainSyncFrame::OnMsgItemSynced( WPARAM wParam, LPARAM ) {
 
 afx_msg LRESULT CMainSyncFrame::OnMsgRefreshStatusBar( WPARAM wParam, LPARAM lParam) {
 
+    CString s1;
     char text[100];
     text[0] = 0;
 
@@ -945,6 +930,7 @@ afx_msg LRESULT CMainSyncFrame::OnMsgRefreshStatusBar( WPARAM wParam, LPARAM lPa
             else if (currentSource == SYNCSOURCE_CALENDAR) sourceName = APPOINTMENT_;
             else if (currentSource == SYNCSOURCE_TASKS)    sourceName = TASK_;
             else if (currentSource == SYNCSOURCE_NOTES)    sourceName = NOTE_;
+            else if (currentSource == SYNCSOURCE_PICTURES) sourceName = PICTURE_;
             sprintf(text, SBAR_DELETING_ITEMS, sourceName);
             break;
         }
@@ -960,9 +946,15 @@ afx_msg LRESULT CMainSyncFrame::OnMsgRefreshStatusBar( WPARAM wParam, LPARAM lPa
             sprintf(text, SBAR_WAITING);
             break;
         }
+        case SBAR_ENDING_SYNC: {
+            s1.LoadString(IDS_ENDING_SYNC);
+            refreshStatusBar(s1);
+            refreshSourceLabels(s1, currentSource);
+            return 0;
+        }
     }
 
-    CString s1 = text;
+    s1 = text;
     refreshStatusBar(s1);
 
     // Refresh source labels for some case
@@ -1178,6 +1170,7 @@ LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam){
     SetForegroundWindow();
 
     Invalidate(FALSE);
+    currentSource = 0;          // Invalidating the currentSource, here it's finished.
     bSyncStarted = false;
     return 0;
 }
@@ -1565,5 +1558,16 @@ LRESULT CMainSyncFrame::OnMsgUnlockButtons(WPARAM wParam, LPARAM lParam) {
     // TODO: move to class member?
     CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
     mainForm->unlockButtons();
+    return 0;
+}
+
+/**
+ * Used to re-enable UI buttons (called after 'continueAfterPrepareSync()' method).
+ */
+LRESULT CMainSyncFrame::OnMsgLockButtons(WPARAM wParam, LPARAM lParam) {
+
+    // TODO: move to class member?
+    CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+    mainForm->lockButtons();
     return 0;
 }

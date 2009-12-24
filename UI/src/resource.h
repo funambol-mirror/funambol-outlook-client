@@ -229,6 +229,7 @@
 #define IDS_PICTURES_DETAILS            293
 #define IDS_PICTURES_FOLDER             294
 #define IDS_MAIN_PICTURES               295
+#define IDS_ENDING_SYNC                 296
 #define IDC_TREE1                       1005
 #define IDC_SCHEDULER_SPIN              1007
 #define IDC_EDIT2                       1008
