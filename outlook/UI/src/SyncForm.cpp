@@ -64,6 +64,8 @@ CSyncForm::CSyncForm()
     syncSourcePictureState  = SYNCSOURCE_STATE_OK; 
 
     lockedUI = false;
+
+    panesCount = countSourceVisible();
 }
 
 CSyncForm::~CSyncForm()
@@ -337,6 +339,16 @@ HBRUSH CSyncForm::OnCtlColor( CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 
 void CSyncForm::refreshSources() {
 
+    // If num sources changed, resize the dialog
+    int newPanesCount = countSourceVisible();
+    if (panesCount != newPanesCount) {
+        // Resize main window
+        CPoint size = getMainWindowSize();
+        AfxGetMainWnd()->SetWindowPos(&CWnd::wndTop, NULL, NULL, size.x, size.y, SWP_SHOWWINDOW | SWP_NOMOVE);
+        //this->SetWindowPos(&CWnd::wndTop, NULL, NULL, rectDialog.Width(), newHeight, SWP_SHOWWINDOW | SWP_NOMOVE);
+        panesCount = newPanesCount;
+    }
+
     // refresh all sources
     refreshSource(SYNCSOURCE_CONTACTS);
     refreshSource(SYNCSOURCE_CALENDAR);
@@ -344,12 +356,13 @@ void CSyncForm::refreshSources() {
     refreshSource(SYNCSOURCE_NOTES);
     refreshSource(SYNCSOURCE_PICTURES);
 
+
     // TODO: this is needed
     if(AfxGetMainWnd() != NULL){
         paneContacts.SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
         paneCalendar.SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
-        paneTasks.SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
-        paneNotes.SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
+        paneTasks.SetBitmap   (((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
+        paneNotes.SetBitmap   (((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
         panePictures.SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
     }
     
@@ -841,6 +854,9 @@ void CSyncForm::refreshSource( int sourceId )
 
         if (isSourceVisible(PICTURE)) {
             // source visible
+            GetDlgItem(IDC_MAIN_STATIC_PICTURES)->ShowWindow(SW_NORMAL);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->ShowWindow(SW_NORMAL);
+            iconPictures.ShowWindow(SW_NORMAL); 
 
             WindowsSyncSourceConfig* ssc = getConfig()->getSyncSourceConfig(PICTURE_);
             if (!ssc) {
@@ -852,8 +868,6 @@ void CSyncForm::refreshSource( int sourceId )
             }
 
             bool enabled = getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled();
-            GetDlgItem(IDC_MAIN_STATIC_PICTURES)->EnableWindow(enabled);
-            GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->EnableWindow(enabled);
             if(enabled) {
                 panePictures.ShowWindow(SW_NORMAL);
                 panePictures.state = STATE_NORMAL;
@@ -864,7 +878,8 @@ void CSyncForm::refreshSource( int sourceId )
                 iconPictures.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_PICTURES_GREY)));
             }
             iconPictures.EnableWindow(enabled);
-        
+            GetDlgItem(IDC_MAIN_STATIC_PICTURES)->EnableWindow(enabled);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->EnableWindow(enabled);
         }
         else {
             // source not visible: hide the controls

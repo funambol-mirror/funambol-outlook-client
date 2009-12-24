@@ -77,7 +77,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="true"
-				AdditionalDependencies="odbc32.lib odbccp32.lib wininet.lib secur32.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib wininet.lib secur32.lib shlwapi.lib"
 				OutputFile=".\Debug/winmainclientdll.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -176,7 +176,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib wininet.lib secur32.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib wininet.lib secur32.lib shlwapi.lib"
 				OutputFile=".\Release/winmainclientdll.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"

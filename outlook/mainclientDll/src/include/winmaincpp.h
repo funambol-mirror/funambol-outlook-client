@@ -271,6 +271,7 @@
 #define SBAR_RECEIVE_DATA_BEGIN             7
 #define SBAR_RECEIVE_DATA_END               8
 #define SBAR_DELETE_CLIENT_ITEMS            9
+#define SBAR_ENDING_SYNC                    10
 
 
 // Status bar messages

@@ -45,8 +45,8 @@
 #define FRAME_CONFIG_X      440
 #define FRAME_CONFIG_Y      420
 #define FRAME_MAIN_X        350
-#define FRAME_MAIN_Y        350
-#define SOURCE_PANE_SIZE_Y  40      // height of each source pane on main screen
+#define FRAME_MAIN_Y        345
+#define SOURCE_PANE_SIZE_Y  45      // height of each source pane on main screen
 
 #define MAIN_PROGRESSBAR_COLOR RGB(255,255,255)
 
@@ -73,6 +73,12 @@ DateFilter::RelativeLowerDate getDateFilterValue(const int index);
 void manageSyncErrorMsg(long code);
 
 CPoint getRelativePosition(CWnd* wnd, CWnd* parentWnd);
+
+/**
+ * Checks the sources visible (array in config) to return
+ * dynamically the size of the mains screen dialog.
+ */
+CPoint getMainWindowSize();
 
 /** @} */
 /** @endcond */

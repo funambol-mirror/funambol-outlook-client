@@ -1,5 +1,26 @@
+2009-12-24
+   - toccy: merged from branch "US1987" (pictures bacward compatibility) branch closed at rev399
+
 2009-12-23
    - toccy: fixed bug #8419: trapped ClientException that can be thrown when filling an item
+   - toccy: fixed bug #8395: OutlookConfig::saveWinSourceConfig() could save the wrong source node
+
+2009-12-22
+   - toccy: fixed bug #8395: some syncsource props were lost after client upgrade
+   - toccy: fixed bug #8401: Cancelling sync when saving server capabilities causes severe error
+   - toccy: [US1987] fixed bug #8404: UI not correctly loaded at first run
+   - toccy: [US1987] fixed bug #8406: Outlook plugin crash if server location is not correct
+
+2009-12-21
+   - toccy: [US1987] added a check at the end of each sync, to enable/disable source pictures.
+            added "Ending..." msg in UI, during the save of configuration (can be very slow!!)
+
+2009-12-18
+   - toccy: [US1987] source picture is now dinamically enabled/disabled reading the config key sourceOrder
+            [US1987] added 'sourcesVisible' ArrayList in config, as the list of sources visible in Client's UI
+                     read/save operate on registry key 'sourceOrder' under the root node
+                     NOTE: contacts,appointment,task,note CANNOT be hidden at the moment (TODO)
+            [US1987] fixed upgrade procedure: force a GET of Server caps if old sw < 8.2 (for pictures enable/disable)
 
 2009-12-10
    - toccy: fixed bug#8280: fixed upgrade procedure from Funambol versions < v.8.2

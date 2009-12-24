@@ -61,6 +61,5 @@ syncModeName
 saveSyncModes
 readSyncModes
 isSourceVisible
-isSourceVisibleA
 countSourceVisible
 getDefaultPicturesPath

@@ -39,6 +39,7 @@
 #include "utils.h"
 #include "winmaincpp.h"
 #include "CalendarSettings.h"
+#include "ClientUtil.h"
 
 
 int getSyncTypeIndex(const char* syncType){
@@ -240,7 +241,6 @@ int getSyncModeCode(const char* syncMode){
 }
 
 
-
 /**
  * Utility to retrieve the relative position of 'wnd' window respect to 'parentWnd'.
  */
@@ -258,4 +258,27 @@ CPoint getRelativePosition(CWnd* wnd, CWnd* parentWnd) {
     pos.x = pwi.rcClient.left - pwiParent.rcClient.left;
     pos.y = pwi.rcClient.top  - pwiParent.rcClient.top;
     return pos;
+}
+
+CPoint getMainWindowSize() {
+    
+    HDC hdc = ::GetDC(0);
+    int dpiX = ::GetDeviceCaps(hdc, LOGPIXELSX);
+    int dpiY = ::GetDeviceCaps(hdc, LOGPIXELSY);
+    ::ReleaseDC(0, hdc);
+
+    //
+    // TODO: set the window size dynamically based on the source number
+    //
+    int sizeX = FRAME_MAIN_X;
+    int sizeY = FRAME_MAIN_Y;
+    if (isSourceVisible(PICTURE)) {
+        sizeY += SOURCE_PANE_SIZE_Y;
+    }
+
+    double dx = sizeX * ((double)dpiX/96);      // default DPI = 96
+    double dy = sizeY * ((double)dpiY/96);      // default DPI = 96
+
+    CPoint point((int)dx, (int)dy);
+    return point;
 }
