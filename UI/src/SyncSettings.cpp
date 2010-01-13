@@ -452,35 +452,35 @@ void CSyncSettings::OnBnClickedSyncButContacts()
 {
     CContactSettings wndContacts;
     INT_PTR result = wndContacts.DoModal();
-    saveSyncTypeContacts = (result != IDOK);
+    saveSyncTypeContacts = true;
 }
 
 void CSyncSettings::OnBnClickedSyncButCalendar()
 {
     CCalendarSettings wndCalendar;
     INT_PTR result = wndCalendar.DoModal();
-    saveSyncTypeCalendar = (result != IDOK);
+    saveSyncTypeCalendar = true;
 }
 
 void CSyncSettings::OnBnClickedSyncButTasks()
 {
     CTaskSettings wndTasks;
     INT_PTR result = wndTasks.DoModal();
-    saveSyncTypeTasks = (result != IDOK);
+    saveSyncTypeTasks = true;
 }
 
 void CSyncSettings::OnBnClickedSyncButNotes()
 {
     CNotesSettings wndNotes;
     INT_PTR result = wndNotes.DoModal();
-    saveSyncTypeNotes = (result != IDOK);
+    saveSyncTypeNotes = true;
 }
 
 void CSyncSettings::OnBnClickedSyncButPictures()
 {
     CPicturesSettings wndPictures;
     INT_PTR result = wndPictures.DoModal();
-    saveSyncTypePictures = (result != IDOK);
+    saveSyncTypePictures = true;
 }
 
 
@@ -512,23 +512,23 @@ bool CSyncSettings::saveSettings(bool saveToDisk)
     saveScheduler = false;
 
     if (saveSyncTypeContacts) {
-        bool enabled = (checkContacts.GetCheck() == BST_CHECKED)? true:false;
+        bool enabled = (checkContacts.GetCheck() == BST_CHECKED);
         getConfig()->getSyncSourceConfig(CONTACT_)->setIsEnabled(enabled);
     }
     if (saveSyncTypeCalendar) {
-        bool enabled = (checkCalendar.GetCheck() == BST_CHECKED)? true:false;
+        bool enabled = (checkCalendar.GetCheck() == BST_CHECKED);
         getConfig()->getSyncSourceConfig(APPOINTMENT_)->setIsEnabled(enabled);
     }
     if (saveSyncTypeTasks) {
-        bool enabled = (checkTasks.GetCheck() == BST_CHECKED)? true:false;
+        bool enabled = (checkTasks.GetCheck() == BST_CHECKED);
         getConfig()->getSyncSourceConfig(TASK_)->setIsEnabled(enabled);
     }
     if (saveSyncTypeNotes) {
-        bool enabled = (checkNotes.GetCheck() == BST_CHECKED)? true:false;
+        bool enabled = (checkNotes.GetCheck() == BST_CHECKED);
         getConfig()->getSyncSourceConfig(NOTE_)->setIsEnabled(enabled);
     }
     if (saveSyncTypePictures) {
-        bool enabled = (checkPictures.GetCheck() == BST_CHECKED)? true:false;
+        bool enabled = (checkPictures.GetCheck() == BST_CHECKED);
         getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(enabled);
     }
 
