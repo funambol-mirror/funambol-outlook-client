@@ -1,5 +1,6 @@
 2010-01-13
    - toccy: fixed UI bug #8469: Source is not enabled if clicking on 'Details' before pressing 'Ok'
+   - toccy: updated about and readme.txt copyright (year 2010)
 
 2009-12-24
    - toccy: merged from branch "US1987" (pictures bacward compatibility) branch closed at rev399

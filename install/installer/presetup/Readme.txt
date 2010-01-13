@@ -10,5 +10,5 @@ See http://www.funambol.com/support
 You can also get support from the open source community.
 See https://www.forge.funambol.org/support
 
-Copyright (C) 2003 - 2009 Funambol, Inc. All rights reserved. 
+Copyright (C) 2003 - 2010 Funambol, Inc. All rights reserved. 
 
