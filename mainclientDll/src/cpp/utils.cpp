@@ -420,7 +420,7 @@ int writeToFile(const string& content, const string& filePath, const char* mode)
     }
 
     FILE* f;
-    if ((f  = fopen(filePath.c_str(), mode)) == NULL) {
+    if ((f  = fileOpen(filePath.c_str(), mode)) == NULL) {
         setErrorF(getLastErrorCode(), ERR_FILE_OPEN, filePath.c_str());
         return 1;
     }
