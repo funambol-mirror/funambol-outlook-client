@@ -2,6 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by OutlookPlugin.rc
 //
+#define IDCANCEL2                       3
 #define IDD_ABOUTBOX                    100
 #define IDD_SYNC_FORM                   101
 #define IDR_MAINFRAME                   128
@@ -45,6 +46,7 @@
 #define IDS_USE_VCARD                   152
 #define IDD_PICTURES                    152
 #define IDS_ENCRYPTION                  153
+#define IDD_FORMVIEW                    153
 #define IDS_ADVANCED_CONTACTS           154
 #define IDS_FULLSYNC_PERFORM            155
 #define IDI_ARROWS32A                   155
@@ -206,6 +208,7 @@
 #define IDS_CODE_SERVER_BUSY            271
 #define IDS_CODE_SERVER_BUSY_SYNC       272
 #define IDS_CODE_SERVER_ERROR_2052      273
+#define IDD_POPUP                       273
 #define IDS_CODE_DROPPED_ITEMS_SERVER   274
 #define IDS_CODE_NO_SOURCES             275
 #define IDS_HOURS2                      276
@@ -230,6 +233,15 @@
 #define IDS_PICTURES_FOLDER             294
 #define IDS_MAIN_PICTURES               295
 #define IDS_ENDING_SYNC                 296
+#define IDS_UP_MESSAGE_SKIPPED          297
+#define IDS_BUT_NOW_LATER_SKIP          298
+#define IDS_BUT_NOW_LATER               299
+#define IDS_UP_MESSAGE                  300
+#define IDS_UP_MANDATORY_MESSAGE        301
+#define IDS_BUT_NOW_EXIT                302
+#define IDS_UP_MANDATORY_MESSAGE_EXIT   303
+#define IDS_UPDATE_SOFTWARE             304
+#define IDS_UPDATE_SOFTWARE_TITLE       305
 #define IDC_TREE1                       1005
 #define IDC_SCHEDULER_SPIN              1007
 #define IDC_EDIT2                       1008
@@ -479,21 +491,26 @@
 #define IDC_PICTURES_OK                 1218
 #define IDC_PICTURES_CANCEL             1219
 #define IDC_PICTURES_EDIT_SYNCTYPE      1220
+#define IDC_POPUP_TEXT                  1220
 #define ID_FILE_CONFIGURATION           32771
 #define ID_FILE_ZZZZ                    32772
 #define ID_FILE_SYNCHRONIZE             32773
 #define ID_TOOLS_FULLSYNC               32774
 #define ID_TOOLS_SETLOGLEVEL            32776
 #define ID_VIEW_GUIDE                   32784
+#define ID_HELP_UPDATESW                32785
+#define ID_MENU_UPDATE_SW               32786
+#define ID_HELP_RRR                     32787
+#define ID_HILFE_UPDATE                 32788
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        272
-#define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1220
+#define _APS_NEXT_RESOURCE_VALUE        274
+#define _APS_NEXT_COMMAND_VALUE         32789
+#define _APS_NEXT_CONTROL_VALUE         1221
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

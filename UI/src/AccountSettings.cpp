@@ -203,6 +203,10 @@ bool CAccountSettings::saveSettings(bool saveToDisk)
     //       (when writing to winreg, toWideChar is then called)
     char* tmp = toMultibyte(url.GetBuffer());
     if (tmp) {
+        // reset the updater info if changing the URL...
+        if (strcmp(tmp, conf->getAccessConfig().getSyncURL()) != 0) {
+            conf->getUpdaterConfig().createDefaultConfig();
+        }
         conf->getAccessConfig().setSyncURL(tmp);
         delete [] tmp;
     }

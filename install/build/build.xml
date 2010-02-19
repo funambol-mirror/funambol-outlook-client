@@ -71,9 +71,11 @@ Forge file for Funambol Outlook Sync Client
        <echo message="docs-dev        : clean, to only generate doxygen docs, no checkout (build from dev working dirs)"/>
     </target>
 
-    <target name="release"        depends="init, clean, build, register-dll, checkout-src, create-docs, forge-src, compile, forge, build-install, build-install-cared"/>
-    <target name="release-nodocs" depends="init, clean, build, register-dll, checkout-src, forge-src, compile, forge, build-install, build-install-cared"/>
-    <target name="docs "          depends="init, clean, build, checkout-src, create-docs, forge-src"/>
+    <target name="release"        depends="init, clean, build, register-dll, checkout-src, create-docs, 
+                                           forge-src, compile, forge, build-install, build-install-cared, generate-update-info"/>
+    <target name="release-nodocs" depends="init, clean, build, register-dll, checkout-src, forge-src, 
+                                           compile, forge, build-install, build-install-cared, generate-update-info"/>
+    <target name="docs "          depends="init, clean, build, checkout-src, create-docs, forge-src, generate-update-info"/>
 
 
     <!-- These execute on working dir (for dev purpose) -->
@@ -82,17 +84,17 @@ Forge file for Funambol Outlook Sync Client
         <antcall target="work-dev"/>
         <antcall target="build-install-cared"/>
     </target>
-    <target name="work-dev"       depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install"/>
-    <target name="work-cared-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install-cared"/>
+    <target name="work-dev"       depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install, generate-update-info"/>
+    <target name="work-cared-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install-cared, generate-update-info"/>
 
     <target name="work-all-noreg">
         <antcall target="clean"/>
         <antcall target="work-dev-noreg"/>
         <antcall target="work-cared-dev-noreg"/>
     </target>
-    <target name="work-dev-noreg"       depends="init, build, compile-no-checkout, forge-no-checkout, build-install"/>
-    <target name="work-cared-dev-noreg" depends="init, build, compile-no-checkout, forge-no-checkout, build-install-cared"/>
-    <target name="docs-dev"             depends="init, clean, build, create-docs-no-checkout"/>
+    <target name="work-dev-noreg"       depends="init, build, compile-no-checkout, forge-no-checkout, build-install, generate-update-info"/>
+    <target name="work-cared-dev-noreg" depends="init, build, compile-no-checkout, forge-no-checkout, build-install-cared, generate-update-info"/>
+    <target name="docs-dev"             depends="init, clean, build, create-docs-no-checkout, generate-update-info"/>
 
 
     <!--
@@ -560,9 +562,9 @@ Forge file for Funambol Outlook Sync Client
     -->
 
     <target name="generate-update-info">
-
+        <property name="ol-upd-info"        value="outlook-upd-info"/>
         <exec executable="touch" >
-         <arg line=" ${dir.output}/ol-upd-info"/>
+         <arg line=" ${dir.output}/${ol-upd-info}"/>
          </exec>
 
          <if>
@@ -575,7 +577,7 @@ Forge file for Funambol Outlook Sync Client
            </else>
           </if>
 
-        <echo message="#File Descriptor" file="${dir.output}/ol-upd-info" append="false" />
+        <echo message="#File Descriptor" file="${dir.output}/${ol-upd-info}" append="false" />
 
         <exec executable="date" outputproperty="zipTimeStamp"/>
 
@@ -583,19 +585,19 @@ Forge file for Funambol Outlook Sync Client
             <arg line=" -c %s ${dir.output}/${fileName}-${release.major}.${release.minor}.${build.number}.exe"/>
         </exec>
 
-        <echo message="#File Descriptor${line.separator}" file="${dir.output}/ol-upd-info" append="false"/>
-        <echo message="#${zipTimeStamp}${line.separator}${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
-        <echo message="# The latest version available for update${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
-        <echo message="version=${release.major}.${release.minor}.${sis.build.number}${line.separator}${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
-        <echo message="# The activation date expressed in the format YYYYMMDD${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
-        <echo message="activation-date=19810221${line.separator}${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
+        <echo message="#File Descriptor${line.separator}" file="${dir.output}/${ol-upd-info}" append="false"/>
+        <echo message="#${zipTimeStamp}${line.separator}${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
+        <echo message="# The latest version available for update${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
+        <echo message="version=${release.major}.${release.minor}.${sis.build.number}${line.separator}${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
+        <echo message="# The activation date expressed in the format YYYYMMDD${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
+        <echo message="activation-date=null${line.separator}${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
 
-        <echo message="# The file size expressed in bytes${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
+        <echo message="# The file size expressed in bytes${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
 
-        <echo message="size=${duSize}${line.separator}${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
+        <echo message="size=${duSize}${line.separator}${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
 
-        <echo message="# The update type: optional, recommended, mandatory${line.separator}" file="${dir.output}/ol-upd-info" append="true"/>
-        <echo message="type=mandatory" file="${dir.output}/ol-upd-info" append="true"/>
+        <echo message="# The update type: optional, recommended, mandatory${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
+        <echo message="type=recommended" file="${dir.output}/${ol-upd-info}" append="true"/>
 
     </target>
 

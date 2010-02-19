@@ -400,6 +400,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\cpp\UpdateManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\cpp\utils.cpp"
 				>
 			</File>

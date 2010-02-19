@@ -80,6 +80,9 @@ public:
 	//{{AFX_MSG(COutlookPluginApp)
 	afx_msg void OnAppAbout();
     afx_msg void OnViewGuide();
+
+    // manually start the update procedure
+    afx_msg void OnUpdateSw();
 		// NOTE - the ClassWizard will add and remove member functions here.
 		//    DO NOT EDIT what you see in these blocks of generated code !
 	//}}AFX_MSG

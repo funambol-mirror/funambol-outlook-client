@@ -59,6 +59,9 @@
 #include "event/OutlookTransportListener.h"
 #include "base/adapter/PlatformAdapter.h"
 #include <string>
+
+#include "UpdateManager.h"
+
 using namespace std;
 
 
@@ -67,6 +70,7 @@ HANDLE syncThread = NULL;
 
 bool isScheduledSync = false;
 bool resetLog        = false;
+void launchSyncClient();
 
 
 /**
@@ -203,6 +207,11 @@ int initLog(bool isScheduled) {
  *           5  aborted by user to avoid full-sync.
  */
 int startSync() {
+
+    // check updates to see if the client has to exit immediately
+    if (checkForMandatoryUpdateBeforeStartingSync()) {
+        return 0;
+    }
 
     int ret           = 0;
     int sourcesActive = 0;
@@ -481,6 +490,11 @@ finally:
 
     // Finally: unlock buttons
     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_UNLOCK_BUTTONS, NULL, NULL);
+
+    // check for updates
+    if (checkUpdate()) {
+        updateProcedure(HwndFunctions::getWindowHandle(), false);
+    }
     return ret;
 }
 
@@ -1066,3 +1080,115 @@ void upgradePlugin(const int oldVersion, const int oldFunambolVersion) {
     }
 }
 
+
+//int OpenMessageBox(HWND hwnd, UINT buttons, UINT msg){
+int OpenMessageBox(HWND hwnd, UINT type, UINT msg){
+    if (hwnd == NULL) {
+        hwnd = HwndFunctions::getWindowHandle();
+    }
+    bool created = false;
+    if(!hwnd){        
+        created = true;
+        launchSyncClient();
+        hwnd = HwndFunctions::getWindowHandle();        
+    }
+
+    //int ret = SendMessage(hwnd, ID_MYMSG_POPUP, buttons, msg);
+    int ret = SendMessage(hwnd, ID_MYMSG_POPUP, type, NULL);
+    
+    if (created) {
+        SendMessage(hwnd, WM_CLOSE, type, NULL);
+    }
+    return ret;
+}
+
+int updateProcedure(HWND hwnd, bool manual) {  
+   
+    UpdateManager* up = getUpdateManager(CLIENT_PLATFORM, hwnd);
+    up->setHwnd(hwnd);
+
+    if (manual) {
+        // Will start the upgrade even if it's not yet time to check (manual update)
+        up->manualCheckForUpdates();
+    }
+    else {
+        // Will start the upgrade if it's time to check
+        up->checkForUpdates();
+    }
+
+    if (up->isNewVersionAvailable()) {
+        return 1;
+    }
+    return 0;
+}
+
+bool isNewSwVersionAvailable() {
+
+    UpdateManager* up = getUpdateManager(CLIENT_PLATFORM, NULL);
+    return up->isNewVersionAvailable();
+}
+
+int checkUpdate() {
+
+    UpdateManager* up = getUpdateManager(CLIENT_PLATFORM, NULL); 
+    return up->checkIsToUpdate();
+}
+
+bool checkForMandatoryUpdateBeforeStartingSync() {
+
+    UpdateManager* up = getUpdateManager(CLIENT_PLATFORM, NULL); 
+    return up->checkForMandatoryUpdateBeforeStarting();
+}
+
+void launchSyncClient() {
+
+    // Note: installDir of Outlook Client is read from HKEY_LOCAL_MACHINE tree:
+    OutlookConfig* config = getConfig();
+    const char* dir = config->getWorkingDir();
+
+    if (!dir || !strcmp(dir, "")) {        
+        return;
+    }
+
+    // program = "C:\...\OutlookPlugin.exe [param]"
+    char* program = NULL;    
+    program = new char[strlen(dir) + strlen(PROGRAM_NAME_EXE) + 2];
+    sprintf(program, "%s\\%s", dir, PROGRAM_NAME_EXE);    
+    
+    STARTUPINFOA         si;
+    PROCESS_INFORMATION  pi;
+    DWORD                processId;
+    DWORD                dwWaitRes = 0;
+    DWORD                timeOut = 5 * 1000; // 10 secs of timeout    
+    
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    ZeroMemory(&pi, sizeof(pi));
+    BOOL res = FALSE;
+
+    //
+    // Start the child process.
+    //
+    SetCurrentDirectoryA(dir);
+    res = CreateProcessA(NULL,             // No module name (use command line).
+                         program,
+                         NULL,             // Process handle not inheritable.
+                         NULL,             // Thread handle not inheritable.
+                         FALSE,            // Set handle inheritance to FALSE.
+                         0,                // No creation flags.
+                         NULL,             // Use parent's environment block.
+                         NULL,             // Use parent's starting directory.
+                         &si,              // Pointer to STARTUPINFO structure.
+                         &pi );            // Pointer to PROCESS_INFORMATION structure.
+    
+    // Save process ID!
+    processId = pi.dwProcessId;
+    
+    dwWaitRes = WaitForSingleObject(pi.hProcess, timeOut);
+
+    // Close process and thread handles.
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
+    if (program) delete [] program;
+}
