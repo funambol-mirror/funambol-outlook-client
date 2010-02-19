@@ -63,3 +63,13 @@ readSyncModes
 isSourceVisible
 countSourceVisible
 getDefaultPicturesPath
+;
+; update procedure
+;
+updateProcedure
+getUpdaterConfig
+readUpdaterConfig
+storeUpdaterConfig
+checkUpdate
+isNewSwVersionAvailable
+getReleaseDate

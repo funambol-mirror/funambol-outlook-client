@@ -38,7 +38,9 @@
 /** @{ */
 
 #include "DateFilter.h"
-
+#include <string>
+#include "base/util/StringBuffer.h"
+using namespace std;
 #define SYNC_DEFAULT_TOTAL_ITEMS  20
 
 // Default dimensions of frames (in case of 96dpi)
@@ -79,6 +81,8 @@ CPoint getRelativePosition(CWnd* wnd, CWnd* parentWnd);
  * dynamically the size of the mains screen dialog.
  */
 CPoint getMainWindowSize();
+
+wstring formatDate(Funambol::StringBuffer& date);
 
 /** @} */
 /** @endcond */

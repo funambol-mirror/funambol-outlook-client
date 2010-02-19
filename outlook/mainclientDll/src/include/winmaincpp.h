@@ -356,6 +356,35 @@ int   getScheduledTaskName(std::wstring& taskName);
 const char* getClientLastErrorMsg ();
 const int   getClientLastErrorCode();
 
+int OpenMessageBox(HWND hwnd, UINT type, UINT msg);
+
+/**
+* Starts the whole update procedure.
+* @param hwnd the handle of the main window from the UI. It is set by the 
+*             when the method is called by the UI form
+* @param manual parameter indicates that the user is starting from UI
+* It returns a value indicating the UI have to show the "Update Software"
+* menu item to start the update procedure manually.
+* ret 1,2 the UI must show the item
+* ret -1,0 the UI hides the item
+*/
+int updateProcedure(HWND hwnd, bool manual = false);
+
+/**
+ * Returns true if a new version is known to be available for upgrade. This
+ * method does not query the upgrade server, but it uses the information
+ * available in the config.
+ */
+bool isNewSwVersionAvailable();
+
+/**
+* It is called to check if there is a new version available. If there is one,
+* it sets a parameter into the reigistry.
+* If necessary, will request via http the updated information.
+*/
+int checkUpdate();
+
+bool checkForMandatoryUpdateBeforeStartingSync();
 
 /** @} */
 /** @endcond */

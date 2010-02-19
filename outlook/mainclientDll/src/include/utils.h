@@ -57,6 +57,18 @@
 #define SYNCSOURCE_PICTURES     5
 
 
+
+/// Used as mapping for the updates choice for the OpenMessageBox for the UI.
+/// With this code type we map the action and the message for the user for the update
+
+#define TYPE_SKIPPED_ACTION             0   // the user has choosen to skip the optional update
+#define TYPE_NOW_LATER_SKIP_OPTIONAL    1
+#define TYPE_NOW_LATER_RECCOMENDED      2
+#define TYPE_NOW_LATER_MANDATORY        3
+#define TYPE_NOW_EXIT_MANDATORY         4
+
+
+
 /*-----------utils functions -----------------*/
 
 // Open a message box with a timeout

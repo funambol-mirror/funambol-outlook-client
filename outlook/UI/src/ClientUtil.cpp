@@ -282,3 +282,46 @@ CPoint getMainWindowSize() {
     CPoint point((int)dx, (int)dy);
     return point;
 }
+
+
+void trim(wstring& str) {
+    wstring::size_type pos = str.find_last_not_of(' ');
+    if(pos != string::npos) {
+        str.erase(pos + 1);
+        pos = str.find_first_not_of(' ');
+        if(pos != string::npos) 
+            str.erase(0, pos);
+    }
+    else 
+        str.erase(str.begin(), str.end());
+}
+
+wstring formatDate(StringBuffer& date) {
+    
+    wstring dd(TEXT(""));
+    wchar_t* wdate = toWideChar(date);
+    if (wdate == NULL) {
+        return dd;
+    }
+    wchar_t data[80];
+    wchar_t formatDate[80];
+    int found = 0;
+    SYSTEMTIME timeDest;
+    swscanf(wdate, L"%4d%2d%2d", &timeDest.wYear, &timeDest.wMonth, &timeDest.wDay);
+    
+    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SLONGDATE, data, 80);
+
+    dd = data;            
+    if ((found = dd.find(TEXT("dddd, "))) != wstring::npos) {
+        dd.replace(found, 6, TEXT(""));
+    } else if ((found = dd.find(TEXT("dddd,"))) != wstring::npos) {
+        dd.replace(found, 5, TEXT(""));
+    }else if ((found = dd.find(TEXT("dddd"))) != wstring::npos) {
+        dd.replace(found, 4, TEXT(""));
+    }
+
+    trim(dd);            
+    GetDateFormat(LOCALE_USER_DEFAULT, NULL, &timeDest, dd.c_str(), formatDate, 80); 
+    dd = formatDate;
+    return dd;
+}

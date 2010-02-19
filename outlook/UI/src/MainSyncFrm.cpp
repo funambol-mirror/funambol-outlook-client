@@ -50,7 +50,7 @@
 
 #include "HwndFunctions.h"
 #include "comutil.h"
-
+#include "Popup.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -88,6 +88,9 @@ BEGIN_MESSAGE_MAP(CMainSyncFrame, CFrameWnd)
     ON_COMMAND(ID_TOOLS_FULLSYNC,               &CMainSyncFrame::OnToolsFullSync)
     ON_COMMAND(ID_FILE_SYNCHRONIZE,             &CMainSyncFrame::OnFileSynchronize)
     ON_COMMAND(ID_TOOLS_SETLOGLEVEL,            &CMainSyncFrame::OnToolsSetloglevel)
+
+    ON_MESSAGE(ID_MYMSG_POPUP,                  &CMainSyncFrame::OnMsgPopup)
+    ON_MESSAGE(ID_MYMSG_OK,                     &CMainSyncFrame::OnOKMsg)
 
 END_MESSAGE_MAP()
 
@@ -239,6 +242,16 @@ void CMainSyncFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMe
                 pPopupMenu->RemoveMenu(0, MF_BYPOSITION | MF_SEPARATOR);
             }
         }
+    }
+
+    if (nIndex == 2 && isNewSwVersionAvailable()) {
+        UINT firstItemID = pPopupMenu->GetMenuItemID(0);
+        if (firstItemID != ID_MENU_UPDATE_SW) {
+            CString s1; 
+            s1.LoadString(IDS_UPDATE_SOFTWARE);
+            pPopupMenu->InsertMenu(0, MF_BYPOSITION | MF_ENABLED, ID_MENU_UPDATE_SW, s1);
+            // pPopupMenu->EnableMenuItem(ID_MENU_UPDATE_SW, MF_GRAYED);
+        }       
     }
 
 finally:
@@ -1570,4 +1583,91 @@ LRESULT CMainSyncFrame::OnMsgLockButtons(WPARAM wParam, LPARAM lParam) {
     CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
     mainForm->lockButtons();
     return 0;
+}
+
+LRESULT CMainSyncFrame::OnOKMsg(WPARAM wParam, LPARAM lParam) {
+
+    this->ShowWindow(SW_MINIMIZE);
+    return 0;
+}
+
+
+LRESULT CMainSyncFrame::OnMsgPopup(WPARAM wParam, LPARAM lParam) {
+
+    CString button1;
+    CString button2;
+    CString button3;
+    CString swap;
+    CString msg;
+    CString buttonval;
+    WCHAR* currentMsg;
+    int sizeOfString;
+    WCHAR*  buffer;
+    wstring formattedDate;
+    
+    OutlookConfig* c = getConfig();
+    if (c == NULL) {
+        return 0;
+    }
+ 
+    UpdaterConfig& config = c->getUpdaterConfig();
+    StringBuffer date = config.getReleaseDate();    
+    if (date.empty()) {
+        c->readUpdaterConfig(true);
+        config = c->getUpdaterConfig();
+        date = config.getReleaseDate();
+    }
+    switch(wParam) {
+        case TYPE_SKIPPED_ACTION:
+            buttonval.LoadString(IDS_OK);
+            msg.LoadString(IDS_UP_MESSAGE_SKIPPED);
+            break;
+        case TYPE_NOW_LATER_SKIP_OPTIONAL:
+            buttonval.LoadString(IDS_BUT_NOW_LATER_SKIP);
+            msg.LoadString(IDS_UP_MESSAGE);
+            break;
+        case TYPE_NOW_LATER_RECCOMENDED:
+            buttonval.LoadString(IDS_BUT_NOW_LATER);
+            msg.LoadString(IDS_UP_MESSAGE);
+            break;
+        case TYPE_NOW_LATER_MANDATORY:
+            buttonval.LoadString(IDS_BUT_NOW_LATER);
+            msg.LoadString(IDS_UP_MANDATORY_MESSAGE);            
+            sizeOfString = (msg.GetLength() + 1);
+            buffer = new WCHAR[sizeOfString];
+            wcsncpy(buffer, msg, sizeOfString);
+            formattedDate = formatDate((StringBuffer&)date);            
+            currentMsg = new WCHAR[sizeOfString + 100];            
+            wsprintf(currentMsg, buffer, formattedDate.c_str());            
+            msg = currentMsg;
+            delete [] currentMsg;
+            delete [] buffer;
+            break;
+        case TYPE_NOW_EXIT_MANDATORY:
+            buttonval.LoadString(IDS_BUT_NOW_EXIT);
+            msg.LoadString(IDS_UP_MANDATORY_MESSAGE_EXIT);                                    
+            break;
+        default:
+            break;
+    }
+    
+    int b1 = buttonval.Find(L"*");
+    int b2 = buttonval.Find(L"*",b1+1);
+    if (b1 == -1 && b2 == -1) {
+        button1 = buttonval;
+        button2 = L"";
+    } else if (b2 == -1){ //just 2 buttons
+        button1 = buttonval.Left(b1);
+        button2 = buttonval.Right(buttonval.GetLength() - b1 -1);
+        button3 = L"";
+    } else { //3 buttons
+        button1 = buttonval.Left(b1);
+        swap = buttonval.Right(buttonval.GetLength() - b1 -1);
+        int s = swap.Find(L"*");
+        button3 = swap.Right(swap.GetLength() - s -1);
+        button2 = swap.Left(s);
+    }
+    return CMessageBox(msg, button1, button2, button3);    
+    
+    
 }

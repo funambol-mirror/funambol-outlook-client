@@ -355,6 +355,21 @@ BEGIN
     IDS_PICTURES_FOLDER     "Pictures &Folder"
     IDS_MAIN_PICTURES       "Pictures"
     IDS_ENDING_SYNC         "Beende..."
+    IDS_UP_MESSAGE_SKIPPED  "You may choose to upgrade to the new version of the application at any time from the application's Help menu."
+    IDS_BUT_NOW_LATER_SKIP  "Now*Later*Skip this Version"
+    IDS_BUT_NOW_LATER       "Now*Later"
+    IDS_UP_MESSAGE          "A new version of this application is available. Would you like to upgrade?"
+    IDS_UP_MANDATORY_MESSAGE 
+                            "A new version of this application is available. Would you like to upgrade? NOTE: Starting on %s, you will be required to upgrade to this new version."
+    IDS_BUT_NOW_EXIT        "Upgrade Now*Exit Application"
+    IDS_UP_MANDATORY_MESSAGE_EXIT 
+                            "A new version of this application is available. To continue using this application, you must first upgrade to the latest version."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_UPDATE_SOFTWARE     "Software Update..."
+    IDS_UPDATE_SOFTWARE_TITLE "Software Update"
 END
 
 #endif    // German (Germany) resources
@@ -688,6 +703,13 @@ BEGIN
     LTEXT           "Server to Client only",IDC_PICTURES_EDIT_SYNCTYPE,17,20,199,11
 END
 
+IDD_FORMVIEW DIALOGEX 0, 0, 185, 93
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "TODO: layout formview",IDC_STATIC,55,42,74,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -809,6 +831,14 @@ BEGIN
         VERTGUIDE, 216
         VERTGUIDE, 289
         BOTTOMMARGIN, 186
+    END
+
+    IDD_FORMVIEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 178
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 86
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -1183,6 +1213,21 @@ BEGIN
     IDS_PICTURES_FOLDER     "Pictures &Folder"
     IDS_MAIN_PICTURES       "Pictures"
     IDS_ENDING_SYNC         "Ending..."
+    IDS_UP_MESSAGE_SKIPPED  "You may choose to upgrade to the new version of the application at any time from the application's Help menu."
+    IDS_BUT_NOW_LATER_SKIP  "Now*Later*Skip this Version"
+    IDS_BUT_NOW_LATER       "Now*Later"
+    IDS_UP_MESSAGE          "A new version of this application is available. Would you like to upgrade?"
+    IDS_UP_MANDATORY_MESSAGE 
+                            "A new version of this application is available. Would you like to upgrade? NOTE: Starting on %s, you will be required to upgrade to this new version."
+    IDS_BUT_NOW_EXIT        "Upgrade Now*Exit Application"
+    IDS_UP_MANDATORY_MESSAGE_EXIT 
+                            "A new version of this application is available. To continue using this application, you must first upgrade to the latest version."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_UPDATE_SOFTWARE     "Software Update..."
+    IDS_UPDATE_SOFTWARE_TITLE "Software Update"
 END
 
 #endif    // English (U.S.) resources
@@ -1241,6 +1286,42 @@ BEGIN
     "L",            ID_TOOLS_SETLOGLEVEL,   VIRTKEY, CONTROL, NOINVERT
     "U",            ID_VIEW_GUIDE,          VIRTKEY, CONTROL, NOINVERT
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_POPUP DIALOGEX 0, 0, 211, 63
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Ok",IDOK,10,39,62,14
+    PUSHBUTTON      "Cancel",IDCANCEL,90,39,33,14
+    PUSHBUTTON      "Skip this Version",IDCANCEL2,141,40,34,14
+    LTEXT           "Static",IDC_POPUP_TEXT,7,7,197,29
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_POPUP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 204
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 56
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1509,6 +1590,21 @@ BEGIN
     IDS_PICTURES_FOLDER     "Pictures &Folder"
     IDS_MAIN_PICTURES       "Pictures"
     IDS_ENDING_SYNC         "Ending..."
+    IDS_UP_MESSAGE_SKIPPED  "You may choose to upgrade to the new version of the application at any time from the application's Help menu."
+    IDS_BUT_NOW_LATER_SKIP  "Now*Later*Skip this Version"
+    IDS_BUT_NOW_LATER       "Now*Later"
+    IDS_UP_MESSAGE          "A new version of this application is available. Would you like to upgrade?"
+    IDS_UP_MANDATORY_MESSAGE 
+                            "A new version of this application is available. Would you like to upgrade? NOTE: Starting on %s, you will be required to upgrade to this new version."
+    IDS_BUT_NOW_EXIT        "Upgrade Now*Exit Application"
+    IDS_UP_MANDATORY_MESSAGE_EXIT 
+                            "A new version of this application is available. To continue using this application, you must first upgrade to the latest version."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_UPDATE_SOFTWARE     "Software Update..."
+    IDS_UPDATE_SOFTWARE_TITLE "Software Update"
 END
 
 #endif    // Italian (Italy) resources

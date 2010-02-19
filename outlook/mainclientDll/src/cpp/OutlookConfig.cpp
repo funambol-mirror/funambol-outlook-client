@@ -50,6 +50,8 @@
 
 #include "base/adapter/PlatformAdapter.h"
 
+#include "UpdateManager.h"
+
 using namespace std;
 
 
@@ -78,7 +80,7 @@ bool OutlookConfig::isInstantiated() {
 
 /// Constructor
 //OutlookConfig::OutlookConfig() : DMTClientConfig(PLUGIN_ROOT_CONTEXT) {
-OutlookConfig::OutlookConfig() {
+OutlookConfig::OutlookConfig() : updaterConfig(PLUGIN_ROOT_CONTEXT) {
     
     DMTClientConfig::initialize();
     winSourceConfigs      = NULL;
@@ -503,6 +505,12 @@ bool OutlookConfig::save(SyncReport* report) {
 
     // Saves the list of sources visible.
     saveSourcesVisible();
+
+    // Must update the syncurl in the updater module if empty
+    UpdateManager* up = getUpdateManager(CLIENT_PLATFORM, NULL);
+    if (getUpdaterConfig().getUrlCheck().empty()) {
+        up->setURLCheck(getSyncURL());
+    }
 
     //
     // Sources management node
@@ -1224,6 +1232,19 @@ void OutlookConfig::upgradeConfig() {
     
     delete [] newSwv;
     delete [] userAgent;
+
+    // delete the updater tree when the upgrade has been finished
+    ManagementNode* n = NULL;
+    DMTree* d = DMTreeFactory::getDMTree(PLUGIN_ROOT_CONTEXT);
+    if (d) {
+        n = d->readManagementNode(PLUGIN_ROOT_CONTEXT);
+        if (n) {
+            n->deletePropertyNode(CONTEXT_UPDATER);
+            delete n;
+            delete d;
+        }
+    }
+
 }
 
 
@@ -1583,3 +1604,25 @@ void OutlookConfig::encryptPrivateData() {
     }
 }
 
+/**
+* Load data from the update tree all the configuration parameters.
+* It populates also the currentVersion of the UpdateConfig class.
+* At the moment "refresh" is not used
+*/
+BOOL OutlookConfig::readUpdaterConfig(bool refresh) {
+    
+    return updaterConfig.read();
+}
+
+/**
+* Save data into the registry
+*/
+void OutlookConfig::storeUpdaterConfig(){
+    
+    updaterConfig.save();
+    }
+
+
+UpdaterConfig& OutlookConfig::getUpdaterConfig() {
+    return updaterConfig;
+}

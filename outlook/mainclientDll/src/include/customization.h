@@ -102,5 +102,9 @@
 // Note: in case of change, please make sure at least one "/" exist.
 #define PLUGIN_ROOT_CONTEXT                 "Funambol/OutlookClient"
 
+// Auto-update feature
+#define UP_URL_RESOURCE                     "/sapi/profile/client?action=get-update-info"
+#define CLIENT_PLATFORM                     "outlook"
+
 
 #endif

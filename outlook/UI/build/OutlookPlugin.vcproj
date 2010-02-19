@@ -363,6 +363,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Popup.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\ProxySettings.cpp"
 				>
 			</File>

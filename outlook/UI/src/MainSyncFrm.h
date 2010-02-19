@@ -175,6 +175,9 @@ public:
 
     afx_msg BOOL OnNcActivate(BOOL bActive);
     afx_msg void OnClose();
+
+    afx_msg LRESULT OnMsgPopup(WPARAM wParam, LPARAM lParam);
+    afx_msg LRESULT OnOKMsg(WPARAM wParam, LPARAM lParam);
 };
 
 

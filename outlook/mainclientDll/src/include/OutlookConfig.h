@@ -45,7 +45,7 @@
 #include "spds/SyncReport.h"
 #include "Client/DMTClientConfig.h"
 #include "WindowsSyncSourceConfig.h"
-
+#include "updater/UpdaterConfig.h"
 #include <string>
 
 
@@ -172,6 +172,10 @@ private:
      */
     void savePropertyValue(const StringBuffer& context, const StringBuffer& name, const StringBuffer& value);
 
+    /**
+    * The parameters related to the update procedure
+    */
+    UpdaterConfig updaterConfig;
 
 protected:
 
@@ -299,6 +303,16 @@ public:
 
     /// Reads only "sync" properties of each source, to win registry.
     _declspec(dllexport) void readSyncModes();
+
+    BOOL readUpdaterConfig(bool refresh);
+
+    /**
+    * Save data into the registry
+    */
+    void storeUpdaterConfig();
+
+    UpdaterConfig& getUpdaterConfig();
+
 };
 
 /** @} */
