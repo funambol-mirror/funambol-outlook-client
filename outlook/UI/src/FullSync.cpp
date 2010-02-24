@@ -120,11 +120,18 @@ BOOL CFullSync::OnInitDialog() {
     radio3.SetCheck(BST_CHECKED);
     radio3.SetFocus();
 
-    checkContacts.EnableWindow(TRUE);
-    checkCalendar.EnableWindow(TRUE);
-    checkTasks.EnableWindow   (TRUE);
-    checkNotes.EnableWindow   (TRUE);
+
+    // Grey out disabled sources
+    if (isSourceEnabled(CONTACT_))     { checkContacts.EnableWindow(TRUE);  }
+    else                               { checkContacts.EnableWindow(FALSE); }
+    if (isSourceEnabled(APPOINTMENT_)) { checkCalendar.EnableWindow(TRUE);  }
+    else                               { checkCalendar.EnableWindow(FALSE); }
+    if (isSourceEnabled(TASK_))        { checkTasks.EnableWindow(TRUE);     }
+    else                               { checkTasks.EnableWindow(FALSE);    }
+    if (isSourceEnabled(NOTE_))        { checkNotes.EnableWindow(TRUE);     }
+    else                               { checkNotes.EnableWindow(FALSE);    }
     checkPictures.EnableWindow(FALSE);  // C2S not available for pictures!
+
 
     // resize/move dynamically the source checkboxes
     adjustCheckboxes();
@@ -241,7 +248,9 @@ void CFullSync::OnBnClickedRefreshC2S() {
 
 void CFullSync::OnBnClickedRefreshS2C() {
 
-    checkPictures.EnableWindow(TRUE);
+    if (isSourceEnabled(PICTURE_)) { 
+        checkPictures.EnableWindow(TRUE);
+    }
 }
 
 

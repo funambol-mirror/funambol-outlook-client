@@ -134,6 +134,12 @@ bool isSourceVisible(const WCHAR* sourceName);
  */
 int countSourceVisible();
 
+/**
+ * Used to quicky check if a specific source is enabled or not, checking
+ * the configuration. If a source is disabled, it's greyed out in UI.
+ */
+bool isSourceEnabled(const char* sourceName);
+
 
 /**
  * Is the given status code an error status code? Error codes are the ones

@@ -63,6 +63,8 @@ readSyncModes
 isSourceVisible
 countSourceVisible
 getDefaultPicturesPath
+isSourceEnabled
+
 ;
 ; update procedure
 ;

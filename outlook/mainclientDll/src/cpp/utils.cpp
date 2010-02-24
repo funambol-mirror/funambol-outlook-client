@@ -1054,6 +1054,16 @@ int countSourceVisible() {
     return sourcesVisible.size();
 }
 
+bool isSourceEnabled(const char* sourceName) {
+
+    OutlookConfig* config = OutlookConfig::getInstance();
+    WindowsSyncSourceConfig* ssc = config->getSyncSourceConfig(sourceName);
+    if (ssc) {
+        return ssc->isEnabled();
+    }
+    return false;
+}
+
 
 //
 // ----------------------------------- Time/date functions ----------------------------------------
