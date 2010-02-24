@@ -1,3 +1,6 @@
+2010-02-24
+   - toccy: fixed bug #8734: Sources not enabled in settings are greyed out in Recover screen
+
 2010-02-19
    - magi: reintegrated branch us3184 at rev 421
 
