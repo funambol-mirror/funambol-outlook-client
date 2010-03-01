@@ -1,5 +1,6 @@
 2010-03-01
-  - toccy: created branch "v85": Funambol Outlook Sync Client v.8.5 (linked to SDK C++ v.8.5)
+  - toccy: updated trunk version to 8.7.0
+           created branch "v85": Funambol Outlook Sync Client v.8.5 (linked to SDK C++ v.8.5)
   - toccy: created tag: Funambol Outlook Sync Client v.8.5.2 (linked to SDK C++ v.8.5.1)
 
 2010-02-24
