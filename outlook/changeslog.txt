@@ -1,3 +1,6 @@
+2010-03-01
+  - toccy: created tag: Funambol Outlook Sync Client v.8.5.2 (linked to SDK C++ v.8.5.1)
+
 2010-02-24
    - toccy: fixed bug #8734: Sources not enabled in settings are greyed out in Recover screen
 
@@ -7,6 +10,9 @@
 2010-02-16
    - magi: added autoupdate feature. Added UpdateManager class (implemented the UpdaterUI interface). 
            it implements also the autoupdate mandatory feature 
+
+2010-02-01
+   - teo: created tag: Funambol Outlook Sync Client v.8.5.1
 
 2010-01-17
    - maria: upgraded version to 8.5.0
