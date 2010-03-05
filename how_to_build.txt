@@ -1,8 +1,9 @@
+*********************************************
 How to build the Funambol Outlook Sync Client
----------------------------------------------
+*********************************************
 
 1. Overview
-
+   --------
     The Outlook Sync Client consists of 4 projects: 
     - OutlookPlugin: the GUI interface of the Plug-in, written in C++ with MFC support (Microsoft Foundation Classes) 
     - winmainclientdll: the Client DLL, used by OutlookPlugin, written in C++ with STL support (Standard Library) 
@@ -13,20 +14,37 @@ How to build the Funambol Outlook Sync Client
 
 
 2. Requirements
+   ------------
+   To build Outlook Sync Client, make sure you have installed all the following into your Windows machine.
+   Note: only Windows XP or later can be used.
 
-    To compile the source files, you need to install the following: 
-    - Microsoft Visual Studio 2005. All projects have been developed with Microsoft Visual Studio 2005, the installation process has been automated using Microsoft Visual Studio 2005 C++ compiler. 
-    - Microsoft Outlook 2003 or later. winmainclientdll and FunambolAddin projects import some Microsoft Outlook libraries, so you need to install Microsoft Outlook to register these libraries into the System. 
+    - Microsoft Visual Studio 2005. 
+      The build process has been automated using Microsoft Visual Studio 2005 C++ compiler. 
 
-    To build the installer, you need to download and install the following: 
-    - Apache Ant (http://ant.apache.org/) 
-    - NSIS (http://nsis.sourceforge.net) 
+    - Microsoft Outlook 2003 or later. 
+      Outlook Sync Client uses some Microsoft Outlook libraries, so you need to install 
+      Microsoft Outlook to register these libraries into the System. 
+
+    - "Apache Ant" version 1.5 or higher (recommended v.1.7.1) 
+      Downloadable from: http://ant.apache.org/
+      Note: Apache Ant needs the Java Development Kit (JDK) installed in order to work 
+      (see http://ant.apache.org/manual/install.html#sysrequirements Note #2).
+
+    - Ant contrib 0.6, required to run some ant tasks
+      * Download "ant-contrib-0.6.jar" from 
+        http://www.java2s.com/Code/Jar/cocoon-2.1.10/Downloadantcontrib06jar.htm
+      * Copy the jar file under the folder "<ant-installation-dir>\lib" 
+
+    - NSIS (Nullsoft Scriptable Install System), version 2.00 or higher
+      Can be downloaded from: http://nsis.sourceforge.net
+   
     - Doxygen (http://www.stack.nl/~dimitri/doxygen/download.html) 
+    
     - [optional] Graphviz (to generate graphs in doxygen doc, http://www.graphviz.org/Download..php)
 
 
 3. Building the installer
-
+   ----------------------
     The installer is a NSIS Windows installer, launched by the Apache 'ant' build tool.
     During the building process, all projects are compiled using the Visual Studio compiler.
     
