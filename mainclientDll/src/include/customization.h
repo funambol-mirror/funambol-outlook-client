@@ -72,8 +72,7 @@
 #define ABOUT_SCREEN_TEXT_MAIN_WEB_SITE     "www.funambol.com"
 
 #define ABOUT_SCREEN_SHOW_LICENSE           1                       /**< if 1, will show the AGPL license text */
-#define ABOUT_SCREEN_SHOW_POWERED_BY        0                       /**< if 1, will show the "powered by" text below instead of the AGPL license */
-#define ABOUT_SCREEN_TEXT_POWERED_BY        "Powered by Funambol"
+#define ABOUT_SCREEN_SHOW_POWERED_BY        0                       /**< if 1, will show the "powered by" image instead of the AGPL license */
 
 
 // Others

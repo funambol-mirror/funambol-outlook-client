@@ -175,10 +175,14 @@ BOOL CAboutDlg::OnInitDialog(){
     SetDlgItemText(IDC_ABOUT_MAIN, s1);
     GetDlgItem(IDC_ABOUT_MAIN)->SetFont(&fontBold);
 
+    // this is the ID of the last object to draw, from top to bottom.
+    int lastObjectID = IDC_ABOUT_MAIN;
+
     // Copyright
     if (ABOUT_SCREEN_SHOW_COPYRIGHT) {
         s1 = ABOUT_SCREEN_TEXT_COPYRIGHT;
         SetDlgItemText(IDC_ABOUT_COPYRIGHT, s1);
+        lastObjectID = IDC_ABOUT_COPYRIGHT;
     }
     else {
         GetDlgItem(IDC_ABOUT_COPYRIGHT)->ShowWindow(SW_HIDE);
@@ -190,25 +194,59 @@ BOOL CAboutDlg::OnInitDialog(){
         linkSite.init();
         s1 = ABOUT_SCREEN_TEXT_MAIN_WEB_SITE; 
         SetDlgItemText(IDC_ABOUT_LINK, s1);
+        lastObjectID = IDC_ABOUT_LINK;
     }
     else {
         linkSite.ShowWindow(SW_HIDE);
     }
 
-    // License text OR "Powered by Funambol"
-    // TODO: show them together?
-    s1 = "";
+    //
+    // License text OR "Powered by Funambol" pic (OR nothing)
+    // They CAN'T be displayed together.
+    //
     if (ABOUT_SCREEN_SHOW_POWERED_BY) {
-        s1 = ABOUT_SCREEN_TEXT_POWERED_BY;
-    } else if (ABOUT_SCREEN_SHOW_LICENSE) {
-        s1 = licence;
+        GetDlgItem(IDC_ABOUT_LICENCE)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_POWERED_BY)->ShowWindow(SW_SHOW);
+        lastObjectID = IDC_POWERED_BY;
     }
-    SetDlgItemText(IDC_ABOUT_LICENCE, s1);
-    GetDlgItem(IDC_ABOUT_LICENCE)->SetFont(&fontSmall);
+    else if (ABOUT_SCREEN_SHOW_LICENSE) {
+        s1 = licence;
+        SetDlgItemText(IDC_ABOUT_LICENCE, s1);
+        GetDlgItem(IDC_ABOUT_LICENCE)->SetFont(&fontSmall);
+        GetDlgItem(IDC_POWERED_BY)->ShowWindow(SW_HIDE);
+        lastObjectID = IDC_ABOUT_LICENCE;
+    }
+    else {
+        // nothing shown
+        GetDlgItem(IDC_ABOUT_LICENCE)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_POWERED_BY)->ShowWindow(SW_HIDE);
+    }
+
 
     //
-    // TODO: fix window height dinamically
+    // Fix OK button and window height dinamically.
+    // They are calculated from the y position of the last object drawn (lastObjectID).
     //
+    CWnd* butOk   = GetDlgItem(IDOK);
+    CWnd* lastObj = GetDlgItem(lastObjectID);
+
+    CPoint pos   = getRelativePosition(lastObj, this);
+    CPoint posOk = getRelativePosition(butOk,   this);
+
+    CRect rectDialog, rectLastObj, rectOk;
+    GetClientRect(&rectDialog);
+    lastObj->GetClientRect(&rectLastObj);
+    butOk->GetClientRect(&rectOk);
+
+    // OK button
+    int y = pos.y + rectLastObj.Height() + 10;    // 10 = some space
+    butOk->SetWindowPos(&CWnd::wndTop, posOk.x, y, NULL, NULL, SWP_SHOWWINDOW | SWP_NOSIZE);
+
+    // Dialog height + center window
+    int newHeight = y + rectOk.Height() + 40;     // 40 = some space
+    int xx = (GetSystemMetrics(SM_CXSCREEN) - rectDialog.Width()) / 2;
+    int yy = (GetSystemMetrics(SM_CYSCREEN) - newHeight         ) / 2;
+    this->SetWindowPos(&CWnd::wndTop, xx, yy, rectDialog.Width(), newHeight, SWP_SHOWWINDOW);
 
     brush.CreateSolidBrush(RGB(255,255,255));
 

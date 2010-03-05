@@ -551,6 +551,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\res\about_powered_by.bmp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\res\arrows32a.ico"
 				>
 			</File>

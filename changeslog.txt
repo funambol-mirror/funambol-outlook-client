@@ -1,3 +1,7 @@
+2010-03-05
+  - toccy: added "about_powered_by.bmp" image, used instead of the plain text string for branded clients
+           Fixed About screen: ok button and dialog size/position are dynamically set given the objects drawn.
+
 2010-03-01
   - toccy: updated trunk version to 8.7.0
            created branch "v85": Funambol Outlook Sync Client v.8.5 (linked to SDK C++ v.8.5)
