@@ -447,6 +447,7 @@ BEGIN
     CTEXT           "[web_address_link]",IDC_ABOUT_LINK,7,129,229,8,SS_NOTIFY
     CTEXT           "[This program is provided AS IS...]\n...\n...\n...",IDC_ABOUT_LICENCE,7,142,229,104
     CTEXT           "[Copyright © 2003 - 2007 Funambol, Inc.]\n[All rights reserved.]",IDC_ABOUT_COPYRIGHT,7,108,229,17
+    CONTROL         276,IDC_POWERED_BY,"Static",SS_BITMAP | SS_CENTERIMAGE,7,145,229,24
 END
 
 IDD_FORM_LEFT DIALOGEX 0, 0, 65, 246
@@ -925,6 +926,7 @@ IDB_BK_BLUE             BITMAP                  "res\\bg_button_blue.bmp"
 IDB_BK_DARK_BLUE        BITMAP                  "res\\bg_button_darkblue.bmp"
 IDB_LEFT_BUTTON         BITMAP                  "res\\left_button.bmp"
 IDB_SEPARATOR           BITMAP                  "res\\left_separator.bmp"
+IDB_POWERED_BY          BITMAP                  "res\\about_powered_by.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

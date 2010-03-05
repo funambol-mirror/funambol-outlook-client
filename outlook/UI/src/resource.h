@@ -213,6 +213,8 @@
 #define IDS_CODE_NO_SOURCES             275
 #define IDS_HOURS2                      276
 #define IDS_HOUR                        276
+#define IDB_BITMAP5                     276
+#define IDB_POWERED_BY                  276
 #define IDS_CODE_FORBIDDEN_403          277
 #define IDS_USE_VTODO                   278
 #define IDS_USE_VNOTE                   279
@@ -492,6 +494,7 @@
 #define IDC_PICTURES_CANCEL             1219
 #define IDC_PICTURES_EDIT_SYNCTYPE      1220
 #define IDC_POPUP_TEXT                  1220
+#define IDC_POWERED_BY                  1221
 #define ID_FILE_CONFIGURATION           32771
 #define ID_FILE_ZZZZ                    32772
 #define ID_FILE_SYNCHRONIZE             32773
@@ -508,9 +511,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        274
+#define _APS_NEXT_RESOURCE_VALUE        277
 #define _APS_NEXT_COMMAND_VALUE         32789
-#define _APS_NEXT_CONTROL_VALUE         1221
+#define _APS_NEXT_CONTROL_VALUE         1222
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
