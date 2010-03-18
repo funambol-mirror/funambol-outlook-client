@@ -231,6 +231,31 @@ ClientRecurrence* ClientTask::getRecPattern() {
 }
 
 
+/**
+ * Used to clear recurrence pattern. 
+ * Throws a ClientException if operation fails.
+ * Returns 0 if no errors.
+ */
+int ClientTask::clearRecPattern() {
+
+    try {
+        hr = pTask->ClearRecurrencePattern();
+        if (FAILED(hr)) {
+            goto error;
+        }
+        recPattern.clearRecurrence();
+    }
+    catch(_com_error &e) {
+        manageComErrors(e);
+        goto error;
+    }
+    return 0;
+
+error: 
+    setErrorF(0, ERR_OUTLOOK_CLEAR_REC, itemType.c_str(), getSafeItemName(this).c_str());
+    throwClientException(getLastErrorMsg());
+    return 1;
+}
 
 
 
