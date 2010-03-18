@@ -1,3 +1,6 @@
+2010-03-18
+  - toccy: fixed bug #8894: Changes to task's recurrency is not apllied on Outlook (US4501)
+
 2010-03-05
   - toccy: added "about_powered_by.bmp" image, used instead of the plain text string for branded clients
            Fixed About screen: ok button and dialog size/position are dynamically set given the objects drawn.

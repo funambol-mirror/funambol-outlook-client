@@ -333,10 +333,13 @@ int checkIllegalXMLChars(char* data) {
 int fillClientItem(const wstring& data, ClientItem* cItem, const wstring& itemType, const WCHAR* dataType) {
 
 
-    // If appointment, we clear the recurrence pattern (all fields are always sent). 
+    // If appointment/task, we clear the recurrence pattern (all fields are always sent). 
     // Also appointment exceptions are removed here (if any).
     if (itemType == APPOINTMENT) {
         ((ClientAppointment*)cItem)->clearRecPattern();
+    }
+    else if (itemType == TASK) {
+        ((ClientTask*)cItem)->clearRecPattern();
     }
 
     bool useSIF = isSIF(dataType);
