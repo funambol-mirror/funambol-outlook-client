@@ -231,6 +231,31 @@ ClientRecurrence* ClientTask::getRecPattern() {
 }
 
 
+/**
+ * Used to clear recurrence pattern. 
+ * Throws a ClientException if operation fails.
+ * Returns 0 if no errors.
+ */
+int ClientTask::clearRecPattern() {
+
+    try {
+        hr = pTask->ClearRecurrencePattern();
+        if (FAILED(hr)) {
+            goto error;
+        }
+        recPattern.clearRecurrence();
+    }
+    catch(_com_error &e) {
+        manageComErrors(e);
+        goto error;
+    }
+    return 0;
+
+error: 
+    setErrorF(0, ERR_OUTLOOK_CLEAR_REC, itemType.c_str(), getSafeItemName(this).c_str());
+    throwClientException(getLastErrorMsg());
+    return 1;
+}
 
 
 
@@ -265,6 +290,23 @@ int ClientTask::saveItem() {
         if (FAILED(hr)) {
             goto error;
         }
+
+        // This is just a workaround to fix an Outlook bug:
+        // some recurring tasks are not correctly stored in Outlook, so they are recurring but the task's 
+        // icon doesn't show the recurring arrows.
+        // In this case, an update that removes the recurrence would fail (without errors from Outlook)
+        // so we have to save twice the task: the 2nd save will work.
+        // An example to create such a corrupted item: create a recurring task, then set the startDate < dueDate = today.
+        // You will see 2 tasks created in Outlook, the one due today is corrupted.
+        if (recPattern.isRecurring() == 0) {
+            clearRecPattern();
+            hr = pTask->Save();
+            if (FAILED(hr)) {
+                goto error;
+            }
+        }
+
+
         // Get the new entry-ID.
         ID = (WCHAR*)pTask->GetEntryID();
     }

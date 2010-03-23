@@ -101,6 +101,8 @@ public:
     
     /// Returns a pointer to the internal ClientRecurrence object (NULL if not recurring).
     ClientRecurrence* getRecPattern();
+    /// Used to clear recurrence pattern.
+    int clearRecPattern();
 
     //
     // Client operations on the item.
