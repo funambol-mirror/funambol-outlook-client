@@ -36,6 +36,8 @@
 ; customization params
 !include "customization.ini"
 
+!include UAC.nsh
+
 ; ------ defines ------
 !define PRODUCT_NAME_EXE                        "OutlookPlugin.exe"
 !define MICROSOFT_OUTLOOK                       "Microsoft Outlook"
@@ -101,7 +103,8 @@ var ICONS_GROUP
 !insertmacro MUI_PAGE_INSTFILES
 
 ; Finish page
-!define MUI_FINISHPAGE_RUN                      "$INSTDIR\${PRODUCT_NAME_EXE}"
+!define MUI_FINISHPAGE_RUN
+!define MUI_FINISHPAGE_RUN_FUNCTION             ExecAppFile
 !ifdef FINISHPAGE_SHOW_README
     !define MUI_FINISHPAGE_SHOWREADME               "$INSTDIR\Readme.txt"
     !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
@@ -128,6 +131,19 @@ ShowInstDetails   show
 ShowUnInstDetails show
 Icon              "${MUI_ICON}"
 
+RequestExecutionLevel user    /* RequestExecutionLevel REQUIRED! */
+
+Function .OnInstFailed
+    ${UAC.Unload} ;Must call unload!
+FunctionEnd
+
+Function .OnInstSuccess
+    ${UAC.Unload} ;Must call unload!
+FunctionEnd
+
+Function ExecAppFile
+    UAC::Exec '' '"$INSTDIR\${PRODUCT_NAME_EXE}"' '' ''
+FunctionEnd
 
 
 ; Check if OUTLOOK.EXE process is running
@@ -272,6 +288,8 @@ FunctionEnd
 ; If not, the installer will be aborted.
 Function CheckUserRights
 
+      ${UAC.I.Elevate.AdminOnly}
+
       ; If user can write this, it's an Admin ;)
       WriteRegStr  HKLM   "${PLUGIN_REGKEY_CONTEXT}"   "${PROPERTY_PATH}"   "$INSTDIR"
       IfErrors 0 +3
@@ -285,6 +303,8 @@ FunctionEnd
 ; If not, the uninstaller will be aborted.
 Function un.CheckUserRights
 
+      ${UAC.I.Elevate.AdminOnly}
+      
       ; If user can write this, it's an Admin ;)
       WriteRegStr  HKLM   "${PLUGIN_REGKEY_CONTEXT}"   "${PROPERTY_PATH}"   "$INSTDIR"
       IfErrors 0 +3

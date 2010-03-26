@@ -444,7 +444,7 @@ Forge file for Funambol Outlook Sync Client
     BUILD-INSTALL
     ========================================================================
     -->
-    <target name="build-install" depends="init,copy-processwork-dll" >
+    <target name="build-install" depends="init,copy-NSIS-plugins" >
         <mkdir dir="${dir.output}"/>
 
         <echo message="${install-builder.nsi}" />
@@ -462,7 +462,7 @@ Forge file for Funambol Outlook Sync Client
     BUILD-INSTALL_FOR_CARED
     ========================================================================
     -->
-    <target name="build-install-cared" depends="init,copy-processwork-dll" >
+    <target name="build-install-cared" depends="init,copy-NSIS-plugins" >
         <mkdir dir="${dir.output}"/>
 
         <!-- Portal version is builded with the REDIST REDEMPTION.DLL -->
@@ -487,9 +487,15 @@ Forge file for Funambol Outlook Sync Client
     COPY-PROCESSWORK-DLL
     ========================================================================
     -->
-    <target name="copy-processwork-dll" depends="init" >
-        <echo message="copying processwork.dll to NSIS plugins dir..." />
+    <target name="copy-NSIS-plugins" depends="init" >
+        
+        <echo message="copying processwork NSIS plugin..." />
         <copy file="${dir.outlook}/install/installer/processwork.dll" todir="${install-builder.dir}/Plugins" overwrite="TRUE"/>
+        
+        <echo message="copying UAC NSIS plugin..." />
+        <copy file="${dir.outlook}/install/installer/UAC/UAC.nsh" todir="${install-builder.dir}/Include" overwrite="TRUE"/>
+        <copy file="${dir.outlook}/install/installer/UAC/UAC.dll" todir="${install-builder.dir}/Plugins" overwrite="TRUE"/>
+        
     </target>
 
 
