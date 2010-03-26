@@ -1,4 +1,5 @@
 2010-03-26
+  - toccy: created tag: Funambol Outlook Sync Client v.8.5.3 (linked to SDK C++ v.8.5.2) [v.8.5 RC1]
   - toccy: merged from trunk to branch v85.
            reintegrated branch US4500:
            * added UAC plugin for NSIS installer (support for UAC on Win Vista / Win 7)
