@@ -1,3 +1,10 @@
+2010-03-26
+  - toccy: merged from trunk to branch v85.
+           reintegrated branch US4500:
+           * added UAC plugin for NSIS installer (support for UAC on Win Vista / Win 7)
+           * Fixed bug #4198 ("cannot schedule" issue in WinVista, due to UAC ON)
+           * Fixed bug #5502 (Error synchronizing when UAC is ON and Outlook 2007 is open)
+
 2010-03-23
   - toccy: fixed issue on recurring tasks: added workaround to remove the recurrence on some
            tasks that are not correctly created in Outlook, saving the tasks twice.
