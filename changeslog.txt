@@ -1,5 +1,9 @@
 2010-04-02
   - toccy: fixed upd-info file creation for cared builds
+  - toccy: fixed bug #9067: URL for manual of outlook sync client still points to v8.0
+
+2010-03-31
+--- released Outlook Sync Client v.8.5.3 (v8.5 RC1) ---
 
 2010-03-26
   - toccy: reintegrated branch US4500:

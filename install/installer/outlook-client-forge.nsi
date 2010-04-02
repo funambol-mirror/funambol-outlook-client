@@ -605,9 +605,11 @@ Section "MainSection" SEC01
       Delete "$WINDIR\OutlookAddinRemover.dll"
 
       ; Write the URL of userguide.url and website.url
+!ifdef USER_GUIDE_LINK
       FileOpen $2 "$INSTDIR\userguide.url" w
       FileWrite $2 "[InternetShortcut]$\r$\nURL=${USER_GUIDE_LINK}"
       FileClose $2
+!endif
       FileOpen $2 "$INSTDIR\website.url" w
       FileWrite $2 "[InternetShortcut]$\r$\nURL=${PRODUCT_WEB_SITE}"
       FileClose $2
