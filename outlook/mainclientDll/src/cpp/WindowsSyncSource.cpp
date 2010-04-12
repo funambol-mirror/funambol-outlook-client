@@ -1963,6 +1963,7 @@ void WindowsSyncSource::checkBirthdayAnniversary(ClientItem* cItem) {
  * - 'Start' corresponds exactly to the date of birthday/anniversary
  * - 'Subject' contains the 'Subject' of contact cItem (usually is e.g. "Mike Portnoy's birthday").
  *   [Note: the subject does not contain exactly the FullName nor the FileAs nor FirstName...]
+ * - 'Creation time' is almost now (max error = 2 sec)
  * 
  * @param cItem        : the ClientContact that was saved
  * @param propertyName : "Anniversary" or "Birthday"
@@ -1989,15 +1990,20 @@ int WindowsSyncSource::deleteAppointment(ClientItem* cItem, const wstring& prope
     }
 
     wstring subject  = cItem->getProperty(L"Subject");
+    long now = (long)time(NULL);
 
     // It's just created, so should be the last one ;)
     ClientItem* newApp = folder->getLastItem();
     if (newApp->getProperty(L"Start") == cItem->getProperty(propertyName)) {        // 1. start = birthday/anniversary date
         if (subject.size() > 0) {
             pos = newApp->getProperty(L"Subject").find(subject);                    // 2. subject contains contact's subject (not empty)
-    }
+        }
         if (pos != wstring::npos) {
-            return (newApp->deleteItem());
+            DATE creationTime = ((ClientAppointment*)newApp)->getCreationTime();
+            long creationTStamp = variantTimeToTimeStamp(creationTime);
+            if (now - creationTStamp <= 2) {                                        // 3. creation time is almost now
+                return (newApp->deleteItem());
+            }
         }
     }
 
@@ -2011,7 +2017,11 @@ int WindowsSyncSource::deleteAppointment(ClientItem* cItem, const wstring& prope
                 pos = newApp->getProperty(L"Subject").find(subject);
             }
             if (pos != wstring::npos) {
-                return (newApp->deleteItem());
+                DATE creationTime = ((ClientAppointment*)newApp)->getCreationTime();
+                long creationTStamp = variantTimeToTimeStamp(creationTime);
+                if (now - creationTStamp <= 2) {
+                    return (newApp->deleteItem());
+                }
             }
         }
     }
