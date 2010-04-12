@@ -650,6 +650,18 @@ const wstring ClientAppointment::getComplexProperty(const wstring& propertyName)
 }
 
 
+DATE ClientAppointment::getCreationTime() {
+
+    try {
+        if (pAppointment) {
+            return pAppointment->GetCreationTime();
+        }
+    }
+    catch(_com_error &e) {
+        manageComErrors(e);
+    }
+    return NULL;
+}
 
 
 

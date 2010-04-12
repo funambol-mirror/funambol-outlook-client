@@ -133,6 +133,12 @@ public:
     DATE localEndDate;
 
 
+    /**
+     * Returns the item's creation time, in variant format (double).
+     * Used to check birthday/anniversary created during a sync, in OL2003.
+     */
+    DATE getCreationTime();
+
 };
 
 /** @} */

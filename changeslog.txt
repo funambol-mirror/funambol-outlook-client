@@ -1,3 +1,8 @@
+2010-04-12
+  - toccy: reintegrated branch US4628:
+           fixed bug #8987: Otlook Sync deletes preexisting appointments auto generated from birthdays in contacts
+           (using appointment's CreationDate to check if it was created by us during the sync)
+
 2010-04-02
   - toccy: fixed upd-info file creation for cared builds
   - toccy: fixed bug #9067: URL for manual of outlook sync client still points to v8.0
