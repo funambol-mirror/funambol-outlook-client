@@ -1,3 +1,5 @@
+2010-04-20
+  - magi : hide the encryption groupbox and checkbox if ENABLE_ENCRYPTION_SETTINGS is 0 
 2010-04-12
   - toccy: reintegrated branch US4628:
            fixed bug #8987: Otlook Sync deletes preexisting appointments auto generated from birthdays in contacts

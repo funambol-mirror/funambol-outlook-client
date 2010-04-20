@@ -365,6 +365,8 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     if (!ENABLE_ENCRYPTION_SETTINGS) {
         checkEncryption.SetCheck(BST_UNCHECKED);
         checkEncryption.EnableWindow(FALSE);
+        checkEncryption.ShowWindow(FALSE);
+        groupSecurity.ShowWindow(FALSE);
     }
 
     // disable windows xp theme, otherwise any color setting for groupbox
