@@ -1,5 +1,10 @@
+2010-04-20
+  - toccy: merged from trunk to branch v85 (@rev 468)
+           * fixed bug #8987: Otlook Sync deletes preexisting appointments auto generated from birthdays in contacts
+             (using appointment's CreationDate to check if it was created by us during the sync)
+
 2010-04-06
-  - maria: created tag: Funambol Outlook Sync Client v.8.5.4 (linked to SDK C++ v.8.5.2) [v.8.5 RC2]
+  - maria: created tag: Funambol Outlook Sync Client v.8.5.4 (linked to SDK C++ v.8.5.2) [v.8.5 GA]
   - toccy: merged from trunk to branch v85 (@rev 459)
            * fixed bug #9067: URL for manual of outlook sync client still points to v8.0
            * fixed upd-info file creation for cared builds           
