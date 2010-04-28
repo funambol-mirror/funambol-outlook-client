@@ -1,5 +1,24 @@
+
+2010-04-28
+  - magi : Added the value of the scheduled values in the customization.h
+           The default is the value in only one. If more then one it gets the first default indication.
+           If no minutes and hours, the scheduled is hidden.
+           Valid minutes are > 4 and < 60. Valid hours are >=1 and <=24. Others values are ignored
+           #define SCHEDULED_MINUTES_VALUES            "5,10,15(default),30,45"
+           #define SCHEDULED_HOURS_VALUES              "1,2,4,6,8,12,24"
+           
+           Fixed issue in FullSync panel when sources are disabled
+  
+  - magi : Added new define in customization.h to have the sourceOrder and the list of enabled sources
+           so that they are defined in a single place.
+           #define SOURCE_ORDER_IN_REGISTRY      "contact,appointment,task,note"  
+           #define CONTACT_SOURCE_ENABLED        true  
+           #define APPOINTMENT_SOURCE_ENABLED    true  
+           #define TASK_SOURCE_ENABLED           true  
+           #define NOTE_SOURCE_ENABLED           true             
 2010-04-26
   - maria: created tag: Funambol Outlook Sync Client v.8.5.5 to brand (linked to SDK C++ v.8.5.2) [v.8.5 GA]
+ 
 2010-04-20
   - magi : hide the encryption groupbox and checkbox if ENABLE_ENCRYPTION_SETTINGS is 0 
   - toccy: merged from trunk to branch v85 (@rev 468)

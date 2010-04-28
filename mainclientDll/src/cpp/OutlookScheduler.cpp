@@ -183,6 +183,12 @@ int setScheduleTask (const char* frequency, const int dayNum, const int minNum) 
     time(&timer);
     struct tm* now = localtime(&timer);
 
+    int minToSet = minNum;
+    if (minToSet == 1440) {
+        minToSet = 1439;   // this because the windows scheduler thrown an error if
+                            // the value is a day
+    }
+
     pTrigger.wBeginDay                = now->tm_mday;               // START = NOW.
     // TASK_TRIGGER uses wBeginMonth in interval (1,12), but tm_mon is in interval (0,11)
     pTrigger.wBeginMonth              = now->tm_mon + 1;
@@ -192,7 +198,7 @@ int setScheduleTask (const char* frequency, const int dayNum, const int minNum) 
 
     pTrigger.cbTriggerSize = sizeof (TASK_TRIGGER) ;
     pTrigger.MinutesDuration          = 1440;                       // Duration = fixed 1 day.
-    pTrigger.MinutesInterval          = minNum;
+    pTrigger.MinutesInterval          = minToSet;
     pTrigger.TriggerType              = TASK_TIME_TRIGGER_DAILY;    // Manage only DAILY schedules!
     pTrigger.Type.Daily.DaysInterval  = dayNum;
     //////////////////////////////////////////////////////
@@ -346,7 +352,12 @@ int getScheduleTask(bool* active, int* dayNum, int* minNum) {
     //
     // Get values
     //
-    *minNum = pTrigger.MinutesInterval;
+    int minToSet = pTrigger.MinutesInterval;
+    if (minToSet == 1439) {
+        minToSet = 1440;    // the value must normalized to get 1 day
+    }
+
+    *minNum = minToSet; // pTrigger.MinutesInterval;
     *dayNum = pTrigger.Type.Daily.DaysInterval;
 
     // Check if trigger correct

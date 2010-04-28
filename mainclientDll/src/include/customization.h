@@ -94,7 +94,17 @@
 #define MAX_SYNCML_MSG_SIZE                 125000                      /**< [bytes], the max syncML message size. default = 125KB */
 #define RESPONSE_TIMEOUT                    900                         /**< [seconds], the HTTP timeout on Server response. default = 15 minutes */
 #define DYNAMICALLY_SHOW_PICTURES           1                           /**< if 1, will automatically show/hide the pictures panel, at the end of sync */
+#define SOURCE_ORDER_IN_REGISTRY            "contact,appointment,task,note"
 
+// set if the sources are enabled/disabled (meaning they can be enabled by settings)
+#define CONTACT_SOURCE_ENABLED              true
+#define APPOINTMENT_SOURCE_ENABLED          true
+#define TASK_SOURCE_ENABLED                 true
+#define NOTE_SOURCE_ENABLED                 true
+#define PICTURE_SOURCE_ENABLED              true
+
+#define SCHEDULED_MINUTES_VALUES            "5,10,15(default),30,45"
+#define SCHEDULED_HOURS_VALUES              "1,2,4,6,8,12,24"
 
 // Win registry root context.
 // This is NOT intended to be customized: we need to use the same registry keys to ensure correct checks
