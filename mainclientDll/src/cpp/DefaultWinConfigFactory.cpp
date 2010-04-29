@@ -118,7 +118,6 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
     sc->setLast                 (0);
     sc->setSync                 ("two-way");
     sc->setEncryption           ("");
-    sc->setIsEnabled            (true);     // All sources enabled by default.
 
     if (wname == CONTACT){
         // since 7.1.2: default is vCard. Both still supported (for backw compaibility).
@@ -127,6 +126,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setVersion          ("2.1");
         sc->setEncoding         ("bin");
         sc->setSupportedTypes   ("text/x-s4j-sifc:1.0,text/x-vcard:2.1");
+        sc->setIsEnabled        (CONTACT_SOURCE_ENABLED);
     }
     else if (wname == APPOINTMENT){
         sc->setURI              ("scal");
@@ -134,6 +134,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setVersion          ("1.0");
         sc->setEncoding         ("b64");
         sc->setSupportedTypes   ("text/x-s4j-sife:1.0,text/x-vcalendar:1.0");
+        sc->setIsEnabled        (APPOINTMENT_SOURCE_ENABLED);
     }
     else if (wname == TASK){
         sc->setURI              ("stask");
@@ -141,6 +142,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setVersion          ("1.0");
         sc->setEncoding         ("b64");
         sc->setSupportedTypes   ("text/x-s4j-sift:1.0,text/x-vcalendar:1.0");
+        sc->setIsEnabled        (TASK_SOURCE_ENABLED);
     }
     else if (wname == NOTE){
         sc->setURI              ("snote");
@@ -148,6 +150,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setVersion          ("1.0");
         sc->setEncoding         ("b64");
         sc->setSupportedTypes   ("text/x-s4j-sifn:1.0,text/x-vnote:1.1");
+        sc->setIsEnabled        (NOTE_SOURCE_ENABLED);
     }
     else if (wname == PICTURE){
         sc->setURI              ("picture");
@@ -156,6 +159,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
         sc->setSupportedTypes   ("application/vnd.omads-file+xml:,application/*:");
         sc->setSync             ("one-way-from-server");                // FIXED for pictures
+        sc->setIsEnabled        (PICTURE_SOURCE_ENABLED);
     }
 
     if (name) delete [] name;

@@ -81,6 +81,13 @@ protected:
     virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
     virtual BOOL PreTranslateMessage(MSG* pMsg);
     afx_msg LRESULT OnInitForm(WPARAM, LPARAM);
+    
+    /// hide a source given its components
+    void hideSource(CButton& button1, CButton& button2, bool* synctype, int sep1, int sep2);
+    
+    /// disable a source (it remaining visible by greyed) given its components
+    void disableSource(CButton& button1, CButton& button2, bool* synctype, int sep1, int sep2);
+ 
 
 	DECLARE_MESSAGE_MAP()
 public:

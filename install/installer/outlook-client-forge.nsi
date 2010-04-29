@@ -376,6 +376,7 @@ Function CheckAppInstalled
   ; 1. Upgrade to a newer version.
   newerVersion:
        ; (installed v. = 6.0)?
+       StrCmp $R8 "" +1 +2          ; if customer avoid to check the v3 version (for sure it isn't) and go with upgrade
        IntCmp $R1 6   0  from_v3  0
 
        MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \

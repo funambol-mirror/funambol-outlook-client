@@ -411,6 +411,10 @@ void OutlookConfig::readSourcesVisible(HKEY rootKey) {
     StringBuffer sources(tmp);
     delete [] tmp;
 
+    if (sources.empty()) {
+        // this is called the first time when the registry is
+        sources = SOURCE_ORDER_IN_REGISTRY;
+    }
     // Get the source names, and add them to the sourceVisible array
     if (!sources.empty()) {
         ArrayList tokens;
@@ -424,10 +428,10 @@ void OutlookConfig::readSourcesVisible(HKEY rootKey) {
 
     // Anyway contacts,calendar,tasks,notes MUST be visible!
     // --- TODO: remove when all sources are dynamically visible ---
-    safeAddSourceVisible(CONTACT_);
-    safeAddSourceVisible(APPOINTMENT_);
-    safeAddSourceVisible(TASK_);
-    safeAddSourceVisible(NOTE_);
+    //safeAddSourceVisible(CONTACT_);
+    //safeAddSourceVisible(APPOINTMENT_);
+    //safeAddSourceVisible(TASK_);
+    //safeAddSourceVisible(NOTE_);
 }
 
 
@@ -1070,7 +1074,7 @@ void OutlookConfig::createDefaultConfig() {
     //
     // Also upgrade the config (swv / userAgent).
     //
-    upgradeConfig();
+    //upgradeConfig();
 
 
     if (installPath) delete [] installPath;
@@ -1102,12 +1106,7 @@ bool OutlookConfig::checkToUpgrade() {
 }
 
 
-/**
- * ---- Update config with values from HKLM (set by installer) ----
- * This is useful when the client has just been upgraded to a new version,
- * only some properties (like 'swv' and 'userAgent') must be corrected.
- */
-void OutlookConfig::upgradeConfig() {
+void OutlookConfig::initializeVersionsAndUserAgent() {
 
     // Backup old Swv and save the new one.
     oldSwv = getBuildNumberFromVersion(getClientConfig().getSwv());
@@ -1124,6 +1123,36 @@ void OutlookConfig::upgradeConfig() {
     char* userAgent = new char[strlen(PROGRAM_NAME) + strlen(newSwv) + 5];
     sprintf(userAgent, "%s v. %s", PROGRAM_NAME, newSwv);
     accessConfig.setUserAgent(userAgent);
+
+    delete [] newSwv;
+    delete [] userAgent;
+
+}
+
+
+/**
+ * ---- Update config with values from HKLM (set by installer) ----
+ * This is useful when the client has just been upgraded to a new version,
+ * only some properties (like 'swv' and 'userAgent') must be corrected.
+ */
+void OutlookConfig::upgradeConfig() {
+    
+    initializeVersionsAndUserAgent();
+    //// Backup old Swv and save the new one.
+    //oldSwv = getBuildNumberFromVersion(getClientConfig().getSwv());
+    //const char* newSwv = readCurrentSwv();
+    //getClientConfig().setSwv(newSwv);
+
+    //// Backup old Funambol product Swv and save the new one.
+    //oldFunambolSwv = getBuildNumberFromVersion(getFunambolSwv().c_str());
+    //StringBuffer funambolNewSwv = readFunambolSwv(HKEY_LOCAL_MACHINE);
+    //setFunambolSwv(funambolNewSwv);
+
+
+    //// Set the new User Agent = "Funambol Outlook Sync Client v. x.y.z"
+    //char* userAgent = new char[strlen(PROGRAM_NAME) + strlen(newSwv) + 5];
+    //sprintf(userAgent, "%s v. %s", PROGRAM_NAME, newSwv);
+    //accessConfig.setUserAgent(userAgent);
 
 
     // Old version < 6.6.0: upgrade supportedTypes and version for each source.
@@ -1230,8 +1259,8 @@ void OutlookConfig::upgradeConfig() {
     // Set the flag to specify that config has been upgraded.
     upgraded = true;
     
-    delete [] newSwv;
-    delete [] userAgent;
+    //delete [] newSwv;
+    //delete [] userAgent;
 
     // delete the updater tree when the upgrade has been finished
     ManagementNode* n = NULL;

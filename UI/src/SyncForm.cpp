@@ -605,6 +605,29 @@ void CSyncForm::OnStnClickedMainBkPictures()
 }
 
 
+void CSyncForm::hideSource(CAnimatedIcon& icon, int iconres, int resource1, 
+                           int resource2, CCustomPane& pane) {
+    
+    icon.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(iconres)));
+    icon.ShowWindow(SW_HIDE); 
+    GetDlgItem(resource1)->ShowWindow(SW_HIDE);
+    GetDlgItem(resource2)->ShowWindow(SW_HIDE);
+    pane.ShowWindow(SW_HIDE);
+
+}
+void CSyncForm::disableSource(CAnimatedIcon& icon, int iconres, int resource1, 
+                           int resource2, CCustomPane& pane) {
+    
+    icon.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(iconres)));
+    icon.EnableWindow(FALSE); 
+    GetDlgItem(resource1)->EnableWindow(FALSE);
+    GetDlgItem(resource2)->EnableWindow(FALSE);
+    pane.EnableWindow(FALSE);
+
+}
+
+
+
 void CSyncForm::refreshSource( int sourceId )
 {
     CString s1;
@@ -631,11 +654,16 @@ void CSyncForm::refreshSource( int sourceId )
         }
         else {
             // source not visible: we hide the controls
+            disableSource(iconContacts, IDI_CONTACTS_GREY, 
+                       IDC_MAIN_STATIC_CONTACTS, IDC_MAIN_STATIC_STATUS_CONTACTS,
+                       paneContacts);
+            /*
             iconContacts.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CONTACTS)));
             iconContacts.ShowWindow(SW_HIDE); 
             GetDlgItem(IDC_MAIN_STATIC_CONTACTS)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->ShowWindow(SW_HIDE);
             paneContacts.ShowWindow(SW_HIDE);
+            */
         }
 
         lastSyncContacts = getConfig()->getSyncSourceConfig(CONTACT_)->getEndTimestamp();
@@ -692,11 +720,16 @@ void CSyncForm::refreshSource( int sourceId )
         }
         else {
             // source not visible: we hide the controls
+            disableSource(iconCalendar, IDI_CALENDAR_GREY, 
+                       IDC_MAIN_STATIC_CALENDAR, IDC_MAIN_STATIC_STATUS_CALENDAR,
+                       paneCalendar);
+            /*
             iconCalendar.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CALENDAR)));
             iconCalendar.ShowWindow(SW_HIDE); 
             GetDlgItem(IDC_MAIN_STATIC_CALENDAR)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_MAIN_STATIC_STATUS_CALENDAR)->ShowWindow(SW_HIDE);
             paneCalendar.ShowWindow(SW_HIDE);
+            */
         }
 
         lastSyncCalendar = getConfig()->getSyncSourceConfig(APPOINTMENT_)->getEndTimestamp();
@@ -750,11 +783,16 @@ void CSyncForm::refreshSource( int sourceId )
         }
         else {
             // source not visible: we hide the controls
+            disableSource(iconTasks, IDI_TASKS_GREY, 
+                       IDC_MAIN_STATIC_TASKS, IDC_MAIN_STATIC_STATUS_TASKS,
+                       paneTasks);
+            /*
             iconTasks.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TASKS)));
             iconTasks.ShowWindow(SW_HIDE); 
             GetDlgItem(IDC_MAIN_STATIC_TASKS)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->ShowWindow(SW_HIDE);
             paneTasks.ShowWindow(SW_HIDE);
+            */
         }
 
         lastSyncTasks = getConfig()->getSyncSourceConfig(TASK_)->getEndTimestamp();
@@ -810,11 +848,16 @@ void CSyncForm::refreshSource( int sourceId )
         }
         else {
             // source not visible: we hide the controls
+            disableSource(iconNotes, IDI_NOTES_GREY, 
+                       IDC_MAIN_STATIC_NOTES, IDC_MAIN_STATIC_STATUS_NOTES,
+                       paneNotes);
+            /*
             iconNotes.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_NOTES)));
             iconNotes.ShowWindow(SW_HIDE); 
             GetDlgItem(IDC_MAIN_STATIC_NOTES)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->ShowWindow(SW_HIDE);
             paneNotes.ShowWindow(SW_HIDE);
+            */
         }
 
         lastSyncNotes = getConfig()->getSyncSourceConfig(NOTE_)->getEndTimestamp();
@@ -883,11 +926,16 @@ void CSyncForm::refreshSource( int sourceId )
         }
         else {
             // source not visible: hide the controls
+            hideSource(iconPictures, IDI_PICTURES, 
+                       IDC_MAIN_STATIC_PICTURES, IDC_MAIN_STATIC_STATUS_PICTURES,
+                       panePictures);
+            /*
             iconPictures.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_PICTURES)));
             iconPictures.ShowWindow(SW_HIDE); 
             GetDlgItem(IDC_MAIN_STATIC_PICTURES)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->ShowWindow(SW_HIDE);
             panePictures.ShowWindow(SW_HIDE);
+            */
         }
 
         lastSyncPictures = getConfig()->getSyncSourceConfig(PICTURE_)->getEndTimestamp();

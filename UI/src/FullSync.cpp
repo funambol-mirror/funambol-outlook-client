@@ -97,29 +97,12 @@ BOOL CFullSync::OnInitDialog() {
     s1.LoadString(IDS_RECOVER);             SetDlgItemText(IDOK, s1);
     s1.LoadString(IDS_CANCEL);              SetDlgItemText(IDCANCEL, s1);
     
-
-    // Show/hide checkboxes
-    if (!isSourceVisible(CONTACT)) {
-        checkContacts.ShowWindow(SW_HIDE);
-    }
-    if (!isSourceVisible(APPOINTMENT)) {
-        checkCalendar.ShowWindow(SW_HIDE);
-    }
-    if (!isSourceVisible(TASK)) {
-        checkTasks.ShowWindow(SW_HIDE);
-    }
-    if (!isSourceVisible(NOTE)) {
-        checkNotes.ShowWindow(SW_HIDE);
-    }
-    if (!isSourceVisible(PICTURE)) {
-        checkPictures.ShowWindow(SW_HIDE);
-    }
-
+     // resize/move dynamically the source checkboxes
+    adjustCheckboxes();
 
     // Refresh from Client is the default
     radio3.SetCheck(BST_CHECKED);
     radio3.SetFocus();
-
 
     // Grey out disabled sources
     if (isSourceEnabled(CONTACT_))     { checkContacts.EnableWindow(TRUE);  }
@@ -133,8 +116,28 @@ BOOL CFullSync::OnInitDialog() {
     checkPictures.EnableWindow(FALSE);  // C2S not available for pictures!
 
 
-    // resize/move dynamically the source checkboxes
-    adjustCheckboxes();
+    // Show/hide checkboxes
+    if (!isSourceVisible(CONTACT)) {
+        // checkContacts.ShowWindow(SW_HIDE);
+        checkContacts.EnableWindow(FALSE);
+
+    }
+    if (!isSourceVisible(APPOINTMENT)) {
+        // checkCalendar.ShowWindow(SW_HIDE);
+        checkCalendar.EnableWindow(FALSE);
+    }
+    if (!isSourceVisible(TASK)) {
+        // checkTasks.ShowWindow(SW_HIDE);
+        checkTasks.EnableWindow(FALSE);
+    }
+    if (!isSourceVisible(NOTE)) {
+        // checkNotes.ShowWindow(SW_HIDE);
+        checkNotes.EnableWindow(FALSE);
+    }
+    if (!isSourceVisible(PICTURE)) {
+        checkPictures.ShowWindow(SW_HIDE);
+    }
+
 
     GetDlgItem(IDOK)->EnableWindow(FALSE);
 
@@ -272,6 +275,11 @@ bool CFullSync::isAtLeastOneSourceChecked() {
 void CFullSync::adjustCheckboxes() {
 
     int numSources = countSourceVisible();
+
+    // currently we consider at least 4 sources
+    if (numSources < 4) {
+        numSources = 4;
+    }
 
     // Get the groupbox 'Items'
     CWnd* group = GetDlgItem(IDC_FULLSYNC_GROUP_ITEMS);
