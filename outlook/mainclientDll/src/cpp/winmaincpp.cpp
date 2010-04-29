@@ -113,6 +113,7 @@ int initializeClient(bool isScheduled) {
     //    Save, to ensure future calls to config.read().
     if (!config->read()) {
         config->createDefaultConfig();
+        config->initializeVersionsAndUserAgent();
         config->save();
         sprintf(logText, INFO_CONFIG_GENERATED);
     }

@@ -156,6 +156,12 @@ public:
     */
     void refreshSource(int sourceId);
 
+    void hideSource(CAnimatedIcon& icon, int iconres, int resource1, 
+                           int resource2, CCustomPane& pane);
+    void disableSource(CAnimatedIcon& icon, int iconres, int resource1, 
+                           int resource2, CCustomPane& pane);
+
+
     // refresh UI info about all sources, calls refreshSource for every sync source
     void refreshSources();
     

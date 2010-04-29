@@ -56,46 +56,132 @@
 
 
 // Values for the scheduler
-char* schedMinutes[] = {"5", "10", "15", "30", "45",             NULL};
-char* schedHours[]   = {"1", "2",  "4",  "6",  "8",  "12", "24", NULL};
+static StringBuffer minutesString = SCHEDULED_MINUTES_VALUES;
+static StringBuffer hoursString   = SCHEDULED_HOURS_VALUES;
+static ArrayList minutesA, hoursA;
+static int defaultPosition = 0;
+static bool initialized = false;
 
-int getSchedulerMinutes(int position) {
-
-    switch (position) {
-        case 0:   return 5;
-        case 1:   return 10;
-        case 2:   return 15;
-        case 3:   return 30;
-        case 4:   return 45;
-        case 5:   return 60;
-        case 6:   return 120;
-        case 7:   return 240;
-        case 8:   return 360;
-        case 9:   return 480;
-        case 10:  return 720;
-        case 11:  return 1439;              // Not 1440 = 24h: it's not allowed
-        default:  return 15;                // Default = 15 minutes
+bool hasDefault(StringBuffer* value) {  
+    if (value->find("fault") != StringBuffer::npos) {
+        return true;
     }
+    return false;
+}
+
+StringBuffer removeDefaultString(StringBuffer& value) {
+    StringBuffer ret = value;
+    size_t pos = value.find("(");
+    if (pos != StringBuffer::npos) {
+        ret = value.substr(0, pos);
+    }
+    return ret;
+}
+
+void populateArrays() {
+    
+    ArrayList tmp;
+    StringBuffer* el; 
+    StringBuffer value, completeValue;
+    int res = 0, minSize = 0, hourSize = 0, totalSize = 0;
+
+    // safe check to remove element that are number <5 and >59
+    if (!minutesString.empty()) {
+    minutesString.split(tmp, ",");    
+    for (el = (StringBuffer *)tmp.front(); el; el = (StringBuffer *)tmp.next() ) {
+        completeValue = el->c_str();
+        value = removeDefaultString(completeValue);
+        res = atoi(value.c_str());
+        if (res >= 5 && res <= 59) {
+            minutesA.add(completeValue);
+        }
+    }
+    }
+
+    tmp.clear();
+    if (!hoursString.empty()) {
+    hoursString.split(tmp, ",");
+    for (el = (StringBuffer *)tmp.front(); el; el = (StringBuffer *)tmp.next() ) {
+        completeValue = el->c_str();
+        value = removeDefaultString(completeValue);
+        res = atoi(value.c_str());
+        if (res >= 1 && res <= 24) {
+            hoursA.add(completeValue);
+        }
+    }
+    }
+    minSize = minutesA.size();
+    hourSize = hoursA.size();
+    totalSize = minSize + hourSize;
+
+    for (int i = 0; i < totalSize; i++) {
+        if (i < minSize) {
+            if (hasDefault((StringBuffer*)minutesA.get(i))) {
+                StringBuffer v = removeDefaultString(*((StringBuffer*)minutesA.get(i)));
+                minutesA.removeElementAt(i);
+                minutesA.add(i, v);
+                if (defaultPosition == 0) {
+                    defaultPosition = i;
+                }
+            }
+        } else {
+            if (hasDefault((StringBuffer*)hoursA.get(i-minSize))) {
+                StringBuffer v = removeDefaultString(*((StringBuffer*)hoursA.get(i-minSize)));
+                hoursA.removeElementAt(i-minSize);                
+                hoursA.add(i-minSize, v);
+                if (defaultPosition == 0) {
+                    defaultPosition = i;
+                }
+            }
+    }
+}
+
 }
 
 int getSchedulerPosition(int minutes) {
 
-    if (minutes <= 5)        return 0;
-    else if (minutes <= 10)  return 1;
-    else if (minutes <= 15)  return 2;
-    else if (minutes <= 30)  return 3;
-    else if (minutes <= 45)  return 4;
-    else if (minutes <= 60)  return 5;
-    else if (minutes <= 120) return 6;
-    else if (minutes <= 240) return 7;
-    else if (minutes <= 360) return 8;
-    else if (minutes <= 480) return 9;
-    else if (minutes <= 720) return 10;
-    else if (minutes <= 1440)return 11;
-    else                     return 2;      // Default = 15 min
+    int minSize = minutesA.size();
+    int hourSize = hoursA.size();
+    int totalSize = minSize + hourSize;
+    StringBuffer* s = NULL;
+    int res = 0, position = 0; 
+
+    for (int i = 0; i < totalSize; i++) {
+        if (i < minSize) {
+            s = (StringBuffer*)minutesA.get(i);
+            res = atoi(s->c_str());
+            if (minutes <= res) {
+                position = i;
+                break;
+            }            
+        } else {
+            s = (StringBuffer*)hoursA.get(i-minSize);
+            res = atoi(s->c_str());
+            res = res * 60;
+            if (minutes <= res) {
+                position = i;
+                break;
+            }    
+        }
+}
+    return position;
 
 }
 
+int getSchedulerMinutes(int position) {
+    
+    int res = 0;
+    StringBuffer* s = NULL;
+    if (position < minutesA.size()) {
+        s = (StringBuffer*)minutesA.get(position);
+        res = atoi(s->c_str());
+    } else {
+        s = (StringBuffer*)hoursA.get(position - minutesA.size());
+        res = atoi(s->c_str());
+        res = res * 60;
+    }
+    return res;
+}
 
 // CSyncSettings
 IMPLEMENT_DYNCREATE(CSyncSettings, CFormView)
@@ -169,6 +255,30 @@ void CSyncSettings::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 
+
+void CSyncSettings::disableSource(CButton& button1, CButton& button2, bool* synctype, int sep1, int sep2) {
+    
+    button1.EnableWindow(FALSE);
+    button2.EnableWindow(FALSE);
+    *synctype = false;
+    GetDlgItem(sep1)->EnableWindow(FALSE);
+    if (sep2 > 0) {
+        GetDlgItem(sep2)->EnableWindow(FALSE);
+    }
+
+}
+void CSyncSettings::hideSource(CButton& button1, CButton& button2, bool* synctype, int sep1, int sep2) {
+    
+        button1.ShowWindow(SW_HIDE);
+        button2.ShowWindow(SW_HIDE);
+        *synctype = false;
+        GetDlgItem(sep1)->ShowWindow(SW_HIDE);
+        if (sep2 > 0) {
+            GetDlgItem(sep2)->ShowWindow(SW_HIDE);
+        }
+}
+
+
 // CSyncSettings message handlers
 LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     CFormView::OnInitialUpdate();
@@ -194,20 +304,30 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     s1.LoadString(IDS_CANCEL); SetDlgItemText(IDC_SYNC_CANCEL, s1);
 
     // Scheduler: add strings to the comboBox
+    if (initialized == false) {
+        populateArrays();
+        initialized = true;
+    }
     s1.LoadString(IDS_SYNC_SYNCHRONIZE_EVERY); 
     SetDlgItemText(IDC_SCHEDULER_CHECK_ENABLED, s1);
     CString sched;
     s1.LoadString(IDS_MINUTES);
-    for (int i=0; schedMinutes[i]; i++) {
-        sched = schedMinutes[i];     sched += " ";     sched += s1;
+    
+    StringBuffer val;
+    for (int i = 0; i < minutesA.size(); i++) {
+        val = ((StringBuffer*)(minutesA.get(i)))->c_str();
+        sched = val.c_str();     sched += " ";     sched += s1;
         comboSchedulerValue.AddString(sched);
     }
     s1.LoadString(IDS_HOUR);
-    sched = schedHours[0];           sched += " ";     sched += s1;
-    comboSchedulerValue.AddString(sched);
+    for (int i = 0; i < hoursA.size(); i++) {
+        val = ((StringBuffer*)(hoursA.get(i)))->c_str();
+        if (val == "1") {
+            s1.LoadString(IDS_HOUR);
+        } else {
     s1.LoadString(IDS_HOURS);
-    for (int i=1; schedHours[i]; i++) {
-        sched = schedHours[i];       sched += " ";     sched += s1;
+        }
+        sched = val.c_str();     sched += " ";     sched += s1;
         comboSchedulerValue.AddString(sched);
     }
 
@@ -232,10 +352,13 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
         }
     }
     else {
+        disableSource(checkContacts, butContacts, &saveSyncTypeContacts, IDC_SEPARATOR_1, 0);
+        /*
         checkContacts.ShowWindow(SW_HIDE);
         butContacts.ShowWindow(SW_HIDE);
         saveSyncTypeContacts = false;
         GetDlgItem(IDC_SEPARATOR_1)->ShowWindow(SW_HIDE);
+        */
     }
 
     // CALENDAR
@@ -251,11 +374,14 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
         }
     }
     else {
+        disableSource(checkCalendar, butCalendar, &saveSyncTypeCalendar, IDC_SEPARATOR_1, IDC_SEPARATOR_2);
+        /*
         checkCalendar.ShowWindow(SW_HIDE);
         butCalendar.ShowWindow(SW_HIDE);
         saveSyncTypeCalendar = false;
         GetDlgItem(IDC_SEPARATOR_1)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_SEPARATOR_2)->ShowWindow(SW_HIDE);
+        */
     }
 
     // TASKS
@@ -271,11 +397,14 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
         }
     }
     else {
+        disableSource(checkTasks, butTasks, &saveSyncTypeTasks, IDC_SEPARATOR_2, IDC_SEPARATOR_3);
+        /*
         checkTasks.ShowWindow(SW_HIDE);
         butTasks.ShowWindow(SW_HIDE);
         saveSyncTypeTasks = false;
         GetDlgItem(IDC_SEPARATOR_2)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_SEPARATOR_3)->ShowWindow(SW_HIDE);
+        */
     }
 
     // NOTES
@@ -291,11 +420,14 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
         }
     }
     else {
+        disableSource(checkNotes, butNotes, &saveSyncTypeNotes, IDC_SEPARATOR_3, IDC_SEPARATOR_4);
+        /*
         checkNotes.ShowWindow(SW_HIDE);
         butNotes.ShowWindow(SW_HIDE);
         saveSyncTypeNotes = false;
         GetDlgItem(IDC_SEPARATOR_3)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_SEPARATOR_4)->ShowWindow(SW_HIDE);
+        */
     }
 
     // PICTURES
@@ -323,19 +455,31 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
                                      SWP_SHOWWINDOW | SWP_NOMOVE);
     }
     else {
+
+        hideSource(checkPictures, butPictures, &saveSyncTypePictures, IDC_SEPARATOR_4, 0);
+        /*
         checkPictures.ShowWindow(SW_HIDE);
         butPictures.ShowWindow(SW_HIDE);
         saveSyncTypePictures = false;
         GetDlgItem(IDC_SEPARATOR_4)->ShowWindow(SW_HIDE);
+        */
     }
 
     
     // Load scheduler settings
     saveScheduler = false;
+    if (minutesA.size() == 0 && hoursA.size() == 0) {
+        checkEnabled.EnableWindow(FALSE);
+        checkEnabled.ShowWindow(SW_HIDE);
+        comboSchedulerValue.ShowWindow(SW_HIDE);
+        groupScheduler.ShowWindow(SW_HIDE);
+
+    } else {
+
     if(! getScheduler(&minutes)){
         checkEnabled.SetCheck(BST_UNCHECKED);
         comboSchedulerValue.EnableWindow(FALSE);
-        int pos = getSchedulerPosition(SCHED_DEFAULT_REPEAT_MINS);
+        int pos = defaultPosition; //getSchedulerPosition();
         comboSchedulerValue.SetCurSel(pos);
     }
     else{
@@ -348,6 +492,7 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
             // Scheduler time was not exactly this one (manually modified?)
             saveScheduler = true;
         }
+    }
     }
 
     // encryption is global
@@ -581,7 +726,7 @@ void CSyncSettings::OnBnClickedSchedulerCheckEnabled()
     }
     else{
         comboSchedulerValue.EnableWindow(TRUE);
-        int pos = getSchedulerPosition(SCHED_DEFAULT_REPEAT_MINS);
+        int pos = defaultPosition;
         comboSchedulerValue.SetCurSel(pos);
     }
 

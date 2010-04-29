@@ -312,6 +312,9 @@ public:
     void storeUpdaterConfig();
 
     UpdaterConfig& getUpdaterConfig();
+    
+    /// initialize oldSwv, oldFunambol_swv and the transport agent
+    void initializeVersionsAndUserAgent();
 
 };
 
