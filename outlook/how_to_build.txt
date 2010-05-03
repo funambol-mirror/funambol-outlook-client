@@ -25,7 +25,7 @@ How to build the Funambol Outlook Sync Client
       Outlook Sync Client uses some Microsoft Outlook libraries, so you need to install 
       Microsoft Outlook to register these libraries into the System. 
 
-    - "Apache Ant" version 1.5 or higher (recommended v.1.7.1) 
+    - "Apache Ant" version 1.6.3 or higher (recommended v.1.7.1) 
       Downloadable from: http://ant.apache.org/
       Note: Apache Ant needs the Java Development Kit (JDK) installed in order to work 
       (see http://ant.apache.org/manual/install.html#sysrequirements Note #2).
