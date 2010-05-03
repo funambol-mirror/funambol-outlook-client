@@ -300,7 +300,7 @@ Forge file for Funambol Outlook Sync Client
 
         <echo message="Compiling Outlook Client..."/>
         <exec dir="${dir.output_src.outlook}" executable="${vs2005.devenv}/devenv" failonerror="true">
-            <arg line="OutlookClient.sln /Out ${log.client} /Build ${client.targetbuild}"/>
+            <arg line="OutlookClient.sln /Out ${log.client}  /Build ${client.targetbuild}"/>
         </exec>
 
         <!-- Open log and continue -->
@@ -320,7 +320,7 @@ Forge file for Funambol Outlook Sync Client
         <!-- Note: compile from dev working dirs -->
 
         <echo message="Compiling Outlook Client..."/>
-        <exec dir="${dir.outlook}" executable="${vs2005.devenv}/devenv" failonerror="true">
+         <exec dir="${dir.outlook}" executable="${vs2005.devenv}/devenv" failonerror="true">
             <arg line="OutlookClient.sln /Out ${log.client} /Build ${client.targetbuild}"/>
         </exec>
 
@@ -382,7 +382,7 @@ Forge file for Funambol Outlook Sync Client
         </copy>
 
     </target>
-
+		
 
     <!--
     ========================================================================
@@ -594,10 +594,8 @@ Forge file for Funambol Outlook Sync Client
         <echo message="#File Descriptor" file="${dir.output}/${ol-upd-info}" append="false" />
 
         <exec executable="date" outputproperty="zipTimeStamp"/>
-
-         <exec executable="stat" outputproperty="duSize">
-            <arg line=" -c %s ${dir.output}/${output.file.name}"/>
-        </exec>
+        
+        <length file="${dir.output}/${output.file.name}" property="fs.length.bytes" />
 
         <echo message="#File Descriptor${line.separator}" file="${dir.output}/${ol-upd-info}" append="false"/>
         <echo message="#${zipTimeStamp}${line.separator}${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
@@ -608,7 +606,7 @@ Forge file for Funambol Outlook Sync Client
 
         <echo message="# The file size expressed in bytes${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
 
-        <echo message="size=${duSize}${line.separator}${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
+        <echo message="size=${fs.length.bytes}${line.separator}${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
 
         <echo message="# The update type: optional, recommended, mandatory${line.separator}" file="${dir.output}/${ol-upd-info}" append="true"/>
         <echo message="type=recommended" file="${dir.output}/${ol-upd-info}" append="true"/>

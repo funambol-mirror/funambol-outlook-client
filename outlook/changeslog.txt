@@ -1,3 +1,5 @@
+2010-05-03
+  - toccy: fixed build.xml (target generate-upd-info) to safely work on both DOS and UNIX systems
 
 2010-04-28
   - magi : Added the value of the scheduled values in the customization.h
