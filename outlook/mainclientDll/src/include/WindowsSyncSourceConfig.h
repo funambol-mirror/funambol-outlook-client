@@ -160,7 +160,8 @@ public:
 
     /// Returns a reference to DateFilter (internally owned).
     _declspec(dllexport) DateFilter& getDateFilter() { return dateFilter; }
-
+	
+	void populateCTCap();
 };
 
 /** @} */

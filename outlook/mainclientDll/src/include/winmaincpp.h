@@ -386,6 +386,16 @@ int checkUpdate();
 
 bool checkForMandatoryUpdateBeforeStartingSync();
 
+/**
+* Added functions to get the ctcaps properties
+*/
+ArrayList* getVTodoProperties();
+ArrayList* getVCalendarProperties();
+ArrayList* getVCardProperties();
+ArrayList* getNoteProperties();
+ArrayList* getVNoteProperties();
+
+
 /** @} */
 /** @endcond */
 #endif

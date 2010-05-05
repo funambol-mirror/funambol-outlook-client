@@ -675,9 +675,11 @@ Section Uninstall
      ; (MUST keep it after uninstall, to be loaded at next Outlook startup
      ; and clean up buttons/bars - then it will unregister itself).
      CopyFiles /SILENT "$INSTDIR\FunambolAddin.dll" "$WINDIR\FunambolAddin.dll"
-     CopyFiles /SILENT "$INSTDIR\Microsoft.VC80.ATL" "$WINDIR"          ; MUST copy also ATL library to WINDIR! (could not be installed).
-     CopyFiles /SILENT "$INSTDIR\Microsoft.VC80.MFC" "$WINDIR"          ; this should not be necessary, but...
-     CopyFiles /SILENT "$INSTDIR\Microsoft.VC80.CRT" "$WINDIR"          ; CRT is also required!
+
+     CopyFiles /SILENT "$INSTDIR\${MSLIB_ATL}" "$WINDIR"          ; MUST copy also ATL library to WINDIR! (could not be installed).
+     CopyFiles /SILENT "$INSTDIR\${MSLIB_MFC}" "$WINDIR"          ; this should not be necessary, but...
+     CopyFiles /SILENT "$INSTDIR\${MSLIB_CRT}" "$WINDIR"          ; CRT is also required!
+     
      RegDLL "$WINDIR\FunambolAddin.dll"
      IfErrors errorDLL3
 

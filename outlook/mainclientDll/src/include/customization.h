@@ -105,6 +105,8 @@
 #define SCHEDULED_MINUTES_VALUES            "5,10,15(default),30,45"
 #define SCHEDULED_HOURS_VALUES              "1,2,4,6,8,12,24"
 
+#define ENABLE_COMPRESSION					true
+
 // Win registry root context.
 // This is NOT intended to be customized: we need to use the same registry keys to ensure correct checks
 // between different versions of the client (i.e. avoid installing 2 plugins, addin cleanup)

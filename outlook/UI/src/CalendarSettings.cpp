@@ -81,8 +81,6 @@ void CCalendarSettings::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_CALENDAR_CHECK_INCLUDE,   checkIncludeSubfolders);
     DDX_Control(pDX, IDC_CALENDAR_BUT_SELECT,      butSelectFolder);
     DDX_Control(pDX, IDC_CALENDAR_EDIT_REMOTE,     editRemote);
-    DDX_Control(pDX, IDC_CALENDAR_RADIO_SIF,       radioSif);
-    DDX_Control(pDX, IDC_CALENDAR_RADIO_VCARD,     radioVcard);
     DDX_Control(pDX, IDC_CALENDAR_GROUP_DIRECTION, groupDirection);
     DDX_Control(pDX, IDC_CALENDAR_GROUP_FOLDER,    groupFolder);
     DDX_Control(pDX, IDC_CALENDAR_GROUP_ADVANCED,  groupAdvanced);
@@ -93,9 +91,7 @@ void CCalendarSettings::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CCalendarSettings, CDialog)
     ON_BN_CLICKED(IDC_CALENDAR_BUTOK,       &CCalendarSettings::OnBnClickedCalendarButok)
     ON_BN_CLICKED(IDC_CALENDAR_BUTCANCEL,   &CCalendarSettings::OnBnClickedCalendarButcancel)
-    ON_BN_CLICKED(IDC_CALENDAR_BUT_SELECT,  &CCalendarSettings::OnBnClickedCalendarButSelect)
-    ON_BN_CLICKED(IDC_CALENDAR_RADIO_VCARD, &CCalendarSettings::OnBnClickedCalendarRadioVcard)
-    ON_BN_CLICKED(IDC_CALENDAR_RADIO_SIF,   &CCalendarSettings::OnBnClickedCalendarRadioSif)
+    ON_BN_CLICKED(IDC_CALENDAR_BUT_SELECT,  &CCalendarSettings::OnBnClickedCalendarButSelect)    
 END_MESSAGE_MAP()
 
 #ifdef _DEBUG
@@ -155,7 +151,10 @@ BOOL CCalendarSettings::OnInitDialog(){
     // Set dropdown-lists initial position
     lstSyncType.SetCurSel(getSyncTypeIndex(ssconf->getSync()));
     lstFilter.SetCurSel(getDateFilterIndex(ssconf->getDateFilter().getRelativeLowerDate()));
-
+	
+	s1.LoadString(IDS_USE_VCAL);
+    SetDlgItemText(IDC_CALENDAR_DATA_FORMAT, s1);
+    
     
     // Get folder path.
     // Note: use 'toWideChar' because we need UTF-8 conversion.
@@ -184,19 +183,7 @@ BOOL CCalendarSettings::OnInitDialog(){
     delete [] remName;
     SetDlgItemText(IDC_CALENDAR_EDIT_REMOTE, s1);
 
-    s1.LoadString(IDS_DATA_FORMAT); SetDlgItemText(IDC_CALENDAR_STATIC_DATAFORMAT, s1);
-    s1.LoadString(IDS_USE_SIF);     SetDlgItemText(IDC_CALENDAR_RADIO_SIF, s1);
-    s1.LoadString(IDS_USE_VCAL);    SetDlgItemText(IDC_CALENDAR_RADIO_VCARD, s1);
-
-    if( strstr(ssconf->getType(),"sif") ){
-        radioSif.SetCheck(BST_CHECKED);
-        currentRadioChecked = SIF_CHECKED;
-    }
-    else {
-        radioVcard.SetCheck(BST_CHECKED);
-        currentRadioChecked = VCALENDAR_CHECKED;
-    }
-
+    s1.LoadString(IDS_DATA_FORMAT); SetDlgItemText(IDC_CALENDAR_STATIC_DATAFORMAT, s1);   
 
     //
     // Hide Advanced settings (remote URI) if defined in customization.h
@@ -204,8 +191,6 @@ BOOL CCalendarSettings::OnInitDialog(){
     if(!SHOW_ADVANCED_SETTINGS) {
         groupAdvanced.ShowWindow(SW_HIDE);
         editRemote.ShowWindow(SW_HIDE);
-        radioSif.ShowWindow(SW_HIDE);
-        radioVcard.ShowWindow(SW_HIDE);
         GetDlgItem(IDC_CALENDAR_STATIC_REMOTE)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_CALENDAR_STATIC_DATAFORMAT)->ShowWindow(SW_HIDE);
 
@@ -269,7 +254,6 @@ bool CCalendarSettings::saveSettings(bool saveToDisk)
     CString remoteName, outlookFolder, syncType;
     CString s1;
     _bstr_t bst;
-    bool useSif;
     WindowsSyncSourceConfig* ssconf = ((OutlookConfig*)getConfig())->getSyncSourceConfig(APPOINTMENT_);
 
     GetDlgItemText(IDC_CALENDAR_EDIT_REMOTE, remoteName);
@@ -310,36 +294,7 @@ bool CCalendarSettings::saveSettings(bool saveToDisk)
     if (remName) {
         ssconf->setURI(remName);
         delete [] remName;
-    }
-
-    if(radioSif.GetCheck() == BST_CHECKED){
-        useSif = true;
-    }
-    else{
-        useSif = false;
-    }
-
-    // Data formats
-    if(useSif){
-        char* version = toMultibyte(SIF_VERSION);
-        ssconf->setType("text/x-s4j-sife");
-        ssconf->setVersion(version);
-        ssconf->setEncoding("b64");
-        delete [] version;
-    }
-    else{
-        char* version = toMultibyte(VCALENDAR_VERSION);
-        ssconf->setType("text/x-vcalendar"); 
-        ssconf->setVersion(version);
-        // When encryption is used, encoding is always 'base64'.
-        if ( !strcmp(ssconf->getEncryption(), "") ) {
-        ssconf->setEncoding("bin");
-        }
-        else {
-            ssconf->setEncoding("b64");
-        }
-        delete [] version;
-    }
+    }   
 
     // Never save to winreg, will save when 'OK' is clicked on SyncSettings.
     //if(saveToDisk)
@@ -376,18 +331,3 @@ void CCalendarSettings::OnBnClickedCalendarButSelect(){
     handleThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)pickFolderCalendar, NULL, 0, NULL);
 }
 
-
-
-void CCalendarSettings::OnBnClickedCalendarRadioSif() {
-    if (currentRadioChecked != SIF_CHECKED) {
-        SetDlgItemText(IDC_CALENDAR_EDIT_REMOTE, SIFE_DEFAULT_NAME);
-        currentRadioChecked = SIF_CHECKED;
-    }
-}
-
-void CCalendarSettings::OnBnClickedCalendarRadioVcard() {
-    if (currentRadioChecked != VCALENDAR_CHECKED) {
-        SetDlgItemText(IDC_CALENDAR_EDIT_REMOTE, VCALENDAR_DEFAULT_NAME);
-        currentRadioChecked = VCALENDAR_CHECKED;
-    }
-}

@@ -1254,7 +1254,37 @@ void OutlookConfig::upgradeConfig() {
         // (we need the Server dataStores, to enable/disable source picture)
         setServerLastSyncURL("");
     }
+	
+	// Old version < 8.7.0
+    if (oldFunambolSwv < 80700) {
+		//
+		// SIF-E and SIF-T deprecation. Changed the default in the upgrade from sif to vcalendar
+		//
+		WindowsSyncSourceConfig* ssc = getSyncSourceConfig(APPOINTMENT_);
+        if (ssc) {
+			// Don't change the source URI. If we were using "scal", it will be preserved during
+			// upgrade. This is required to keep the anchors Server side and avoid a 1st time slow-sync.
+            // ssc->setURI("event");
+			ssc->setType("text/x-vcalendar");
+            ssc->setVersion("1.0");
+            ssc->setEncoding("bin");
+			ssc->setSupportedTypes("text/x-vcalendar:1.0,text/x-s4j-sife:1.0");
+			
+        }
 
+		ssc = getSyncSourceConfig(TASK_);
+        if (ssc) {
+			// Don't change the source URI. If we were using "stask", it will be preserved during
+			// upgrade. This is required to keep the anchors Server side and avoid a 1st time slow-sync.
+            // ssc->setURI("task");
+			ssc->setType("text/x-vcalendar");
+            ssc->setVersion("1.0");
+            ssc->setEncoding("bin");
+			ssc->setSupportedTypes("text/x-vcalendar:1.0,text/x-s4j-sife:1.0");
+        }
+		getAccessConfig().setCompression(ENABLE_COMPRESSION);
+        
+    }
         
     // Set the flag to specify that config has been upgraded.
     upgraded = true;
