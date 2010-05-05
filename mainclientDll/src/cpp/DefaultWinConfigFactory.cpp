@@ -77,7 +77,7 @@ AccessConfig* DefaultWinConfigFactory::getAccessConfig() {
     ac->setUserAgent            (PROGRAM_NAME);                         // This is replaced during config.upgradeConfig()
     ac->setCheckConn            (FALSE);
     ac->setResponseTimeout      (RESPONSE_TIMEOUT);                     // [seconds] timeout on server = 15 min
-
+	ac->setCompression			(ENABLE_COMPRESSION);
     return ac;
 }
 
@@ -129,19 +129,19 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setIsEnabled        (CONTACT_SOURCE_ENABLED);
     }
     else if (wname == APPOINTMENT){
-        sc->setURI              ("scal");
-        sc->setType             ("text/x-s4j-sife");
+        sc->setURI              ("event");
+        sc->setType             ("text/x-vcalendar");
         sc->setVersion          ("1.0");
-        sc->setEncoding         ("b64");
-        sc->setSupportedTypes   ("text/x-s4j-sife:1.0,text/x-vcalendar:1.0");
+        sc->setEncoding         ("bin");
+        sc->setSupportedTypes   ("text/x-vcalendar:1.0,text/x-s4j-sife:1.0");
         sc->setIsEnabled        (APPOINTMENT_SOURCE_ENABLED);
     }
     else if (wname == TASK){
-        sc->setURI              ("stask");
-        sc->setType             ("text/x-s4j-sift");
+        sc->setURI              ("task");
+        sc->setType             ("text/x-vcalendar");
         sc->setVersion          ("1.0");
-        sc->setEncoding         ("b64");
-        sc->setSupportedTypes   ("text/x-s4j-sift:1.0,text/x-vcalendar:1.0");
+        sc->setEncoding         ("bin");
+        sc->setSupportedTypes   ("text/x-vcalendar:1.0,text/x-s4j-sift:1.0");
         sc->setIsEnabled        (TASK_SOURCE_ENABLED);
     }
     else if (wname == NOTE){

@@ -1,3 +1,12 @@
+2010-05-05  
+  - magi : Removed sif support for calendar and task. A fresh installation use the vCalendar as default
+           for appointment and task. The sourceURI are "event" and "task".
+           For an upgrade the sourceURI remain the same as before (scal and stask) but using the
+           vCalendar format.
+           Updated the UI accordling to remove sif choice
+           Added support of ctcaps capabilities for all the sources (vcard and vcalendar) 
+           Added the support for using compression by default
+           Fixed the build.xml, funambol-outlook-client-forge.properties and outlook-client-forge.nsi to be used with VS2008
 2010-05-03
   - toccy: fixed build.xml (target generate-upd-info) to safely work on both DOS and UNIX systems
 

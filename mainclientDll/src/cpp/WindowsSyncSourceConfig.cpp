@@ -37,6 +37,7 @@
 
 #include "WindowsSyncSourceConfig.h"
 #include "base/util/utils.h"
+#include "winmaincpp.h"
 
 
 WindowsSyncSourceConfig::WindowsSyncSourceConfig() {
@@ -55,6 +56,7 @@ WindowsSyncSourceConfig::WindowsSyncSourceConfig(SyncSourceConfig* sc) {
         throw getLastErrorMsg();
     }
     s = sc;
+	populateCTCap();
 }
 
 WindowsSyncSourceConfig::~WindowsSyncSourceConfig() {
@@ -128,6 +130,7 @@ WindowsSyncSourceConfig::WindowsSyncSourceConfig(const WindowsSyncSourceConfig& 
     setUseSubfolders (wsc.getUseSubfolders ()); 
     setEndTimestamp  (wsc.getEndTimestamp  ());
     setIsSynced      (wsc.getIsSynced      ());
+	populateCTCap();
 }
 
 
@@ -145,6 +148,8 @@ WindowsSyncSourceConfig& WindowsSyncSourceConfig::operator = (const WindowsSyncS
     setUseSubfolders (wsc.getUseSubfolders ()); 
     setEndTimestamp  (wsc.getEndTimestamp  ());
     setIsSynced      (wsc.getIsSynced      ());
+	
+	populateCTCap();
 
     return *this;
 }
@@ -156,6 +161,7 @@ WindowsSyncSourceConfig& WindowsSyncSourceConfig::operator = (const WindowsSyncS
  */
 void WindowsSyncSourceConfig::setCommonConfig(SyncSourceConfig* sc) {
     s = sc;
+	populateCTCap();
 }
 
 
@@ -168,4 +174,38 @@ void WindowsSyncSourceConfig::initialize() {
     useSubfolders   = false;
     endTimestamp    = 0;
     isSynced        = false;
+}
+
+void WindowsSyncSourceConfig::populateCTCap() {
+	
+    ArrayList* p = NULL;
+
+	if (strcmp(s->getName(), CONTACT_) == 0) {    
+        //adding vcard
+        p = getVCardProperties();
+        s->addCtCap(p, "text/x-vcard", "2.1");
+        delete p; p = NULL;
+    }
+    if (strcmp(s->getName(), APPOINTMENT_) == 0) {       
+        //adding vcalendar
+        p = getVCalendarProperties();
+        s->addCtCap(p, "text/x-vcalendar", "1.0");
+        delete p; p = NULL;
+    }
+    if (strcmp(s->getName(), TASK_) == 0) {       
+        //adding vTodo
+        p = getVTodoProperties();
+        s->addCtCap(p, "text/x-vcalendar", "1.0");
+        delete p; p = NULL;
+    }
+    if (strcmp(s->getName(), NOTE_) == 0) {
+		// sif
+		p = getNoteProperties();
+		s->addCtCap(p);
+		p->clear();
+
+		p = getVNoteProperties();
+		s->addCtCap(p, "text/x-vnote", "1.1");        
+        delete p; p = NULL;
+    }
 }

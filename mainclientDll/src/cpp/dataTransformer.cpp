@@ -54,6 +54,8 @@
 #include "outlook/ClientException.h"
 #include "SIFFields.h"
 
+#include "syncml\core\Property.h"
+#include "syncml\core\PropParam.h"
 #include <string>
 
 using namespace std;
@@ -865,4 +867,687 @@ void replaceDefaultPath(wstring& path, const wstring& defaultFolder) {
     path += L"\\";
     replaceAll(source, dest, path);
     path = path.substr(0, path.length()-1);
+}
+
+
+ArrayList* getVCalendarProperties(){
+
+    ArrayList* props = new ArrayList();
+    Property* p = new Property();
+    ArrayList valenums;
+    StringBuffer val;
+
+    p->setPropName("BEGIN");
+    val = "VCALENDAR";
+    valenums.add(val);
+	val = "VEVENT";
+	valenums.add(val);
+    p->setValEnums(&valenums);
+    props->add(*p);
+
+    valenums.clear();
+
+    p->setPropName("END");
+    val = "VCALENDAR";
+    valenums.add(val);
+    val = "VEVENT";
+    valenums.add(val);
+    p->setValEnums(&valenums);
+    props->add(*p);
+
+    valenums.clear();
+    
+    p->setPropName("VERSION");
+    val = "1.0";
+    valenums.add(val);
+    p->setValEnums(&valenums);
+    props->add(*p);
+	
+	valenums.clear();
+	
+	p->setPropName("CLASS");
+    val = "PUBLIC";
+    valenums.add(val);
+	val = "PRIVATE";
+    valenums.add(val);
+	val = "CONFIDENTIAL";
+    valenums.add(val);	
+    p->setValEnums(&valenums);
+    props->add(*p);
+	
+	valenums.clear();	
+	delete p; p = NULL;    
+    p = new Property();    
+
+    p->setPropName("X-FUNAMBOL-ALLDAY");
+    props->add(*p);
+    p->setPropName("DESCRIPTION");
+    props->add(*p);
+    p->setPropName("X-MICROSOFT-CDO-BUSYSTATUS");
+    props->add(*p);
+    p->setPropName("CATEGORIES");
+    props->add(*p);
+    p->setPropName("DTEND");
+    props->add(*p);
+    p->setPropName("LOCATION");
+    props->add(*p);
+    p->setPropName("STATUS");
+    props->add(*p);
+    p->setPropName("SUMMARY");
+    props->add(*p);
+    p->setPropName("X-FUNAMBOL-BILLINGINFO");
+    props->add(*p);
+	p->setPropName("X-FUNAMBOL-COMPANIES");
+    props->add(*p);
+	p->setPropName("X-FUNAMBOL-MILEAGE");
+    props->add(*p);
+	p->setPropName("X-FUNAMBOL-NOAGING");
+    props->add(*p);
+	p->setPropName("X-FUNAMBOL-FOLDER");
+    props->add(*p);
+    p->setPropName("X-MICROSOFT-CDO-REPLYTIME");
+    props->add(*p);
+    p->setPropName("DALARM");
+    props->add(*p);
+	p->setPropName("PRIORITY");
+    props->add(*p);    
+    props->add(*p);
+    p->setPropName("DTSTART");
+    props->add(*p);
+    p->setPropName("SUMMARY");
+    props->add(*p);
+    p->setPropName("RRULE");
+    props->add(*p);
+    p->setPropName("EXDATE");
+    props->add(*p);
+    p->setPropName("RDATE");
+    props->add(*p);
+    p->setPropName("TZ");
+    props->add(*p);
+    p->setPropName("DAYLIGHT");
+    props->add(*p);
+
+    delete p; p = NULL;
+
+    return props;
+}
+
+ArrayList* getVCardProperties(){
+
+    ArrayList* props = new ArrayList();
+    Property* p = new Property();
+    PropParam* pp = new PropParam();
+    ArrayList pparams;
+    ArrayList valenums;
+    StringBuffer val;
+
+
+    p->setPropName("BEGIN");
+    val = "VCARD";
+    valenums.add(val);
+    p->setValEnums(&valenums);
+    props->add(*p);
+
+    valenums.clear();
+
+    p->setPropName("END");
+    val = "VCARD";
+    valenums.add(val);
+    p->setValEnums(&valenums);
+    props->add(*p);
+
+    valenums.clear();
+    
+    p->setPropName("VERSION");
+    val = "2.1";
+    valenums.add(val);
+    p->setValEnums(&valenums);
+    props->add(*p);
+	
+	valenums.clear();
+
+	p->setPropName("CLASS");
+    val = "PUBLIC";
+    valenums.add(val);
+	val = "PRIVATE";
+    valenums.add(val);
+	val = "CONFIDENTIAL";
+    valenums.add(val);	
+    p->setValEnums(&valenums);
+    props->add(*p);
+	
+	valenums.clear();	
+	
+	delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+    p->setPropName("X-ANNIVERSARY");
+    props->add(*p);
+    
+    p->setPropName("BDAY");
+    props->add(*p);
+    
+    p->setPropName("NOTE");
+    props->add(*p);
+
+	p->setPropName("FN");
+    props->add(*p);
+    
+    p->setPropName("TEL");
+    pp->setParamName("VOICE");
+    pparams.add(*pp);
+    pp->setParamName("WORK");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+	
+	pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+	p->setPropName("TEL");
+    pp->setParamName("WORK");
+    pparams.add(*pp);
+    pp->setParamName("FAX");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+	
+	pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+	p->setPropName("TEL");
+    pp->setParamName("CAR");
+    pparams.add(*pp);
+    pp->setParamName("VOICE");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+	
+	p->setPropName("TEL");
+    pp->setParamName("WORK");
+    pparams.add(*pp);
+    pp->setParamName("PREF");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();   
+   
+	p->setPropName("TEL");
+    pp->setParamName("HOME");
+    pparams.add(*pp);
+    pp->setParamName("FAX");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+    p->setPropName("TEL");
+    pp->setParamName("VOICE");
+    pparams.add(*pp);
+    pp->setParamName("HOME");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+	p->setPropName("TEL");
+    pp->setParamName("PREF");
+    pparams.add(*pp);
+    pp->setParamName("VOICE");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+	p->setPropName("TEL");
+    pp->setParamName("CELL");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+	p->setPropName("TEL");
+    pp->setParamName("X-FUNAMBOL-TELEX");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+	
+	p->setPropName("TEL");
+    pp->setParamName("PAGER");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+	p->setPropName("TEL");
+    pp->setParamName("FAX");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+	p->setPropName("TEL");
+    pp->setParamName("VOICE");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+
+
+    p->setPropName("CATEGORIES");
+    props->add(*p);
+
+    p->setPropName("X-FUNAMBOL-CHILDREN");
+    props->add(*p);
+
+    p->setPropName("ORG");
+    props->add(*p);
+
+	p->setPropName("ROLE");
+    props->add(*p);
+
+    //p->setPropName("X-FUNAMBOL-CUSTOMERID");
+    //props->add(*p);
+
+    p->setPropName("EMAIL");
+    pp->setParamName("INTERNET");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+    p->setPropName("EMAIL");
+    pp->setParamName("INTERNET");
+    pparams.add(*pp);
+    pp->setParamName("HOME");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+    p->setPropName("EMAIL");
+    pp->setParamName("INTERNET");
+    pparams.add(*pp);
+    pp->setParamName("WORK");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+    p->setPropName("ADR");
+    pp->setParamName("HOME");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+	
+	p->setPropName("ADR");
+    pp->setParamName("WORK");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+    p->setPropName("URL");
+    pp->setParamName("HOME");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+    p->setPropName("EMAIL");
+    pp->setParamName("INTERNET");
+    pparams.add(*pp);
+    pp->setParamName("HOME");
+    pparams.add(*pp);
+    pp->setParamName("X-FUNAMBOL-INSTANTMESSENGER");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+    p->setPropName("TITLE");
+    props->add(*p);
+
+    p->setPropName("N");
+    props->add(*p);
+
+    p->setPropName("X-MANAGER");
+    props->add(*p);
+    
+    p->setPropName("NICKNAME");
+    props->add(*p);
+
+    p->setPropName("ADR");
+    props->add(*p);    
+
+    p->setPropName("PHOTO");
+    props->add(*p);
+
+	p->setPropName("PRIORITY");
+    props->add(*p);
+
+    p->setPropName("TEL");
+    pp->setParamName("X-FUNAMBOL-RADIO");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+	p->setPropName("TEL");
+    pp->setParamName("X-FUNAMBOL-CALLBACK");
+    pparams.add(*pp);
+    p->setPropParams(&pparams);
+    props->add(*p);
+
+    pparams.clear();
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+    p = new Property();
+    pp = new PropParam();
+
+    p->setPropName("X-SPOUSE");
+    props->add(*p);
+
+    p->setPropName("URL");
+    props->add(*p);
+	
+	p->setPropName("X-FUNAMBOL-BILLINGINFO");
+    props->add(*p);
+
+	p->setPropName("X-FUNAMBOL-COMPANIES");
+    props->add(*p);
+
+	p->setPropName("X-FUNAMBOL-FOLDER");
+    props->add(*p);
+
+	p->setPropName("X-FUNAMBOL-GENDER");
+    props->add(*p);
+
+	p->setPropName("X-FUNAMBOL-HOBBIES");
+    props->add(*p);
+
+	p->setPropName("X-FUNAMBOL-INITIALS");
+    props->add(*p);
+
+	p->setPropName("X-FUNAMBOL-LANGUAGES");
+    props->add(*p);
+
+	p->setPropName("X-FUNAMBOL-MILEAGE");
+    props->add(*p);
+
+	p->setPropName("X-FUNAMBOL-SUBJECT");
+    props->add(*p);
+
+	p->setPropName("X-FUNAMBOL-ORGANIZATIONALID");
+    props->add(*p);
+
+    p->setPropName("X-FUNAMBOL-YOMICOMPANYNAME");
+    props->add(*p);
+
+    p->setPropName("X-FUNAMBOL-YOMIFIRSTNAME");
+    props->add(*p);
+
+    p->setPropName("X-FUNAMBOL-YOMILASTNAME");
+    props->add(*p);
+
+    delete p; p = NULL;
+    delete pp; pp = NULL;
+
+    return props;
+}
+
+ArrayList* getVTodoProperties(){
+
+    ArrayList* props = new ArrayList();
+    Property* p = new Property();
+    ArrayList valenums;
+    StringBuffer val;
+	
+	p->setPropName("BEGIN");
+    val = "VCALENDAR";
+    valenums.add(val);
+	val = "VTODO";
+	valenums.add(val);
+    p->setValEnums(&valenums);
+    props->add(*p);   
+
+    valenums.clear();
+
+    p->setPropName("END");
+    val = "VTODO";
+    valenums.add(val);
+	val = "VCALENDAR";
+    valenums.add(val);	
+    p->setValEnums(&valenums);
+    props->add(*p);
+
+    valenums.clear();
+    
+    p->setPropName("VERSION");
+    val = "1.0";
+    valenums.add(val);
+    p->setValEnums(&valenums);
+    props->add(*p);
+	
+	valenums.clear();
+
+	p->setPropName("CLASS");
+    val = "PUBLIC";
+    valenums.add(val);
+	val = "PRIVATE";
+    valenums.add(val);
+	val = "CONFIDENTIAL";
+    valenums.add(val);	
+    p->setValEnums(&valenums);
+    props->add(*p);
+	
+	valenums.clear();	
+	
+	delete p; p = NULL;
+    p = new Property();
+    
+    p->setPropName("X-FUNAMBOL-ALLDAY");
+    props->add(*p);
+    p->setPropName("X-FUNAMBOL-FOLDER");
+    props->add(*p);
+    p->setPropName("DESCRIPTION");
+    props->add(*p);
+    p->setPropName("CATEGORIES");
+    props->add(*p);
+    p->setPropName("STATUS");
+    props->add(*p);
+    p->setPropName("COMPLETED");
+    props->add(*p);
+    p->setPropName("DUE");
+    props->add(*p);
+    p->setPropName("PRIORITY");
+    props->add(*p);
+    //p->setPropName("X-FUNAMBOL-AALARMOPTIONS");
+    //props->add(*p);
+    p->setPropName("AALARM");
+    props->add(*p);
+    p->setPropName("CLASS");
+    props->add(*p);
+    p->setPropName("DTSTART");
+    props->add(*p);
+    p->setPropName("SUMMARY");
+    props->add(*p);
+    p->setPropName("X-FUNAMBOL-TEAMTASK");
+    props->add(*p);
+    p->setPropName("RRULE");
+    props->add(*p);
+	p->setPropName("PERCENT-COMPLETE");
+    props->add(*p);
+	p->setPropName("X-FUNAMBOL-ACTUALWORK");
+    props->add(*p);
+	p->setPropName("X-FUNAMBOL-BILLINGINFO");
+    props->add(*p);
+	p->setPropName("X-FUNAMBOL-COMPANIES");
+    props->add(*p);
+	p->setPropName("X-FUNAMBOL-MILEAGE");
+    props->add(*p);
+	p->setPropName("X-FUNAMBOL-TOTALWORK");
+    props->add(*p);
+
+    delete p; p = NULL;
+
+    return props;
+}
+
+ArrayList* getNoteProperties(){
+
+    ArrayList* p = new ArrayList();
+	
+    //adding sif
+    Property subject,body;
+    subject.setPropName("Subject");
+    body.setPropName("Body");
+    p->add(subject);
+    p->add(body);
+   
+    return p;
+}
+
+ArrayList* getVNoteProperties() {
+	
+	ArrayList* p = new ArrayList();
+
+    Property pval;
+	Property subject, body;
+
+    subject.setPropName("SUBJECT");
+    body.setPropName("BODY");
+    ArrayList valenums;
+    StringBuffer val;
+
+    pval.setPropName("BEGIN");
+    val = "VNOTE";
+    valenums.add(val);
+    pval.setValEnums(&valenums);
+    p->add(pval);
+
+    valenums.clear();
+
+    pval.setPropName("END");
+    val = "VNOTE";
+    valenums.add(val);
+    pval.setValEnums(&valenums);
+    p->add(pval);
+
+    valenums.clear();
+
+    pval.setPropName("VERSION");
+    val = "1.1";
+    valenums.add(val);
+    pval.setValEnums(&valenums);
+    p->add(pval);
+    p->add(subject);
+    p->add(body);
+   // s->addCtCap(p, "text/x-vnote", "1.1");
+    
+	return p;
+
 }

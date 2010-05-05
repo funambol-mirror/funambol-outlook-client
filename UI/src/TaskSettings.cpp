@@ -85,16 +85,13 @@ void CTaskSettings::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_TASKS_GROUP_DIRECTION, groupDirection);
     DDX_Control(pDX, IDC_TASKS_GROUP_FOLDER, groupFolder);
     DDX_Control(pDX, IDC_TASKS_ADVANCED, groupAdvanced);
-    DDX_Control(pDX, IDC_TASKS_RADIO_SIF, radioSif);
-    DDX_Control(pDX, IDC_TASKS_RADIO_VTODO, radioVTodo);
+   
 }
 
 BEGIN_MESSAGE_MAP(CTaskSettings, CDialog)
     ON_BN_CLICKED(IDC_TASKS_OK, &CTaskSettings::OnBnClickedTasksOk)
     ON_BN_CLICKED(IDC_TASKS_CANCEL, &CTaskSettings::OnBnClickedTasksCancel)
-    ON_BN_CLICKED(IDC_TASKS_BUT_SELECT, &CTaskSettings::OnBnClickedTasksButSelect)
-    ON_BN_CLICKED(IDC_TASKS_RADIO_VTODO, &CTaskSettings::OnBnClickedTasksRadioVTodo)
-    ON_BN_CLICKED(IDC_TASKS_RADIO_SIF, &CTaskSettings::OnBnClickedTasksRadioSif)
+    ON_BN_CLICKED(IDC_TASKS_BUT_SELECT, &CTaskSettings::OnBnClickedTasksButSelect)   
 END_MESSAGE_MAP()
 
 
@@ -146,7 +143,10 @@ BOOL CTaskSettings::OnInitDialog(){
     s1.LoadString(IDS_CANCEL); SetDlgItemText(IDC_TASKS_CANCEL, s1);
 
     lstSyncType.SetCurSel(getSyncTypeIndex(ssconf->getSync()));
-
+	
+	s1.LoadString(IDS_USE_VCAL);
+	SetDlgItemText(IDC_TASKS_DATA_FORMAT, s1);
+        
     // Get folder path.
     // Note: use 'toWideChar' because we need UTF-8 conversion.
     WCHAR* olFolder = toWideChar(ssconf->getFolderPath());
@@ -173,20 +173,7 @@ BOOL CTaskSettings::OnInitDialog(){
     delete [] remName;
     SetDlgItemText(IDC_TASKS_EDIT_REMOTE, s1);
 
-    wndTasks = this;
-
-
-    s1.LoadString(IDS_USE_SIF);    SetDlgItemText(IDC_TASKS_RADIO_SIF,   s1);
-    s1.LoadString(IDS_USE_VTODO);  SetDlgItemText(IDC_TASKS_RADIO_VTODO, s1);
-    if( strstr(ssconf->getType(),"sif") ){
-        radioSif.SetCheck(BST_CHECKED);
-        currentRadioChecked = SIF_CHECKED;
-    }
-    else {
-        radioVTodo.SetCheck(BST_CHECKED);
-        currentRadioChecked = VTODO_CHECKED;
-    }
-
+    wndTasks = this;   
 
     //
     // Hide Advanced settings (remote URI) if defined in customization.h
@@ -196,9 +183,7 @@ BOOL CTaskSettings::OnInitDialog(){
         editRemote.ShowWindow(SW_HIDE);
         GetDlgItem(IDC_TASKS_STATIC_REMOTE)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_TASKS_STATIC_DATAFORMAT)->ShowWindow(SW_HIDE);
-        radioSif.ShowWindow(SW_HIDE);
-        radioVTodo.ShowWindow(SW_HIDE);
-
+       
         // Redraw buttons 'OK' and 'Cancel' where the groupAdvanced was located
         CPoint posAdvanced = getRelativePosition(&groupAdvanced, this);
         int top = posAdvanced.y + 10;   // 10 = some space
@@ -290,30 +275,7 @@ bool CTaskSettings::saveSettings(bool saveToDisk)
     if (remName) {
         ssconf->setURI(remName);
         delete [] remName;
-    }
-
-
-    // Data formats
-    if(radioSif.GetCheck() == BST_CHECKED){
-        char* version = toMultibyte(SIF_VERSION);
-        ssconf->setType("text/x-s4j-sift");
-        ssconf->setVersion(version);
-        ssconf->setEncoding("b64");
-        delete [] version;
-    }
-    else{
-        char* version = toMultibyte(VCALENDAR_VERSION);
-        ssconf->setType("text/x-vcalendar"); 
-        ssconf->setVersion(version);
-        // When encryption is used, encoding is always 'base64'.
-        if ( !strcmp(ssconf->getEncryption(), "") ) {
-            ssconf->setEncoding("bin");
-        }
-        else {
-            ssconf->setEncoding("b64");
-        }
-        delete [] version;
-    }
+    }    
 
     // Never save to winreg, will save when 'OK' is clicked on SyncSettings.
     //if(saveToDisk)
@@ -351,16 +313,3 @@ void CTaskSettings::OnBnClickedTasksButSelect()
     handleThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)pickFolderTasks, NULL, 0, NULL);
 }
 
-void CTaskSettings::OnBnClickedTasksRadioSif() {
-    if (currentRadioChecked != SIF_CHECKED) {
-        SetDlgItemText(IDC_TASKS_EDIT_REMOTE, SIFT_DEFAULT_NAME);
-        currentRadioChecked = SIF_CHECKED;
-    }
-}
-
-void CTaskSettings::OnBnClickedTasksRadioVTodo() {
-    if (currentRadioChecked != VTODO_CHECKED) {
-        SetDlgItemText(IDC_TASKS_EDIT_REMOTE, VTODO_DEFAULT_NAME);
-        currentRadioChecked = VTODO_CHECKED;
-    }
-}

@@ -495,6 +495,8 @@
 #define IDC_PICTURES_EDIT_SYNCTYPE      1220
 #define IDC_POPUP_TEXT                  1220
 #define IDC_POWERED_BY                  1221
+#define IDC_CALENDAR_DATA_FORMAT        1222
+#define IDC_TASKS_DATA_FORMAT           1223
 #define ID_FILE_CONFIGURATION           32771
 #define ID_FILE_ZZZZ                    32772
 #define ID_FILE_SYNCHRONIZE             32773
@@ -513,7 +515,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        277
 #define _APS_NEXT_COMMAND_VALUE         32789
-#define _APS_NEXT_CONTROL_VALUE         1222
+#define _APS_NEXT_CONTROL_VALUE         1224
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

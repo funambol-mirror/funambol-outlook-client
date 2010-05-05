@@ -84,16 +84,13 @@ public:
     CStatic groupDirection;
     CStatic groupFolder;
     CStatic groupAdvanced;
-    CButton radioSif;
-    CButton radioVTodo;
-
+   
     bool saveSettings(bool);
 
     afx_msg void OnBnClickedTasksOk();
     afx_msg void OnBnClickedTasksCancel();
     afx_msg void OnBnClickedTasksButSelect();
-    afx_msg void OnBnClickedTasksRadioVTodo();
-    afx_msg void OnBnClickedTasksRadioSif();
+    
 };
 
 /** @} */
