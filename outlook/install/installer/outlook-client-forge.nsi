@@ -52,6 +52,7 @@
 !define PRODUCT_UNINST_KEY                      "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define MSMAPIAPPS_REGKEY_CONTEXT               "Software\Microsoft\Windows Messaging Subsystem\MSMapiApps"
 !define SHELLFOLDERS_CONTEXT                    "Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders"
+!define TELEPHONY_LOCATIONS_CONTEXT             "Software\Microsoft\Windows\CurrentVersion\Telephony\Locations"
 !define PROPERTY_PATH                           "installDir"
 !define PROPERTY_ADDIN_NAME                     "FileName"
 !define PROPERTY_SWV                            "swv"
@@ -635,6 +636,9 @@ Section "MainSection" SEC01
 
       ; Write registry keys
       Call writeRegistry
+      
+      ; check if telephony location is correctly set
+      Call checkTelephonyLocation
 
 SectionEnd
 
@@ -950,4 +954,32 @@ Function un.deleteUsersFiles
 
   done:
 FunctionEnd
+
+
+;
+; Checks if there is at least one Telephony Location defined in the system.
+; If not, we define a default one (US locale = area code 1).
+;
+; This is necessary on WinXP otherwise the phone numbers may lose the trailing "+"
+; when they're added in Outlook using Outlook APIs (bug 6218), causing sync issues.
+; It is safe: if a location is already defined, it does nothing.
+;
+Function checkTelephonyLocation
+
+     EnumRegKey  $R1  HKLM  "${TELEPHONY_LOCATIONS_CONTEXT}"  0
+
+     ; empty string means "no subkey is found", so we need to create one
+     StrCmp $R1 "" 0 done
+     
+     WriteRegDWORD  HKLM  "${TELEPHONY_LOCATIONS_CONTEXT}"            "CurrentID"  1
+     WriteRegDWORD  HKLM  "${TELEPHONY_LOCATIONS_CONTEXT}"            "NextID"     2
+     
+     WriteRegStr    HKLM  "${TELEPHONY_LOCATIONS_CONTEXT}\Location1"  "Name"       "Location"
+     WriteRegStr    HKLM  "${TELEPHONY_LOCATIONS_CONTEXT}\Location1"  "AreaCode"   "1"
+     WriteRegDWORD  HKLM  "${TELEPHONY_LOCATIONS_CONTEXT}\Location1"  "Country"    1
+     
+  done:
+FunctionEnd
+
+
 

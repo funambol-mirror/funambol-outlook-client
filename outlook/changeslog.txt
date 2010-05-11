@@ -1,3 +1,7 @@
+2010-05-10
+  - toccy: fixed bug #6218: The "+" of the international country code is missing after sync
+           (added a check in the installer script, in order to set a default telephony locale if missing)
+
 2010-05-05  
   - magi : Removed sif support for calendar and task. A fresh installation use the vCalendar as default
            for appointment and task. The sourceURI are "event" and "task".
