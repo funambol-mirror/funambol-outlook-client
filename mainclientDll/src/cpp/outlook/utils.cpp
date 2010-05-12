@@ -433,3 +433,77 @@ bool vBoolToBool(VARIANT_BOOL vbool) {
     else
         return false;
 }
+
+
+/*
+ * Sysyem time ("yyyy-MM-dd") -> Variant time (double).
+ * If empty string passed, returns REFERRED_MAX_DATE.
+ * UTC is ignored (only date, no time).
+ *
+ * @param dataString : the input string in System time format
+ * @param date       : [OUT] the returned value into VariantTime format
+ * @param type       : used to set the hours and minutes:
+ *                     "END"   to set hour 23:59
+ *                     "START" to set hour 00:00 (default)
+ *
+ * Set the hour to 00:00 is used for birthday, anniversary and
+ * startDate of appointment when it is all day event.
+ * Set hour 23:59 for endDate when an appointment is allDayEvent.
+ */
+void systemTimeDateToDouble(const wstring& dataString, DATE* date, WCHAR* type) {
+
+    WCHAR* token  = NULL;
+    WCHAR* dummy  = NULL;
+    WCHAR* Ztoken = NULL;
+    WCHAR tmp[50];
+    int ret = 0;
+    SYSTEMTIME t;
+
+    WCHAR internalString[20];
+    wsprintf(internalString, dataString.c_str());
+
+    Ztoken = wcschr(internalString, '-');
+    if (Ztoken == NULL) {
+        // Note: DO NOT REMOVE THIS!
+        // If wrong format ("YYYYMMDDThhmmssZ") the correct function is called...
+        systemTimeToDouble(dataString, date, NULL);
+        return;
+    }
+
+    //  TEXT("yyyy-MM-dd")
+    token = wcstok(internalString, L"-");
+
+    if (token != NULL) {
+        //yyyy
+        wcsncpy(tmp, internalString, 4);
+        tmp[4] = 0;
+        swscanf(tmp, L"%d",&t.wYear);
+        //MM
+        wcsncpy(tmp, internalString + 5, 2);
+        tmp[2] = 0;
+        swscanf(tmp, L"%d",&t.wMonth);
+        //dd
+         wcsncpy(tmp, internalString + 8, 2);
+        tmp[2] = 0;
+        swscanf(tmp, L"%d",&t.wDay);
+
+        if (wcscmp(type, L"END") == 0) {
+            t.wHour = 23;
+            t.wMinute = 59;
+            t.wSecond = 0;
+        }
+        else {
+            t.wHour = 0;
+            t.wMinute = 0;
+            t.wSecond = 0;
+        }
+
+        // set to default
+        t.wMilliseconds = 0;
+        t.wDayOfWeek = 0;
+        ret = SystemTimeToVariantTime(&t, date);
+    }
+    else {
+        (*date) = REFERRED_MAX_DATE;
+    }
+}

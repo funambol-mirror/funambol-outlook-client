@@ -47,6 +47,7 @@
 #include <string>
 using namespace std;
 
+wstring programNameForScheduledTask = WPROGRAM_NAME;
 
 /**
  * Set a Task into task scheduler. It takes values to insert from Schedule form.
@@ -472,7 +473,6 @@ ITaskScheduler* initScheduleInstance() {
     return pITS;
 }
 
-
 /**
  * Used to create the scheduled task name: 
  * "Funambol Outlook Sync Client - <UserName>".
@@ -483,7 +483,12 @@ ITaskScheduler* initScheduleInstance() {
  */
 int getScheduledTaskName(wstring& taskName) {
 
+    /*
+
     taskName = WPROGRAM_NAME;
+
+    */
+    taskName = programNameForScheduledTask;
 
     wstring user;
     if (getWindowsUser(user)) {
@@ -492,4 +497,8 @@ int getScheduledTaskName(wstring& taskName) {
     taskName += L" - ";
     taskName += user;
     return 0;
+}
+
+void setProgramNameForScheduledTask(wstring name) {
+    programNameForScheduledTask = name;
 }

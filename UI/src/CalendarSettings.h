@@ -77,7 +77,7 @@ protected:
 public:
     CComboBox lstSyncType;              // sync types
     CEdit editFolder;                   // folder to sync
-    CButton checkIncludeSubfolders;     // include subfolders
+    CButton checkInclude;               // include subfolders
     CButton butSelectFolder;            // button for selecting the folder to be synced
     CEdit editRemote;                   // remote name of the source
     CButton radioSif;
@@ -89,6 +89,8 @@ public:
     CComboBox lstFilter;
     CStatic groupFilter;
 
+    CButton checkShared;
+
     bool saveSettings(bool saveToDisk);
 
     afx_msg void OnBnClickedCalendarButok();
@@ -96,6 +98,7 @@ public:
     afx_msg void OnBnClickedCalendarButSelect();
     afx_msg void OnBnClickedCalendarRadioVcard();
     afx_msg void OnBnClickedCalendarRadioSif();
+    afx_msg void OnBnClickedCalendarCheckShared();
 };
 
 /** @} */

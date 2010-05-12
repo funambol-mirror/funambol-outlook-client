@@ -43,6 +43,7 @@
 #include "outlook/defs.h"
 #include "outlook/ClientAppointment.h"
 #include "outlook/ClientException.h"
+#include "outlook/ClientFolder.h"
 #include "outlook/utils.h"
 #include "outlook/itemProps.h"
 
@@ -90,8 +91,14 @@ void ClientAppointment::setCOMPtr(_AppointmentItemPtr& ptr, const wstring& itemI
     try {
         pSafeAppointment->Item = pAppointment;
 
+        pUserProperties = pAppointment->UserProperties;
+        userPropertiesCount = pUserProperties->Count;
+
         pItemProperties = pAppointment->ItemProperties;
         propertiesCount = pItemProperties->Count;
+
+        propertiesCount -= userPropertiesCount;
+
         if (propertiesCount) {
             pItemProperty = pItemProperties->Item(0);
         }
@@ -411,6 +418,10 @@ ClientItem* ClientAppointment::copyItem() {
     cNew = new ClientAppointment();
     cNew->setCOMPtr(pAppNew);
 
+    if (cNew->getRecPattern()) {
+        cNew->getRecPattern()->read();
+    }
+
     return (ClientItem*)cNew;
 
 error:
@@ -427,34 +438,34 @@ error:
  * @param   destFolder  the destination ClientFolder to move this object to
  * @return              0 if no errors
  */
-//int ClientAppointment::moveItem(ClientFolder* destFolder) {
-//
-//    if (!pAppointment) {
-//        goto error;
-//    }
-//
-//    // Get destination folder
-//    MAPIFolder* pDestFolder = destFolder->getCOMPtr();
-//    if (!pDestFolder) {
-//        goto error;
-//    }
-//
-//    // Move item
-//    try {
-//        pAppointment->Move(pDestFolder);
-//    }
-//    catch(_com_error &e) {
-//        manageComErrors(e);
-//        goto error;
-//    }
-//
-//    parentPath = destFolder->getPath();
-//    return 0;
-//
-//error:
-//    LOG.error("Error moving item '%ls'", getSafeItemName(this));
-//    return 1;
-//}
+int ClientAppointment::moveItem(ClientFolder* destFolder) {
+
+    if (!pAppointment) {
+        goto error;
+    }
+
+    // Get destination folder
+    MAPIFolder* pDestFolder = destFolder->getCOMPtr();
+    if (!pDestFolder) {
+        goto error;
+    }
+
+    // Move item
+    try {
+        this->setCOMPtr((_AppointmentItemPtr)pAppointment->Move(pDestFolder));
+    }
+    catch(_com_error &e) {
+        manageComErrors(e);
+        goto error;
+    }
+
+    parentPath = destFolder->getPath();
+    return 0;
+
+error:
+    LOG.error("Error moving item '%ls'", getSafeItemName(this));
+    return 1;
+}
 
 
 
@@ -533,6 +544,11 @@ const wstring ClientAppointment::getSafeProperty(const wstring& propertyName) {
     }
     if (tmpVal) {
         propertyValue = tmpVal;
+
+        // Manage error in API to read item's body: one newline is always appended.
+        if (propertyName == L"Body") {
+            removeLastNewLine(propertyValue);
+        }
     }
 
     return propertyValue;
@@ -855,6 +871,10 @@ ClientAppointment::ClientAppointment(const ClientAppointment& c) {
     pSafeAppointment= c.pSafeAppointment;
     recPattern      = c.recPattern;
     timeZoneInfo    = c.timeZoneInfo;
+
+    
+    userPropertyMap     = c.userPropertyMap;
+    userPropertiesCount = c.userPropertiesCount;
 }
 
 
@@ -879,6 +899,11 @@ ClientAppointment ClientAppointment::operator=(const ClientAppointment& c) {
     cnew.createSafeAppointmentInstance();
     cnew.pSafeAppointment= c.pSafeAppointment;
     cnew.recPattern      = c.recPattern;
+
+    
+
+    cnew.userPropertyMap     = c.userPropertyMap;
+    cnew.userPropertiesCount = c.userPropertiesCount;
 
     return cnew;
 }
@@ -925,4 +950,70 @@ ClientAppointment ClientAppointment::operator=(const ClientAppointment& c) {
 //    }
 //}
 
+
+void ClientAppointment::clearAttendees()
+{
+    Redemption::ISafeRecipientsPtr pRecipients = pSafeAppointment->GetRecipients();
+    int countRecipient = pRecipients->GetCount();
+    for(int i = countRecipient;i>0;i--) {
+        pRecipients->Remove(i);
+    }
+}
+
+bool ClientAppointment::addAttendee(const ClientRecipient & recipient)
+{
+    bool success = FALSE;
+
+    Redemption::ISafeRecipientsPtr temp = pSafeAppointment->GetRecipients();
+    Redemption::ISafeRecipientPtr rec;
+
+    if (temp) {
+        rec = temp->Add(recipient.getNamedEmail().c_str());
+        success = rec->Resolve(false) == TRUE;
+    }
+
+    return success;
+}
+
+int ClientAppointment::getNumAttendees() {
+
+    Redemption::ISafeRecipientsPtr pRecipients = pSafeAppointment->GetRecipients();
+    int countRecipients = pRecipients->GetCount();
+    return countRecipients;
+}
+
+ClientRecipient ClientAppointment::getAttendee(int index)
+{
+    Redemption::ISafeRecipientsPtr pRecipients = pSafeAppointment->GetRecipients();
+    int countRecipients = pRecipients->GetCount();
+    if (index >= countRecipients) {
+        throwClientException("Invalid recipient index");
+    }
+    return ClientRecipient(pRecipients->Item(index));
+}
+
+bool ClientAppointment::removeAttendee(int index)
+{
+    Redemption::ISafeRecipientsPtr pRecipients = pSafeAppointment->GetRecipients();
+    int countRecipients = pRecipients->GetCount();
+    if (index < countRecipients) {
+        pRecipients->Remove(index);
+        return true;
+    }
+    return false;
+}
+
+std::map<int, ClientRecipient> ClientAppointment::getAttendees()
+{
+    std::map<int, ClientRecipient> attendees;
+
+    Redemption::ISafeRecipientsPtr pRecipients = pSafeAppointment->GetRecipients();
+    int countRecipient = pRecipients->GetCount();
+
+    for(int i = countRecipient;i>0;i--) {
+        attendees[i] = ClientRecipient(pRecipients->Item(i));
+    }
+
+    return attendees;
+}
 

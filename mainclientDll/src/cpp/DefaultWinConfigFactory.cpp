@@ -81,12 +81,9 @@ AccessConfig* DefaultWinConfigFactory::getAccessConfig() {
     return ac;
 }
 
-
-
 DeviceConfig* DefaultWinConfigFactory::getDeviceConfig() {
 
     DeviceConfig* dc = new DeviceConfig();
-
     dc->setMan                  ("Funambol");
     dc->setMod                  (PROGRAM_NAME);
     dc->setOem                  ("");
@@ -106,8 +103,19 @@ DeviceConfig* DefaultWinConfigFactory::getDeviceConfig() {
     return dc;
 }
 
+WindowsDeviceConfig* DefaultWinConfigFactory::getWindowsDeviceConfig(DeviceConfig & dc) {
 
-// *** TODO: get sif/vCard version and types from API (vocl/winItem.h) ***
+    WindowsDeviceConfig* wdc = new WindowsDeviceConfig(dc);
+
+    wdc->setLogNum               (10);
+    wdc->setLogSize              (1);
+    wdc->setAttach               (false);
+
+    return wdc;
+}
+
+
+
 SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wname) {
 
     SyncSourceConfig* sc = new SyncSourceConfig();
@@ -115,50 +123,55 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
 
     sc->setName                 (name);
     sc->setSyncModes            ("slow,two-way,one-way-server,one-way-client,refresh-server,refresh-client");
+    sc->setEncoding             (DLLCustomization::sourceDefaultEncoding);
     sc->setLast                 (0);
     sc->setSync                 ("two-way");
     sc->setEncryption           ("");
 
     if (wname == CONTACT){
         // since 7.1.2: default is vCard. Both still supported (for backw compaibility).
-        sc->setURI              ("card");
+        sc->setURI              (DLLCustomization::sourceContactsVcardUri);
         sc->setType             ("text/x-vcard");
         sc->setVersion          ("2.1");
-        sc->setEncoding         ("bin");
-        sc->setSupportedTypes   ("text/x-s4j-sifc:1.0,text/x-vcard:2.1");
+        sc->setSupportedTypes   ("text/x-vcard:2.1,text/x-s4j-sifc:1.0");
         sc->setIsEnabled        (CONTACT_SOURCE_ENABLED);
     }
     else if (wname == APPOINTMENT){
-        sc->setURI              ("event");
+        sc->setURI              (DLLCustomization::sourceCalendarVcalUri);
         sc->setType             ("text/x-vcalendar");
         sc->setVersion          ("1.0");
-        sc->setEncoding         ("bin");
         sc->setSupportedTypes   ("text/x-vcalendar:1.0,text/x-s4j-sife:1.0");
         sc->setIsEnabled        (APPOINTMENT_SOURCE_ENABLED);
     }
     else if (wname == TASK){
-        sc->setURI              ("task");
+        sc->setURI              (DLLCustomization::sourceTasksVcalUri);
         sc->setType             ("text/x-vcalendar");
         sc->setVersion          ("1.0");
-        sc->setEncoding         ("bin");
         sc->setSupportedTypes   ("text/x-vcalendar:1.0,text/x-s4j-sift:1.0");
         sc->setIsEnabled        (TASK_SOURCE_ENABLED);
     }
     else if (wname == NOTE){
-        sc->setURI              ("snote");
-        sc->setType             ("text/x-s4j-sifn");
-        sc->setVersion          ("1.0");
-        sc->setEncoding         ("b64");
-        sc->setSupportedTypes   ("text/x-s4j-sifn:1.0,text/x-vnote:1.1");
+        if (DLLCustomization::sourceNotesDefaultSif) {
+            sc->setURI              (DLLCustomization::sourceNotesSifUri);
+            sc->setType             ("text/x-s4j-sifn");
+            sc->setVersion          ("1.0");
+            sc->setEncoding         ("b64");
+            sc->setSupportedTypes   ("text/x-s4j-sifn:1.0,text/x-vnote:1.1");
+        } else {
+            sc->setURI              (DLLCustomization::sourceNotesVnoteUri);
+            sc->setType             ("text/x-vnote");
+            sc->setVersion          ("1.0");
+            sc->setSupportedTypes   ("text/x-vnote:1.1");
+        }
         sc->setIsEnabled        (NOTE_SOURCE_ENABLED);
     }
     else if (wname == PICTURE){
-        sc->setURI              ("picture");
+        sc->setURI              (DLLCustomization::sourcePicturesUri);
         sc->setType             ("application/vnd.omads-file+xml");      // not really used, as it's detected from each item received
         sc->setVersion          ("");
         sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
         sc->setSupportedTypes   ("application/vnd.omads-file+xml:,application/*:");
-        sc->setSync             ("one-way-from-server");                // FIXED for pictures
+        sc->setSync             ("one-way-from-server");                 // FIXED for pictures
         sc->setIsEnabled        (PICTURE_SOURCE_ENABLED);
     }
 
@@ -173,7 +186,7 @@ WindowsSyncSourceConfig* DefaultWinConfigFactory::getWinSyncSourceConfig(const w
 
     WindowsSyncSourceConfig* wsc = new WindowsSyncSourceConfig(sc);
 
-    wsc->setUseSubfolders       (true);
+    wsc->setUseSubfolders       (DLLCustomization::defaultUseSubfolders);
     wsc->setFolderPath          ("");
     wsc->setEndTimestamp        (0);
 

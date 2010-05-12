@@ -79,6 +79,7 @@ BOOL         vBoolToBOOL(VARIANT_BOOL vbool);
 bool         vBoolToBool(VARIANT_BOOL vbool);
 VARIANT_BOOL BOOLToVBool(BOOL b);
 
+void systemTimeDateToDouble(const wstring& dataString, DATE* date, WCHAR* type = L"START");
 
 /** @} */
 /** @endcond */

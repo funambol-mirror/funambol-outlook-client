@@ -41,7 +41,7 @@
 #include "MainSyncFrm.h"
 #include "winmaincpp.h"
 #include "ClientUtil.h"
-
+#include "UICustomization.h"
 #include "utils.h"
 #include "AnimatedIcon.h"
 
@@ -55,7 +55,7 @@ static char THIS_FILE[] = __FILE__;
 IMPLEMENT_DYNCREATE(CSyncForm, CFormView)
 
 CSyncForm::CSyncForm()
-	: CFormView(CSyncForm::IDD)
+    : CFormView(CSyncForm::IDD)
 {
     syncSourceContactState  = SYNCSOURCE_STATE_OK; 
     syncSourceCalendarState = SYNCSOURCE_STATE_OK; 
@@ -316,8 +316,11 @@ HBRUSH CSyncForm::OnCtlColor( CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 
     pDC->SetBkMode(TRANSPARENT);
     if(pWnd->GetDlgCtrlID() == IDC_MAIN_MSG_PRESS){
-        //set text color white to 'Sync All' text
-        pDC->SetTextColor(RGB(255,255,255));
+        //set text color to 'Sync All' text
+        int r = UICustomization::syncAllTextRed;
+        int g = UICustomization::syncAllTextGreen;
+        int b = UICustomization::syncAllTextBlue;
+        pDC->SetTextColor(RGB(r,g,b));
     }
     if(pWnd->GetRuntimeClass() == RUNTIME_CLASS(CAnimatedIcon) ){
         return HBRUSH(brushHollow);
@@ -632,6 +635,8 @@ void CSyncForm::refreshSource( int sourceId )
 {
     CString s1;
 
+    WindowsSyncSourceConfig * config;
+
     if (sourceId == SYNCSOURCE_CONTACTS) {
         unsigned long lastSyncContacts=0;
         iconStatusContacts.StopAnim();
@@ -732,7 +737,11 @@ void CSyncForm::refreshSource( int sourceId )
             */
         }
 
-        lastSyncCalendar = getConfig()->getSyncSourceConfig(APPOINTMENT_)->getEndTimestamp();
+
+        lastSyncCalendar = 0;
+        if (config = getConfig()->getSyncSourceConfig(APPOINTMENT_)) {
+            lastSyncCalendar = config->getEndTimestamp();
+        }
 
         // check if the last sync failed
         if(syncSourceCalendarState == SYNCSOURCE_STATE_NOT_SYNCED){
@@ -795,8 +804,11 @@ void CSyncForm::refreshSource( int sourceId )
             */
         }
 
-        lastSyncTasks = getConfig()->getSyncSourceConfig(TASK_)->getEndTimestamp();
 
+        lastSyncTasks = 0;
+        if (config = getConfig()->getSyncSourceConfig(TASK_)) {
+            lastSyncTasks = config->getEndTimestamp();
+        }
 
         // check if the last sync failed
         if(syncSourceTaskState == SYNCSOURCE_STATE_NOT_SYNCED){
@@ -910,7 +922,7 @@ void CSyncForm::refreshSource( int sourceId )
                 return;
             }
 
-            bool enabled = getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled();
+            bool enabled = getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled() || getConfig()->getSyncSourceConfig(PICTURE_)->getIsRefreshMode();
             if(enabled) {
                 panePictures.ShowWindow(SW_NORMAL);
                 panePictures.state = STATE_NORMAL;
@@ -938,8 +950,10 @@ void CSyncForm::refreshSource( int sourceId )
             */
         }
 
-        lastSyncPictures = getConfig()->getSyncSourceConfig(PICTURE_)->getEndTimestamp();
-
+        lastSyncPictures = 0;
+        if (config = getConfig()->getSyncSourceConfig(PICTURE_)) {
+            lastSyncPictures = config->getEndTimestamp();
+        }
 
         // check if the last sync failed
         if (syncSourcePictureState == SYNCSOURCE_STATE_NOT_SYNCED){

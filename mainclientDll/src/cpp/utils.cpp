@@ -175,7 +175,8 @@ bool isAcceptedDataType(const wstring& dataType) {
          dataType == L"text/x-s4j-sift"  ||
          dataType == L"text/x-s4j-sifn"  ||
          dataType == L"text/x-vcard"     ||
-         dataType == L"text/x-vcalendar" ){
+         dataType == L"text/x-vnote"     ||
+         dataType == L"text/x-vcalendar"){
         return true;
     }
     else {
@@ -193,6 +194,7 @@ bool isAcceptedDataType(const string& dataType) {
          dataType == "text/x-s4j-sift"  ||
          dataType == "text/x-s4j-sifn"  || 
          dataType == "text/x-vcard"     ||
+         dataType == "text/x-vnote"     ||
          dataType == "text/x-vcalendar" ) {
         return true;
     }
@@ -802,7 +804,7 @@ void printReport(SyncReport* sr, SyncSource** sources) {
 
     SyncSourceReport* ssr = NULL;
     string res;
-    char tmp[1024];
+    StringBuffer tmp;
 
     res =      "============================================================\n";
     res.append("================   SYNCHRONIZATION REPORT   ================\n");
@@ -815,10 +817,10 @@ void printReport(SyncReport* sr, SyncSource** sources) {
     else {
         res.append("SYNCHRONIZATION COMPLETED WITH ERRORS\n");
         res.append("-------------------------------------\n");
-        sprintf(tmp, "Last error message = \"%s\"\n", sr->getLastErrorMsg());
-        res.append(tmp);
-        sprintf(tmp, "Last error code    = %d\n\n", sr->getLastErrorCode());
-        res.append(tmp);
+        tmp.sprintf("Last error message = \"%s\"\n", sr->getLastErrorMsg());
+        res.append(tmp.c_str());
+        tmp.sprintf("Last error code    = %d\n\n", sr->getLastErrorCode());
+        res.append(tmp.c_str());
     }
 
     int i=0;
@@ -831,8 +833,8 @@ void printReport(SyncReport* sr, SyncSource** sources) {
 
         // SourceName
         char* name = friendlyName(ssr->getSourceName());
-        sprintf(tmp, "%s:\n", name);
-        res.append(tmp);
+        tmp.sprintf("%s:\n", name);
+        res.append(tmp.c_str());
         for (unsigned int j=0; j<strlen(name)+1; j++) {
             res.append("-");
         }
@@ -900,8 +902,8 @@ void printReport(SyncReport* sr, SyncSource** sources) {
             if ((newCTot-newCOk > 0) || (modCTot-modCOk > 0)) {
                 res.append("    Sync completed - WARNING: some items have not been inserted on Outlook.\n");
                 if (ssr->getLastErrorCode()) {
-                    sprintf(tmp, "    Last error = \"%s\" (code %d)\n", ssr->getLastErrorMsg(), ssr->getLastErrorCode());
-                    res.append(tmp);
+                    tmp.sprintf("    Last error = \"%s\" (code %d)\n", ssr->getLastErrorMsg(), ssr->getLastErrorCode());
+                    res.append(tmp.c_str());
                 }
                 if (!sr->getLastErrorCode()) {
                     // This will prompt a warning msg on the UI.
@@ -914,8 +916,8 @@ void printReport(SyncReport* sr, SyncSource** sources) {
             else if ((newSTot-newSOk > 0) || (modSTot-modSOk > 0)) {
                 res.append("    Sync completed - WARNING: some items have not been inserted on server.\n");
                 if (ssr->getLastErrorCode()) {
-                    sprintf(tmp, "    Last error = \"%s\" (code %d)\n", ssr->getLastErrorMsg(), ssr->getLastErrorCode());
-                    res.append(tmp);
+                    tmp.sprintf("    Last error = \"%s\" (code %d)\n", ssr->getLastErrorMsg(), ssr->getLastErrorCode());
+                    res.append(tmp.c_str());
                 }
                 if (!sr->getLastErrorCode()) {
                     // This will prompt a warning msg on the UI.
@@ -932,13 +934,13 @@ void printReport(SyncReport* sr, SyncSource** sources) {
 
             char* usedMode = syncModeName(mode);
             const char* origMode = sources[i]->getConfig().getSync();
-            sprintf(tmp, "    Sync type: %s", usedMode);
-            res.append(tmp);
+            tmp.sprintf("    Sync type: %s", usedMode);
+            res.append(tmp.c_str());
 
             // Slow requested by server
             if (strcmp(usedMode, origMode)) {
-                sprintf(tmp, " (requested by Server)", usedMode);
-                res.append(tmp);
+                tmp.sprintf(" (requested by Server)", usedMode);
+                res.append(tmp.c_str());
             }
             res.append("\n\n");
         }
@@ -947,8 +949,8 @@ void printReport(SyncReport* sr, SyncSource** sources) {
         // Source error
         //
         else {
-            sprintf(tmp, "    Sync failed: %s (code = %d)\n\n", ssr->getLastErrorMsg(), ssr->getLastErrorCode());
-            res.append(tmp);
+            tmp.sprintf("    Sync failed: %s (code = %d)\n\n", ssr->getLastErrorMsg(), ssr->getLastErrorCode());
+            res.append(tmp.c_str());
         }
 
         //
@@ -956,22 +958,22 @@ void printReport(SyncReport* sr, SyncSource** sources) {
         //
         res.append("            | on Client | on Server\n");
         res.append("    --------|-----------|----------\n");
-        sprintf(tmp, "    New     | %4d/%4d | %4d/%4d ", newCOk, newCTot, newSOk, newSTot);
-        res.append(tmp);
+        tmp.sprintf("    New     | %4d/%4d | %4d/%4d ", newCOk, newCTot, newSOk, newSTot);
+        res.append(tmp.c_str());
         if (newSEx) {
-            sprintf(tmp, " (%d already exist on Server)", newSEx);
-            res.append(tmp);
+            tmp.sprintf(" (%d already exist on Server)", newSEx);
+            res.append(tmp.c_str());
         }
         res.append("\n");
-        sprintf(tmp, "    Updated | %4d/%4d | %4d/%4d ", modCOk, modCTot, modSOk, modSTot);
-        res.append(tmp);
+        tmp.sprintf("    Updated | %4d/%4d | %4d/%4d ", modCOk, modCTot, modSOk, modSTot);
+        res.append(tmp.c_str());
         if (modSEx) {
-            sprintf(tmp, " (%d already exist on Server)", modSEx);
-            res.append(tmp);
+            tmp.sprintf(" (%d already exist on Server)", modSEx);
+            res.append(tmp.c_str());
         }
         res.append("\n");
-        sprintf(tmp, "    Deleted | %4d/%4d | %4d/%4d \n\n\n", delCOk, delCTot, delSOk, delSTot);
-        res.append(tmp);
+        tmp.sprintf("    Deleted | %4d/%4d | %4d/%4d \n\n\n", delCOk, delCTot, delSOk, delSTot);
+        res.append(tmp.c_str());
 
         i++;
     }

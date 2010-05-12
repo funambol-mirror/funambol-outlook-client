@@ -54,6 +54,9 @@
 
 using namespace std;
 
+#define PROPERTY_ATTACH                "attach"
+#define PROPERTY_LOG_NUM               "logNum"
+#define PROPERTY_LOG_SIZE              "logSize"
 
 //
 // Init static pointer.
@@ -84,6 +87,7 @@ OutlookConfig::OutlookConfig() : updaterConfig(PLUGIN_ROOT_CONTEXT) {
     
     DMTClientConfig::initialize();
     winSourceConfigs      = NULL;
+    winDC                 = NULL;
     workingDir            = NULL;
     logDir                = NULL;
     winSourceConfigsCount = 0;
@@ -155,7 +159,7 @@ bool OutlookConfig::read() {
     // It's defaulted to swv in case it's not found.
     funambolSwv = readFunambolSwv(HKEY_CURRENT_USER);
 
-    // Username/Password are stored encrypted (new since 6.0.9).
+    // Username/Password are stored encrypted.
     decryptPrivateData();
 
 
@@ -426,12 +430,6 @@ void OutlookConfig::readSourcesVisible(HKEY rootKey) {
         }
     }
 
-    // Anyway contacts,calendar,tasks,notes MUST be visible!
-    // --- TODO: remove when all sources are dynamically visible ---
-    //safeAddSourceVisible(CONTACT_);
-    //safeAddSourceVisible(APPOINTMENT_);
-    //safeAddSourceVisible(TASK_);
-    //safeAddSourceVisible(NOTE_);
 }
 
 
@@ -754,7 +752,7 @@ _declspec(dllexport) WindowsSyncSourceConfig* OutlookConfig::getSyncSourceConfig
  * @param wsc : the WindowsSyncSourceConfig passed by reference
  * @return      TRUE if no errors
  */
-BOOL OutlookConfig::setSyncSourceConfig(WindowsSyncSourceConfig& wsc) {
+bool OutlookConfig::setSyncSourceConfig(WindowsSyncSourceConfig& wsc) {
 
     unsigned int i=0;
     for (i=0; i<winSourceConfigsCount; ++i) {
@@ -836,7 +834,7 @@ bool OutlookConfig::addWindowsSyncSourceConfig(const wstring& sourceName)
  * @param wsc : the WindowsSyncSourceConfig passed by reference
  * @return      TRUE if no errors
  */
-BOOL OutlookConfig::addSyncSourceConfig(WindowsSyncSourceConfig& wsc) {
+bool OutlookConfig::addSyncSourceConfig(WindowsSyncSourceConfig& wsc) {
 
     unsigned int i = 0;
     WindowsSyncSourceConfig* s = NULL;
@@ -998,8 +996,11 @@ void OutlookConfig::createDefaultConfig() {
     //
     // DeviceConfig
     //
-    DeviceConfig* dc = DefaultWinConfigFactory::getDeviceConfig();
-    setDeviceConfig(*dc);
+
+    DeviceConfig * dc = DefaultWinConfigFactory::getDeviceConfig();
+    DMTClientConfig::setDeviceConfig(*dc);
+    WindowsDeviceConfig* wdc = DefaultWinConfigFactory::getWindowsDeviceConfig(DMTClientConfig::getDeviceConfig());
+    setDeviceConfig(*wdc);
     delete dc;
 
 
@@ -1070,13 +1071,6 @@ void OutlookConfig::createDefaultConfig() {
     char* logPath = toMultibyte(wlogPath);
     setLogDir(logPath);
 
-
-    //
-    // Also upgrade the config (swv / userAgent).
-    //
-    //upgradeConfig();
-
-
     if (installPath) delete [] installPath;
     if (logPath)     delete [] logPath;
     if (wlogPath)    delete [] wlogPath;
@@ -1118,6 +1112,9 @@ void OutlookConfig::initializeVersionsAndUserAgent() {
     StringBuffer funambolNewSwv = readFunambolSwv(HKEY_LOCAL_MACHINE);
     setFunambolSwv(funambolNewSwv);
 
+    if (DLLCustomization::shouldFakeOldFunambolSwv) {
+        oldFunambolSwv = DLLCustomization::fakeOldFunambolSwv;
+    }
 
     // Set the new User Agent = "Funambol Outlook Sync Client v. x.y.z"
     char* userAgent = new char[strlen(PROGRAM_NAME) + strlen(newSwv) + 5];
@@ -1153,40 +1150,6 @@ void OutlookConfig::upgradeConfig() {
     //char* userAgent = new char[strlen(PROGRAM_NAME) + strlen(newSwv) + 5];
     //sprintf(userAgent, "%s v. %s", PROGRAM_NAME, newSwv);
     //accessConfig.setUserAgent(userAgent);
-
-
-    // Old version < 6.6.0: upgrade supportedTypes and version for each source.
-    //  vTodo and vNote are supported, SIF version has been added.
-    if (oldFunambolSwv < 60600) {
-        WindowsSyncSourceConfig* ssc = getSyncSourceConfig(CONTACT_);
-        if (ssc) {
-            ssc->setSupportedTypes("text/x-s4j-sifc:1.0,text/x-vcard:2.1");
-            if (!strcmp(ssc->getType(), "text/x-s4j-sifc")) {
-                ssc->setVersion("1.0");
-            }
-        }
-        ssc = getSyncSourceConfig(APPOINTMENT_);
-        if (ssc) {
-            ssc->setSupportedTypes("text/x-s4j-sife:1.0,text/x-vcalendar:1.0");
-            if (!strcmp(ssc->getType(), "text/x-s4j-sife")) {
-                ssc->setVersion("1.0");
-            }
-        }
-        ssc = getSyncSourceConfig(TASK_);
-        if (ssc) {
-            ssc->setSupportedTypes("text/x-s4j-sift:1.0,text/x-vcalendar:1.0");
-            if (!strcmp(ssc->getType(), "text/x-s4j-sift")) {
-                ssc->setVersion("1.0");
-            }
-        }
-        ssc = getSyncSourceConfig(NOTE_);
-        if (ssc) {
-            ssc->setSupportedTypes("text/x-s4j-sifn:1.0,text/x-vnote:1.1");
-            if (!strcmp(ssc->getType(), "text/x-s4j-sifn")) {
-                ssc->setVersion("1.0");
-            }
-        }
-    }
 
     // Old version < 7.1.1: add default filtering to events.
     if (oldFunambolSwv < 70101) {
@@ -1245,14 +1208,10 @@ void OutlookConfig::upgradeConfig() {
         }
     }
 
-    // Old version < 8.2.7
-    if (oldFunambolSwv < 80207) {
-        getAccessConfig().setMaxMsgSize(MAX_SYNCML_MSG_SIZE);       // from 250K to 125K
-        getAccessConfig().setResponseTimeout(RESPONSE_TIMEOUT);     // from 10min to 15min
-
-        // Force the GET of Server capabilities at next sync.
-        // (we need the Server dataStores, to enable/disable source picture)
-        setServerLastSyncURL("");
+    // Old version < 8.7.0
+    if (oldFunambolSwv < 80700) {
+        getAccessConfig().setMaxMsgSize(MAX_SYNCML_MSG_SIZE);       // now it's 125K
+        getAccessConfig().setResponseTimeout(RESPONSE_TIMEOUT);     // now it's 15min
     }
 	
 	// Old version < 8.7.0
@@ -1282,15 +1241,16 @@ void OutlookConfig::upgradeConfig() {
             ssc->setEncoding("bin");
 			ssc->setSupportedTypes("text/x-vcalendar:1.0,text/x-s4j-sife:1.0");
         }
+
 		getAccessConfig().setCompression(ENABLE_COMPRESSION);
-        
     }
+
+    // ALWAYS force the GET of Server capabilities at next sync.
+    // (to make sure all server caps are parsed, even the new ones) 
+    setServerLastSyncURL("");
         
     // Set the flag to specify that config has been upgraded.
     upgraded = true;
-    
-    //delete [] newSwv;
-    //delete [] userAgent;
 
     // delete the updater tree when the upgrade has been finished
     ManagementNode* n = NULL;
@@ -1560,7 +1520,8 @@ finally:
 
 
 
-/// Check if it's a normal/portal build (from HKLM keys).
+/*
+// DEPRECATED: portal build is now a normal build.
 bool OutlookConfig::checkPortalBuild() {
     
     bool ret = false;
@@ -1573,33 +1534,25 @@ bool OutlookConfig::checkPortalBuild() {
     if (portal) delete [] portal;
     return ret;
 }
-
+*/
 
 
 /**
  * Decrypt private data (Username/Password/Proxy username/Proxy password).
  * Data is stored encrypted (B64(DES(data)) since version 6.0.9.
  * Data must be in clear text into the config, as config is used by API.
+ * NOTE: data MUST be encrypted in registry, upgrades from v6 or older clients
+ *       is no more supported, since v8.7.
  *
  * @return  0 if data decrypted.
- *          1 if no decryption was necessary (data not encrypted before v.6.0.9).
+ *          1 if error
  */
 int OutlookConfig::decryptPrivateData() {
 
-    // Check if previous version is < 6.0.9.
+    // Check previous version installed.
     int funambolVersion = getBuildNumberFromVersion(getFunambolSwv().c_str());
+    const char* pass_key = NULL;
     
-    // to handle the new upgrade to the new key with the new password for portal
-    // if it is empty then do nothing, otherwise it rewrites the values 
-    // This modification is introduced in the 7.0.1 version    
-    StringBuffer pass_key = PASS_KEY;    
-    if (funambolVersion < 60009) {
-        // No decryption is necessary.
-        return 1;
-    } else if (funambolVersion < 70001 && (checkPortalBuild() || CARED_KEY)) {
-        pass_key = NULL;        
-    }
-
     // Username
     char* decData = decryptData(accessConfig.getUsername(), pass_key);
     if (decData) {
@@ -1637,26 +1590,28 @@ int OutlookConfig::decryptPrivateData() {
  */
 void OutlookConfig::encryptPrivateData() {
 
+    const char* pass_key = NULL;
+
     // Username
-    char* encData = encryptData(accessConfig.getUsername(), PASS_KEY);
+    char* encData = encryptData(accessConfig.getUsername(), pass_key);
     if (encData) {
         accessConfig.setUsername(encData);
         delete [] encData; encData = NULL;
     }
     // Password
-    encData = encryptData(accessConfig.getPassword(), PASS_KEY);
+    encData = encryptData(accessConfig.getPassword(), pass_key);
     if (encData) {
         accessConfig.setPassword(encData);
         delete [] encData; encData = NULL;
     }
     // Proxy username
-    encData = encryptData(accessConfig.getProxyUsername(), PASS_KEY);
+    encData = encryptData(accessConfig.getProxyUsername(), pass_key);
     if (encData) {
         accessConfig.setProxyUsername(encData);
         delete [] encData; encData = NULL;
     }
     // Proxy password
-    encData = encryptData(accessConfig.getProxyPassword(), PASS_KEY);
+    encData = encryptData(accessConfig.getProxyPassword(), pass_key);
     if (encData) {
         accessConfig.setProxyPassword(encData);
         delete [] encData; encData = NULL;
@@ -1684,4 +1639,125 @@ void OutlookConfig::storeUpdaterConfig(){
 
 UpdaterConfig& OutlookConfig::getUpdaterConfig() {
     return updaterConfig;
+}
+void OutlookConfig::setDeviceConfig(const WindowsDeviceConfig & wdc)
+{
+    WindowsDeviceConfig * temp = winDC;
+    winDC = new WindowsDeviceConfig(wdc);
+    if (temp)
+        delete temp;
+}
+
+WindowsDeviceConfig & OutlookConfig::getWindowsDeviceConfig()
+{
+    return *winDC;
+}
+
+WindowsDeviceConfig & OutlookConfig::getDeviceConfig()
+{
+    return *winDC;
+}
+
+/*
+ * Save Device Config properties in DMTree.
+ * Device properties are placed in 3 nodes under syncML node
+ * (DevInfo - DevDetail - Ext)
+ *
+ * @param n: the 'syncml' node (parent node)
+ */
+void OutlookConfig::saveDeviceConfig(ManagementNode& n, bool server) {
+
+    if (server) {
+        DMTClientConfig::saveDeviceConfig(n, true);
+    } else {
+        DMTClientConfig::saveDeviceConfig(n, false);
+
+        ManagementNode* node;
+        char nodeName[DIM_MANAGEMENT_PATH];
+
+        char syncMLContext[DIM_MANAGEMENT_PATH];
+        char* fn = n.createFullName();
+        sprintf(syncMLContext, "%s", fn);
+        delete [] fn;
+
+        //
+        // Ext properties (other misc props)
+        //
+        sprintf(nodeName, "%s%s", syncMLContext, CONTEXT_EXT);
+        node = dmt->readManagementNode(nodeName);
+        if (node) {
+            char * tmp = new char[10];
+            sprintf(tmp, "%i", winDC->getLogNum());
+            node->setPropertyValue(PROPERTY_LOG_NUM,tmp);
+            delete [] tmp;
+
+            tmp = new char[10];
+            sprintf(tmp, "%i", winDC->getLogSize());
+            node->setPropertyValue(PROPERTY_LOG_SIZE,tmp);
+            delete [] tmp;
+
+            tmp = (winDC->getAttach() ? "1" : "0");
+            node->setPropertyValue(PROPERTY_ATTACH,tmp);
+            delete node;
+            node = NULL;
+        }
+    }
+}
+
+bool OutlookConfig::readDeviceConfig(ManagementNode& n, bool server)
+{
+    if (server) {
+        return DMTClientConfig::readDeviceConfig(n, true);
+    } else {
+
+        bool ret = DMTClientConfig::readDeviceConfig(n);
+        if (!ret)
+            return ret;
+
+        if (winDC)
+        {
+            delete winDC;
+        }
+        winDC = new WindowsDeviceConfig(DMTClientConfig::getDeviceConfig());
+
+        char nodeName[DIM_MANAGEMENT_PATH];
+        nodeName[0] = 0;
+        ManagementNode* node;
+
+        char syncMLContext[DIM_MANAGEMENT_PATH];
+        char* fn = n.createFullName();
+        sprintf(syncMLContext, "%s", fn);
+        delete [] fn;
+
+        //
+        // Ext properties (other misc props)
+        //
+        sprintf(nodeName, "%s%s", syncMLContext, CONTEXT_EXT);
+        node = dmt->readManagementNode(nodeName);
+        if (node) {
+            char * tmp;
+            tmp = node->readPropertyValue(PROPERTY_ATTACH);
+            winDC->setAttach((*tmp == '1') ? true : false);
+            delete [] tmp;
+
+            tmp = node->readPropertyValue(PROPERTY_LOG_NUM);
+            int x = atoi(tmp);
+            winDC->setLogNum(x);
+            delete [] tmp;
+
+            tmp = node->readPropertyValue(PROPERTY_LOG_SIZE);
+            x = atoi(tmp);
+            winDC->setLogSize(x);
+            delete [] tmp;
+
+            delete node;
+            node = NULL;
+        }
+        else {
+            return false;
+        }
+
+        return true;
+    }
+
 }

@@ -40,15 +40,17 @@
 /** @addtogroup outlook */
 /** @{ */
 
-
+#include "base/util/StringBuffer.h"
 #include "outlook/defs.h"
-#include "outlook/ClientFolder.h"
-#include "outlook/ClientItem.h"
-#include "outlook/ClientMail.h"
-#include "outlook/ClientContact.h"
-#include "outlook/ClientAppointment.h"
-#include "outlook/ClientTask.h"
-#include "outlook/ClientNote.h"
+
+// Forward declarations
+class ClientFolder;
+class ClientItem;
+class ClientMail;
+class ClientContact;
+class ClientAppointment;
+class ClientTask;
+class ClientNote;
 
 #include <string>
 
@@ -174,18 +176,18 @@ private:
     *
     *@return        true if a match between the REG_TZI_FORMAT is retrieved, false otherwise
     */
-    bool getDisplayTimezone(REG_TZI_FORMAT& tz, StringBuffer* display);
+    bool getDisplayTimezone(REG_TZI_FORMAT& tz, Funambol::StringBuffer* display);
 
 protected:
 
     // Constructor
-    ClientApplication();
+    ClientApplication(bool checkAttach = false);
 
 
 public:
 
     // Method to get the sole instance of ClientApplication
-    static ClientApplication* getInstance();
+    static ClientApplication* getInstance(bool checkAttach = false);
 
     // Returns true if static instance is not NULL.
     static bool isInstantiated();
@@ -234,7 +236,7 @@ public:
     *
     * @return StringBuffer the hex converted
     */
-    StringBuffer getHexTimezone(const char *buf, int len);
+    Funambol::StringBuffer getHexTimezone(const char *buf, int len);
     
     /**
     * It set the timezone in the recurring appointment

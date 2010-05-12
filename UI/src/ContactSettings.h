@@ -83,7 +83,8 @@ public:
     CStatic groupDirection;
     CStatic groupFolder;
     CStatic groupAdvanced;
-    
+    CButton checkShared;
+
     bool saveSettings(bool saveToDisk);
 
     afx_msg void OnBnClickedContactsButok();
@@ -91,6 +92,7 @@ public:
     afx_msg void OnBnClickedContactsButFolder();
     afx_msg void OnBnClickedContactsRadioSif();
     afx_msg void OnBnClickedContactsRadioVcard();
+    afx_msg void OnBnClickedContactsCheckShared();
 };
 
 /** @} */

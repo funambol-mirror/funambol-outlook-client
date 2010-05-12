@@ -141,14 +141,16 @@ ClientException::~ClientException() {
 void ClientException::setExceptionData(const char* msg, DWORD code, bool fatalError, bool needDisplay) {
 
     if (msg) {
+        // Copy the new string first, in case its being set to the same pointer
+        char * tmp = stringdup(msg);
         if (errorMsg) {
             delete []  errorMsg;  errorMsg = NULL;
         }
+        errorMsg = tmp;
         if (werrorMsg) {
             delete [] werrorMsg; werrorMsg = NULL;
         }
-        errorMsg  = stringdup(msg);
-        werrorMsg = toWideChar(msg);
+        werrorMsg = toWideChar(tmp);
     }
     errorCode = code;
     fatal = fatalError;

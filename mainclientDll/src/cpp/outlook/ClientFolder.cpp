@@ -41,6 +41,13 @@
 #include "utils.h"
 
 #include "outlook/ClientFolder.h"
+
+#include "outlook/ClientItem.h"
+#include "outlook/ClientMail.h"
+#include "outlook/ClientContact.h"
+#include "outlook/ClientAppointment.h"
+#include "outlook/ClientTask.h"
+#include "outlook/ClientNote.h"
 #include "outlook/ClientException.h"
 #include "outlook/utils.h"
 
@@ -787,8 +794,6 @@ error:
 }
 
 
-
-
 /**
  * Set the appropriate internal item, based on the item type.
  * If the internal item is NULL, it is created new. Then the item is
@@ -987,4 +992,11 @@ ClientFolder ClientFolder::operator=(ClientFolder& f) {
     else                fnew.note = NULL;
 
     return fnew;
+}
+
+void ClientFolder::deleteFolder()
+{
+    if (pFolder) {
+        pFolder->Delete();
+    }
 }

@@ -117,17 +117,17 @@ Forge file for Funambol Outlook Sync Client
         <!-- Dirs to read src from (no-checkout build) -->
         <property name="dir.src"            value="funambol-outlook-sync-client-src-"/>
         <property name="dir.outlook"        value="${dir.distribution}/.."/>
-    	<property name="dir.ui"             value="${dir.outlook}/UI"/>
-    	<property name="dir.mainclientdll"  value="${dir.outlook}/mainclientDll"/>
-    	<property name="dir.outlookaddin"   value="${dir.outlook}/Addin"/>
-    	<property name="dir.design"         value="${dir.outlook}/docs"/>
-    	<property name="dir.native_api"     value="${dir.outlook}/cpp-sdk"/>
-    	<property name="dir.zlib"           value="${dir.native_api}/tools/zlib"/>
-    	<property name="dir.presetup"       value="${dir.outlook}/install/installer/presetup"/>
+        <property name="dir.ui"             value="${dir.outlook}/UI"/>
+        <property name="dir.mainclientdll"  value="${dir.outlook}/mainclientDll"/>
+        <property name="dir.outlookaddin"   value="${dir.outlook}/Addin"/>
+        <property name="dir.design"         value="${dir.outlook}/docs"/>
+        <property name="dir.native_api"     value="${dir.outlook}/cpp-sdk"/>
+        <property name="dir.zlib"           value="${dir.native_api}/tools/zlib"/>
+        <property name="dir.presetup"       value="${dir.outlook}/install/installer/presetup"/>
 
-    	<!-- Log files -->
-    	<property name="log.SVN"            value="${dir.output}/SVN_export.log"/>
-    	<property name="log.client"         value="${dir.output}/build_client.log"/>
+        <!-- Log files -->
+        <property name="log.SVN"            value="${dir.output}/SVN_export.log"/>
+        <property name="log.client"         value="${dir.output}/build_client.log"/>
         <property name="log.NSIS"           value="${dir.output}/build_NSIS.log"/>
         <property name="log.NSIS_sp"        value="${dir.output}/build_NSIS_SP.log"/>
         <property name="log.doxygen"        value="${dir.output}/build_doxygen.log"/>
@@ -175,6 +175,24 @@ Forge file for Funambol Outlook Sync Client
         <echo message="MSLib.crt       = ${MSLib.crt}" />
        
 
+
+        <condition property="client.targetbuild"
+            value="Release MinDependency|Win32"
+            else="Debug|Win32">
+            <equals arg1="${build.debug}" arg2="false"/>
+        </condition>
+
+        <condition property="plugin.dir.obj"
+            value="Release"
+            else="Debug">
+            <equals arg1="${build.debug}" arg2="false"/>
+        </condition>
+
+        <condition property="addin.dir.obj"
+            value="ReleaseMinDependency"
+            else="Debug">
+            <equals arg1="${build.debug}" arg2="false"/>
+        </condition>
     </target>
 
 
@@ -197,17 +215,17 @@ Forge file for Funambol Outlook Sync Client
         <echo message="*********************" />
 
 
-	<!-- Output dirs for src files -->
-	<property name="dir.output_src"               value="${dir.output}/${dir.src}${release.major}.${release.minor}.${build.number}"/>
-	<property name="dir.output_src.home"          value="${dir.output_src}/Funambol/Outlook Sync Client"/>
-	<property name="dir.output_src.outlook"       value="${dir.output_src.home}"/>
-	<property name="dir.output_src.native_api"    value="${dir.output_src.home}/cpp-sdk"/>
-	<property name="dir.output_src.zlib"          value="${dir.output_src.native_api}/tools/zlib"/>
-	<property name="dir.output_src.UI"            value="${dir.output_src.outlook}/UI"/>
-	<property name="dir.output_src.mainclientdll" value="${dir.output_src.outlook}/mainclientdll"/>
-	<property name="dir.output_src.outlookaddin"  value="${dir.output_src.outlook}/Addin"/>
-	<property name="dir.output_src.design"        value="${dir.output_src.outlook}/docs"/>
-	<property name="dir.output_src.install"       value="${dir.output_src.outlook}/install"/>
+    <!-- Output dirs for src files -->
+    <property name="dir.output_src"               value="${dir.output}/${dir.src}${release.major}.${release.minor}.${build.number}"/>
+    <property name="dir.output_src.home"          value="${dir.output_src}/Funambol/Outlook Sync Client"/>
+    <property name="dir.output_src.outlook"       value="${dir.output_src.home}"/>
+    <property name="dir.output_src.native_api"    value="${dir.output_src.home}/cpp-sdk"/>
+    <property name="dir.output_src.zlib"          value="${dir.output_src.native_api}/tools/zlib"/>
+    <property name="dir.output_src.UI"            value="${dir.output_src.outlook}/UI"/>
+    <property name="dir.output_src.mainclientdll" value="${dir.output_src.outlook}/mainclientdll"/>
+    <property name="dir.output_src.outlookaddin"  value="${dir.output_src.outlook}/Addin"/>
+    <property name="dir.output_src.design"        value="${dir.output_src.outlook}/docs"/>
+    <property name="dir.output_src.install"       value="${dir.output_src.outlook}/install"/>
     
     <!-- 
       Set the 'funambol.swv' value, to be passed at the NSIS installer.
@@ -379,18 +397,18 @@ Forge file for Funambol Outlook Sync Client
         <!--
         Copy DLLs and needed files into fileset dir
         -->
-	      <copy todir="${dir.fileset}" overwrite="TRUE">
-	           <fileset dir="${dir.output_src.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
-	           <fileset dir="${dir.output_src.UI}/build/Release"                  includes="OutlookPlugin.exe"/>
-	           <fileset dir="${dir.output_src.install}/installer/Redemption_Lib"  includes="Redemption.dll"/>
-	           <fileset dir="${dir.output_src.outlookaddin}/ReleaseMinDependency" includes="FunambolAddin.dll"/>
+        <copy todir="${dir.fileset}" overwrite="TRUE">
+            <fileset dir="${dir.output_src.mainclientdll}/build/${plugin.dir.obj}" includes="winmainclientdll.dll"/>
+            <fileset dir="${dir.output_src.UI}/build/${plugin.dir.obj}"            includes="OutlookPlugin.exe"/>
+            <fileset dir="${dir.output_src.install}/installer/Redemption_Lib"      includes="Redemption.dll"/>
+            <fileset dir="${dir.output_src.outlookaddin}/${addin.dir.obj}"         includes="FunambolAddin.dll"/>
         </copy>
 
         <copy todir="${dir.fileset}/images" overwrite="TRUE">
             <fileset dir="${dir.output_src.UI}/src/res" includes="OutlookPlugin.ico"/>
         </copy>
         
-	<!-- These are DLLs required to run VC++ software -->
+    <!-- These are DLLs required to run VC++ software -->
 	    <copy todir="${dir.fileset}/redist" overwrite="TRUE">
             <fileset dir="${dir.VCpp2005Lib}" includes="**/${MSLib.atl}/, **/${MSLib.crt}/, **/${MSLib.mfc}/" />
         </copy>
@@ -439,10 +457,10 @@ Forge file for Funambol Outlook Sync Client
         Copy DLLs and needed files into fileset dir
         -->
         <copy todir="${dir.fileset}" overwrite="TRUE">
-	          <fileset dir="${dir.mainclientdll}/build/Release"       includes="winmainclientdll.dll"/>
-            <fileset dir="${dir.ui}/build/Release"                  includes="OutlookPlugin.exe"/>
-            <fileset dir="${dir.redemptionLib}"                     includes="Redemption.dll"/>
-            <fileset dir="${dir.outlookaddin}/ReleaseMinDependency" includes="FunambolAddin.dll"/>
+            <fileset dir="${dir.mainclientdll}/build/${plugin.dir.obj}" includes="winmainclientdll.dll"/>
+            <fileset dir="${dir.ui}/build/${plugin.dir.obj}"            includes="OutlookPlugin.exe"/>
+            <fileset dir="${dir.redemptionLib}"                         includes="Redemption.dll"/>
+            <fileset dir="${dir.outlookaddin}/${addin.dir.obj}"         includes="FunambolAddin.dll"/>
         </copy>
 
         <copy todir="${dir.fileset}/images" overwrite="TRUE">
@@ -450,7 +468,7 @@ Forge file for Funambol Outlook Sync Client
         </copy>
 
 
-	<!-- These are DLLs required to run VC++ software -->
+    <!-- These are DLLs required to run VC++ software -->
 	 <copy todir="${dir.fileset}/redist" overwrite="TRUE">
             <fileset dir="${dir.VCpp2005Lib}" includes="**/${MSLib.atl}/, **/${MSLib.crt}/, **/${MSLib.mfc}/" />
         </copy>
@@ -475,7 +493,7 @@ Forge file for Funambol Outlook Sync Client
         <echo message="output to: ${log.NSIS}" />
         <exec dir="${dir.forge}" executable="${install-builder.nsi}" output="${log.NSIS}" failonerror="true">
             <arg line="/DPRODUCT_VERSION=${release.major}.${release.minor}.${build.number}
-	                   /DFILE_NAME=${fileName} 
+                       /DFILE_NAME=${fileName} 
                        /DFUNAMBOL_SWV=${funambol.swv} 
                        /DMSLIB_ATL=${MSLib.atl}
                        /DMSLIB_MFC=${MSLib.mfc}
@@ -499,7 +517,7 @@ Forge file for Funambol Outlook Sync Client
 
         <!-- Portal version is builded with the REDIST REDEMPTION.DLL -->
         <echo message="Replace Redemption.dll with the redistributable one..." />
-	    <copy todir="${dir.fileset}" overwrite="TRUE">
+        <copy todir="${dir.fileset}" overwrite="TRUE">
             <fileset dir="${dir.redemptionLibRedist}" includes="Redemption.dll"/>
         </copy>
 
@@ -563,13 +581,13 @@ Forge file for Funambol Outlook Sync Client
         <property name="cppapi.root"   value="output/export/cpp-sdk"  />
 
         <echo message="Creating documentation with doxygen..." />
-	<exec dir="output/export/docs" executable="doxygen" output="${log.doxygen}" >
+    <exec dir="output/export/docs" executable="doxygen" output="${log.doxygen}" >
             <arg line="${doxyfile}" />
-            <env key="FUNAMBOL_OLPLUGIN_ROOT" path="${olclient.root}"/>			<!-- root of OLPlugin project      -->
-            <env key="FUNAMBOL_NATIVE_ROOT"   path="${cppapi.root}"/>			<!-- root of Native API project    -->
-            <env key="ENABLED_SECTIONS"  value="API OLPLUGIN" />			    <!-- add "DEV" for complete docs   -->
-            <env key="SHOW_PRIVATE_DATA" value="YES" />					        <!-- "YES" to show private members -->
-            <env key="HAVE_DOT"          value="YES" />					        <!-- "NO" to hide graphs           -->
+            <env key="FUNAMBOL_OLPLUGIN_ROOT" path="${olclient.root}"/>            <!-- root of OLPlugin project      -->
+            <env key="FUNAMBOL_NATIVE_ROOT"   path="${cppapi.root}"/>            <!-- root of Native API project    -->
+            <env key="ENABLED_SECTIONS"  value="API OLPLUGIN" />                <!-- add "DEV" for complete docs   -->
+            <env key="SHOW_PRIVATE_DATA" value="YES" />                            <!-- "YES" to show private members -->
+            <env key="HAVE_DOT"          value="YES" />                            <!-- "NO" to hide graphs           -->
         </exec>
     </target>
 
@@ -588,13 +606,13 @@ Forge file for Funambol Outlook Sync Client
         <property name="cppapi.root"   value="${dir.native_api}"/>
 
         <echo message="Creating documentation with doxygen..." />
-	<exec dir="${dir.design}" executable="doxygen" output="${log.doxygen}" >
+        <exec dir="${dir.design}" executable="doxygen" output="${log.doxygen}" >
             <arg line="${doxyfile}" />
-	    <env key="FUNAMBOL_OLPLUGIN_ROOT" path="${olclient.root}"/>			    <!-- root of OLPlugin project      -->
-	    <env key="FUNAMBOL_NATIVE_ROOT"   path="${cppapi.root}"/>			    <!-- root of Native API project    -->
-	    <env key="ENABLED_SECTIONS"      value="API OLPLUGIN" />			    <!-- add "DEV" for complete docs   -->
-	    <env key="SHOW_PRIVATE_DATA"     value="YES" />				            <!-- "YES" to show private members -->
-	    <env key="HAVE_DOT"              value="YES" />				            <!-- "NO" to hide graphs           -->
+        <env key="FUNAMBOL_OLPLUGIN_ROOT" path="${olclient.root}"/>                <!-- root of OLPlugin project      -->
+        <env key="FUNAMBOL_NATIVE_ROOT"   path="${cppapi.root}"/>                <!-- root of Native API project    -->
+        <env key="ENABLED_SECTIONS"      value="API OLPLUGIN" />                <!-- add "DEV" for complete docs   -->
+        <env key="SHOW_PRIVATE_DATA"     value="YES" />                            <!-- "YES" to show private members -->
+        <env key="HAVE_DOT"              value="YES" />                            <!-- "NO" to hide graphs           -->
         </exec>
     </target>
 

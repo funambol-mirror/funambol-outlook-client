@@ -40,12 +40,15 @@
 #include "utils.h"
 #include "outlook/defs.h"
 
-#include "outlook/ClientApplication.h"
-#include "outlook/ClientAppointment.h"
-#include "outlook/ClientContact.h"
+
+
+#include "outlook/ClientFolder.h"
+#include "outlook/ClientItem.h"
 #include "outlook/ClientMail.h"
-#include "outlook/ClientNote.h"
+#include "outlook/ClientContact.h"
+#include "outlook/ClientAppointment.h"
 #include "outlook/ClientTask.h"
+#include "outlook/ClientNote.h"
 #include "outlook/ClientException.h"
 #include "outlook/utils.h"
 
@@ -65,10 +68,10 @@ ClientApplication* ClientApplication::pinstance = NULL;
 /**
  * Method to create the sole instance of ClientApplication
  */
-ClientApplication* ClientApplication::getInstance() {
+ClientApplication* ClientApplication::getInstance(bool checkAttach) {
 
     if (pinstance == NULL) {
-        pinstance = new ClientApplication;
+        pinstance = new ClientApplication(checkAttach);
     }
     return pinstance;
 }
@@ -86,7 +89,7 @@ bool ClientApplication::isInstantiated() {
  * Creates a new instance of Outlook application then logs in.
  * Initializes version & programName.
  */
-ClientApplication::ClientApplication() {
+ClientApplication::ClientApplication(bool checkAttach) {
     hr = S_OK;
 
     try {
@@ -94,6 +97,7 @@ ClientApplication::ClientApplication() {
         LOG.debug("Initialize COM library");
         hr = CoInitialize(NULL);
         //hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+        LOG.debug("Initialize result: 0x%8.8x", hr);
         if (FAILED(hr)) {
             throwClientFatalException(ERR_COM_INITIALIZE);
             return; 
@@ -102,12 +106,31 @@ ClientApplication::ClientApplication() {
             LOG.debug("Warning: COM library already opened for this thread.");
         }
 
-        // Instantiate Outlook
-        LOG.debug("Create %ls instance...", OL_APPLICATION);
-        hr = pApp.CreateInstance(OL_APPLICATION);
-        if (FAILED(hr)) {
-            throwClientFatalException(ERR_OUTLOOK_OPEN);
-            return;
+        if (getConfig()->getWindowsDeviceConfig().getAttach() && checkAttach)
+        {
+            // Attach to existing outlook
+            LOG.debug("Attaching to %ls instance...", OL_APPLICATION);
+            hr = pApp.GetActiveObject(OL_APPLICATION);
+            LOG.debug("Attach result: 0x%8.8x", hr);
+            if (FAILED(hr)) 
+            {
+                LOG.debug("Attach error code: %ld", GetLastError());
+                throwClientFatalException(ERR_OUTLOOK_ATTACH);
+                return;
+            }
+        }
+        else
+        {
+            // Instantiate Outlook
+            LOG.debug("Create %ls instance...", OL_APPLICATION);
+            hr = pApp.CreateInstance(OL_APPLICATION);
+            LOG.debug("Instantiation result: 0x%8.8x", hr);
+            if (FAILED(hr))
+            {
+                LOG.debug("Instantiate error code: %ld", GetLastError());
+                throwClientFatalException(ERR_OUTLOOK_OPEN);
+                return;
+            }
         }
 
         // "MAPI" = the only available message store.
@@ -124,7 +147,13 @@ ClientApplication::ClientApplication() {
         // all Extended MAPI objects.
         createSafeInstances();
     }
+    catch(ClientException * e) {
+        //CoUninitialize();
+        throw e;
+        return;
+    }
     catch(_com_error &e) {
+        //CoUninitialize();
         manageComErrors(e);
         // Fatal exception, so we will exit the thread.
         throwClientFatalException(ERR_OUTLOOK_OPEN);
@@ -132,6 +161,7 @@ ClientApplication::ClientApplication() {
     }
     // *** To catch unexpected exceptions... ***
     catch(...) {
+        //CoUninitialize();
         throwClientFatalException(ERR_OUTLOOK_OPEN);
         return;
     }
@@ -233,6 +263,8 @@ ClientApplication::~ClientApplication() {
     catch(...) {
         throwClientException(ERR_OUTLOOK_RELEASE_COMOBJECTS);
     }
+
+    CoUninitialize();
 
     LOG.info(INFO_OUTLOOK_CLOSED);
 }

@@ -153,6 +153,10 @@ void manageSyncErrorMsg(long code) {
         case -6:
             s1.LoadString(IDS_CODE_SYNC_STOPPED);break;             // *** OBSOLETE? ***
 
+        case ERR_CODE_FOLDER_PATH_MATCH:
+            s1.LoadString(IDS_CODE_FOLDER_PATH_NOT_FOUND);
+            break;
+
         case 402:
             s1.LoadString(IDS_CODE_AUTH_EXPIRED_402); break;
         case 403:

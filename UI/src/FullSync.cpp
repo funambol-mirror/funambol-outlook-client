@@ -40,6 +40,8 @@
 #include "SyncForm.h"
 #include "ClientUtil.h"
 #include "utils.h"
+#include "UICustomization.h"
+
 #include "winmaincpp.h"
 
 
@@ -52,22 +54,22 @@ CFullSync::~CFullSync() {}
 void CFullSync::DoDataExchange(CDataExchange* pDX)
 {
     CDialog::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_FULLSYNC_CHECK_CONTACTS,  checkContacts);
-    DDX_Control(pDX, IDC_FULLSYNC_CHECK_CALENDAR,  checkCalendar);
-    DDX_Control(pDX, IDC_FULLSYNC_CHECK_TASKS,     checkTasks);
-    DDX_Control(pDX, IDC_FULLSYNC_CHECK_NOTES,     checkNotes);
+    DDX_Control(pDX, IDC_FULLSYNC_CHECK_CONTACTS, checkContacts);
+    DDX_Control(pDX, IDC_FULLSYNC_CHECK_CALENDAR, checkCalendar);
+    DDX_Control(pDX, IDC_FULLSYNC_CHECK_TASKS, checkTasks);
+    DDX_Control(pDX, IDC_FULLSYNC_CHECK_NOTES, checkNotes);
     DDX_Control(pDX, IDC_FULLSYNC_CHECK_PICTURES,  checkPictures);
-    DDX_Control(pDX, IDC_FULLSYNC_RADIO1,          radio1);
-    DDX_Control(pDX, IDC_FULLSYNC_RADIO2,          radio2);
-    DDX_Control(pDX, IDC_FULLSYNC_RADIO3,          radio3);
+    DDX_Control(pDX, IDC_FULLSYNC_RADIO1, radio1);
+    DDX_Control(pDX, IDC_FULLSYNC_RADIO2, radio2);
+    DDX_Control(pDX, IDC_FULLSYNC_RADIO3, radio3);
     DDX_Control(pDX, IDC_FULLSYNC_GROUP_DIRECTION, groupDirection);
-    DDX_Control(pDX, IDC_FULLSYNC_GROUP_ITEMS,     groupItems);
+    DDX_Control(pDX, IDC_FULLSYNC_GROUP_ITEMS, groupItems);
 }
 
 
 BEGIN_MESSAGE_MAP(CFullSync, CDialog)
-    ON_BN_CLICKED(IDOK,                        &CFullSync::OnBnClickedOk)
-    ON_BN_CLICKED(IDCANCEL,                    &CFullSync::OnBnClickedCancel)
+    ON_BN_CLICKED(IDOK, &CFullSync::OnBnClickedOk)
+    ON_BN_CLICKED(IDCANCEL, &CFullSync::OnBnClickedCancel)
     ON_BN_CLICKED(IDC_FULLSYNC_CHECK_CONTACTS, &CFullSync::OnBnClickedSourceCheckBox)
     ON_BN_CLICKED(IDC_FULLSYNC_CHECK_CALENDAR, &CFullSync::OnBnClickedSourceCheckBox)
     ON_BN_CLICKED(IDC_FULLSYNC_CHECK_TASKS,    &CFullSync::OnBnClickedSourceCheckBox)
@@ -100,9 +102,16 @@ BOOL CFullSync::OnInitDialog() {
      // resize/move dynamically the source checkboxes
     adjustCheckboxes();
 
-    // Refresh from Client is the default
-    radio3.SetCheck(BST_CHECKED);
-    radio3.SetFocus();
+
+    if (UICustomization::defaultFullSyncFromClient) {
+        // Refresh from Server is the default
+        radio3.SetCheck(BST_CHECKED);
+        radio3.SetFocus();
+    } else {
+        // Refresh from Server is the default
+        radio2.SetCheck(BST_CHECKED);
+        radio2.SetFocus();
+    }
 
     // Grey out disabled sources
     if (isSourceEnabled(CONTACT_))     { checkContacts.EnableWindow(TRUE);  }
@@ -162,21 +171,30 @@ void CFullSync::OnBnClickedOk() {
     if (radio1.GetCheck() == BST_CHECKED) {
         pos = 0;
     }
-
     // "refresh-from-server"
     else if (radio2.GetCheck() == BST_CHECKED) {
 
-        // Prompt a warning message...
-        unsigned int flags = MB_YESNO | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_APPLMODAL;
-        int selected = MessageBox(WMSG_BOX_REFRESH_FROM_SERVER, WPROGRAM_NAME, flags);
-        if (selected == IDNO) {
-            return;
+        if (UICustomization::confirmOnRefreshFromServer) {
+            // Prompt a warning message...
+            unsigned int flags = MB_YESNO | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_APPLMODAL;
+            int selected = MessageBox(WMSG_BOX_REFRESH_FROM_SERVER, WPROGRAM_NAME, flags);
+            if (selected == IDNO) {
+                return;
+            }
         }
         pos = 1;
     }
 
     // "refresh-from-client"
     else if (radio3.GetCheck() == BST_CHECKED) {
+        if (UICustomization::confirmOnRefreshFromClient) {
+            // Prompt a warning message...
+            unsigned int flags = MB_YESNO | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_APPLMODAL;
+            int selected = MessageBox(WMSG_BOX_REFRESH_FROM_CLIENT, WPROGRAM_NAME, flags);
+            if (selected == IDNO) {
+                return;
+            }
+        }
         pos = 2;
     }
 
@@ -217,7 +235,7 @@ void CFullSync::OnBnClickedOk() {
         getConfig()->getSyncSourceConfig(PICTURE_)->setSync(fullSyncMode);
     }
     else {
-        getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(false);
+    getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(false);
     }
 
     getConfig()->setFullSync(true);

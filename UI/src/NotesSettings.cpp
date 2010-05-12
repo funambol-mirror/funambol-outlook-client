@@ -41,11 +41,13 @@
 #include "NotesSettings.h"
 #include "MainSyncFrm.h"
 #include "ClientUtil.h"
+#include "SettingsHelper.h"
 
 #include "winmaincpp.h"
 #include "utils.h"
 #include "comutil.h"
 #include "OutlookPlugin.h"
+#include "UICustomization.h"
 
 #include <string>
 
@@ -82,12 +84,15 @@ void CNotesSettings::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_NOTES_EDIT_FOLDER, editFolder);
     DDX_Control(pDX, IDC_NOTES_CHECK_INCLUDE, checkInclude);
     DDX_Control(pDX, IDC_NOTES_BUT_SELECT, butSelectFolder);
+    DDX_Control(pDX, IDC_NOTES_CHECK_INCLUDE, checkInclude);
     DDX_Control(pDX, IDC_NOTES_EDIT_REMOTE, editRemote);
     DDX_Control(pDX, IDC_NOTES_GROUP_DIRECTION, groupDirection);
     DDX_Control(pDX, IDC_NOTES_GROUP_FOLDER, groupFolder);
     DDX_Control(pDX, IDC_NOTES_GROUP_ADVANCED, groupAdvanced);
     DDX_Control(pDX, IDC_NOTES_RADIO_SIF, radioSif);
     DDX_Control(pDX, IDC_NOTES_RADIO_VNOTE, radioVNote);
+
+    DDX_Control(pDX, IDC_NOTES_CHECK_SHARED, checkShared);
 }
 
 BEGIN_MESSAGE_MAP(CNotesSettings, CDialog)
@@ -96,6 +101,7 @@ BEGIN_MESSAGE_MAP(CNotesSettings, CDialog)
     ON_BN_CLICKED(IDC_NOTES_BUT_SELECT, &CNotesSettings::OnBnClickedNotesButSelect)
     ON_BN_CLICKED(IDC_NOTES_RADIO_VNOTE, &CNotesSettings::OnBnClickedNotesRadioVNote)
     ON_BN_CLICKED(IDC_NOTES_RADIO_SIF, &CNotesSettings::OnBnClickedNotesRadioSif)
+    ON_BN_CLICKED(IDC_NOTES_CHECK_SHARED, &CNotesSettings::OnBnClickedNotesCheckShared)
 END_MESSAGE_MAP()
 
 // CNotesSettings diagnostics
@@ -139,7 +145,11 @@ BOOL CNotesSettings::OnInitDialog(){
     s1.LoadString(IDS_SELECT_FOLDER); SetDlgItemText(IDC_NOTES_BUT_SELECT, s1);
     s1.LoadString(IDS_REMOTE_NAME); SetDlgItemText(IDC_NOTES_STATIC_REMOTE, s1);
     s1.LoadString(IDS_DATA_FORMAT); SetDlgItemText(IDC_NOTES_STATIC_DATAFORMAT, s1);
+    s1.LoadString(IDS_USE_SIF); SetDlgItemText(IDC_NOTES_STATIC_DATAFORMAT2, s1);
+    s1.LoadString(IDS_USE_SIF);    SetDlgItemText(IDC_NOTES_RADIO_SIF,   s1);
+    s1.LoadString(IDS_USE_VNOTE);  SetDlgItemText(IDC_NOTES_RADIO_VNOTE, s1);
     s1.LoadString(IDS_ADVANCED); SetDlgItemText(IDC_NOTES_GROUP_ADVANCED, s1);
+    s1.LoadString(IDS_SHARED); SetDlgItemText(IDC_NOTES_CHECK_SHARED, s1);
 
     s1.LoadString(IDS_OK); SetDlgItemText(IDC_NOTES_OK, s1);
     s1.LoadString(IDS_CANCEL); SetDlgItemText(IDC_NOTES_CANCEL, s1);
@@ -174,11 +184,12 @@ BOOL CNotesSettings::OnInitDialog(){
     delete [] remName;
     SetDlgItemText(IDC_NOTES_EDIT_REMOTE, s1);
 
+    if (s1.Right(wcslen(SHARED_SUFFIX)).Compare(SHARED_SUFFIX) == 0) {
+        checkShared.SetCheck(BST_CHECKED);
+    }
+
     wndNotes = this;
 
-
-    s1.LoadString(IDS_USE_SIF);    SetDlgItemText(IDC_NOTES_RADIO_SIF,   s1);
-    s1.LoadString(IDS_USE_VNOTE);  SetDlgItemText(IDC_NOTES_RADIO_VNOTE, s1);
     if( strstr(ssconf->getType(),"sif") ){
         radioSif.SetCheck(BST_CHECKED);
         currentRadioChecked = SIF_CHECKED;
@@ -187,36 +198,78 @@ BOOL CNotesSettings::OnInitDialog(){
         radioVNote.SetCheck(BST_CHECKED);
         currentRadioChecked = VNOTE_CHECKED;
     }
-    
-    //
-    // Hide Advanced settings (remote URI) if defined in customization.h
-    //
-    if(!SHOW_ADVANCED_SETTINGS) {
+
+    // Apply customizations
+    bool shared             = UICustomization::shared;
+    bool forceUseSubfolders = UICustomization::forceUseSubfolders;
+    bool hideDataFormats    = UICustomization::hideDataFormats;
+    bool hideAllAdvanced    = !SHOW_ADVANCED_SETTINGS;
+
+    if (!shared) {
+        GetDlgItem(IDC_NOTES_CHECK_SHARED)->ShowWindow(SW_HIDE);
+    } else {
+        editRemote.EnableWindow(false);
+    }
+
+    if (forceUseSubfolders) {
+        checkInclude.SetCheck(BST_CHECKED);
+        checkInclude.ShowWindow(SW_HIDE);
+
+        // Resize things
+        CRect rect;
+        checkInclude.GetClientRect(&rect);
+        int dy = -1 * (rect.Height() + 5);
+
+        resizeItem(GetDlgItem(IDC_NOTES_GROUP_FOLDER), 0, dy);
+
+        moveItem(this, &groupAdvanced, 0, dy);
+        moveItem(this, &editRemote,    0, dy);
+        moveItem(this, &radioSif,      0, dy);
+        moveItem(this, &radioVNote,    0, dy);
+        moveItem(this, &checkShared,   0, dy);
+        moveItem(this, GetDlgItem(IDC_NOTES_STATIC_REMOTE),     0, dy);
+        moveItem(this, GetDlgItem(IDC_NOTES_STATIC_DATAFORMAT), 0, dy);
+        moveItem(this, GetDlgItem(IDC_NOTES_STATIC_DATAFORMAT2), 0, dy);
+        moveItem(this, GetDlgItem(IDC_NOTES_OK),             0, dy);
+        moveItem(this, GetDlgItem(IDC_NOTES_CANCEL),         0, dy);
+
+        setWindowHeight(this, GetDlgItem(IDC_NOTES_OK));
+    }
+
+    if (hideAllAdvanced) {
         groupAdvanced.ShowWindow(SW_HIDE);
         editRemote.ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_NOTES_STATIC_REMOTE)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_NOTES_STATIC_DATAFORMAT)->ShowWindow(SW_HIDE);
         radioSif.ShowWindow(SW_HIDE);
         radioVNote.ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_NOTES_STATIC_REMOTE)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_NOTES_STATIC_DATAFORMAT)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_NOTES_STATIC_DATAFORMAT2)->ShowWindow(SW_HIDE);
 
-        // Redraw buttons 'OK' and 'Cancel' where the groupAdvanced was located
-        CPoint posAdvanced = getRelativePosition(&groupAdvanced, this);
-        int top = posAdvanced.y + 10;   // 10 = some space
+        CRect rect;
+        groupAdvanced.GetClientRect(&rect);
+        int dy = -1 * (rect.Height() + 10);
 
-        CWnd* butOk     = GetDlgItem(IDC_NOTES_OK);
-        CWnd* butCancel = GetDlgItem(IDC_NOTES_CANCEL);
-        CRect rectDialog, rectOk;
-        GetClientRect(&rectDialog);
-        butOk->GetClientRect(&rectOk);
+        moveItem(this, GetDlgItem(IDC_NOTES_OK),     0, dy);
+        moveItem(this, GetDlgItem(IDC_NOTES_CANCEL), 0, dy);
 
-        CPoint posOk     = getRelativePosition(butOk,     this);
-        CPoint posCancel = getRelativePosition(butCancel, this);
-        butOk->SetWindowPos(&CWnd::wndTop, posOk.x, top, NULL, NULL, SWP_SHOWWINDOW | SWP_NOSIZE);
-        butCancel->SetWindowPos(&CWnd::wndTop, posCancel.x, top, NULL, NULL, SWP_SHOWWINDOW | SWP_NOSIZE);
+        setWindowHeight(this, GetDlgItem(IDC_NOTES_OK));
+    } else if (hideDataFormats) {
+        radioSif.ShowWindow(SW_HIDE);
+        radioVNote.ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_NOTES_STATIC_DATAFORMAT)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_NOTES_STATIC_DATAFORMAT2)->ShowWindow(SW_HIDE);
 
-        // Resize window, now it's smaller
-        int newHeight = top + rectOk.Height() + 50;     // 50 = some space
-        this->SetWindowPos(&CWnd::wndTop, NULL, NULL, rectDialog.Width(), newHeight, SWP_SHOWWINDOW | SWP_NOMOVE);
+        // Resize things
+        CRect rect;
+        GetDlgItem(IDC_NOTES_STATIC_DATAFORMAT)->GetClientRect(&rect);
+        int dy = -1 * (rect.Height() + 5);
+
+        resizeItem(&groupAdvanced, 0, dy);
+
+        moveItem(this, GetDlgItem(IDC_NOTES_OK),     0, dy);
+        moveItem(this, GetDlgItem(IDC_NOTES_CANCEL), 0, dy);
+
+        setWindowHeight(this, GetDlgItem(IDC_NOTES_OK));
     }
 
     // disable windows xp theme, otherwise any color setting for groupbox
@@ -267,6 +320,15 @@ bool CNotesSettings::saveSettings(bool saveToDisk)
         wsafeMessageBox(s1);
         return false;
     };
+
+    if (UICustomization::showWarningOnChangeFromOneWay) {
+        int currentSyncType = getSyncTypeIndex(ssconf->getSync());
+        int newSyncType = lstSyncType.GetCurSel();
+        if (checkOneWayToTwoWay(currentSyncType, newSyncType)) {
+           return false;
+        }
+    }
+
     // sync source enabled
     ssconf->setSync(getSyncTypeName(lstSyncType.GetCurSel()));
 
@@ -274,11 +336,20 @@ bool CNotesSettings::saveSettings(bool saveToDisk)
     //       (when writing to winreg, toWideChar is then called)
     char* olFolder = toMultibyte(outlookFolder.GetBuffer());
     if (olFolder) {
+        // If folder has changed, clear anchors
+        if (UICustomization::clearAnchorsOnFolderChange) {
+            const char * original = ssconf->getFolderPath();
+            if (strcmp(original, olFolder) != 0 && UICustomization::clearAnchorsOnFolderChange) {
+                ssconf->setLast(0);
+                ssconf->setEndTimestamp(0);
+            }
+        }
+        
         ssconf->setFolderPath(olFolder);
         delete [] olFolder;
     }
 
-    if(checkInclude.GetCheck() == BST_CHECKED)
+    if(checkInclude.GetCheck() == BST_CHECKED || UICustomization::forceUseSubfolders)
         ssconf->setUseSubfolders(true);
     else
         ssconf->setUseSubfolders(false);
@@ -288,7 +359,6 @@ bool CNotesSettings::saveSettings(bool saveToDisk)
         ssconf->setURI(remName);
         delete [] remName;
     }
-
 
     // Data formats
     if(radioSif.GetCheck() == BST_CHECKED){
@@ -360,4 +430,18 @@ void CNotesSettings::OnBnClickedNotesRadioVNote() {
         SetDlgItemText(IDC_NOTES_EDIT_REMOTE, VNOTE_DEFAULT_NAME);
         currentRadioChecked = VNOTE_CHECKED;
     }
+}
+
+void CNotesSettings::OnBnClickedNotesCheckShared() {
+    long editId = IDC_NOTES_EDIT_REMOTE;
+
+    CString currentValue;
+    GetDlgItemText(editId, currentValue);
+    CString warningMessage;
+    warningMessage.LoadString(IDS_UNCHECK_SHARED);
+
+    CString newValue = processSharedCheckboxClick(NOTES_REMOTE_NAME,
+         checkShared.GetCheck() != 0, currentValue, warningMessage);
+
+    SetDlgItemText(editId, newValue);
 }

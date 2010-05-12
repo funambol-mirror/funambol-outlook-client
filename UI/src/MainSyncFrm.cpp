@@ -51,6 +51,8 @@
 #include "HwndFunctions.h"
 #include "comutil.h"
 #include "Popup.h"
+#include "UICustomization.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -84,6 +86,7 @@ BEGIN_MESSAGE_MAP(CMainSyncFrame, CFrameWnd)
     ON_MESSAGE(ID_MYMSG_SOURCE_STATE,           &CMainSyncFrame::OnMsgSyncSourceState) 
     ON_MESSAGE(ID_MYMSG_LOCK_BUTTONS,           &CMainSyncFrame::OnMsgLockButtons)
     ON_MESSAGE(ID_MYMSG_UNLOCK_BUTTONS,         &CMainSyncFrame::OnMsgUnlockButtons)
+    ON_MESSAGE(ID_MYMSG_CANCEL_SYNC,            &CMainSyncFrame::CancelSync)
     ON_COMMAND(ID_FILE_CONFIGURATION,           &CMainSyncFrame::OnFileConfiguration)
     ON_COMMAND(ID_TOOLS_FULLSYNC,               &CMainSyncFrame::OnToolsFullSync)
     ON_COMMAND(ID_FILE_SYNCHRONIZE,             &CMainSyncFrame::OnFileSynchronize)
@@ -261,8 +264,8 @@ finally:
 
 BOOL CMainSyncFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
-	if (!CFrameWnd::PreCreateWindow(cs))
-		return FALSE;
+    if( !CFrameWnd::PreCreateWindow(cs) )
+        return FALSE;
 
     // TODO: set here main window size and style
     cs.style =  WS_SYSMENU  | WS_VISIBLE | WS_MINIMIZEBOX;
@@ -354,7 +357,6 @@ void CMainSyncFrame::OnToolsFullSync()
     CFullSync wndFullSync;
     INT_PTR result = wndFullSync.DoModal();  
 }
-
 
 
 /**
@@ -964,7 +966,7 @@ afx_msg LRESULT CMainSyncFrame::OnMsgRefreshStatusBar( WPARAM wParam, LPARAM lPa
             refreshStatusBar(s1);
             refreshSourceLabels(s1, currentSource);
             return 0;
-        }
+    }
     }
 
     s1 = text;
@@ -1291,9 +1293,11 @@ void CMainSyncFrame::StartSync(){
     }
 }
 
+LRESULT CMainSyncFrame::CancelSync(WPARAM wParam, LPARAM lParam){
+    return CancelSync(false);
+}
 
-
-int CMainSyncFrame::CancelSync(){
+int CMainSyncFrame::CancelSync(bool confirm){
     int ret = 1;
     CString msg;
     CString s1;
@@ -1308,9 +1312,11 @@ int CMainSyncFrame::CancelSync(){
     //
     // Display warning.
     //
-    unsigned int flags = MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_APPLMODAL;
-    int selected = MessageBox(WMSG_BOX_CANCEL_SYNC, WPROGRAM_NAME, flags);
-
+    int selected = IDYES;
+    if (confirm) {
+        unsigned int flags = MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND | MB_APPLMODAL;
+        selected = MessageBox(WMSG_BOX_CANCEL_SYNC, WPROGRAM_NAME, flags);
+    }
 
     // First check again if sync is running (could be terminated in the meanwhile...)
     if (!checkSyncInProgress()) {
@@ -1584,6 +1590,13 @@ LRESULT CMainSyncFrame::OnMsgLockButtons(WPARAM wParam, LPARAM lParam) {
     mainForm->lockButtons();
     return 0;
 }
+
+
+LRESULT CMainSyncFrame::Synchronize(WPARAM wParam, LPARAM lParam){
+    OnFileSynchronize();
+    return NULL;
+}
+
 
 LRESULT CMainSyncFrame::OnOKMsg(WPARAM wParam, LPARAM lParam) {
 

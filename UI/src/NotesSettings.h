@@ -71,6 +71,8 @@ protected:
     CButton radioSif;
     CButton radioVNote;
 
+    CButton checkShared;
+
 public:
 
 	CNotesSettings();           
@@ -91,6 +93,7 @@ public:
     afx_msg void OnBnClickedNotesButSelect();
     afx_msg void OnBnClickedNotesRadioVNote();
     afx_msg void OnBnClickedNotesRadioSif();
+    afx_msg void OnBnClickedNotesCheckShared();
 };
 
 /** @} */

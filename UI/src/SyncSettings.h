@@ -110,10 +110,12 @@ public:
     bool saveSyncTypeNotes;
     bool saveSyncTypePictures;
     bool saveScheduler; // true if scheduler settings have changed
+    bool saveAttach; // true if the checkbox to require outlook open is changed
 
     // scheduler
     CButton checkEnabled;
     CButton checkEncryption;
+    CButton checkAttach;
     CStatic groupItems;
     CStatic groupScheduler;
     CStatic groupSecurity;
@@ -137,6 +139,7 @@ public:
   
     afx_msg void OnBnClickedSchedulerCheckEnabled();
     afx_msg void OnCbnSelchangeSchedulerComboValue();
+    afx_msg void OnBnClickedSyncCheckOutlookOpen();
 };
 
 

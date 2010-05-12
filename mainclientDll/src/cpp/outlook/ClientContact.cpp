@@ -40,6 +40,8 @@
 #include "utils.h"
 
 #include "outlook/defs.h"
+#include "outlook/ClientItem.h"
+#include "outlook/ClientFolder.h"
 #include "outlook/ClientApplication.h"
 #include "outlook/ClientContact.h"
 #include "outlook/ClientException.h"
@@ -112,8 +114,14 @@ void ClientContact::setCOMPtr(_ContactItemPtr& ptr, const wstring& itemID) {
     try {
         pSafeContact->Item = pContact;
 
+        pUserProperties     = pContact->UserProperties;
+        userPropertiesCount = pUserProperties->Count;
+
         pItemProperties = pContact->ItemProperties;
         propertiesCount = pItemProperties->Count;
+
+        propertiesCount -= userPropertiesCount;
+
         if (propertiesCount) {
             pItemProperty = pItemProperties->Item(0);
         }
@@ -299,34 +307,34 @@ error:
  * @param   destFolder  the destination ClientFolder to move this object to
  * @return              0 if no errors
  */
-//int ClientContact::moveItem(ClientFolder* destFolder) {
-//
-//    if (!pContact) {
-//        goto error;
-//    }
-//
-//    // Get destination folder
-//    MAPIFolder* pDestFolder = destFolder->getCOMPtr();
-//    if (!pDestFolder) {
-//        goto error;
-//    }
-//
-//    // Move item
-//    try {
-//        pContact->Move(pDestFolder);
-//    }
-//    catch(_com_error &e) {
-//        manageComErrors(e);
-//        goto error;
-//    }
-//
-//    parentPath = destFolder->getPath();
-//    return 0;
-//
-//error:
-//    LOG.error("Error moving item '%ls'", getSafeItemName(this));
-//    return 1;
-//}
+int ClientContact::moveItem(ClientFolder* destFolder) {
+
+    if (!pContact) {
+        goto error;
+    }
+
+    // Get destination folder
+    MAPIFolder* pDestFolder = destFolder->getCOMPtr();
+    if (!pDestFolder) {
+        goto error;
+    }
+
+    // Move item
+    try {
+        this->setCOMPtr((_ContactItemPtr)pContact->Move(pDestFolder));
+    }
+    catch(_com_error &e) {
+        manageComErrors(e);
+        goto error;
+    }
+
+    parentPath = destFolder->getPath();
+    return 0;
+
+error:
+    LOG.error("Error moving item '%ls'", getSafeItemName(this));
+    return 1;
+}
 
 
 
@@ -432,7 +440,7 @@ const wstring ClientContact::getSafeProperty(const wstring& propertyName) {
              (propertyName == L"Email2Address" && pSafeContact->GetEmail2AddressType() == (_bstr_t)L"EX") ||
              (propertyName == L"Email3Address" && pSafeContact->GetEmail3AddressType() == (_bstr_t)L"EX") ) {
 
-            ClientApplication* ol = ClientApplication::getInstance();
+            ClientApplication* ol = ClientApplication::getInstance(true);
             propertyValue = ol->getSMTPfromEX(propertyValue);
         }
         else if (propertyName == L"Email1AddressType" ||
@@ -441,6 +449,11 @@ const wstring ClientContact::getSafeProperty(const wstring& propertyName) {
             if (propertyValue == L"EX") {
                 propertyValue = L"SMTP";
             }
+        }
+
+        // Manage error in API to read item's body: one newline is always appended.
+        if (propertyName == L"Body") {
+            removeLastNewLine(propertyValue);
         }
     }
 
@@ -575,7 +588,7 @@ const wstring ClientContact::getComplexProperty(const wstring& propertyName) {
     else if (propertyName == L"Photo") {
 
         // Safe check: picture supported since Outlook 2003
-        ClientApplication* ol = ClientApplication::getInstance();
+        ClientApplication* ol = ClientApplication::getInstance(true);
         int version = _wtoi(ol->getVersion().c_str());
         if (version < 11) {
             return L"";
@@ -797,7 +810,7 @@ int ClientContact::setComplexProperty(const wstring& propertyName, const wstring
     // Photo
     else if (propertyName == L"Photo") {
         // Safe check: picture is supported since Outlook 2003
-        ClientApplication* ol = ClientApplication::getInstance();
+        ClientApplication* ol = ClientApplication::getInstance(true);
         int version = _wtoi(ol->getVersion().c_str());
         if (version < 11) {
             return 0;
@@ -1046,6 +1059,9 @@ ClientContact::ClientContact(const ClientContact& c) {
 
     willCreateAnniversaryEvent = c.willCreateAnniversaryEvent;
     willCreateBirthdayEvent    = c.willCreateBirthdayEvent;
+
+    userPropertyMap     = c.userPropertyMap;
+    userPropertiesCount = c.userPropertiesCount;
 }
 
 
@@ -1072,6 +1088,10 @@ ClientContact ClientContact::operator=(const ClientContact& c) {
 
     cnew.willCreateAnniversaryEvent = c.willCreateAnniversaryEvent;
     cnew.willCreateBirthdayEvent    = c.willCreateBirthdayEvent;
+
+
+    cnew.userPropertyMap     = c.userPropertyMap;
+    cnew.userPropertiesCount = c.userPropertiesCount;
 
     return cnew;
 }

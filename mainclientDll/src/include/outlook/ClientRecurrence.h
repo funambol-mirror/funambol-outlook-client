@@ -220,6 +220,9 @@ public:
     bool                getHasTimezone     () { return hasTimezone; }
     void                setHasTimezone     (bool v) { hasTimezone = v; }
 
+    const double        getPatternStart    ();
+    const double        getPatternEnd      ();
+
     // Get property value (wstring) from its name.
     const std::wstring getProperty(const std::wstring& propertyName);
 

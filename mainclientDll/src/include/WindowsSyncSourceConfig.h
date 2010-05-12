@@ -42,6 +42,7 @@
 
 #include "spds/SyncSourceConfig.h"
 #include "DateFilter.h"
+#include "defs.h"
 
 using namespace Funambol;
 
@@ -70,7 +71,6 @@ private:
 
     /// Timestamp of the last finished sync.
     long endTimestamp;
-
 
     /// Pointer to (external) original SyncSourceConfig object, to retrieve
     /// all common properties: we MUST get/set common properties from 
@@ -157,6 +157,8 @@ public:
 
     bool getIsSynced() const;
     void setIsSynced(bool v);
+
+    _declspec(dllexport) bool getIsRefreshMode() const;
 
     /// Returns a reference to DateFilter (internally owned).
     _declspec(dllexport) DateFilter& getDateFilter() { return dateFilter; }

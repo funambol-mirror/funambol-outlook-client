@@ -41,6 +41,7 @@
 #include "ContactSettings.h"
 #include "MainSyncFrm.h"
 #include "ClientUtil.h"
+#include "SettingsHelper.h"
 
 #include "vocl/WinItem.h"
 #include "winmaincpp.h"
@@ -48,6 +49,7 @@
 #include "comutil.h"
 #include "OutlookPlugin.h"
 #include <string>
+#include "UICustomization.h"
 
 using namespace std;
 // CContactSettings
@@ -88,14 +90,19 @@ void CContactSettings::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_CONTACTS_GROUP_DIRECTION, groupDirection);
     DDX_Control(pDX, IDC_CONTACTS_GROUP_FOLDER, groupFolder);
     DDX_Control(pDX, IDC_CONTACTS_GROUP_ADVANCED, groupAdvanced);
+
+    DDX_Control(pDX, IDC_CONTACTS_CHECK_SHARED, checkShared);
 }
 
 BEGIN_MESSAGE_MAP(CContactSettings, CDialog)
     ON_BN_CLICKED(IDC_CONTACTS_BUTOK, &CContactSettings::OnBnClickedContactsButok)
     ON_BN_CLICKED(IDC_CONTACTS_BUTCANCEL, &CContactSettings::OnBnClickedContactsButcancel)
     ON_BN_CLICKED(IDC_CONTACTS_BUT_FOLDER, &CContactSettings::OnBnClickedContactsButFolder)
+
     ON_BN_CLICKED(IDC_CONTACTS_RADIO_SIF, &CContactSettings::OnBnClickedContactsRadioSif)
     ON_BN_CLICKED(IDC_CONTACTS_RADIO_VCARD, &CContactSettings::OnBnClickedContactsRadioVcard)
+
+    ON_BN_CLICKED(IDC_CONTACTS_CHECK_SHARED, &CContactSettings::OnBnClickedContactsCheckShared)
 END_MESSAGE_MAP()
 
 
@@ -148,9 +155,9 @@ BOOL CContactSettings::OnInitDialog(){
     s1.LoadString(IDS_OK);                  SetDlgItemText(IDC_CONTACTS_BUTOK, s1);
     s1.LoadString(IDS_CANCEL);              SetDlgItemText(IDC_CONTACTS_BUTCANCEL, s1);
 
+    s1.LoadString(IDS_SHARED);              SetDlgItemText(IDC_CONTACTS_CHECK_SHARED, s1);
 
     // load settings from Registry
-
     lstSyncType.SetCurSel(getSyncTypeIndex(ssconf->getSync()));
     
     // Get folder path.
@@ -179,6 +186,10 @@ BOOL CContactSettings::OnInitDialog(){
     delete [] remName;
     SetDlgItemText(IDC_CONTACTS_EDIT_REMOTE, s1);
 
+    if (s1.Right(wcslen(SHARED_SUFFIX)).Compare(SHARED_SUFFIX) == 0) {
+        checkShared.SetCheck(BST_CHECKED);
+    }
+
     if( strstr(ssconf->getType(),"sif") ){
         s1.LoadString(IDS_USE_SIF);
         SetDlgItemText(IDC_CONTACTS_DATA_FORMAT, s1);
@@ -192,11 +203,48 @@ BOOL CContactSettings::OnInitDialog(){
         currentRadioChecked = VCARD_CHECKED;
     }
 
+    // Hide the radio buttons of data format: only vCard (since 7.1.2).
+    GetDlgItem(IDC_CONTACTS_RADIO_SIF)->ShowWindow(SW_HIDE);
+    GetDlgItem(IDC_CONTACTS_RADIO_VCARD)->ShowWindow(SW_HIDE);
 
-    //
-    // Hide Advanced settings (remote URI) if defined in customization.h
-    //
-    if(!SHOW_ADVANCED_SETTINGS) {
+    // Apply customizations
+    bool shared             = UICustomization::shared;
+    bool forceUseSubfolders = UICustomization::forceUseSubfolders;
+    bool hideDataFormats    = UICustomization::hideDataFormats;
+    bool hideAllAdvanced    = !SHOW_ADVANCED_SETTINGS;
+
+    if (!shared) {
+        GetDlgItem(IDC_CONTACTS_CHECK_SHARED)->ShowWindow(SW_HIDE);
+    } else {
+        editRemote.EnableWindow(false);
+    }
+
+    if (forceUseSubfolders) {
+        checkInclude.SetCheck(BST_CHECKED);
+        checkInclude.ShowWindow(SW_HIDE);
+
+        // Resize things
+        CRect rect;
+        checkInclude.GetClientRect(&rect);
+        int dy = -1 * (rect.Height() + 5);
+
+        resizeItem(GetDlgItem(IDC_CONTACTS_GROUP_FOLDER), 0, dy);
+
+        moveItem(this, &groupAdvanced, 0, dy);
+        moveItem(this, &editRemote,    0, dy);
+        moveItem(this, &radioSif,      0, dy);
+        moveItem(this, &radioVcard,    0, dy);
+        moveItem(this, &checkShared,   0, dy);
+        moveItem(this, GetDlgItem(IDC_CONTACTS_STATIC_REMOTE),     0, dy);
+        moveItem(this, GetDlgItem(IDC_CONTACTS_STATIC_DATAFORMAT), 0, dy);
+        moveItem(this, GetDlgItem(IDC_CONTACTS_DATA_FORMAT),       0, dy);
+        moveItem(this, GetDlgItem(IDC_CONTACTS_BUTOK),             0, dy);
+        moveItem(this, GetDlgItem(IDC_CONTACTS_BUTCANCEL),         0, dy);
+
+        setWindowHeight(this, GetDlgItem(IDC_CONTACTS_BUTOK));
+    }
+
+    if (hideAllAdvanced) {
         groupAdvanced.ShowWindow(SW_HIDE);
         editRemote.ShowWindow(SW_HIDE);
         radioSif.ShowWindow(SW_HIDE);
@@ -204,30 +252,32 @@ BOOL CContactSettings::OnInitDialog(){
         GetDlgItem(IDC_CONTACTS_STATIC_REMOTE)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_CONTACTS_STATIC_DATAFORMAT)->ShowWindow(SW_HIDE);
 
-        // Redraw buttons 'OK' and 'Cancel' where the groupAdvanced was located
-        CPoint posAdvanced = getRelativePosition(&groupAdvanced, this);
-        int top = posAdvanced.y + 10;   // 10 = some space
+        CRect rect;
+        groupAdvanced.GetClientRect(&rect);
+        int dy = -1 * (rect.Height() + 10);
 
-        CWnd* butOk     = GetDlgItem(IDC_CONTACTS_BUTOK);
-        CWnd* butCancel = GetDlgItem(IDC_CONTACTS_BUTCANCEL);
-        CRect rectDialog, rectOk;
-        GetClientRect(&rectDialog);
-        butOk->GetClientRect(&rectOk);
+        moveItem(this, GetDlgItem(IDC_CONTACTS_BUTOK),     0, dy);
+        moveItem(this, GetDlgItem(IDC_CONTACTS_BUTCANCEL), 0, dy);
 
-        CPoint posOk     = getRelativePosition(butOk,     this);
-        CPoint posCancel = getRelativePosition(butCancel, this);
-        butOk->SetWindowPos(&CWnd::wndTop, posOk.x, top, NULL, NULL, SWP_SHOWWINDOW | SWP_NOSIZE);
-        butCancel->SetWindowPos(&CWnd::wndTop, posCancel.x, top, NULL, NULL, SWP_SHOWWINDOW | SWP_NOSIZE);
+        setWindowHeight(this, GetDlgItem(IDC_CONTACTS_BUTOK));
+    } else if (hideDataFormats) {
+        radioSif.ShowWindow(SW_HIDE);
+        radioVcard.ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_CONTACTS_STATIC_DATAFORMAT)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_CONTACTS_DATA_FORMAT)->ShowWindow(SW_HIDE);
 
-        // Resize window, now it's smaller
-        int newHeight = top + rectOk.Height() + 50;     // 50 = some space
-        this->SetWindowPos(&CWnd::wndTop, NULL, NULL, rectDialog.Width(), newHeight, SWP_SHOWWINDOW | SWP_NOMOVE);
+        // Resize things
+        CRect rect;
+        GetDlgItem(IDC_CONTACTS_STATIC_DATAFORMAT)->GetClientRect(&rect);
+        int dy = -1 * (rect.Height() + 5);
+
+        resizeItem(&groupAdvanced, 0, dy);
+
+        moveItem(this, GetDlgItem(IDC_CONTACTS_BUTOK),     0, dy);
+        moveItem(this, GetDlgItem(IDC_CONTACTS_BUTCANCEL), 0, dy);
+
+        setWindowHeight(this, GetDlgItem(IDC_CONTACTS_BUTOK));
     }
-
-    // Hide the radio buttons of data format: only vCard (since 7.1.2).
-    GetDlgItem(IDC_CONTACTS_RADIO_SIF)->ShowWindow(SW_HIDE);
-    GetDlgItem(IDC_CONTACTS_RADIO_VCARD)->ShowWindow(SW_HIDE);
-
 
     // disable windows xp theme, otherwise any color setting for groupbox
     // will be overriden by the theme settings
@@ -277,6 +327,15 @@ bool CContactSettings::saveSettings(bool saveToDisk)
         wsafeMessageBox(s1);
         return false;
     };
+
+    if (UICustomization::showWarningOnChangeFromOneWay) {
+        int currentSyncType = getSyncTypeIndex(ssconf->getSync());
+        int newSyncType = lstSyncType.GetCurSel();
+        if (checkOneWayToTwoWay(currentSyncType, newSyncType)) {
+           return false;
+        }
+    }
+
     // sync source enabled
     ssconf->setSync(getSyncTypeName(lstSyncType.GetCurSel()));
 
@@ -284,11 +343,20 @@ bool CContactSettings::saveSettings(bool saveToDisk)
     //       (when writing to winreg, toWideChar is then called)
     char* olFolder = toMultibyte(outlookFolder.GetBuffer());
     if (olFolder) {
+        // If folder has changed, clear anchors
+        if (UICustomization::clearAnchorsOnFolderChange) {
+            const char * original = ssconf->getFolderPath();
+            if (strcmp(original, olFolder) != 0) {
+                ssconf->setLast(0);
+                ssconf->setEndTimestamp(0);
+            }
+        }
+        
         ssconf->setFolderPath(olFolder);
         delete [] olFolder;
     }
 
-    if(checkInclude.GetCheck() == BST_CHECKED)
+    if(checkInclude.GetCheck() == BST_CHECKED || UICustomization::forceUseSubfolders)
         ssconf->setUseSubfolders(true);
     else
         ssconf->setUseSubfolders(false);
@@ -373,4 +441,18 @@ void CContactSettings::OnBnClickedContactsRadioVcard() {
         SetDlgItemText(IDC_CONTACTS_EDIT_REMOTE, VCARD_DEFAULT_NAME);
         currentRadioChecked = VCARD_CHECKED;
     }
+}
+
+void CContactSettings::OnBnClickedContactsCheckShared() {
+    long editId = IDC_CONTACTS_EDIT_REMOTE;
+
+    CString currentValue;
+    GetDlgItemText(editId, currentValue);
+    CString warningMessage;
+    warningMessage.LoadString(IDS_UNCHECK_SHARED);
+
+    CString newValue = processSharedCheckboxClick(CONTACTS_REMOTE_NAME,
+         checkShared.GetCheck() != 0, currentValue, warningMessage);
+
+    SetDlgItemText(editId, newValue);
 }

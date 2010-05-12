@@ -48,6 +48,8 @@
 #include "NotesSettings.h"
 #include "TaskSettings.h"
 #include "PicturesSettings.h"
+#include "UICustomization.h"
+#include "SettingsHelper.h"
 
 #include "customization.h"
 #include "winmaincpp.h"
@@ -200,41 +202,43 @@ void CSyncSettings::DoDataExchange(CDataExchange* pDX)
     CFormView::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_SYNC_CHECK_CONTACTS, checkContacts);
     DDX_Control(pDX, IDC_SYNC_CHECK_CALENDAR, checkCalendar);
-    DDX_Control(pDX, IDC_SYNC_CHECK_TASKS,    checkTasks);
-    DDX_Control(pDX, IDC_SYNC_CHECK_NOTES,    checkNotes);
+    DDX_Control(pDX, IDC_SYNC_CHECK_TASKS, checkTasks);
+    DDX_Control(pDX, IDC_SYNC_CHECK_NOTES, checkNotes);
     DDX_Control(pDX, IDC_SYNC_CHECK_PICTURES, checkPictures);
 
     DDX_Control(pDX, IDC_SYNC_BUT_CONTACTS, butContacts);
     DDX_Control(pDX, IDC_SYNC_BUT_CALENDAR, butCalendar);
-    DDX_Control(pDX, IDC_SYNC_BUT_TASKS,    butTasks);
-    DDX_Control(pDX, IDC_SYNC_BUT_NOTES,    butNotes);
+    DDX_Control(pDX, IDC_SYNC_BUT_TASKS, butTasks);
+    DDX_Control(pDX, IDC_SYNC_BUT_NOTES, butNotes);
     DDX_Control(pDX, IDC_SYNC_BUT_PICTURES, butPictures);
 
     DDX_Control(pDX, IDC_SCHEDULER_CHECK_ENABLED, checkEnabled);
-    DDX_Control(pDX, IDC_SCHEDULER_COMBO_VALUE,   comboSchedulerValue);
-    DDX_Control(pDX, IDC_SYNC_CHECK_ENCRYPTION,   checkEncryption);
-    DDX_Control(pDX, IDC_SYNC_GROUP_ITEMS,        groupItems);
-    DDX_Control(pDX, IDC_SCHEDULER_GROUP,         groupScheduler);
-    DDX_Control(pDX, IDC_SYNC_GROUP_SECURITY,     groupSecurity);
+    DDX_Control(pDX, IDC_SCHEDULER_COMBO_VALUE, comboSchedulerValue);
+    DDX_Control(pDX, IDC_SYNC_CHECK_ENCRYPTION, checkEncryption);
+    DDX_Control(pDX, IDC_SYNC_CHECK_OUTLOOK_OPEN, checkAttach);
+    DDX_Control(pDX, IDC_SYNC_GROUP_ITEMS, groupItems);
+    DDX_Control(pDX, IDC_SCHEDULER_GROUP, groupScheduler);
+    DDX_Control(pDX, IDC_SECURITY_GROUP, groupSecurity);
 }
 
 BEGIN_MESSAGE_MAP(CSyncSettings, CFormView)
     ON_MESSAGE( WM_INITDIALOG, OnInitForm ) 
-    ON_BN_CLICKED(IDC_SYNC_CHECK_CONTACTS,  &CSyncSettings::OnBnClickedSyncCheckContacts)
-    ON_BN_CLICKED(IDC_SYNC_CHECK_CALENDAR,  &CSyncSettings::OnBnClickedSyncCheckCalendar)
-    ON_BN_CLICKED(IDC_SYNC_CHECK_TASKS,     &CSyncSettings::OnBnClickedSyncCheckTasks)
-    ON_BN_CLICKED(IDC_SYNC_CHECK_NOTES,     &CSyncSettings::OnBnClickedSyncCheckNotes)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_CONTACTS, &CSyncSettings::OnBnClickedSyncCheckContacts)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_CALENDAR, &CSyncSettings::OnBnClickedSyncCheckCalendar)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_TASKS, &CSyncSettings::OnBnClickedSyncCheckTasks)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_NOTES, &CSyncSettings::OnBnClickedSyncCheckNotes)
     ON_BN_CLICKED(IDC_SYNC_CHECK_PICTURES,  &CSyncSettings::OnBnClickedSyncCheckPictures)
-    ON_BN_CLICKED(IDC_SYNC_OK,              &CSyncSettings::OnBnClickedSyncOk)
-    ON_BN_CLICKED(IDC_SYNC_CANCEL,          &CSyncSettings::OnBnClickedSyncCancel)
-    ON_BN_CLICKED(IDC_SYNC_BUT_CONTACTS,    &CSyncSettings::OnBnClickedSyncButContacts)
-    ON_BN_CLICKED(IDC_SYNC_BUT_CALENDAR,    &CSyncSettings::OnBnClickedSyncButCalendar)
-    ON_BN_CLICKED(IDC_SYNC_BUT_TASKS,       &CSyncSettings::OnBnClickedSyncButTasks)
-    ON_BN_CLICKED(IDC_SYNC_BUT_NOTES,       &CSyncSettings::OnBnClickedSyncButNotes)
+    ON_BN_CLICKED(IDC_SYNC_OK, &CSyncSettings::OnBnClickedSyncOk)
+    ON_BN_CLICKED(IDC_SYNC_CANCEL, &CSyncSettings::OnBnClickedSyncCancel)
+    ON_BN_CLICKED(IDC_SYNC_BUT_CONTACTS, &CSyncSettings::OnBnClickedSyncButContacts)
+    ON_BN_CLICKED(IDC_SYNC_BUT_CALENDAR, &CSyncSettings::OnBnClickedSyncButCalendar)
+    ON_BN_CLICKED(IDC_SYNC_BUT_TASKS, &CSyncSettings::OnBnClickedSyncButTasks)
+    ON_BN_CLICKED(IDC_SYNC_BUT_NOTES, &CSyncSettings::OnBnClickedSyncButNotes)
     ON_BN_CLICKED(IDC_SYNC_BUT_PICTURES,    &CSyncSettings::OnBnClickedSyncButPictures)
     ON_WM_NCPAINT()
-    ON_BN_CLICKED(IDC_SCHEDULER_CHECK_ENABLED,  &CSyncSettings::OnBnClickedSchedulerCheckEnabled)
+    ON_BN_CLICKED(IDC_SCHEDULER_CHECK_ENABLED, &CSyncSettings::OnBnClickedSchedulerCheckEnabled)
     ON_CBN_SELCHANGE(IDC_SCHEDULER_COMBO_VALUE, &CSyncSettings::OnCbnSelchangeSchedulerComboValue)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_OUTLOOK_OPEN, &CSyncSettings::OnBnClickedSyncCheckOutlookOpen)
 END_MESSAGE_MAP()
 
 
@@ -300,7 +304,11 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     SetDlgItemText(IDC_SYNC_BUT_NOTES,    s1);
     SetDlgItemText(IDC_SYNC_BUT_PICTURES, s1);
 
-    s1.LoadString(IDS_OK);     SetDlgItemText(IDC_SYNC_OK,     s1);
+    s1.LoadString(IDS_SYNC_SYNCHRONIZE_EVERY); SetDlgItemText(IDC_SCHEDULER_CHECK_ENABLED, s1);
+    s1.LoadString(IDS_SYNC_ENABLE_ENCRYPTION); SetDlgItemText(IDC_SYNC_CHECK_ENCRYPTION, s1);
+    s1.LoadString(IDS_REQUIRE_OUTLOOK_OPEN); SetDlgItemText(IDC_SYNC_CHECK_OUTLOOK_OPEN, s1);
+
+    s1.LoadString(IDS_OK); SetDlgItemText(IDC_SYNC_OK, s1);
     s1.LoadString(IDS_CANCEL); SetDlgItemText(IDC_SYNC_CANCEL, s1);
 
     // Scheduler: add strings to the comboBox
@@ -331,7 +339,7 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
         comboSchedulerValue.AddString(sched);
     }
 
-    s1.LoadString(IDS_SECURITY);                 SetDlgItemText(IDC_SYNC_GROUP_SECURITY,  s1);
+    s1.LoadString(IDS_SECURITY);                 SetDlgItemText(IDC_SYNC_GROUP_SECURITY, s1);
     s1.LoadString(IDS_SYNC_ENABLE_ENCRYPTION);   SetDlgItemText(IDC_SYNC_CHECK_ENCRYPTION, s1);
 
 
@@ -476,23 +484,25 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
 
     } else {
 
-    if(! getScheduler(&minutes)){
-        checkEnabled.SetCheck(BST_UNCHECKED);
-        comboSchedulerValue.EnableWindow(FALSE);
-        int pos = defaultPosition; //getSchedulerPosition();
-        comboSchedulerValue.SetCurSel(pos);
-    }
-    else{
-        checkEnabled.SetCheck(BST_CHECKED);
-        comboSchedulerValue.EnableWindow(TRUE);
-        int pos = getSchedulerPosition(minutes);
-        comboSchedulerValue.SetCurSel(pos);
-
-        if (getSchedulerMinutes(pos) != minutes) {
-            // Scheduler time was not exactly this one (manually modified?)
-            saveScheduler = true;
+        if(! getScheduler(&minutes)){
+            checkEnabled.SetCheck(BST_UNCHECKED);
+            comboSchedulerValue.EnableWindow(FALSE);
+            int pos = defaultPosition; //getSchedulerPosition();
+            comboSchedulerValue.SetCurSel(pos);
+            checkAttach.EnableWindow(FALSE);
         }
-    }
+        else{
+            checkEnabled.SetCheck(BST_CHECKED);
+            comboSchedulerValue.EnableWindow(TRUE);
+            int pos = getSchedulerPosition(minutes);
+            comboSchedulerValue.SetCurSel(pos);
+    
+            if (getSchedulerMinutes(pos) != minutes) {
+                // Scheduler time was not exactly this one (manually modified?)
+                saveScheduler = true;
+            }
+            checkAttach.EnableWindow(TRUE);
+        }
     }
 
     // encryption is global
@@ -512,6 +522,22 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
         checkEncryption.EnableWindow(FALSE);
         checkEncryption.ShowWindow(FALSE);
         groupSecurity.ShowWindow(FALSE);
+    }
+
+    // attach option
+    if (UICustomization::attachOption) {
+        if (getConfig()->getWindowsDeviceConfig().getAttach()) {
+            checkAttach.SetCheck(BST_CHECKED);
+        } else {
+            checkAttach.SetCheck(BST_UNCHECKED);
+        }
+    } else {
+        checkAttach.SetCheck(BST_UNCHECKED);
+        checkAttach.ShowWindow(SW_HIDE);
+        int dy = -17;
+        moveItem(this, GetDlgItem(IDC_SECURITY_GROUP), 0, dy);
+        moveItem(this, &checkEncryption, 0, dy);
+        resizeItem(GetDlgItem(IDC_SCHEDULER_GROUP), 0, dy);
     }
 
     // disable windows xp theme, otherwise any color setting for groupbox
@@ -708,6 +734,14 @@ bool CSyncSettings::saveSettings(bool saveToDisk)
         }
     }
 
+    if(saveAttach)
+    {
+        if (checkAttach.GetCheck())
+            getConfig()->getWindowsDeviceConfig().setAttach(true);
+        else
+            getConfig()->getWindowsDeviceConfig().setAttach(false);
+    }
+
     if(saveToDisk)
         getConfig()->save();
 
@@ -723,11 +757,13 @@ void CSyncSettings::OnBnClickedSchedulerCheckEnabled()
 {
     if(checkEnabled.GetCheck() == BST_UNCHECKED){
         comboSchedulerValue.EnableWindow(FALSE);
+        checkAttach.EnableWindow(FALSE);
     }
     else{
         comboSchedulerValue.EnableWindow(TRUE);
         int pos = defaultPosition;
         comboSchedulerValue.SetCurSel(pos);
+        checkAttach.EnableWindow(TRUE);
     }
 
     saveScheduler = true;
@@ -754,4 +790,9 @@ BOOL CSyncSettings::PreTranslateMessage(MSG* pMsg){
 void CSyncSettings::OnCbnSelchangeSchedulerComboValue()
 {
     saveScheduler = true;
+}
+
+void CSyncSettings::OnBnClickedSyncCheckOutlookOpen()
+{
+    saveAttach = true;
 }

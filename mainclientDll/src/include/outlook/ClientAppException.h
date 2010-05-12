@@ -40,7 +40,11 @@
 /** @addtogroup outlook_rec */
 /** @{ */
 
+// Forward Declaration
+class ClientAppointment;
+
 #include "outlook/defs.h"
+#include "outlook/ClientRecipient.h"
 
 #include <string>
 
@@ -73,6 +77,8 @@ private:
     std::wstring  reminderSet;
     std::wstring  reminderMinutesBeforeStart;
     std::wstring  importance;
+
+    std::vector<std::wstring> attendees;
 
     // Exception properties:
     DATE          originalDate;
@@ -160,6 +166,11 @@ public:
     const std::wstring  formatOriginalDate(BOOL isAllDay, const std::wstring& start);
     const std::wstring  formatOriginalDate();
 
+    std::vector<std::wstring> getAttendees();
+    void inheritAttendees(ClientAppointment * cApp);
+
+private:
+    void processAttendees(const std::map<int, ClientRecipient> & attendeeList);
 };
 
 /** @} */

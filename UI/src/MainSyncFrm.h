@@ -111,9 +111,15 @@ protected:
 
     afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 
+// Overrides
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(CConfigFrame)
+    protected:
+    virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
+    //}}AFX_VIRTUAL
+
 	DECLARE_MESSAGE_MAP()
 
-	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
     
     /// Overrided to dynamically remove the 'view User Guide' button & separator.
     afx_msg void OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
@@ -151,7 +157,7 @@ public:
 
     void OnConfigClosed();
     void StartSync();
-    int CancelSync();
+    int CancelSync(bool confirm = true);
 
     //afx_msg void OnUpdatePage(CCmdUI *pCmdUI); //status bar update
     afx_msg LRESULT OnMsgSyncBegin      (WPARAM , LPARAM);
@@ -166,6 +172,10 @@ public:
     afx_msg LRESULT OnMsgSyncSourceState(WPARAM, LPARAM);
     afx_msg LRESULT OnMsgUnlockButtons  (WPARAM, LPARAM);
     afx_msg LRESULT OnMsgLockButtons    (WPARAM, LPARAM);
+
+    afx_msg LRESULT CancelSync(WPARAM wParam, LPARAM lParam);
+
+    afx_msg LRESULT Synchronize(WPARAM wParam, LPARAM lParam);
 
     afx_msg void OnFileConfiguration();
     afx_msg void OnToolsFullSync();

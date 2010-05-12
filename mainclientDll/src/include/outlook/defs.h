@@ -75,7 +75,8 @@
 
 // Error messages for Outlook
 #define ERR_OUTLOOK                         "Outlook Error."
-#define ERR_OUTLOOK_OPEN                    "Unable to instantiate Microsoft Outlook.\nPlease check if Outlook is installed and correctly configured."
+#define ERR_OUTLOOK_OPEN                    "Unable to instantiate Microsoft Outlook.\nPlease check if Outlook is installed, and correctly configured."
+#define ERR_OUTLOOK_ATTACH                  "Unable to attach to Microsoft Outlook.\nPlease check if Outlook is installed, open, and correctly configured."
 #define ERR_OUTLOOK_LOGOFF                  "Outlook Error: unable to log off."
 #define ERR_OUTLOOK_CLEANUP                 "Outlook Error cleaning up."
 #define ERR_OUTLOOK_RELEASE_COMOBJECTS      "Error releasing COM pointers."
@@ -152,7 +153,8 @@
 #define DBG_OUTLOOK_NOT_LOGGED              "No Logoff: %ls (COM error %08lx)"
 /** @endcond */     // cond DEV
 
-
+#define WMSG_BOX_NO_DATA_ITEM               L"Warning: " WPROGRAM_NAME L" detected a lot of deleted %ls data.\nIf this is not correct, please press no, shutdown outlook, and try again. If this message appears incorrectly again, contact support.\nIf you press yes, a large portion of your %ls data will be deleted on the server.\n\nContinue Sync?"
+#define ERR_NO_DATA_ITEM                    PROGRAM_NAME" detected mass delete of %ls data. Verifying with user."
 
 // Import libraries: Outlook Object Model and Redemption.
 // --------------------------------------------------------

@@ -41,16 +41,18 @@
 /** @{ */
 
 #include "outlook/defs.h"
-#include "outlook/ClientItem.h"
 
 #include <string>
 
+// Forward declaration of Folder
+class ClientFolder;
+
+// Forward declaration of Item
+class ClientItem;
 
 /// Standard name of the contact's picture in Outlook
 #define PICTURE_OUTLOOK_NAME           L"ContactPicture.jpg"
 #define PICTURE_TMP_NAME               L"~pic-tmp.jpg"
-
-
 
 /**
  * Wraps the Outlook contact object.
@@ -123,7 +125,7 @@ public:
     int saveItem();
     int deleteItem();
     ClientItem* copyItem();
-    //int moveItem(ClientFolder* destFolder);
+    int moveItem(ClientFolder* destFolder);
 
 
     /// Returns true if a Anniversary event has been created silently by Outlook during saveItem().

@@ -45,6 +45,8 @@
 
 #include <string>
 
+//Forward declaration of Folder
+class ClientFolder;
 
 
 ////// ---------- NOT USED BY NOW -------- ///////////
@@ -93,7 +95,7 @@ public:
     int saveItem();
     int deleteItem();
     ClientItem* copyItem();
-    //int moveItem(ClientFolder* destFolder);
+    int moveItem(ClientFolder* destFolder);
 
 
     //
