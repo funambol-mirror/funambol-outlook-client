@@ -43,6 +43,7 @@
 #include "outlook/utils.h"
 #include "outlook/itemProps.h"
 
+#include "vocl/AppDefs.h"
 
 using namespace std;
 
@@ -61,12 +62,17 @@ ClientItem::ClientItem() {
     propertiesCount = 0;
 
     propertyMap.clear();
+
+
+    userPropertyMap.clear();
+    userPropertiesCount = 0;
 }
 
 // Destructor
 ClientItem::~ClientItem() {
 
     propertyMap.clear();
+    userPropertyMap.clear();
 
     if (pItemProperty)   { pItemProperty.Release();   }
     if (pItemProperties) { pItemProperties.Release(); }
@@ -105,16 +111,29 @@ const int ClientItem::getPropertiesIndex() {
  */
 void ClientItem::createPropertyMap() {
 
+    propertyMap.clear();
+
     wstring propertyName;
     int i = 0;
+    propertiesCount = pItemProperties->Count;
+    int temp = propertiesCount;
 
     try {
-        for (i=0; i<propertiesCount; i++) {
+        for (i=0; i<temp; i++) {
             pItemProperty = pItemProperties->Item(i);
             propertyName = (WCHAR*)pItemProperty->GetName();
 
             // Fill the property map
-            propertyMap[propertyName] = i;
+            if (pItemProperty->GetIsUserProperty())
+            {
+                userPropertyMap[propertyName] = i;
+                userPropertiesCount++;
+                propertiesCount--;
+            }
+            else
+            {
+                propertyMap[propertyName] = i;
+            }
         }
     }
     catch(_com_error &e) {
@@ -125,6 +144,45 @@ void ClientItem::createPropertyMap() {
 
 }
 
+void ClientItem::createUserPropertyMap() {
+
+    userPropertyMap.clear();
+
+    if (getType() == NOTE)
+        return; // Notes user properties do not have a UserProperties object
+
+    wstring propertyName;
+    int i = 0;
+
+    int oldPropertiesCount = propertiesCount;
+    int oldUserPropertiesCount = userPropertiesCount;
+
+    userPropertiesCount = pUserProperties->Count;
+    propertiesCount = pItemProperties->Count - userPropertiesCount;
+
+    int temp = propertiesCount+userPropertiesCount;
+    try {
+        for (i=oldPropertiesCount; i<temp; i++) {
+            pItemProperty = pItemProperties->Item(i);
+            propertyName = (WCHAR*)pItemProperty->GetName();
+
+            // should always be user
+            if (pItemProperty->GetIsUserProperty())
+            {
+                userPropertyMap[propertyName] = i;
+            }
+            else
+            {
+                throwClientException("User properties are not after standard properties, cannot continue");
+            }
+        }
+    }
+    catch(_com_error &e) {
+        manageComErrors(e);
+        setErrorF(0, ERR_OUTLOOK_PROP_MAP, itemType.c_str(), i);
+        throwClientFatalException(getLastErrorMsg());
+    }
+}
 
 
 
@@ -343,7 +401,138 @@ int ClientItem::setSimpleProperty(const wstring& propertyName, const wstring& pr
     }
 
     pItemProperty = pItemProperties->Item(propertiesIndex);
-    _bstr_t bstrValue = (_bstr_t)propertyValue.c_str();    
+    _bstr_t bstrValue = (_bstr_t)propertyValue.c_str();
     pItemProperty->PutValue(bstrValue);
+
     return 0;
+}
+
+const wstring ClientItem::getUserPropertyValue(std::wstring name)
+{
+    try
+    {
+        int realIndex     = userPropertyMap[name];
+        pItemProperty      = pItemProperties->Item(realIndex);
+        _bstr_t bstrValue = (_bstr_t)pItemProperty->GetValue();
+        return (WCHAR*)bstrValue;
+    }
+    catch(...)
+    {
+        return L"";
+    }
+}
+
+const bool ClientItem::getUserProperty(std::wstring &name, std::wstring &value)
+{
+    try 
+    {
+        value.clear();
+        int realIndex = userPropertyMap[name];
+        pItemProperty     = pItemProperties->Item(realIndex);
+        _bstr_t bstrValue = (_bstr_t)pItemProperty->GetName();
+        name.clear();
+        name.append((WCHAR*)bstrValue);
+        bstrValue = (_bstr_t)pItemProperty->GetValue();
+        value.append((WCHAR*)bstrValue);
+        return true;
+    }
+    catch(...)
+    {
+        return false;
+    }
+}
+
+const int ClientItem::getUserPropertiesCount() 
+{
+    return userPropertyMap.size();
+}
+
+const std::vector<std::wstring> ClientItem::getUserPropertyNames()
+{
+    std::vector<std::wstring> result;
+
+    std::map<std::wstring, int>::reverse_iterator it = userPropertyMap.rbegin();
+    for (; it != userPropertyMap.rend(); it++)
+    {
+        result.push_back(it->first); 
+    }
+
+    return result;
+}
+
+void ClientItem::removeUserProperty(std::wstring name)
+{
+    if (userPropertyMap.find(name) != userPropertyMap.end())
+    {
+        pItemProperties->Remove(userPropertyMap[name]);
+        userPropertyMap.erase(name);
+    }
+}
+
+void ClientItem::setUserProperty(std::wstring name, std::wstring value)
+{
+    if (userPropertyMap.find(name) == userPropertyMap.end())
+    {
+        pItemProperty = pItemProperties->Add((_bstr_t)name.c_str(), olText, true);
+        pItemProperty->PutValue((_bstr_t)value.c_str());
+    }
+    else
+    {
+        // For a recover from server, the extra property map can become wrong after
+        // the last item is deleted, therefore we recurse and try to add it if 
+        // this fails.
+        try {
+            pItemProperty = pItemProperties->Item(userPropertyMap[name]);
+            pItemProperty->PutValue((_bstr_t)value.c_str());
+        } catch (...) {
+            userPropertyMap.erase(name);
+            return setUserProperty(name, value);
+        }
+    }
+}
+
+void ClientItem::clearUserProperties() {
+
+    recreatePropertyMap();
+    std::vector<std::wstring> props = getUserPropertyNames();
+    for (size_t x = 0; x < props.size(); x++) {
+        removeUserProperty(props[x]);
+    }
+    recreatePropertyMap();
+}
+
+void ClientItem::recreatePropertyMap() {
+    propertyMap.clear();
+    userPropertyMap.clear();
+    userPropertiesCount = 0;
+    this->createPropertyMap();
+}
+
+bool ClientItem::isReadOnly()
+{
+    try 
+    {
+        pItemProperty     = pItemProperties->Item(X_WM_WRITE_PERMISSION);
+        _bstr_t bstrValue = (_bstr_t)pItemProperty->GetValue();
+        if (bstrValue == (_bstr_t)X_TRUE)
+        {
+            return false;
+        }
+        return true;
+    }
+    catch(...)
+    {
+        return false;
+    }
+}
+
+
+void ClientItem::removeLastNewLine(std::wstring& value)
+{
+    int len = value.length();
+    if (len > 1) {
+        if (value[len-2] == '\r' && value[len-1] == '\n') {
+            value = value.substr(0, len-2);
+        }
+    }
 }

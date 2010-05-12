@@ -51,6 +51,7 @@
 
 #include <string>
 #include <list>
+#include <map>
 
 
 typedef std::list<std::wstring>         itemKeyList;
@@ -76,11 +77,12 @@ typedef itemKeyList::iterator           itemKeyIterator;
 #define ERR_CODE_NO_ROOT_FOLDER         110
 #define ERR_CODE_OPEN_OUTLOOK           111
 #define ERR_CODE_READ_ALL_ITEMS         112
+#define ERR_CODE_ID_MAP_PATH            120
+#define ERR_CODE_FOLDER_PATH_MATCH      121
 
 
 #define MAX_SOURCE_ERRORS                 500   /**< Max number of bad errors allowed                    */
 #define TIMESTAMP_DELAY                   2     /**< Outlook introduces some delay while saving items    */
-#define DONT_SEND_FILTERED_DEL_ITEMS      1     /**< When filters change, there can be many Deleted items to send */
 
 /** @endcond */
 
@@ -100,9 +102,55 @@ private:
 
     /// Pointer to the sole instance of ClientApplication (singleton)
     ClientApplication* outlook;
+    boolean forceOpenOutlook;
 
     int filterDirection;
 
+
+
+    class CacheData
+    {
+    public:
+        CacheData()
+        {}
+        CacheData(long ts, std::wstring p)
+        {
+            lastModified = ts;
+            parentPath = p;
+        }
+
+        long lastModified;
+        std::wstring parentPath;
+    };
+    std::map<std::wstring, CacheData> cache;
+
+    std::wstring lastAddedId;
+    std::map<std::wstring, std::wstring> idMap;
+    std::map<std::wstring, std::wstring> idMapReverse;
+
+    void cacheItem(std::wstring itemID, long lastModified, std::wstring parentPath);
+    void clearCache();
+
+    bool getItemDetails(const std::wstring & itemID, std::wstring & parentPath);
+    bool getItemDetails(const std::wstring & itemID, std::wstring & parentPath, long & lastModified);
+    bool getItemDetails(const std::wstring & itemID, std::wstring & parentPath, long & lastModified, ClientItem * & cItem);
+    bool getItemDetailsFromCache(const std::wstring & itemID, std::wstring & parentPath, long & lastModified);
+    std::map<std::wstring, CacheData> addedItems;
+    void itemAdded(ClientItem * item);
+
+    std::wstring getIdMapFile();
+    std::map<std::wstring, std::wstring> readIdMap(const std::wstring & idMapFile);
+    int writeIdMap(const std::map<std::wstring, std::wstring> & idMap);
+    void constructIdMaps(std::wstring idMapFile);
+
+    bool isNewIdInMap(const std::wstring & id);
+    bool isOldIdInMap(const std::wstring & id);
+    void addToIdMap(const std::wstring & oldId, const std::wstring & newId);
+    std::wstring getOldIdFromNewId(const std::wstring & id);
+    std::wstring getNewIdFromOldId(const std::wstring & id);
+    void removeOldIdFromMap(const std::wstring & id);
+    void removeNewIdFromMap(const std::wstring & id);
+    void removeIdFromMap(const std::wstring & id);
 
 protected:
 
@@ -143,6 +191,10 @@ protected:
     // Get all items inside 'folder' and push them (only keys) into 'listItems' list.
     void pushAllSubfolderItemsToList(ClientFolder* folder, itemKeyList& listItems, itemKeyList& listItemsPaths);
     void pushAllItemsToList         (ClientFolder* folder, itemKeyList& listItems, itemKeyList& listItemsPaths);
+
+    // Update the lists of all items and all paths
+    void updateAllItemsLists(itemKeyList &itemsToDelete, itemKeyList &itemPathsToDelete,
+        itemKeyList &itemsToAdd, itemKeyList &itemPathsToAdd);
 
     // Fill internal itemKeyLists of NEW/MOD/DEL item keys from last successfull sync.
     int manageModificationsFromLastSync();
@@ -187,12 +239,12 @@ protected:
      */
     bool filterClientItem(ClientItem* item, DateFilter::FilterDirection direction, const char* command = NULL);
 
+
     /**
      * Refresh all active filters.
      * DateFilter on events is related to the current time.
      */
     void updateFilters();
-
 
 public:
 
@@ -249,6 +301,7 @@ public:
     /// Returns a reference to DateFilter (proxy method).
     DateFilter& getDateFilter() { return getConfig().getDateFilter(); }
 
+    int upgradeCalendarFolders(bool fixMyCalendar = false);
 };
 
 /** @} */

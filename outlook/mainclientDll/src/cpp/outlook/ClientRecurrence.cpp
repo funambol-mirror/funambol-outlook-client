@@ -47,8 +47,7 @@
 
 using namespace std;
 
-
-
+#define MAX_OCCURRENCES                     1000
 
 // Constructor:
 ClientRecurrence::ClientRecurrence() {
@@ -154,7 +153,7 @@ void ClientRecurrence::clearRecurrence() {
  * @return: 0 if no errors
  */
 int ClientRecurrence::read() {
-    
+
     DATE patternEnd;
     VARIANT_BOOL vNoEnd;
     bool isAppointmentRecurrence = true;
@@ -183,10 +182,10 @@ int ClientRecurrence::read() {
     vNoEnd         = pRec->GetNoEndDate();
     patternEnd     = pRec->GetPatternEndDate();
     occurrences    = pRec->GetOccurrences();
-    
+
     patternStartTime = pRec->GetStartTime(); 
     patternEndTime   = pRec->GetEndTime();   
-    
+
     
 
     //
@@ -203,12 +202,12 @@ int ClientRecurrence::read() {
             doubleToSystemTime(patternStartDate, patternStart, FALSE, true);
         }
     }
-             
+
      // set the startTime of the appointment
     if (patternStartTime < LIMIT_MAX_DATE) {
         doubleToSystemTime(startTime, patternStartTime, FALSE, false);
     }
-    
+
     // set the endTime of the appointment
     if (patternEndTime < LIMIT_MAX_DATE) {
         doubleToSystemTime(endTime, patternEndTime, FALSE, false);
@@ -264,7 +263,7 @@ int ClientRecurrence::read() {
     if (noEndDate) {
         occurrences = 0;
     }
-    
+
     ClientApplication* cp = ClientApplication::getInstance();
     if (cp->getOutgoingTimezone() && isAppointmentRecurrence) {
         
@@ -639,6 +638,8 @@ int ClientRecurrence::save() {
         // PatternEndDate: UTC value is expected, but accept also "yyyyMMdd"
         //
         systemTimeToDouble(patternEndDate, &patternEnd);
+        if (patternEnd)
+            patternEnd -= .5; // Timezone fix
 
 
         // CHANGE-DAY to Local: modify monthOfYear / dayOfMonth / dayOfWeekMask.
@@ -721,7 +722,11 @@ int ClientRecurrence::save() {
     // ----- (ignore patternEndDate if values disagree)
     if (occurrences != 0 && occurrences != -1) {
         i++;
-        hr = pRec->put_Occurrences((long)occurrences);
+        if (occurrences >= MAX_OCCURRENCES) {
+            hr = pRec->put_NoEndDate(BOOLToVBool(true)); //Just set it to no end date.
+        } else {
+            hr = pRec->put_Occurrences((long)occurrences);
+        }
         if (FAILED(hr)) goto error;
     }
     else {
@@ -1651,3 +1656,16 @@ int ClientRecurrence::saveException(ClientAppException* cException) {
 //    return cnew;
 //}
 
+const double ClientRecurrence::getPatternStart()
+{
+    double ret;
+    systemTimeDateToDouble(patternStartDate, &ret);
+    return ret;
+}
+
+const double ClientRecurrence::getPatternEnd()
+{
+    double ret;
+    systemTimeDateToDouble(patternEndDate, &ret);
+    return ret;
+}

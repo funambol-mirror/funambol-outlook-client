@@ -75,6 +75,8 @@ class DefaultWinConfigFactory : public DefaultConfigFactory {
          */
         static DeviceConfig*  getDeviceConfig();
 
+        static WindowsDeviceConfig * getWindowsDeviceConfig(DeviceConfig & dc);
+
         /**
          * Returns a default generated SyncSourceConfig for Win32 (common props of SyncSourceConfig).
          * @param name : the name of syncsource desired

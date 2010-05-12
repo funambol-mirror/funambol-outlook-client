@@ -44,8 +44,10 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
-
+//Forward declaration of Folder
+class ClientFolder;
 
 /**
 ******************************************************************************
@@ -71,9 +73,13 @@ protected:
     int propertiesCount;
     int propertiesIndex;
 
+    std::map<std::wstring,int> userPropertyMap;
+    int userPropertiesCount;
+
     /// Pointers to microsoft outlook objects.
     ItemPropertiesPtr   pItemProperties;
     ItemPropertyPtr     pItemProperty;
+    UserPropertiesPtr   pUserProperties;
 
     /// Result of COM pointers operations.
     HRESULT hr;
@@ -91,6 +97,10 @@ protected:
 
     int         setSimpleProperty (const std::wstring& propertyName, const std::wstring& propertyValue);
     virtual int setComplexProperty(const std::wstring& propertyName, const std::wstring& propertyValue) = 0;
+
+    /// Manages error in API to read item's body: one newline is always appended.
+    /// Removes just one newline at the end (if exists).
+    void removeLastNewLine(std::wstring& value);
 
 public:
 
@@ -112,9 +122,10 @@ public:
     virtual int         saveItem() = 0;
     virtual int       deleteItem() = 0;
     virtual ClientItem* copyItem() = 0;
-    //virtual int       moveItem(ClientFolder* destFolder) = 0;
+    virtual int       moveItem(ClientFolder* destFolder) = 0;
     // saveAs/close...?
 
+    void createUserPropertyMap();
 
     //
     // Methods to menage item properties.
@@ -126,6 +137,18 @@ public:
     const std::wstring getProperty(const std::wstring& propertyName);
     /// To set a property value from its name.
     int setProperty(const std::wstring& propertyName, const std::wstring& propertyValue);
+
+    const std::wstring getUserPropertyValue(std::wstring name);
+    const bool         getUserProperty(std::wstring &name, std::wstring &value);
+    const int          getUserPropertiesCount();
+    const std::vector<std::wstring>
+                       getUserPropertyNames();
+    void               removeUserProperty(std::wstring name);
+    void               setUserProperty(std::wstring name, std::wstring value);
+    void               clearUserProperties();
+    void               recreatePropertyMap();
+
+    bool               isReadOnly();
 
 };
 

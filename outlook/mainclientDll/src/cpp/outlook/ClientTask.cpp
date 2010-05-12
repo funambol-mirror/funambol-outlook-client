@@ -40,6 +40,7 @@
 #include "utils.h"
 
 #include "outlook/defs.h"
+#include "outlook/ClientFolder.h"
 #include "outlook/ClientApplication.h"
 #include "outlook/ClientTask.h"
 #include "outlook/ClientException.h"
@@ -88,8 +89,14 @@ void ClientTask::setCOMPtr(_TaskItemPtr& ptr, const wstring& itemID) {
     try {
         pSafeTask->Item = pTask;
 
+        pUserProperties = pTask->UserProperties;
+        userPropertiesCount = pUserProperties->Count;
+
         pItemProperties = pTask->ItemProperties;
         propertiesCount = pItemProperties->Count;
+
+        propertiesCount -= userPropertiesCount;
+
         if (propertiesCount) {
             pItemProperty = pItemProperties->Item(0);
         }
@@ -270,19 +277,41 @@ int ClientTask::saveItem() {
     // -> disable reminder, notify user in the LOG file.
     if (getProperty(L"ReminderSet") == L"1") {
         ClientApplication* ol = ClientApplication::getInstance();
-        ClientFolder*  folder = ol->getDefaultFolder(itemType);         // WARNING! this changes the ClientApplication::folder object...
-        wstring defFolderPath = folder->getPath();                      // (pay attention if any pointer was linked to it)
-        if (parentPath != defFolderPath) {
-            LOG.info(INFO_OUTLOOK_REMINDER_RESET, getProperty(L"Subject").c_str());
-            setProperty(L"ReminderSet", L"0");
+        if (ol)
+        {
+            ClientFolder*  folder = ol->getDefaultFolder(itemType);         // WARNING! this changes the ClientApplication::folder object...
+            wstring defFolderPath = folder->getPath();                      // (pay attention if any pointer was linked to it)
+            if (parentPath != defFolderPath) 
+            {
+                LOG.info(INFO_OUTLOOK_REMINDER_RESET, getProperty(L"Subject").c_str());
+                setProperty(L"ReminderSet", L"0");
+            }
         }
     }
-
-    try {
-        // Save recurrence pattern if needed.
-        if (recPattern.isRecurring()) {
-            if (recPattern.save()) {
-                goto error;
+    try 
+    {
+        if (!pTask->GetComplete())
+        {
+            // Save recurrence pattern for NOT COMPLETED task if needed.
+            if (recPattern.isRecurring()) 
+            {
+                if (recPattern.save()) 
+                {
+                    goto error;
+                }
+            }
+        }
+        else
+        {
+            // This is to work around outlooks handling of recurring tasks.
+            // Outlook creates the next occurrance and clears the recurrance on 
+            // the previous.
+            if (recPattern.isRecurring()) 
+            {
+                pTask->PutComplete(BOOLToVBool(0));
+                pTask->PutComplete(BOOLToVBool(1));
+                LOG.info("Sleeping 2 seconds to save completed recurring task");
+                Sleep(2000);
             }
         }
 
@@ -401,34 +430,34 @@ error:
  * @param   destFolder  the destination ClientFolder to move this object to
  * @return              0 if no errors
  */
-//int ClientTask::moveItem(ClientFolder* destFolder) {
-//
-//    if (!pTask) {
-//        goto error;
-//    }
-//
-//    // Get destination folder
-//    MAPIFolder* pDestFolder = destFolder->getCOMPtr();
-//    if (!pDestFolder) {
-//        goto error;
-//    }
-//
-//    // Move item
-//    try {
-//        pTask->Move(pDestFolder);
-//    }
-//    catch(_com_error &e) {
-//        manageComErrors(e);
-//        goto error;
-//    }
-//
-//    parentPath = destFolder->getPath();
-//    return 0;
-//
-//error:
-//    LOG.error("Error moving item '%ls'", ID.c_str());
-//    return 1;
-//}
+int ClientTask::moveItem(ClientFolder* destFolder) {
+
+    if (!pTask) {
+        goto error;
+    }
+
+    // Get destination folder
+    MAPIFolder* pDestFolder = destFolder->getCOMPtr();
+    if (!pDestFolder) {
+        goto error;
+    }
+
+    // Move item
+    try {
+        this->setCOMPtr((_TaskItemPtr)pTask->Move(pDestFolder));
+    }
+    catch(_com_error &e) {
+        manageComErrors(e);
+        goto error;
+    }
+
+    parentPath = destFolder->getPath();
+    return 0;
+
+error:
+    LOG.error("Error moving item '%ls'", ID.c_str());
+    return 1;
+}
 
 
 
@@ -503,6 +532,11 @@ const wstring ClientTask::getSafeProperty(const wstring& propertyName) {
     }
     if (tmpVal) {
         propertyValue = tmpVal;
+
+        // Manage error in API to read item's body: one newline is always appended.
+        if (propertyName == L"Body") {
+            removeLastNewLine(propertyValue);
+        }
     }
 
     return propertyValue;
@@ -789,6 +823,9 @@ ClientTask::ClientTask(const ClientTask& c) {
     createSafeTaskInstance();
     pSafeTask       = c.pSafeTask;
     recPattern      = c.recPattern;
+
+    userPropertyMap     = c.userPropertyMap;
+    userPropertiesCount = c.userPropertiesCount;
 }
 
 

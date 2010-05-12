@@ -40,6 +40,8 @@
 /** @addtogroup ClientDLL */
 /** @{ */
 
+#define OUTLOOK 1
+
 // ------------------------------- Definitions ------------------------------
 // Program parameters:
 #define SYNC_MUTEX_NAME                     "fol-SyncInProgress"
@@ -56,6 +58,14 @@
 #define SIFE_DEFAULT_NAME                  L"scal"
 #define SIFT_DEFAULT_NAME                  L"stask"
 #define SIFN_DEFAULT_NAME                  L"snote"
+
+#define CALENDAR_REMOTE_NAME               L"calendar"
+#define CONTACTS_REMOTE_NAME               L"contacts"
+#define TASKS_REMOTE_NAME                  L"tasks"
+#define NOTES_REMOTE_NAME                  L"notes"
+
+#define SHARED_SUFFIX                      L"-shared"
+
 
 #define MAX_PATH_LENGTH                     512
 
@@ -130,13 +140,16 @@
 #define MSG_BOX_CANCEL_SYNC                 "Are you really sure you want to cancel current synchronization?"
 #define WMSG_BOX_CANCEL_SYNC               L"Are you really sure you want to cancel current synchronization?"
 #define WMSG_BOX_ASK_SLOW_1                L"The server has requested a full sync of all items for "
-#define WMSG_BOX_ASK_SLOW_2                L".\nThis process may take up to a few minutes depending on the number of items\nand network bandwidth. Do you wish to proceed? (YES in %d seconds...)"
+#define WMSG_BOX_ASK_SLOW_2                L".\nThis process may take up to a few minutes depending on the number of items\nand network bandwidth.\n\nDo you wish to proceed? (YES in %d seconds...)"
+#define WMSG_BOX_ASK_SLOW_3                   L".\nThis process may take up to a few minutes depending on the number of items\nand network bandwidth.\nYou are configured to perform a one-way sync, this can change data\non both the client and server.\n\nDo you wish to proceed?"
 #define WMSG_BOX_REFRESH_FROM_SERVER       L"A sync to replace your local data with your server data has been requested.\nAll the local items will be deleted before adding the server items.\nAre you sure you want to continue?"
+#define WMSG_BOX_REFRESH_FROM_CLIENT       L"A sync to replace your server data with your local data has been requested.\nAll the data will be deleted on the server before adding the local items.\nThis may result in the loss of data in any fields supported by other devices, but not by Outlook.\nAre you sure you want to continue?"
 
 
 // Error messages
 #define ERR_UNKNOWN                         "Unknown error."
 #define ERR_OPEN_OUTLOOK                    "Error opening Outlook application."
+#define ERR_ATTACH_OUTLOOK                  "Error attaching to Outlook application."
 #define ERR_TAG_NOT_FOUND                   "Bad XML format: tag '%ls' not found."
 #define ERR_BAD_FOLDER_PATH                 "Bad folder path: %ls"
 #define ERR_INSTALL_DIR                     "Error retrieving the install directory path."
@@ -285,6 +298,8 @@
 #define SBAR_WAITING                        "Waiting for Server response..."
 /** @endcond */  // cond DEV
 
+#include "defs.h"
+
 // -------------------------------- Includes -------------------------------
 #include <mstask.h>
 #include "spds/SyncItem.h"
@@ -300,7 +315,7 @@
 //--------------------------- Public Functions ----------------------------
 
 // Main functions:
-int  initializeClient   (bool isScheduled);
+int  initializeClient   (bool isScheduled, bool justRead = false);
 int  initLog            (bool isScheduled);
 int  startSync          ();
 int  closeClient        ();
@@ -312,6 +327,7 @@ int  hardTerminateSync  (HANDLE hSyncThread);
 int  exitSyncThread     (int code);
 void endSync();
 void upgradePlugin      (const int oldVersion, const int oldFunambolVersion);
+void upgradeScheduledTask();
 
 
 // Configuration:
@@ -327,14 +343,15 @@ std::wstring getDefaultFolderPath(const std::wstring& itemType);
 // dataTransformer functions:
 /** @addtogroup dataTransformer */
 /** @{ */
+void         initWinItems       ();
 WinItem*     createWinItem      (bool useSIF, const std::wstring itemType);
 WinItem*     createWinItem      (bool useSIF, const std::wstring itemType, const std::wstring& data, const WCHAR** sifFields);
-SyncItem*    convertToSyncItem  (ClientItem* cItem, const char* dataType, const std::wstring& defaultFolder);
+SyncItem*    convertToSyncItem  (ClientItem* cItem, const char* dataType, const std::wstring& defaultFolder, bool addUserProperties = true);
 int          fillClientItem     (const std::wstring& sif, ClientItem* cItem, const std::wstring& itemType, const WCHAR* dataType);
 WCHAR**      getProperSifArray  (const std::wstring& type);
 int          normalizeExceptions(ClientItem* cItem, itemKeyList& allItems, itemKeyList& allItemsPaths);
 int          deleteOccurrencesInInterval(const DATE startDate, const DATE originalDate, ClientRecurrence* cRec);
-int          setRecurrenceExceptions    (ClientItem* cItem, std::list<std::wstring> &excludeDates, std::list<std::wstring> &includeDates);
+int          setRecurrenceExceptions(ClientItem * cItem, ClientRecurrence * cRec, std::list<std::wstring> &excludeDates, std::list<std::wstring> &includeDates);
 int          checkIllegalXMLChars(char* data);
 std::wstring getVPropertyValue  (const std::wstring& dataString, const std::wstring& propertyName);
 void         replaceDefaultPath(std::wstring& path, const std::wstring& defaultFolder);
@@ -351,12 +368,14 @@ int   getScheduleTask   (bool* active, int* dayNum, int* minNum);
 int   deleteScheduleTask();
 ITaskScheduler* initScheduleInstance();
 int   getScheduledTaskName(std::wstring& taskName);
+void setProgramNameForScheduledTask(std::wstring name);
 /** @} */
 
 const char* getClientLastErrorMsg ();
 const int   getClientLastErrorCode();
 
 int OpenMessageBox(HWND hwnd, UINT type, UINT msg);
+_declspec(dllexport) int checkUpdate(const char *infoURL, char *availableVersionData, char *updateURLData);
 
 /**
 * Starts the whole update procedure.
@@ -395,6 +414,12 @@ ArrayList* getVCardProperties();
 ArrayList* getNoteProperties();
 ArrayList* getVNoteProperties();
 
+
+/**
+ * Returns the installed MS Outlook name and version, as a string.
+ * Empty string in case of error.
+ */
+__declspec(dllexport) StringBuffer getOutlookVersion();
 
 /** @} */
 /** @endcond */

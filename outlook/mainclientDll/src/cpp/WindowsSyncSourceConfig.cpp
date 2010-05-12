@@ -165,6 +165,17 @@ void WindowsSyncSourceConfig::setCommonConfig(SyncSourceConfig* sc) {
 }
 
 
+bool WindowsSyncSourceConfig::getIsRefreshMode() const {
+    bool result = false;
+    const char * syncMode = getSync();
+    if (syncMode) {
+        result = !strcmp(syncMode, "refresh-from-client") || !strcmp(syncMode, "refresh-from-server");
+    }
+
+    return result;
+}
+
+
 
 /// Initialize members
 void WindowsSyncSourceConfig::initialize() {

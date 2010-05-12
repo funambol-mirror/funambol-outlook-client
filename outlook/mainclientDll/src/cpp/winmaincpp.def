@@ -56,7 +56,6 @@ getScheduledSync
 getClientLastErrorMsg
 getClientLastErrorCode
 readCurrentSwv
-checkPortalBuild
 syncModeName
 saveSyncModes
 readSyncModes
@@ -64,6 +63,7 @@ isSourceVisible
 countSourceVisible
 getDefaultPicturesPath
 isSourceEnabled
+getOutlookVersion
 
 ;
 ; update procedure

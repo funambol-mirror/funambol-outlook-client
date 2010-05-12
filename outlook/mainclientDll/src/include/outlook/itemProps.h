@@ -150,7 +150,7 @@ static WCHAR* safeTaskProps[] = {
 };
 
 
-/// Tasks properties protected by Outlook security patch.
+/// Notes properties protected by Outlook security patch.
 static WCHAR* safeNoteProps[] = {
 
     {L"Body"                },

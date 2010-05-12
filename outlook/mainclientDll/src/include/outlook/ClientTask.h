@@ -46,7 +46,8 @@
 
 #include <string>
 
-
+//Forward declaration of Folder
+class ClientFolder;
 
 /**
  * Wraps the Outlook task object.
@@ -110,7 +111,7 @@ public:
     int saveItem();
     int deleteItem();
     ClientItem* copyItem();
-    //int moveItem(ClientFolder* destFolder);
+    int moveItem(ClientFolder* destFolder);
 
 };
 

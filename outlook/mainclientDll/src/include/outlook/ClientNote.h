@@ -42,6 +42,7 @@
 
 #include "outlook/defs.h"
 #include "outlook/ClientItem.h"
+#include "outlook/ClientFolder.h"
 
 #include <string>
 
@@ -91,7 +92,7 @@ public:
     int saveItem();
     int deleteItem();
     ClientItem* copyItem();
-    //int moveItem(ClientFolder* destFolder);
+    int moveItem(ClientFolder* destFolder);
 
 };
 

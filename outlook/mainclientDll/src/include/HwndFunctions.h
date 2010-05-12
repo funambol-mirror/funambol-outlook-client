@@ -47,17 +47,18 @@
 #define ID_MYMSG_SYNCSOURCE_END       (WM_APP+4)
 #define ID_MYMSG_SYNC_ITEM_SYNCED     (WM_APP+5)
 #define ID_MYMSG_SYNC_TOTALITEMS      (WM_APP+6)
-//#define ID_MYMSG_SYNC_TOTALSOURCES    (WM_APP+7)      not used
+//#define ID_MYMSG_SYNC_TOTALSOURCES  (WM_APP+7)      not used
 #define ID_MYMSG_STARTSYNC_ENDED      (WM_APP+8)
 #define ID_MYMSG_REFRESH_STATUSBAR    (WM_APP+9)
-//#define ID_MYMSG_MODAL                (WM_APP+10)     not used
+//#define ID_MYMSG_MODAL              (WM_APP+10)     not used
 #define ID_MYMSG_SOURCE_STATE         (WM_APP+11)
 #define ID_MYMSG_SYNC_STARTSYNC_BEGIN (WM_APP+12)
 #define ID_MYMSG_UNLOCK_BUTTONS       (WM_APP+13)
 #define ID_MYMSG_LOCK_BUTTONS         (WM_APP+14)
 #define ID_MYMSG_POPUP                (WM_APP+15)
 #define ID_MYMSG_OK                   (WM_APP+16)
-
+#define ID_MYMSG_CANCEL_SYNC          (WM_APP+17)
+#define ID_MYMSG_SYNC                 (WM_APP+18)
 /** @endcond */
 
 #define PLUGIN_UI_CLASSNAME         _T("FunambolApp")

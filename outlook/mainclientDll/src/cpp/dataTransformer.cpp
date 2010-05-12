@@ -49,10 +49,16 @@
 #include "vocl/WinNoteSIF.h"
 
 #include "outlook/utils.h"
+
 #include "outlook/ClientItem.h"
+#include "outlook/ClientTask.h"
+#include "outlook/ClientAppointment.h"
+#include "outlook/ClientContact.h"
+#include "outlook/ClientNote.h"
 #include "outlook/ClientAppException.h"
 #include "outlook/ClientException.h"
 #include "SIFFields.h"
+#include "customization.h"
 
 #include "syncml\core\Property.h"
 #include "syncml\core\PropParam.h"
@@ -60,6 +66,9 @@
 
 using namespace std;
 
+void initWinItems() {
+    WinItem::setDefaultValidateFunction(&(DLLCustomization::validateExtraProperty));
+}
 
 /**
  * Creates an empty WinItem object of the desired type (Client to Server).
@@ -88,13 +97,9 @@ WinItem* createWinItem(bool useSIF, const wstring itemType) {
         if (useSIF) item = new WinNoteSIF();
         else        item = new WinNote();
     }
-    else {
-        LOG.error("Internal error! createWinItem: item type '%ls' not supported", itemType.c_str());
-    }
 
     return item;
 }
-
 
 
 /**
@@ -127,9 +132,6 @@ WinItem* createWinItem(bool useSIF, const wstring itemType, const wstring& data,
         if (useSIF) item = new WinNoteSIF(data, sifFields);
         else        item = new WinNote(data);
     }
-    else {
-        LOG.error("Internal error! createWinItem: item type '%ls' not supported", itemType.c_str());
-    }
 
     return item;
 }
@@ -145,10 +147,12 @@ WinItem* createWinItem(bool useSIF, const wstring itemType, const wstring& data,
  * @param cItem          [INPUT] pointer to ClientItem
  * @param dataType       the mime type of data we want into the SyncItem (SIF/VCard/...)
  * @param defaultFolder  the default folder path for this syncsource
+ * @param addUserProperties 
+ *                       Wether or not to add user properties to the outgoing item
  * @return               the (new allocated) SyncItem object.
  *                       Returned pointer MUST be freed by the caller
  */
-SyncItem* convertToSyncItem(ClientItem* cItem, const char* dataType, const wstring& defaultFolder) {
+SyncItem* convertToSyncItem(ClientItem* cItem, const char* dataType, const wstring& defaultFolder, bool addUserProperties) {
 
     if (!cItem) {
         return NULL;
@@ -164,25 +168,35 @@ SyncItem* convertToSyncItem(ClientItem* cItem, const char* dataType, const wstri
     char* data = NULL;
     WCHAR** sifFields = getProperSifArray(type);
     bool useSIF = isSIF(dataType);
+    wstring propertyValue;
 
     // Replace "\\Personal Folders\Contacts" with "DEFAULT_FOLDER"
     wstring path = cItem->getParentPath();
     replaceDefaultPath(path, defaultFolder);
 
-
     // Internally switch to the correct WinObject.
-    WinItem* winItem = createWinItem(useSIF, cItem->getType());
+    // Fill WinItem object (parse data string).
+    WinItem * winItem = createWinItem(useSIF, type);
 
-
-    //
-    // Fill all properties: ClientItem -> WinItem.
-    //
+    // "Folder" is retrieved separately in WindowsSyncSource.
     for (int i=0; sifFields[i]; i++) {
-        const wstring value = cItem->getProperty(sifFields[i]);
-        winItem->setProperty(sifFields[i], value);
+        propertyValue = cItem->getProperty(sifFields[i]);
+        winItem->setProperty(sifFields[i], propertyValue);
     }
-    winItem->setProperty(L"Folder", path);
 
+    cItem->createUserPropertyMap();
+
+    if (addUserProperties) {
+        std::vector<std::wstring> names = cItem->getUserPropertyNames();
+        std::vector<std::wstring>::iterator it = names.begin();
+        for (; it != names.end(); it++) {
+            if (cItem->getUserProperty(*it, propertyValue)) {
+                winItem->setExtraProperty(*it, propertyValue);
+            }
+        }
+    }
+
+    winItem->setProperty(L"Folder", path);
 
     //
     // Set specific properties for each item-type.
@@ -190,7 +204,7 @@ SyncItem* convertToSyncItem(ClientItem* cItem, const char* dataType, const wstri
     if (cItem->getType() == CONTACT) {
         ClientApplication* ol = ClientApplication::getInstance();
         int version = _wtoi(ol->getVersion().c_str());
-        if (version < 11) {
+        if (version < 11 || DLLCustomization::neverSendPhotos) {
             // Photo supported on Outlook2003 or later. We remove the property
             // so that the <Photo> tag will not be sent.
             winItem->removeElement(L"Photo");
@@ -202,21 +216,22 @@ SyncItem* convertToSyncItem(ClientItem* cItem, const char* dataType, const wstri
         }
     }
 
-    else if (cItem->getType() == APPOINTMENT) {
-        WinEvent* winE = (WinEvent*)winItem;
+    else if (type == APPOINTMENT) {
+        WinEvent * winE = (WinEvent*)winItem;
 
         // Manage recurrence properties
         ClientAppointment* cApp = (ClientAppointment*)cItem;
         ClientRecurrence*  cRec = NULL;
         if ( cApp && (cRec = cApp->getRecPattern()) ) {
-            // Fill recurrence properties.
-            
-            // getTimezone from appointment            
-            ClientApplication* application = ClientApplication::getInstance();                        
-            TIME_ZONE_INFORMATION* tz = application->getTimezone(cApp);
-            winE->setTimezone(tz);
-            delete tz;
+            // getTimezone from appointment
+            if (DLLCustomization::sendTimezone) {
+                ClientApplication* application = ClientApplication::getInstance();
+                TIME_ZONE_INFORMATION* tz = application->getTimezone(cApp);
+                winE->setTimezone(tz);
+                delete tz;
+            }
 
+            // Fill recurrence properties
             WinRecurrence* rec = winE->getRecPattern();
             for (int i=0; recurrenceFields[i]; i++) {
                 const wstring value = cRec->getProperty(recurrenceFields[i]);
@@ -238,24 +253,59 @@ SyncItem* convertToSyncItem(ClientItem* cItem, const char* dataType, const wstri
                 }
             }
         }
+
+        // Attendees
+        if (cApp && DLLCustomization::syncAttendees) {
+            list<WinRecipient>* attendees = winE->getRecipients();
+            std::map<int, ClientRecipient> attList = cApp->getAttendees();
+            std::map<int, ClientRecipient>::iterator it;
+            for (it = attList.begin(); it != attList.end(); it++) {
+                WinRecipient wr;
+                wr.setProperty(L"AttendeeName", (it->second).getName());
+                wr.setProperty(L"AttendeeEmail", (it->second).getEmail());
+
+                // Get status doesnt really work yet, but this block is right
+                switch ((it->second).getStatus())
+                {
+                    default:
+                    case Redemption::olResponseNone:
+                    case Redemption::olResponseNotResponded:
+                    case Redemption::olResponseOrganized:
+                            wr.setProperty(L"AttendeeStatus", L"NEEDS ACTION");
+                        break;
+                    case Redemption::olResponseTentative:
+                            wr.setProperty(L"AttendeeStatus", L"TENATIVE");
+                        break;
+                    case Redemption::olResponseAccepted:
+                            wr.setProperty(L"AttendeeStatus", L"ACCEPTED");
+                        break;
+                    case Redemption::olResponseDeclined:
+                            wr.setProperty(L"AttendeeStatus", L"DECLINED");
+                        break;
+                }
+
+                attendees->push_back(wr);
+            }
+        }
     }
 
-    else if (cItem->getType() == TASK) {
-        WinTask* winT = (WinTask*)winItem;
+    else if (type == TASK) {
+        WinTask * winT = (WinTask*)winItem;
 
         // Manage recurrence properties
-        ClientTask* cTask = (ClientTask*)cItem;
-        ClientRecurrence* cRec = NULL;
-        if ( cTask && (cRec = cTask->getRecPattern()) ) {
+        ClientTask * cTask = (ClientTask*)cItem;
+        ClientRecurrence*  cRec = NULL;
+        if ( cTask && (cRec = cTask->getRecPattern()) && cTask->getProperty(L"Complete").compare(L"1")) {
             // Fill recurrence properties.
             WinRecurrence* rec = winT->getRecPattern();
             for (int i=0; recurrenceFields[i]; i++) {
                 const wstring value = cRec->getProperty(recurrenceFields[i]);
                 rec->setProperty(recurrenceFields[i], value);
             }
+
+            // TODO: Recurrence exceptions
         }
     }
-
 
     //
     // Format the data string. 'toString' will call the specialized method
@@ -266,7 +316,6 @@ SyncItem* convertToSyncItem(ClientItem* cItem, const char* dataType, const wstri
     if (winItem) {
         delete winItem; winItem = NULL;
     }
-
 
     //
     // Set SyncItem data.
@@ -289,9 +338,6 @@ SyncItem* convertToSyncItem(ClientItem* cItem, const char* dataType, const wstri
 
     return sItem;
 }
-
-
-
 
 /**
  * Check for illegal XML chars inside 'data'.
@@ -319,7 +365,6 @@ int checkIllegalXMLChars(char* data) {
     return ret;
 }
 
-    
 
 /**
  * data string (SIF/VCard/...) -> ClientItem (server to client).
@@ -354,6 +399,11 @@ int fillClientItem(const wstring& data, ClientItem* cItem, const wstring& itemTy
     // fill it (parse data string + fill propertyMap).
     WinItem* winItem = createWinItem(useSIF, itemType, data, (const WCHAR**)sifFields);
 
+    if (itemType == CONTACT) {
+        if (!DLLCustomization::saveFileAs && winItem->getProperty(L"FileAs", propertyValue)) {
+            winItem->removeElement(L"FileAs");
+        }
+    }
 
     //
     // WinItem -> ClientItem (set only properties found)
@@ -365,19 +415,30 @@ int fillClientItem(const wstring& data, ClientItem* cItem, const wstring& itemTy
         }
     }
 
+    // Extra properties
+    std::vector<std::wstring> names = winItem->getExtraPropertyNames();
+    std::vector<std::wstring>::iterator it = names.begin();
+    for (; it != names.end(); it++) {
+        if (winItem->getExtraProperty(*it, propertyValue)) {
+            cItem->setUserProperty(*it, propertyValue);
+        }
+    }
+
     //
     // Set specific properties for each item-type.
     //
     if (itemType == APPOINTMENT) {
-        WinEvent* winE = (WinEvent*)winItem;
+        WinEvent * winE = ((WinEvent*)winItem);
 
         // Set recurrence properties
         ClientAppointment* cApp = (ClientAppointment*)cItem;
-        ClientRecurrence*  cRec = NULL;
+        ClientRecurrence * cRec = NULL;
+
+        // cRec is not NULL if 'IsRecurring' is set = 1.
         if ( cApp && (cRec = cApp->getRecPattern()) ) {     // cRec is not NULL if 'IsRecurring' is set = 1.
-            
-            WinRecurrence* rec = winE->getRecPattern();
-                        
+
+            WinRecurrence * rec = ((WinEvent*)winItem)->getRecPattern();
+
             // first of all check if there is the Timezone Information set
             // and set the prop in the recurrence. It is used in the 
             if (winE->hasTimezone()) {
@@ -395,39 +456,99 @@ int fillClientItem(const wstring& data, ClientItem* cItem, const wstring& itemTy
                     cRec->setProperty(recurrenceFields[i], value);
                 }
             }
-
             // Set events exceptions
-            setRecurrenceExceptions(cItem, *(winE->getExcludeDates()), *(winE->getIncludeDates()));
+            setRecurrenceExceptions(cItem, cRec, *(winE->getExcludeDates()), *(winE->getIncludeDates()));
         }
-    }
 
-    else if (itemType == TASK) {
-        WinTask* winT = (WinTask*)winItem;
+        // Attendees
+        if (DLLCustomization::syncAttendees) {
+            list<WinRecipient>* attendees = ((WinEvent*)winItem)->getRecipients();
+            list<WinRecipient>::iterator it;
 
-        // Set recurrence properties
-        ClientTask* cTask = (ClientTask*)cItem;
-        ClientRecurrence*  cRec = NULL;
-        if ( cTask && (cRec = cTask->getRecPattern()) ) {     // cRec is not NULL if 'IsRecurring' is set = 1.
+            std::wstring email;
+            std::wstring attendee;
 
-            WinRecurrence* rec = winT->getRecPattern();
-            for (int i=0; recurrenceFields[i]; i++) {
-                wstring value;
-                // Set only properties found!
-                if (rec->getProperty(recurrenceFields[i], value)) {
-                    cRec->setProperty(recurrenceFields[i], value);
+            std::map<int, ClientRecipient> attList = cApp->getAttendees();
+            std::map<int, ClientRecipient>::iterator listIt;
+
+            // For all existing attendees
+            for (it = attendees->begin(); it != attendees->end(); it++) {
+                email = L"";
+
+                if (it->getProperty(L"AttendeeEmail", email)) {
+                    bool found = false;
+                    for (listIt = attList.begin(); listIt != attList.end(); listIt++) {
+                        if (email.compare((listIt->second).getEmail()) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        it->getNamedEmail(attendee);
+                        cApp->addAttendee(ClientRecipient(attendee));
+                    }
+                }
+            }
+
+            std::map<int, ClientRecipient>::reverse_iterator rlistIt;
+
+            // For all existing attendees (backwards, so when we remove indices, the next ones work
+            for (rlistIt = attList.rbegin(); rlistIt != attList.rend(); rlistIt++) {
+
+                email = L"";
+                bool found = false;
+
+                // For all incoming attendees
+                for (it = attendees->begin(); it != attendees->end(); it++) {
+                    email = L"";
+                    if (it->getProperty(L"AttendeeEmail", email)) {
+                        if (email.compare((rlistIt->second).getEmail()) == 0) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                // If there's an existing attendee that is not incoming, remove it
+                if (!found) {
+                    cApp->removeAttendee(rlistIt->first);
                 }
             }
         }
     }
 
-    if (winItem) {
-        delete winItem; winItem = NULL;
+    else if (itemType == TASK) {
+        ClientTask* cTask = (ClientTask*)cItem;
+        WinRecurrence * wRec = ((WinTask*)winItem)->getRecPattern();
+
+        // cRec is not NULL if 'IsRecurring' is set = 1.
+        if (cTask && wRec) {
+            ClientRecurrence*  cRec = cTask->getRecPattern();
+            if (cRec) {
+
+                // Manage recurring properties.
+                for (int i=0; recurrenceFields[i]; i++) {
+                    if (wRec->getProperty(recurrenceFields[i], propertyValue)) {
+                        replaceAll(L"&lt;",  L"<", propertyValue);
+                        replaceAll(L"&gt;",  L">", propertyValue);
+                        replaceAll(L"&amp;", L"&", propertyValue);
+                        cRec->setProperty(recurrenceFields[i], propertyValue);
+                    }
+                }
+
+                // TODO: recurrence exceptions
+            }
+        }
     }
+
+    if (winItem) {
+        delete winItem;
+        winItem = NULL;
+    }
+
 
     return 0;
 }
-
-
 
 
 /**
@@ -449,7 +570,7 @@ WCHAR** getProperSifArray(const wstring& type) {
         return noteFields;
     }
     else {
-        LOG.error("Internal error: getProperSifArray, bad item type '%ls'", type.c_str());
+        // error...
         return NULL;
     }
 }
@@ -488,6 +609,7 @@ int normalizeExceptions(ClientItem* cItem, itemKeyList& allItems, itemKeyList& a
         return 0;
     }
 
+    bool changed = false;
 
     //
     // Scan all exceptions
@@ -499,6 +621,8 @@ int normalizeExceptions(ClientItem* cItem, itemKeyList& allItems, itemKeyList& a
             continue;
         }
         else {
+            changed = true;
+
             // Modified exceptions must be converted.
             // --------------------------------------
             LOG.debug(DBG_NORMALIZING_EXCEPTION, getSafeItemName(cItem).c_str(), cEx->formatOriginalDate().c_str());
@@ -507,10 +631,16 @@ int normalizeExceptions(ClientItem* cItem, itemKeyList& allItems, itemKeyList& a
             // 1. Create new (unlinked) single event.
             //
             // Copy from main appointment (all original props are copied).
-            ClientItem* cItemNew = cItem->copyItem();
+            ClientFolder * folder = NULL;
+            folder = ClientApplication::getInstance()->getFolderFromPath(cItem->getType(), cItem->getParentPath());
+            if (!folder) {
+                // TODO failure
+            }
+
+            ClientItem * cItemNew = folder->addItem();
 
             if (cItemNew) {
-                // MUST clear the rec pattern...
+                // clear the rec pattern...
                 cItemNew->setProperty(L"IsRecurring", L"0");
                 ((ClientAppointment*)cItemNew)->clearRecPattern();
 
@@ -521,20 +651,27 @@ int normalizeExceptions(ClientItem* cItem, itemKeyList& allItems, itemKeyList& a
                     cItemNew->setProperty(exAppointmentFields[j], propertyValue);
                 }
 
+                std::vector<std::wstring> attendees = cEx->getAttendees();
+                if (attendees.size() == 0) {
+                    cEx->inheritAttendees((ClientAppointment*)cItem);
+                    attendees = cEx->getAttendees();
+                }
+                for (size_t x = 0; x < attendees.size(); x++) {
+                    ((ClientAppointment*)cItemNew)->addAttendee(ClientRecipient(attendees[x]));
+                }
+
                 // Save the new appointment and add its LUID to the new items list.
                 if (!cItemNew->saveItem()) {
                     allItems.push_back(cItemNew->getID());
                     allItemsPaths.push_back(cItemNew->getParentPath());
                 }
                 else {
-                    setErrorF(getLastErrorCode(), ERR_ITEM_SAVE, APPOINTMENT, getSafeItemName(cItemNew).c_str(), cItemNew->getParentPath().c_str());
+                    setErrorF(0,ERR_ITEM_SAVE, APPOINTMENT, getSafeItemName(cItemNew).c_str(), cItemNew->getParentPath().c_str());
                     goto error;
                 }
-                delete cItemNew;
-                cItemNew = NULL;
             }
             else {
-                setErrorF(getLastErrorCode(), ERR_ITEM_CREATE, APPOINTMENT, cItemNew->getParentPath().c_str());
+                setErrorF(0, ERR_ITEM_CREATE, APPOINTMENT, cItemNew->getParentPath().c_str());
                 goto error;
             }
 
@@ -543,31 +680,50 @@ int normalizeExceptions(ClientItem* cItem, itemKeyList& allItems, itemKeyList& a
             //    Must also save the recurring appointment (it's modified)
             //
             cEx->setDeleted(TRUE);
-            if (cItem->saveItem()) {
-                setErrorF(getLastErrorCode(), ERR_ITEM_SAVE, L"recurring appointment", getSafeItemName(cItem).c_str(), cItem->getParentPath().c_str());
-                goto error;
-            }
+            // Dont save the event yet, we do all work in memory
 
             //
             // 3. Delete also ALL (existing) occurrences between originalDate and StartDate!
             //    (create an exception 'occurrence deleted' for each occurrence found).
             //
-            DATE startDate  = NULL;
-            systemTimeToDouble(cEx->getStart(), &startDate, true);
             DATE originalDate = cEx->getOriginalDate();
-            int numExCreated = deleteOccurrencesInInterval(startDate, originalDate, cRec);
+
+            DATE startDateNewTime  = NULL;
+            systemTimeToDouble(cEx->getStart(), &startDateNewTime, false);
+
+            DATE startDateOriginalTime = (int)startDateNewTime + (DATE)(originalDate - ((DATE)int(originalDate)));
+            DATE originalDateNewTime = (int)originalDate + (DATE)(startDateNewTime - ((DATE)int(startDateNewTime)));
+
+            int numExCreated = 0;
+            numExCreated += deleteOccurrencesInInterval(startDateOriginalTime, originalDate, cRec);
+            if (originalDate != originalDateNewTime) {
+                // Event time has changed, check for the exception at the new time
+                numExCreated += deleteOccurrencesInInterval(startDateNewTime, originalDateNewTime, cRec);
+            }
+
+            /*
+            // Dont do this now - it causes problems.  Resolve all exceptions first
 
             //
             // 4. Save the recurring appointment (if it's modified)
             //
             if (numExCreated > 0) {
                 if (cItem->saveItem()) {
-                    setErrorF(getLastErrorCode(), ERR_ITEM_SAVE, L"recurring appointment", getSafeItemName(cItem).c_str(), cItem->getParentPath().c_str());
+                    setErrorF(0, ERR_ITEM_SAVE, L"recurring appointment", getSafeItemName(cItem).c_str(), cItem->getParentPath().c_str());
                     goto error;
                 }
             }
+
+*/
         }
     } // end: for (int i=0; i<exCount; i++)
+
+    if (changed) {
+        if (cItem->saveItem()) {
+            setErrorF(0, ERR_ITEM_SAVE, L"recurring appointment", getSafeItemName(cItem).c_str(), cItem->getParentPath().c_str());
+            goto error;
+        }
+    }
 
     return 0;
 
@@ -638,7 +794,7 @@ int deleteOccurrencesInInterval(const DATE startDate, const DATE originalDate, C
 
 
 /**
- * Sets the appointment exceptions for the item passed (server to client).
+ * Sets the recurrence exceptions for the item passed (server to client).
  * Exceptions dates are passed with 2 lists 'escludeDates' and 'includeDates'.
  * Each exception found is set into a ClientAppException object. Each ClientRecurrence
  * object can have a list of ClientAppExceptions.
@@ -650,19 +806,15 @@ int deleteOccurrencesInInterval(const DATE startDate, const DATE originalDate, C
  *   -> a new (unlinked event) is created
  *   -> the item is modified itself, must be added next sync to the MOD items list
  * 
- * @param cItem        : the ClientItem object to modify (it's an appointment)
+ * @param cItem        : the ClientItem object to modify (it's an appointment or task)
+ * @param cRec         : the ClientRecurrence object
  * @param excludeDates : a list of exclude-dates (occurrences to delete)
  * @param includeDates : a list of include-dates (occurrences to add)
  * @return               0 if exceptions saved with no errors.
  *                       1 if not recurring (nothing done).
  *                      -1 if errors.
  */
-int setRecurrenceExceptions(ClientItem* cItem, list<wstring> &excludeDates, list<wstring> &includeDates) {
-
-    if (!cItem) return -1;
-    ClientAppointment*  cApp = (ClientAppointment*)cItem;
-    if (!cApp)  return -1;
-    ClientRecurrence*   cRec = cApp->getRecPattern();
+int setRecurrenceExceptions(ClientItem * cItem, ClientRecurrence* cRec, list<wstring> &excludeDates, list<wstring> &includeDates) {
 
     // Not recurring: nothing to do.
     if (!cRec) {
@@ -678,7 +830,6 @@ int setRecurrenceExceptions(ClientItem* cItem, list<wstring> &excludeDates, list
         cRec->resetExceptions();
         return 0;
     }
-
 
     ClientAppException* cOcc = NULL;
     wstring excludeDate      = EMPTY_WSTRING;
@@ -716,7 +867,6 @@ int setRecurrenceExceptions(ClientItem* cItem, list<wstring> &excludeDates, list
             exIterator ++;
         }
     }
-
 
     //
     // 2. INCLUDE_DATE: 'occurrences to add' -> create new appointment (unlinked)
@@ -768,6 +918,7 @@ int setRecurrenceExceptions(ClientItem* cItem, list<wstring> &excludeDates, list
     }
 
 
+
     //
     // 3. If this appointment has been modified, we MUST add it to the list 
     //    of MOD items on next sync! (use a list of forced modified items)
@@ -809,6 +960,7 @@ error:
 }
 
 
+
 /**
  * Get a property value from a string formatted vCard / vCalendar.
  * Parses the string, and returns the property value from the passed name.
@@ -827,25 +979,42 @@ wstring getVPropertyValue(const wstring& dataString, const wstring& propertyName
 
     wstring value = EMPTY_WSTRING;
     wstring::size_type pos = dataString.find(propertyName, 0);
-    const wstring delim = L":\n\r";
+    const wstring delimstart = L":";
+    const wstring delimend = L"\r\n";
 
     if (pos != wstring::npos) {
         pos += propertyName.length();
-        wstring::size_type start = dataString.find_first_not_of(delim, pos);
+        wstring::size_type start = dataString.find_first_not_of(delimstart, pos);
         if (start != wstring::npos) {
-            wstring::size_type end = dataString.find_first_of(delim, start);
-            if ((end != wstring::npos) && (end-start > 0)) {
-                value = dataString.substr(start, end-start);
+            wstring::size_type end = dataString.find_first_of(delimend, start);
+            while ((end != wstring::npos)) {
+                if (end == dataString.length()) {
+                    // Data is bad, quit
+                    break;
+                }
+
+                // Build up the string
+                value += dataString.substr(start, end-start);
+                WCHAR nextchar = dataString[end+2];
+                if (nextchar == ' ') {
+                    // Its a fold, not the end
+                    start = end+3;
+                    end = dataString.find_first_of(delimend, start);
+                } else {
+                    end = wstring::npos;
+                }
             }
         }
     }
+
+    // Unescape , too, bug in server will be fixed in later releases
+    replaceAll(L"\\,", L",", value);
 
     // Un-escape special chars of vCard 2.1 (";" and "\").
     replaceAll(L"\\;", L";", value);
     replaceAll(L"\\\\", L"\\", value);
     return value;
 }
-
 
 
 /**

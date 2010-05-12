@@ -46,6 +46,10 @@
 #include "MainSyncFrm.h"
 #include "ClientUtil.h"
 #include "CustomLabel.h"
+#include "Welcome.h"
+#include "Upgrading.h"
+
+#include "UICustomization.h"
 
 #include "winmaincpp.h"
 #include "utils.h"  
@@ -88,8 +92,11 @@ END_MESSAGE_MAP()
 
 COutlookPluginApp::COutlookPluginApp()
 {
-	// TODO: add construction code here,
-	// Place all significant initialization in InitInstance
+    // TODO: add construction code here,
+    // Place all significant initialization in InitInstance
+#ifdef _DEBUG
+    //MessageBox(NULL, L"This is a debug copy of this program.  Do not distribute", WPROGRAM_NAME, MB_OK);
+#endif
 }
 
 
@@ -376,12 +383,58 @@ BOOL COutlookPluginApp::InitInstance()
             HWND wnd = HwndFunctions::getWindowHandle();
             ShowWindow(wnd, SW_RESTORE);
             SetForegroundWindow(wnd);
+
+            if (startSyncNow)
+            {
+                CWnd * pWnd = CWnd::FromHandle(wnd);
+                pWnd->SendMessage(ID_MYMSG_SYNC);
+            }
+
             return FALSE;
         }
         else{
             // UI not opened
             if(! checkSyncInProgress()) {
-                initializeClient(false);
+                initializeClient(false, true);
+
+                CUpgrading upgrade;
+                bool showWait = false;
+
+                unsigned int failFlags= MB_OK | MB_ICONASTERISK | MB_SETFOREGROUND | MB_APPLMODAL;
+
+                if (UICustomization::showWelcomeMessage) {
+
+                    OutlookConfig* config = OutlookConfig::getInstance();
+                    if (config->checkToUpgrade()) {
+                        CWelcome welcome;
+                        int ret = welcome.DoModal();
+                        if (ret != IDOK) {
+                            MessageBox(NULL, L"Upgrade aborted", WPROGRAM_NAME, failFlags);
+                            exit(0);
+                        }
+
+                        if (UICustomization::showUpgradingMessage) {
+                            upgrade.Create(IDD_UPGRADING, NULL);
+                            upgrade.ShowWindow(SW_SHOW);
+                            upgrade.UpdateWindow();
+                            showWait = true;
+                        }
+                    }
+                }
+
+                int ret = initializeClient(false, false);
+
+                if (ret != 0) {
+                    if (showWait) {
+                        upgrade.CloseWindow();
+                    }
+                    MessageBox(NULL, L"Upgrade aborted", WPROGRAM_NAME, failFlags);
+                    exit(0);
+                }
+
+                if (showWait) {
+                    upgrade.CloseWindow();
+                }
             }
             else{
                 // A sync is already in progress (another scheduled).

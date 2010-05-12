@@ -39,11 +39,13 @@
 #include "TaskSettings.h"
 #include "MainSyncFrm.h"
 #include "ClientUtil.h"
+#include "SettingsHelper.h"
 
 #include "winmaincpp.h"
 #include "utils.h"
 #include "comutil.h"
 #include "OutlookPlugin.h"
+#include "UICustomization.h"
 
 #include <string>
 
@@ -77,21 +79,22 @@ CTaskSettings::~CTaskSettings()
 void CTaskSettings::DoDataExchange(CDataExchange* pDX)
 {
     CDialog::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_TASKS_COMBO_SYNCTYPE, lstSyncType);
-    DDX_Control(pDX, IDC_TASKS_EDIT_FOLDER, editFolder);
-    DDX_Control(pDX, IDC_TASKS_CHECK_INCLUDE, checkInclude);
-    DDX_Control(pDX, IDC_TASKS_BUT_SELECT, butSelectFolder);
-    DDX_Control(pDX, IDC_TASKS_EDIT_REMOTE, editRemote);
+    DDX_Control(pDX, IDC_TASKS_COMBO_SYNCTYPE,  lstSyncType);
+    DDX_Control(pDX, IDC_TASKS_EDIT_FOLDER,     editFolder);
+    DDX_Control(pDX, IDC_TASKS_CHECK_INCLUDE,   checkInclude);
+    DDX_Control(pDX, IDC_TASKS_BUT_SELECT,      butSelectFolder);
+    DDX_Control(pDX, IDC_TASKS_EDIT_REMOTE,     editRemote);
     DDX_Control(pDX, IDC_TASKS_GROUP_DIRECTION, groupDirection);
-    DDX_Control(pDX, IDC_TASKS_GROUP_FOLDER, groupFolder);
-    DDX_Control(pDX, IDC_TASKS_ADVANCED, groupAdvanced);
-   
+    DDX_Control(pDX, IDC_TASKS_GROUP_FOLDER,    groupFolder);
+    DDX_Control(pDX, IDC_TASKS_ADVANCED,        groupAdvanced);
+    DDX_Control(pDX, IDC_TASKS_CHECK_SHARED,    checkShared);
 }
 
 BEGIN_MESSAGE_MAP(CTaskSettings, CDialog)
-    ON_BN_CLICKED(IDC_TASKS_OK, &CTaskSettings::OnBnClickedTasksOk)
-    ON_BN_CLICKED(IDC_TASKS_CANCEL, &CTaskSettings::OnBnClickedTasksCancel)
-    ON_BN_CLICKED(IDC_TASKS_BUT_SELECT, &CTaskSettings::OnBnClickedTasksButSelect)   
+    ON_BN_CLICKED(IDC_TASKS_OK,           &CTaskSettings::OnBnClickedTasksOk)
+    ON_BN_CLICKED(IDC_TASKS_CANCEL,       &CTaskSettings::OnBnClickedTasksCancel)
+    ON_BN_CLICKED(IDC_TASKS_BUT_SELECT,   &CTaskSettings::OnBnClickedTasksButSelect)   
+    ON_BN_CLICKED(IDC_TASKS_CHECK_SHARED, &CTaskSettings::OnBnClickedTasksCheckShared)
 END_MESSAGE_MAP()
 
 
@@ -129,24 +132,21 @@ BOOL CTaskSettings::OnInitDialog(){
     s1.LoadString(IDS_SYNCTYPE2); lstSyncType.AddString(s1);
     s1.LoadString(IDS_SYNCTYPE3); lstSyncType.AddString(s1);
 
-    s1.LoadString(IDS_SYNC_DIRECTION); SetDlgItemText(IDC_TASKS_GROUP_DIRECTION, s1);
-    s1.LoadString(IDS_TASKS_FOLDER); SetDlgItemText(IDC_TASKS_GROUP_FOLDER, s1);
-    s1.LoadString(IDS_CURRENT); SetDlgItemText(IDC_TASKS_STATIC_FOLDER, s1);
-    s1.LoadString(IDS_INCLUDE_SUBFOLDERS); SetDlgItemText(IDC_TASKS_CHECK_INCLUDE, s1);
-    s1.LoadString(IDS_SELECT_FOLDER); SetDlgItemText(IDC_TASKS_BUT_SELECT, s1);
-    s1.LoadString(IDS_REMOTE_NAME); SetDlgItemText(IDC_TASKS_STATIC_REMOTE, s1);
-
-    s1.LoadString(IDS_ADVANCED); SetDlgItemText(IDC_TASKS_ADVANCED, s1);
-    s1.LoadString(IDS_DATA_FORMAT); SetDlgItemText(IDC_TASKS_STATIC_DATAFORMAT, s1);
-
-    s1.LoadString(IDS_OK); SetDlgItemText(IDC_TASKS_OK, s1);
-    s1.LoadString(IDS_CANCEL); SetDlgItemText(IDC_TASKS_CANCEL, s1);
+    s1.LoadString(IDS_SYNC_DIRECTION);      SetDlgItemText(IDC_TASKS_GROUP_DIRECTION, s1);
+    s1.LoadString(IDS_TASKS_FOLDER);        SetDlgItemText(IDC_TASKS_GROUP_FOLDER, s1);
+    s1.LoadString(IDS_CURRENT);             SetDlgItemText(IDC_TASKS_STATIC_FOLDER, s1);
+    s1.LoadString(IDS_INCLUDE_SUBFOLDERS);  SetDlgItemText(IDC_TASKS_CHECK_INCLUDE, s1);
+    s1.LoadString(IDS_SELECT_FOLDER);       SetDlgItemText(IDC_TASKS_BUT_SELECT, s1);
+    s1.LoadString(IDS_REMOTE_NAME);         SetDlgItemText(IDC_TASKS_STATIC_REMOTE, s1);
+    s1.LoadString(IDS_ADVANCED);            SetDlgItemText(IDC_TASKS_ADVANCED, s1);
+    s1.LoadString(IDS_DATA_FORMAT);         SetDlgItemText(IDC_TASKS_STATIC_DATAFORMAT, s1);
+    s1.LoadString(IDS_USE_VCAL);            SetDlgItemText(IDC_TASKS_DATA_FORMAT, s1);
+    s1.LoadString(IDS_SHARED);              SetDlgItemText(IDC_TASKS_CHECK_SHARED, s1);
+    s1.LoadString(IDS_OK);                  SetDlgItemText(IDC_TASKS_OK, s1);
+    s1.LoadString(IDS_CANCEL);              SetDlgItemText(IDC_TASKS_CANCEL, s1);
 
     lstSyncType.SetCurSel(getSyncTypeIndex(ssconf->getSync()));
 	
-	s1.LoadString(IDS_USE_VCAL);
-	SetDlgItemText(IDC_TASKS_DATA_FORMAT, s1);
-        
     // Get folder path.
     // Note: use 'toWideChar' because we need UTF-8 conversion.
     WCHAR* olFolder = toWideChar(ssconf->getFolderPath());
@@ -161,11 +161,11 @@ BOOL CTaskSettings::OnInitDialog(){
         // an exception occured while trying to get the default folder
         EndDialog(-1);
     }
-
     SetDlgItemText(IDC_TASKS_EDIT_FOLDER, s1);
 
-    if(ssconf->getUseSubfolders())
+    if(ssconf->getUseSubfolders()) {
         checkInclude.SetCheck(BST_CHECKED);
+    }
 
     // Note: use 'toWideChar' because we need UTF-8 conversion.
     WCHAR* remName = toWideChar(ssconf->getURI());
@@ -173,36 +173,81 @@ BOOL CTaskSettings::OnInitDialog(){
     delete [] remName;
     SetDlgItemText(IDC_TASKS_EDIT_REMOTE, s1);
 
-    wndTasks = this;   
+    if (s1.Right(wcslen(SHARED_SUFFIX)).Compare(SHARED_SUFFIX) == 0) {
+        checkShared.SetCheck(BST_CHECKED);
+    }
 
-    //
-    // Hide Advanced settings (remote URI) if defined in customization.h
-    //
-    if(!SHOW_ADVANCED_SETTINGS) {
+    wndTasks = this;
+
+
+    // Apply customizations
+    bool shared             = UICustomization::shared;
+    bool forceUseSubfolders = UICustomization::forceUseSubfolders;
+    bool hideDataFormats    = UICustomization::hideDataFormats;
+    bool hideAllAdvanced    = !SHOW_ADVANCED_SETTINGS;
+
+    if (forceUseSubfolders) {
+        checkInclude.SetCheck(BST_CHECKED);
+        checkInclude.ShowWindow(SW_HIDE);
+
+        // Resize things
+        CRect rect;
+        checkInclude.GetClientRect(&rect);
+        int dy = -1 * (rect.Height() + 5);
+
+        resizeItem(GetDlgItem(IDC_TASKS_GROUP_FOLDER), 0, dy);
+
+        moveItem(this, &groupAdvanced, 0, dy);
+        moveItem(this, &editRemote,    0, dy); 
+        moveItem(this, &checkShared,   0, dy);
+        moveItem(this, GetDlgItem(IDC_TASKS_DATA_FORMAT),       0, dy);
+        moveItem(this, GetDlgItem(IDC_TASKS_STATIC_REMOTE),     0, dy);
+        moveItem(this, GetDlgItem(IDC_TASKS_STATIC_DATAFORMAT), 0, dy);
+        moveItem(this, GetDlgItem(IDC_TASKS_OK),                0, dy);
+        moveItem(this, GetDlgItem(IDC_TASKS_CANCEL),            0, dy);
+
+        setWindowHeight(this, GetDlgItem(IDC_TASKS_OK));
+    }
+
+    if (hideAllAdvanced) {
         groupAdvanced.ShowWindow(SW_HIDE);
         editRemote.ShowWindow(SW_HIDE);
         GetDlgItem(IDC_TASKS_STATIC_REMOTE)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_TASKS_STATIC_DATAFORMAT)->ShowWindow(SW_HIDE);
-       
-        // Redraw buttons 'OK' and 'Cancel' where the groupAdvanced was located
-        CPoint posAdvanced = getRelativePosition(&groupAdvanced, this);
-        int top = posAdvanced.y + 10;   // 10 = some space
+        GetDlgItem(IDC_TASKS_DATA_FORMAT)->ShowWindow(SW_HIDE);
 
-        CWnd* butOk     = GetDlgItem(IDC_TASKS_OK);
-        CWnd* butCancel = GetDlgItem(IDC_TASKS_CANCEL);
-        CRect rectDialog, rectOk;
-        GetClientRect(&rectDialog);
-        butOk->GetClientRect(&rectOk);
+        CRect rect;
+        groupAdvanced.GetClientRect(&rect);
+        int dy = -1 * (rect.Height() + 10);
 
-        CPoint posOk     = getRelativePosition(butOk,     this);
-        CPoint posCancel = getRelativePosition(butCancel, this);
-        butOk->SetWindowPos(&CWnd::wndTop, posOk.x, top, NULL, NULL, SWP_SHOWWINDOW | SWP_NOSIZE);
-        butCancel->SetWindowPos(&CWnd::wndTop, posCancel.x, top, NULL, NULL, SWP_SHOWWINDOW | SWP_NOSIZE);
+        moveItem(this, GetDlgItem(IDC_TASKS_OK),     0, dy);
+        moveItem(this, GetDlgItem(IDC_TASKS_CANCEL), 0, dy);
 
-        // Resize window, now it's smaller
-        int newHeight = top + rectOk.Height() + 50;     // 50 = some space
-        this->SetWindowPos(&CWnd::wndTop, NULL, NULL, rectDialog.Width(), newHeight, SWP_SHOWWINDOW | SWP_NOMOVE);
+        setWindowHeight(this, GetDlgItem(IDC_TASKS_OK));
+    } 
+    else if (hideDataFormats) {
+        GetDlgItem(IDC_TASKS_STATIC_DATAFORMAT)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_TASKS_DATA_FORMAT)->ShowWindow(SW_HIDE);
+
+        // Resize things
+        CRect rect;
+        GetDlgItem(IDC_TASKS_STATIC_DATAFORMAT)->GetClientRect(&rect);
+        int dy = -1 * (rect.Height() + 5);
+
+        resizeItem(&groupAdvanced, 0, dy);
+
+        moveItem(this, GetDlgItem(IDC_TASKS_OK),     0, dy);
+        moveItem(this, GetDlgItem(IDC_TASKS_CANCEL), 0, dy);
+
+        setWindowHeight(this, GetDlgItem(IDC_TASKS_OK));
     }
+
+    // Shared folders
+    if (shared) {
+        editRemote.EnableWindow(false);
+    } else {
+        GetDlgItem(IDC_TASKS_CHECK_SHARED)->ShowWindow(SW_HIDE);
+    } 
 
 
     // disable windows xp theme, otherwise any color setting for groupbox
@@ -255,6 +300,14 @@ bool CTaskSettings::saveSettings(bool saveToDisk)
         return false;
     };
 
+    if (UICustomization::showWarningOnChangeFromOneWay) {
+        int currentSyncType = getSyncTypeIndex(ssconf->getSync());
+        int newSyncType = lstSyncType.GetCurSel();
+        if (checkOneWayToTwoWay(currentSyncType, newSyncType)) {
+           return false;
+        }
+    }
+
     // sync source enabled
     ssconf->setSync(getSyncTypeName(lstSyncType.GetCurSel()));
     
@@ -262,6 +315,15 @@ bool CTaskSettings::saveSettings(bool saveToDisk)
     //       (when writing to winreg, toWideChar is then called)
     char* olFolder = toMultibyte(outlookFolder.GetBuffer());
     if (olFolder) {
+        // If folder has changed, clear anchors
+        if (UICustomization::clearAnchorsOnFolderChange) {
+            const char * original = ssconf->getFolderPath();
+            if (strcmp(original, olFolder) != 0) {
+                ssconf->setLast(0);
+                ssconf->setEndTimestamp(0);
+            }
+        }
+        
         ssconf->setFolderPath(olFolder);
         delete [] olFolder;
     }
@@ -271,11 +333,11 @@ bool CTaskSettings::saveSettings(bool saveToDisk)
     else
         ssconf->setUseSubfolders(false);
 
-    char* remName = toMultibyte(remoteName.GetBuffer());
-    if (remName) {
-        ssconf->setURI(remName);
-        delete [] remName;
-    }    
+    StringBuffer remName;
+    remName.convert(remoteName.GetBuffer());
+    if (!remName.null()) {
+        ssconf->setURI(remName.c_str());
+    } 
 
     // Never save to winreg, will save when 'OK' is clicked on SyncSettings.
     //if(saveToDisk)
@@ -311,5 +373,21 @@ void CTaskSettings::OnBnClickedTasksButSelect()
     outlookFolder = L"";
     BeginModalState();
     handleThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)pickFolderTasks, NULL, 0, NULL);
+}
+
+
+
+void CTaskSettings::OnBnClickedTasksCheckShared() {
+    long editId = IDC_TASKS_EDIT_REMOTE;
+
+    CString currentValue;
+    GetDlgItemText(editId, currentValue);
+    CString warningMessage;
+    warningMessage.LoadString(IDS_UNCHECK_SHARED);
+
+    CString newValue = processSharedCheckboxClick(TASKS_REMOTE_NAME,
+         checkShared.GetCheck() != 0, currentValue, warningMessage);
+
+    SetDlgItemText(editId, newValue);
 }
 

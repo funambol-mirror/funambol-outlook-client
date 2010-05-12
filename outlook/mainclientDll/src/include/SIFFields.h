@@ -179,6 +179,7 @@ static WCHAR* contactFields[] = {
     {L"IMAddress"                          },                // Returns or sets a String that represents a contact's Microsoft Instant Messenger address.
     {L"Importance"                         },                // Returns or sets the relative importance level for the Outlook item. Can be one of the following OlImportance constants: olImportanceHigh(2), olImportanceLow(0), or olImportanceNormal(1). This property corresponds to the MAPI property PR_IMPORTANCE. 
     {L"Initials"                           },                // Returns or sets the initials for the contact
+    {L"InternetFreeBusyAddress"            },                // Returns or sets the internet free/busy url for the contact
     {L"JobTitle"                           },                // Returns or sets the job title for the contact
     {L"Language"                           },                // Returns or sets the language for the contact
     {L"LastName"                           },                // Returns or sets the last name for the contact

@@ -65,6 +65,12 @@ public:
     CButton radioDebug;
     CStatic groupLevel;
 
+    CEdit logFileSize;
+    CSpinButtonCtrl logFileSizeSpin;
+
+    CEdit logFileNum;
+    CSpinButtonCtrl logFileNumSpin;
+
     bool saveSettings(bool saveToDisk);
 
     afx_msg void OnBnClickedLogOk();
@@ -73,6 +79,10 @@ public:
     afx_msg void OnBnClickedLogRadioInfo();
     afx_msg void OnBnClickedLogRadioDebug();
     afx_msg void OnBnClickedLogViewlog();
+    afx_msg void OnBnClickedLogViewpath();
+
+    void sendLogs();
+    afx_msg void OnBnClickedLogSend();
 };
 
 /** @} */

@@ -58,6 +58,11 @@
 #include "event/OutlookSyncItemListener.h"
 #include "event/OutlookTransportListener.h"
 #include "base/adapter/PlatformAdapter.h"
+#include "http/Proxy.h"
+#include "http/URL.h"
+#include "http/TransportAgentFactory.h"
+#include "base/util/XMLProcessor.h"
+
 #include <string>
 
 #include "UpdateManager.h"
@@ -98,7 +103,8 @@ __declspec(dllexport) OutlookConfig* getConfig() {
  * @param isScheduled true if it's a scheduled sync
  * @return            0 if no errors
  */
-int initializeClient(bool isScheduled) {
+
+int initializeClient(bool isScheduled, bool justRead) {
 
     int ret=0;
     char logText[512];
@@ -117,16 +123,24 @@ int initializeClient(bool isScheduled) {
         config->save();
         sprintf(logText, INFO_CONFIG_GENERATED);
     }
+
+    if (justRead) {
+        return 0;
+    }
+
     //
     // 2. Check if sw version has changed (client may have been upgraded).
     //    If config upgraded, save it to disk.
     if (config->checkToUpgrade()) {
         config->upgradeConfig();
-        config->save();
 
         // Execute actions to upgrade the plugin from old version.
         upgradePlugin(config->getOldSwv(), config->getOldFunambolSwv());
+
+        config->save();
         sprintf(logText, INFO_SWV_UPGRADED, config->getSwv(), config->getFunambolSwv().c_str());
+
+        upgradeScheduledTask();
     }
 
     // Simply save to public var.
@@ -227,6 +241,7 @@ int startSync() {
     config->setAbortSync(false);  
 
     // Check if log size is too big (>10MB).
+    /*
     if (!resetLog && (LOG.getLogSize() > MAX_LOG_SIZE)) {
         resetLog = true;
     }
@@ -241,10 +256,49 @@ int startSync() {
         LOG.reset(title.c_str());
         resetLog = false;
     }
+    */
+    // BEGIN LOG ROTATE
+    if (!LOG.rotateLogFile(
+        config->getWindowsDeviceConfig().getLogSize(),
+        config->getWindowsDeviceConfig().getLogNum()
+        )) {
+        // TODO
+        /*
+        WCHAR tmp[512];
+        wsprintf(tmp, L"Unable to rotate log file: \"%s\".\nPlease check your user's permissions.", LOG.getLogPath()));
+        MessageBox(NULL, tmp, WPROGRAM_NAME, MB_SETFOREGROUND | MB_OK);
+        */
+    }
+
+    try {
+        ClientApplication * outlook = ClientApplication::getInstance(isScheduledSync);
+    }
+    catch (ClientException* e) {
+        // Must set the errors, here could be a fatal exception
+        setErrorF(0, e->getErrorMsg());
+        bool display = 
+            !isScheduledSync && getConfig()->getWindowsDeviceConfig().getAttach()
+            ||
+            !getConfig()->getWindowsDeviceConfig().getAttach();
+        if (display)
+        {
+            e->setExceptionData(e->getErrorMsg(), e->getErrorCode(), false, true);
+            manageClientException(e);
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
+    }
 
     // Update log level: could be changed from initialize().
     LOG.setLevel(config->getClientConfig().getLogLevel());
     LOG.debug("Starting the Sync process...");
+
+    if (isScheduledSync) {
+        LOG.info(" *** Scheduled sync started ***");
+    }
 
     // If here, this is the ONLY instance of sync process 
     // -> set the scheduled flag on win registry.
@@ -307,7 +361,8 @@ int startSync() {
     for (int j=0; j<sourcesOrder.size(); j++) {
         for (int i=0; i<sourcesCount; i++) {
             const bool enabled = config->getSyncSourceConfig(i)->isEnabled();
-            if (enabled) {
+            const bool isRefresh = config->getSyncSourceConfig(i)->getIsRefreshMode();
+            if (enabled || isRefresh) {
                 StringBuffer* name = (StringBuffer*)sourcesOrder.get(j);
                 if (*name == config->getSyncSourceConfig(i)->getName()) {
                     // Here the right SyncSource is added to the source array.
@@ -426,7 +481,6 @@ finally:
     int sourceID = -1;
 
     if(report){  // check if the sync report is valid
-
         // Update the errors from SyncReport
         setErrorF(report->getLastErrorCode(), "%s", report->getLastErrorMsg());
         ret = getLastErrorCode();
@@ -434,6 +488,7 @@ finally:
         //
         // Fire the SOURCE_STATE message to the UI, to tell the state of sources synced
         //
+
         int i=0;
         while (sources[i]) {
             SyncSourceReport* ssReport = NULL;
@@ -477,6 +532,7 @@ finally:
             delete sources[i];
             i++;
         }
+        delete [] sources;
         sources = NULL;
     }
 
@@ -525,9 +581,6 @@ void endSync() {
         syncMutex = NULL;
     }
 
-    // *** TODO: see if necessary ***
-    //CoUninitialize();
-
     // Unset Listeners
     ManageListener::releaseAllListeners();
 }
@@ -574,10 +627,7 @@ void closeOutlook() {
             if (outlook) {
                 LOG.debug("Deleting ClientApplication instance");
                 delete outlook;
-
-                // Close COM library for current thread
-                LOG.debug("Closing COM library...");
-                CoUninitialize();
+                outlook = NULL;
             }
         }
         catch (ClientException* e) {
@@ -791,7 +841,7 @@ wstring getDefaultFolderPath(const wstring& itemType) {
     ClientFolder*      folder  = NULL;
     
     try {
-        outlook = ClientApplication::getInstance();
+        outlook = ClientApplication::getInstance(false);
         if (outlook) {
             folder = outlook->getDefaultFolder(itemType);
         }
@@ -865,10 +915,7 @@ finally:
     // Delete ClientApplication: this is called from UI config, so we should
     // release the COM library to be correctly used by next thread.
     try {
-        if (outlook) {
-            delete outlook; 
-            outlook = NULL;
-        }
+        closeOutlook();
     } 
     catch (ClientException* e) {
         manageClientException(e);
@@ -962,29 +1009,10 @@ const int getClientLastErrorCode() {
  */
 void upgradePlugin(const int oldVersion, const int oldFunambolVersion) {
 
-    if (oldFunambolVersion < 60000) {
+    // Upgrades from v6 are no more supported (since v8.7)
+    if (oldFunambolVersion < 70000) {
         return;
     }
-
-    // Old version < 6.0.10: remove the old scheduled task (now per-user jobs)
-    if (oldFunambolVersion < 60010) {
-        char tmp[MAX_PATH_LENGTH];
-        GetWindowsDirectoryA(tmp, MAX_PATH_LENGTH);
-
-        // usually: "C:\Windows\Tasks\Funambol Outlook Plug-in.job"
-        string jobPath = tmp;
-        jobPath += "\\Tasks\\Funambol Outlook Plug-in.job";
-        remove(jobPath.c_str());
-    }
-
-    // Old version < 6.0.9: delete the old logfile (now .txt)
-    if (oldFunambolVersion < 60009) {
-        OutlookConfig* config = OutlookConfig::getInstance();
-        string oldLogPath = config->getLogDir();
-        oldLogPath += "\\OLPlugin.log";
-        remove(oldLogPath.c_str());
-    }
-
 
     // Old version < 7.1.4: Client name has changed, was "Outlook Plug-in"
     //   1. move cache files and delete old folder
@@ -1018,13 +1046,6 @@ void upgradePlugin(const int oldVersion, const int oldFunambolVersion) {
         WCHAR* dataPath = toWideChar(pt.c_str());
         wstring newDataPath(dataPath);
         delete [] dataPath;
-        /*
-        wstring newDataPath(appDataPath);
-        newDataPath += TEXT("\\");
-        newDataPath += FUNAMBOL_DIR_NAME;
-        newDataPath += TEXT("\\");
-        newDataPath += OLPLUGIN_DIR_NAME;
-        */
 
         // List of possible cache files to copy
         list<wstring> fileNames;
@@ -1079,8 +1100,33 @@ void upgradePlugin(const int oldVersion, const int oldFunambolVersion) {
 
         _wrename(oldTaskName.c_str(), newTaskName.c_str());
     }
+
+    // Old version < 8.7.0: delete the old logfile (old name)
+    if (oldFunambolVersion < 80700) {
+        OutlookConfig* config = OutlookConfig::getInstance();
+        string oldLogPath = config->getLogDir();
+        oldLogPath += "\\outlook-client-log.txt";
+        remove(oldLogPath.c_str());
+    }
+
+    return;
 }
 
+
+void upgradeScheduledTask() {
+    //upgrade scheduled task
+    setProgramNameForScheduledTask(L"Outlook-Sync Plug-in");
+    bool active;
+    int dayNum;
+    int minNum;
+
+    int res = getScheduleTask(&active, &dayNum, &minNum);
+    if (res >= 0) {
+        deleteScheduleTask();
+        setProgramNameForScheduledTask(WPROGRAM_NAME);
+        setScheduleTask(EVERY_DAY, dayNum, minNum);
+    }
+}
 
 //int OpenMessageBox(HWND hwnd, UINT buttons, UINT msg){
 int OpenMessageBox(HWND hwnd, UINT type, UINT msg){
@@ -1192,4 +1238,21 @@ void launchSyncClient() {
     CloseHandle(pi.hThread);
 
     if (program) delete [] program;
+}
+
+
+__declspec(dllexport) StringBuffer getOutlookVersion() {
+
+    StringBuffer name;
+    
+    ClientApplication* outlook = ClientApplication::getInstance();
+    if (outlook) {
+        wstring wName = outlook->getName();
+        wName.append(TEXT(" (version = "));
+        wName.append(outlook->getVersion());
+        wName.append(TEXT(")"));
+        name.convert(wName.c_str());
+    }
+
+    return name;
 }

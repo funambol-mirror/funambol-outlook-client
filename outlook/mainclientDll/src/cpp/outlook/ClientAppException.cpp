@@ -271,6 +271,16 @@ int ClientAppException::read() {
             importance = (WCHAR*)bstrValue;
         }
         i++;
+
+        // "Attendees"
+        std::map<int, ClientRecipient> attendees;
+        pSafeAppointment->Item = pAppointment;
+        Redemption::ISafeRecipientsPtr pRecipients = pSafeAppointment->GetRecipients();
+        int countRecipient = pRecipients->GetCount();
+        for(int i = countRecipient;i>0;i--) {
+            attendees[i] = ClientRecipient(pRecipients->Item(i));
+        }
+        processAttendees(attendees);
     }
     catch(_com_error &e) {
         manageComErrors(e);
@@ -732,7 +742,24 @@ void ClientAppException::setImportance(const wstring& val) {
     importance = val;
 }
 
+std::vector<std::wstring> ClientAppException::getAttendees() {
+    return attendees;
+}
 
+void ClientAppException::inheritAttendees(ClientAppointment * cApp) {
+    processAttendees(cApp->getAttendees());
+}
+
+void ClientAppException::processAttendees(const std::map<int, ClientRecipient> & attendeeList) {
+
+    int countRecipient = attendeeList.size();
+
+    std::map<int, ClientRecipient>::const_iterator it;
+    for(it = attendeeList.begin(); it != attendeeList.end(); it++) 
+    {
+        attendees.push_back((it->second).getNamedEmail());
+    }
+}
 
 
 

@@ -371,6 +371,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\SettingsHelper.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Splitter.cpp"
 				>
 				<FileConfiguration
@@ -438,6 +442,18 @@
 			</File>
 			<File
 				RelativePath="..\src\TaskSettings.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\UICustomization.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Upgrading.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Welcome.cpp"
 				>
 			</File>
 		</Filter>
@@ -522,6 +538,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\SettingsHelper.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Splitter.h"
 				>
 			</File>
@@ -539,6 +559,18 @@
 			</File>
 			<File
 				RelativePath="..\src\TaskSettings.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\UICustomization.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Upgrading.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Welcome.h"
 				>
 			</File>
 		</Filter>
@@ -615,6 +647,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\res\icon_account_grey.ico"
+				>
+			</File>
+			<File
 				RelativePath="..\src\res\icon_alert.ico"
 				>
 			</File>
@@ -636,6 +672,10 @@
 			</File>
 			<File
 				RelativePath="..\src\res\icon_syncing.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\src\res\icon_syncing_grey.ico"
 				>
 			</File>
 			<File
@@ -704,6 +744,14 @@
 			</File>
 			<File
 				RelativePath="..\src\res\Toolbar.bmp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\res\updates.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\src\res\updates_grey.ico"
 				>
 			</File>
 		</Filter>

@@ -235,11 +235,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\include\defs.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\include\HwndFunctions.h"
 				>
 			</File>
 			<File
 				RelativePath="..\src\include\OutlookConfig.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\include\OutlookLogAccessor.h"
 				>
 			</File>
 			<File
@@ -260,6 +268,10 @@
 			</File>
 			<File
 				RelativePath="..\src\include\vObjectConverter.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\include\WindowsDeviceConfig.h"
 				>
 			</File>
 			<File
@@ -342,6 +354,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\include\outlook\ClientRecipient.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\include\outlook\ClientRecurrence.h"
 					>
 				</File>
@@ -368,6 +384,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath="..\src\cpp\Customization.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\cpp\dataTransformer.cpp"
 				>
 			</File>
@@ -388,6 +408,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\cpp\OutlookLogAccessor.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\cpp\OutlookScheduler.cpp"
 				>
 			</File>
@@ -405,6 +429,10 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\cpp\WindowsDeviceConfig.cpp"
 				>
 			</File>
 			<File
@@ -488,6 +516,10 @@
 				</File>
 				<File
 					RelativePath="..\src\cpp\outlook\ClientNote.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\cpp\ClientRecipient.cpp"
 					>
 				</File>
 				<File

@@ -154,7 +154,7 @@ Function CheckMicrosoftApp
         IntCmp $0 0 checkProcess
         MessageBox MB_OKCANCEL "I need to close ${MICROSOFT_OUTLOOK} to proceed with the installation of $(^Name). Ok?" IDCANCEL Cancel
         SendMessage $0 16  0 0  $R1 /TIMEOUT=1000            ; WM_CLOSE = 16, timeout = 1000 ms
-        Sleep 1500                                           ; wait 1500 ms for Outlook closing
+        Sleep 2500                                           ; wait 2500 ms for Outlook closing
 
         ; If Outlook still running, ask to close it manually.
         FindWindow $0 "${MICROSOFT_OUTLOOK_CLASS_NAME}"
@@ -189,7 +189,7 @@ Function un.CheckMicrosoftApp
         IntCmp $0 0 checkProcess
         MessageBox MB_OKCANCEL "I need to close ${MICROSOFT_OUTLOOK} to proceed with the uninstallation of $(^Name). Ok?" IDCANCEL Cancel
         SendMessage $0 16  0 0  $R1 /TIMEOUT=1000            ; WM_CLOSE = 16, timeout = 1000 ms
-        Sleep 1500                                           ; wait 1500 ms for Outlook closing
+        Sleep 2500                                           ; wait 2500 ms for Outlook closing
 
         ; If Outlook still running, ask to close it manually.
         FindWindow $0 "${MICROSOFT_OUTLOOK_CLASS_NAME}"
@@ -376,9 +376,11 @@ Function CheckAppInstalled
 
   ; 1. Upgrade to a newer version.
   newerVersion:
-       ; (installed v. = 6.0)?
-       StrCmp $R8 "" +1 +2          ; if customer avoid to check the v3 version (for sure it isn't) and go with upgrade
-       IntCmp $R1 6   0  from_v3  0
+ 
+       ; installed version too old?
+       ; NOTE: upgrades from a Funambol version < 7.0.0 is forbidden.
+       StrCmp $R8 "" +1 +2                                              ; if customer avoid to check the "too old" version (for sure it isn't) and go with upgrade
+       IntCmp $R1 7   0  tooOldVersion  0
 
        MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
                   "A previous version of ${PRODUCT_NAME} is already installed (version $R1). $\nPress OK to proceed with the upgrade." \
@@ -411,7 +413,7 @@ Function CheckAppInstalled
 
 
   ; 4. Upgrade from a version < v6 (3.0.x) -> avoid.
-  from_v3:
+  tooOldVersion:
        MessageBox MB_OK|MB_ICONEXCLAMATION \
                   "A previous version of ${PRODUCT_NAME} is already installed (version $R1). $\nPlease uninstall it first."
        Abort

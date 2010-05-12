@@ -85,12 +85,15 @@ public:
     CStatic groupFolder;
     CStatic groupAdvanced;
    
+    CButton checkShared;
+
     bool saveSettings(bool);
 
     afx_msg void OnBnClickedTasksOk();
     afx_msg void OnBnClickedTasksCancel();
     afx_msg void OnBnClickedTasksButSelect();
     
+    afx_msg void OnBnClickedTasksCheckShared();
 };
 
 /** @} */

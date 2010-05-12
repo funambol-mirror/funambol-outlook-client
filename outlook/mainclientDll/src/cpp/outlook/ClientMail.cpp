@@ -42,6 +42,7 @@
 #include "outlook/defs.h"
 #include "outlook/ClientMail.h"
 #include "outlook/ClientException.h"
+#include "outlook/ClientFolder.h"
 #include "outlook/utils.h"
 
 
@@ -86,8 +87,14 @@ void ClientMail::setCOMPtr(_MailItemPtr& ptr, const wstring& itemID) {
     try {
         pSafeMail->Item = pMail;
 
+        pUserProperties = pMail->UserProperties;
+        userPropertiesCount = pUserProperties->Count;
+
         pItemProperties = pMail->ItemProperties;
         propertiesCount = pItemProperties->Count;
+
+        propertiesCount -= userPropertiesCount;
+
         if (propertiesCount) {
             pItemProperty = pItemProperties->Item(0);
         }
@@ -272,34 +279,34 @@ error:
  * @param   destFolder  the destination ClientFolder to move this object to
  * @return              0 if no errors
  */
-//int ClientMail::moveItem(ClientFolder* destFolder) {
-//
-//    if (!pMail) {
-//        goto error;
-//    }
-//
-//    // Get destination folder
-//    MAPIFolder* pDestFolder = destFolder->getCOMPtr();
-//    if (!pDestFolder) {
-//        goto error;
-//    }
-//
-//    // Move item
-//    try {
-//        pMail->Move(pDestFolder);
-//    }
-//    catch(_com_error &e) {
-//        manageComErrors(e);
-//        goto error;
-//    }
-//
-//    parentPath = destFolder->getPath();
-//    return 0;
-//
-//error:
-//    LOG.error("Error moving item '%ls'", ID.c_str());
-//    return 1;
-//}
+int ClientMail::moveItem(ClientFolder* destFolder) {
+
+    if (!pMail) {
+        goto error;
+    }
+
+    // Get destination folder
+    MAPIFolder* pDestFolder = destFolder->getCOMPtr();
+    if (!pDestFolder) {
+        goto error;
+    }
+
+    // Move item
+    try {
+        this->setCOMPtr((_MailItemPtr)pMail->Move(pDestFolder));
+    }
+    catch(_com_error &e) {
+        manageComErrors(e);
+        goto error;
+    }
+
+    parentPath = destFolder->getPath();
+    return 0;
+
+error:
+    LOG.error("Error moving item '%ls'", ID.c_str());
+    return 1;
+}
 
 
 
@@ -365,6 +372,7 @@ ClientMail::ClientMail(const ClientMail& c) {
     propertiesIndex = c.propertiesIndex;
     propertiesCount = c.propertiesCount;
     propertyMap     = c.propertyMap;
+    userPropertyMap= c.userPropertyMap;
 
     createSafeMailInstance();
     pSafeMail       = c.pSafeMail;
@@ -388,6 +396,7 @@ ClientMail ClientMail::operator=(const ClientMail& c) {
     cnew.propertiesIndex = c.propertiesIndex;
     cnew.propertiesCount = c.propertiesCount;
     cnew.propertyMap     = c.propertyMap;
+    cnew.userPropertyMap= c.userPropertyMap;
 
     cnew.createSafeMailInstance();
     cnew.pSafeMail       = c.pSafeMail;

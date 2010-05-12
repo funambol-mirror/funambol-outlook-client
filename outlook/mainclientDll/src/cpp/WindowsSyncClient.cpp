@@ -98,8 +98,9 @@ int WindowsSyncClient::continueAfterPrepareSync() {
         cApp->setOutgoingTimezone(true);
     }
 
-
     if (DISPLAY_SLOWSYNC_WARNING) {
+
+        bool unpause = true;
 
         sourceNameList      slowSyncList;
         sourceNameIterator  iter;
@@ -118,6 +119,11 @@ int WindowsSyncClient::continueAfterPrepareSync() {
                 slowSyncList.push_back(syncSources[i]->getName());
             }
             i++;
+
+            if (initialSyncMode == 202 || initialSyncMode == 204)
+            {
+                unpause = DLLCustomization::continueOnSlowWithOneWay;
+            }
         }
 
 
@@ -146,16 +152,29 @@ int WindowsSyncClient::continueAfterPrepareSync() {
                 i ++;
             }
             message += names;
-
-            WCHAR* tmp = new WCHAR[wcslen(WMSG_BOX_ASK_SLOW_2) + 10];
-            wsprintf(tmp, WMSG_BOX_ASK_SLOW_2, ASK_SLOW_TIMEOUT);
+            WCHAR* tmp = new WCHAR[max(wcslen(WMSG_BOX_ASK_SLOW_2), wcslen(WMSG_BOX_ASK_SLOW_3)) + 10];
+            if (unpause)
+            {
+                wsprintf(tmp, WMSG_BOX_ASK_SLOW_2, ASK_SLOW_TIMEOUT);
+            }
+            else
+            {
+                wsprintf(tmp, WMSG_BOX_ASK_SLOW_3);
+            }
             message += tmp;
             delete [] tmp;
 
-
             // Prompt a timed MessageBox (10sec default)
             unsigned int flags = MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND| MB_TOPMOST;
-            int res = TimedMessageBox(NULL, message.c_str(), TEXT(PROGRAM_NAME), flags, ASK_SLOW_TIMEOUT * 1000);
+            int res = IDNO;
+            if (unpause)
+            {
+                res = TimedMessageBox(NULL, message.c_str(), TEXT(PROGRAM_NAME), flags, ASK_SLOW_TIMEOUT * 1000);
+            }
+            else
+            {
+                res = MessageBox(NULL, message.c_str(), TEXT(PROGRAM_NAME), flags);
+            }
 
             // '-1' is returned after the time-out.
             if (res == IDYES || res == -1) {

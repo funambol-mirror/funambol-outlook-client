@@ -44,6 +44,9 @@
 #include "HwndFunctions.h"
 #include "outlook/ClientFolder.h"
 #include "outlook/ClientException.h"
+#include "outlook/ClientContact.h"
+#include "SyncException.h"
+#include "vocl/AppDefs.h"
 #include "spds/constants.h"
 
 
@@ -66,6 +69,8 @@ WindowsSyncSource::WindowsSyncSource(const WCHAR* name, WindowsSyncSourceConfig*
     filteredItems.clear();
 
     defaultFolderPath = EMPTY_WSTRING;
+
+    forceOpenOutlook = false;
 }
 
 
@@ -108,6 +113,8 @@ WindowsSyncSourceConfig& WindowsSyncSource::getConfig() {
 int WindowsSyncSource::beginSync() {
     checkAbortedSync();
 
+    initWinItems();
+
     // From now we consider this source synced.
     winConfig.setIsSynced(true);
 
@@ -117,14 +124,16 @@ int WindowsSyncSource::beginSync() {
     //
     LOG.debug(DBG_OUTLOOK_OPEN, getName());
     try {
-        outlook = ClientApplication::getInstance();
+        outlook = ClientApplication::getInstance(!forceOpenOutlook);
     }
     catch (ClientException* e) {
         // Must set the errors, here could be a fatal exception
         manageSourceErrorF(ERR_CODE_OPEN_OUTLOOK, ERR_BEGIN_SYNC, getName());
         report->setState(SOURCE_ERROR);
+        setErrorF(0, ERR_BEGIN_SYNC, getName());
+        e->setExceptionData(e->getErrorMsg(), e->getErrorCode(), false, true);
         manageClientException(e);
-        goto error;
+        throwSyncException(getLastErrorMsg(), 2);
     }
 
     // Just store the default folder path (can be used more times during sync)
@@ -138,13 +147,16 @@ int WindowsSyncSource::beginSync() {
         LOG.error(ERR_FOLDER_DEFAULT_PATH, getName());
     }
 
-
     // This is the folder we want to sync (folder selected from config).
     folder = getStartFolder();
     if (!folder) {
-        manageSourceErrorF(ERR_CODE_OPEN_OUTLOOK, ERR_BEGIN_SYNC, getName());
-        goto error;
+        manageSourceErrorF(ERR_CODE_FOLDER_PATH_MATCH, ERR_BEGIN_SYNC, getName());
+        setErrorF(ERR_CODE_FOLDER_PATH_MATCH, getLastErrorMsg());
+        closeOutlook();
+        throwSyncException("Folder paths do not match", ERR_CODE_FOLDER_PATH_MATCH);
     }
+
+    defaultFolderPath = folder->getPath();
 
     if ( strcmp(getConfig().getName(), "appointment")== 0 && getSyncMode() == SYNC_SLOW ){
             DateFilter& f = getDateFilter();
@@ -198,7 +210,12 @@ error:
  * @return  0 if no errors occurred
  */
 int WindowsSyncSource::endSync() {
-    checkAbortedSync();
+    itemKeyIterator it;
+    std::map<std::wstring, std::wstring>::iterator mit;
+
+    LOG.debug("Ending sync for '%ls'", getName());
+
+    //checkAbortedSync();
 
     if ( strcmp(getConfig().getName(), "appointment")== 0 && getSyncMode() == SYNC_SLOW ){
             DateFilter& filter = getDateFilter();
@@ -212,10 +229,15 @@ int WindowsSyncSource::endSync() {
         return 1;
     }
 
+    LOG.debug("Opened old items db");
+
     //
     // Format data string as an XML with items keys.
     //
     wstring data = createOldItems();
+
+    LOG.debug("Old items list created");
+
     if (writeToFile(data, oldItemsPath)) {
 
         // directories could not exist... (first time).
@@ -230,11 +252,16 @@ int WindowsSyncSource::endSync() {
         }
     }
 
+    LOG.debug("Wrote items db");
 
     // For appointments: close the file for 'forced modified items'.
     if (!wcscmp(getName(), APPOINTMENT)) {
         closeDataFile(APPOINTMENT_FORCED_MODIFIED);
     }
+
+    LOG.debug("Closed db");
+
+    writeIdMap(idMap);
 
     ret = 0;
     goto finally;
@@ -248,6 +275,7 @@ error:
 
 finally:
 
+    LOG.debug("Setting end timestamp");
     // Set end timestamp to config: here this source is finished.
     winConfig.setEndTimestamp((unsigned long)time(NULL));
 
@@ -255,6 +283,10 @@ finally:
         delete [] oldItemsPath;
         oldItemsPath = NULL;
     }
+
+    LOG.info("Clearing cache for %ls", getName());
+    clearCache();
+
     return ret;
 }
 
@@ -299,19 +331,22 @@ SyncItem* WindowsSyncSource::getFirstItem() {
         try {
             cItem = outlook->getItemFromID(*iAll, getName());
             sItem = convertToSyncItem(cItem, winConfig.getType(), defaultFolderPath);
-            if (!sItem) {
-                // TBD: Something wrong -> getNextItem and update report/fire events. 
-            }
             LOG.info(INFO_GET_ITEM, getName(), getSafeItemName(cItem).c_str());
         }
         catch (ClientException* e) {
             manageClientException(e);
             manageSourceErrorF(ERR_CODE_ITEM_GET, ERR_ITEM_GET, getSafeItemName(cItem).c_str(), getName());
-            // TBD: Something wrong -> getNextItem and update report/fire events. 
-            return NULL;
+            sItem = NULL;
         }
         iAll++;
+        if (!sItem) {
+            return getNextItem();
+        }
     }
+
+    idMap.clear();
+    idMapReverse.clear();
+
     return sItem;
 }
 
@@ -341,9 +376,12 @@ SyncItem* WindowsSyncSource::getNextItem() {
         catch (ClientException* e) {
             manageClientException(e);
             manageSourceErrorF(ERR_CODE_ITEM_GET, ERR_ITEM_GET, getSafeItemName(cItem).c_str(), getName());
-            return NULL;
+            sItem = NULL;
         }
         iAll++;
+        if (!sItem) {
+            return getNextItem();
+        }
     }
     return sItem; 
 }
@@ -370,9 +408,29 @@ SyncItem* WindowsSyncSource::getFirstNewItem() {
     //
     // Create list of NEW/MOD/DEL items from previous sync.
     //
-    if (manageModificationsFromLastSync()) {
+
+    int manageCode = manageModificationsFromLastSync();
+    if (manageCode > 0)
+    {
         LOG.info(INFO_OLD_ITEMS_NOT_FOUND);
     }
+    else if (manageCode < 0 && DLLCustomization::warnOnLargeDelete)
+    {
+        WCHAR temp[512];
+        LOG.info(ERR_NO_DATA_ITEM, getName());
+        swprintf(temp, 512, WMSG_BOX_NO_DATA_ITEM, getName(), getName());
+        bool cancel = (IDNO == MessageBox(NULL,temp, WPROGRAM_NAME, MB_YESNO));
+        if (cancel)
+        {
+            manageSourceError(ERR_CODE_ITEM_GET, getLastErrorMsg());
+            //ClientApplication::invalidate();
+            //throwSyncException(lastErrorMsg, ERR_CODE_ITEM_GET);
+            //softTerminateSync();
+            SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_CANCEL_SYNC, NULL, NULL);
+            //checkAbortedSync();
+        }
+    }
+
 
 
     // For appointments: reset the 'appointment_modified' file,
@@ -396,15 +454,18 @@ SyncItem* WindowsSyncSource::getFirstNewItem() {
 
         try {
             cItem = outlook->getItemFromID(*iNew, getName());
-            sItem = convertToSyncItem(cItem, winConfig.getType(), defaultFolderPath);
+            sItem = convertToSyncItem(cItem, winConfig.getType(), defaultFolderPath, false);
             LOG.info(INFO_GET_NEW_ITEM, getName(), getSafeItemName(cItem).c_str());
         }
         catch (ClientException* e) {
             manageClientException(e);
             manageSourceErrorF(ERR_CODE_ITEM_GET, ERR_ITEM_GET_NEW, getSafeItemName(cItem).c_str(), getName());
-            return NULL;
+            sItem = NULL;
         }
         iNew++;
+        if (!sItem) {
+            return getNextNewItem();
+        }
     }
     return sItem;
 }
@@ -434,9 +495,12 @@ SyncItem* WindowsSyncSource::getNextNewItem() {
         catch (ClientException* e) {
             manageClientException(e);
             manageSourceErrorF(ERR_CODE_ITEM_GET, ERR_ITEM_GET_NEW, getSafeItemName(cItem).c_str(), getName());
-            return NULL;
+            sItem = NULL;
         }
         iNew++;
+        if (!sItem) {
+            return getNextNewItem();
+        }
     }
     return sItem; 
 }
@@ -461,18 +525,34 @@ SyncItem* WindowsSyncSource::getFirstUpdatedItem() {
     if (modItems.size() > 0) {
 
         iMod = modItems.begin();
+        std::wstring key = *iMod;
 
         try {
             cItem = outlook->getItemFromID(*iMod, getName());
-            sItem = convertToSyncItem(cItem, winConfig.getType(), defaultFolderPath);
-            LOG.info(INFO_GET_UPDATED_ITEM, getName(), getSafeItemName(cItem).c_str());
+            if (cItem && cItem->isReadOnly()) {
+                sItem = NULL;
+            } else {
+                sItem = convertToSyncItem(cItem, config->getType(), defaultFolderPath);
+                LOG.info(INFO_GET_UPDATED_ITEM, getName(), getSafeItemName(cItem).c_str());
+            }
         }
         catch (ClientException* e) {
             manageClientException(e);
             manageSourceErrorF(ERR_CODE_ITEM_GET, ERR_ITEM_GET_MOD, getSafeItemName(cItem).c_str(), getName());
-            return NULL;
+            sItem = NULL;
         }
         iMod++;
+        if (!sItem) {
+            removeIdFromMap(key);
+            return getNextUpdatedItem();
+        }
+        else {
+            // Updated item - send original id from before upgrade
+            std::wstring key = sItem->getKey();
+            if (isNewIdInMap(key)){
+                sItem->setKey(getOldIdFromNewId(key).c_str());
+            }
+        }
     }
     return sItem;
 }
@@ -494,17 +574,35 @@ SyncItem* WindowsSyncSource::getNextUpdatedItem() {
     SyncItem*   sItem = NULL;
 
     if ( (modItems.size() > 0) && (iMod != modItems.end()) ) {
+
+        std::wstring key = *iMod;
+
         try {
             cItem = outlook->getItemFromID(*iMod, getName());
-            sItem = convertToSyncItem(cItem, winConfig.getType(), defaultFolderPath);
-            LOG.info(INFO_GET_UPDATED_ITEM, getName(), getSafeItemName(cItem).c_str());
+            if (cItem && cItem->isReadOnly()) {
+                sItem = NULL;
+            } else {
+                sItem = convertToSyncItem(cItem, config->getType(), defaultFolderPath);
+                LOG.info(INFO_GET_UPDATED_ITEM, getName(), getSafeItemName(cItem).c_str());
+            }
         }
         catch (ClientException* e) {
             manageClientException(e);
             manageSourceErrorF(ERR_CODE_ITEM_GET, ERR_ITEM_GET_MOD, getSafeItemName(cItem).c_str(), getName());
-            return NULL;
+            sItem = NULL;
         }
         iMod++;
+        if (!sItem) {
+            removeIdFromMap(key);
+            return getNextUpdatedItem();
+        }
+        else {
+            // Updated item - send original id from before upgrade
+            std::wstring key = sItem->getKey();
+            if (isNewIdInMap(key)){
+                sItem->setKey(getOldIdFromNewId(key).c_str());
+            }
+        }
     }
     return sItem;           
 }
@@ -526,6 +624,7 @@ SyncItem* WindowsSyncSource::getFirstDeletedItem() {
     if (delItems.size() > 0) {
         iDel = delItems.begin();
         sItem = new SyncItem((*iDel).c_str());
+        removeIdFromMap(*iDel);
         sItem->setDataSize(0);
         iDel++;
     }
@@ -547,6 +646,8 @@ SyncItem* WindowsSyncSource::getNextDeletedItem() {
     SyncItem* sItem = NULL;
 
     if ( (delItems.size() > 0) && (iDel != delItems.end()) ) {
+        removeIdFromMap(*iDel);
+
         sItem = new SyncItem((*iDel).c_str());
         sItem->setDataSize(0);
         iDel++;
@@ -575,9 +676,11 @@ int WindowsSyncSource::removeAllItems() {
     // Remove internally ALL items: totalItems = allItems + filteredItems.
     // ---------------------------- 
     itemKeyList totalItems = allItems;
-    totalItems.sort();
-    filteredItems.sort();
-    totalItems.merge(filteredItems);    // lists MUST be sorted!
+    if (DLLCustomization::removeFilteredDataOnCleanup) {
+        totalItems.sort();
+        filteredItems.sort();
+        totalItems.merge(filteredItems);    // lists MUST be sorted!
+    }
     itemKeyIterator iTotal = totalItems.begin();
 
     if (totalItems.size() > 0) {
@@ -590,12 +693,13 @@ int WindowsSyncSource::removeAllItems() {
         int i=1;
         iTotal = totalItems.begin();
         while (iTotal != totalItems.end()) {
-            // Check aborted once every 100...
-            if ((i % 100) == 0) checkAbortedSync();
+            // Check aborted once every 50...
+            if ((i % 50) == 0) checkAbortedSync();
 
             try {
                 // Get each item
                 cItem = outlook->getItemFromID(*iTotal, getName());
+
                 if (!cItem) {
                     manageSourceErrorF(ERR_CODE_ITEM_GET, ERR_ITEM_GET, getSafeItemName(cItem).c_str(), getName());
                     iTotal++; 
@@ -623,7 +727,10 @@ int WindowsSyncSource::removeAllItems() {
             i++;
         }
     }
-    
+
+    idMap.clear();
+    idMapReverse.clear();
+
     // Here, all items have been removed.
     return 0;
 }
@@ -641,7 +748,6 @@ int WindowsSyncSource::removeAllItems() {
  */
 int WindowsSyncSource::addItem(SyncItem& item) {
     checkAbortedSync();
-    
     if (!report->checkState()) {
         LOG.debug(DBG_STATE_ERR_ITEM_IGNORED);
         return STC_COMMAND_FAILED;
@@ -739,6 +845,7 @@ int WindowsSyncSource::addItem(SyncItem& item) {
         if (cItem->saveItem()) {
             goto errorSave;  
         }
+        lastAddedId = cItem->getID();
     }
     catch (ClientException* e) {
         manageClientException(e);
@@ -749,9 +856,10 @@ int WindowsSyncSource::addItem(SyncItem& item) {
     // -> notify user on LOG.
     checkBirthdayAnniversary(cItem);   
 
-
     // Set item key = GUID.
     item.setKey(cItem->getID().c_str());
+
+    itemAdded(cItem);
 
     LOG.info(INFO_ITEM_ADDED, getName(), getSafeItemName(cItem).c_str());
     ret = STC_ITEM_ADDED;
@@ -838,6 +946,7 @@ int WindowsSyncSource::updateItem(SyncItem& item) {
     WCHAR* data = toWideChar(charData);
     wstring dataString = data;                                      // TBD: Could we avoid these 2 copy?
     wstring path = EMPTY_WSTRING;
+    wstring oldId;
 
 
     // Check if is an accepted mime type
@@ -850,6 +959,12 @@ int WindowsSyncSource::updateItem(SyncItem& item) {
     //
     // Get ClientItem to update.
     //
+
+    if (isOldIdInMap(item.getKey())) {
+        std::wstring originalId = item.getKey();
+        item.setKey(getNewIdFromOldId(item.getKey()).c_str());
+    }
+
     try {
         cItem = outlook->getItemFromID(item.getKey(), getName());
         if (!cItem) goto errorNotFound;
@@ -882,6 +997,7 @@ int WindowsSyncSource::updateItem(SyncItem& item) {
             wstring savedSubject = EMPTY_WSTRING;
             try {
                 savedSubject = getSafeItemName(cItem);
+                oldId = cItem->getID();
                 if (cItem->deleteItem()) {
                     goto errorDelete;
                 }
@@ -891,6 +1007,16 @@ int WindowsSyncSource::updateItem(SyncItem& item) {
                 goto errorDelete;
             }
             LOG.info(INFO_ITEM_DELETED, getName(), savedSubject.c_str());
+
+            // Update the path in the path list, and map the id
+            for (iAll = allItems.begin(), iAllPaths = allItemsPaths.begin(); iAll != allItems.end(); iAll++, iAllPaths++) {
+                if ((*iAll) == oldId) {
+                    (*iAll) = lastAddedId;
+                    (*iAllPaths) = path;
+                    break;
+                }
+            }
+            addToIdMap(oldId, lastAddedId);
         }
         else {
             ret = STC_COMMAND_FAILED;
@@ -1008,6 +1134,14 @@ int WindowsSyncSource::deleteItem(SyncItem& item) {
     //
     // Get ClientItem to delete.
     //
+
+    if (isOldIdInMap(item.getKey())) {
+        std::wstring originalId = item.getKey();
+        item.setKey(getNewIdFromOldId(item.getKey()).c_str());
+        removeIdFromMap(item.getKey());
+        removeIdFromMap(originalId);
+    }
+
     try {
         cItem = outlook->getItemFromID(item.getKey(), getName());
         if (!cItem) goto errorNotFound;
@@ -1142,6 +1276,10 @@ ClientFolder* WindowsSyncSource::getStartFolder() {
         return NULL;
     }
 
+    if (path.compare(L"") != 0 && folder->getPath().compare(path.c_str()) != 0) {
+        return NULL;
+    }
+
     if (folder) {
         // Save current path used to configuration.
         char* p = toMultibyte(folder->getPath().c_str());
@@ -1182,13 +1320,16 @@ void WindowsSyncSource::pushAllSubfolderItemsToList(ClientFolder* folder, itemKe
     // Push all subfolder's items.
     //
     ClientFolder* subFolder = NULL;
-    if (folder->getSubfoldersCount() > 0) {
-        subFolder = folder->getFirstSubfolder();
-        // Recursive call!
-        pushAllSubfolderItemsToList(subFolder, listItems, listItemsPaths);
+    int count = folder->getSubfoldersCount();
+    std::vector<std::wstring> folders;
+    for (int x = 0; x < count; x++) {
+        std::wstring name = folder->getSubfolder(x)->getName();
+        folders.push_back(name);
+    }
 
-        for (int i=1; i < folder->getSubfoldersCount(); i++) {
-            subFolder = folder->getNextSubfolder();
+    for (int x = 0; x < count; x++) {
+        subFolder = folder->getSubfolderFromName(folders[x]);
+        if(subFolder) {
             // Recursive call!
             pushAllSubfolderItemsToList(subFolder, listItems, listItemsPaths);
         }
@@ -1220,62 +1361,73 @@ void WindowsSyncSource::pushAllItemsToList(ClientFolder* folder, itemKeyList& li
     int itemsCount = folder->getItemsCount();
     LOG.debug(DBG_READ_ALL_ITEMS, getName(), folder->getPath().c_str(), itemsCount);
 
-    if (itemsCount > 0) {
-        item = folder->getFirstItem();
+    if (itemsCount == 0) {
+        return;
+    }
         if (LOG.getLevel() >= LOG_LEVEL_DEBUG) {
             LOG.debug("Reading item: \"%ls\"", getSafeItemName(item).c_str());
         }
 
+    itemKeyList existingItems;
+
+    item = folder->getFirstItem();
+    // Item could be NULL if type not correct! -> ignore it.
+    if (item != NULL) {
+        existingItems.push_back(item->getID());
+    }
+
+    for (int i = 1; i < itemsCount; i++) {
+        item = folder->getNextItem();
         // Item could be NULL if type not correct! -> ignore it.
-        // Filter all items, based on the active filters for this source.
-        // Filter only if direction is OUTPUT (outgoing items).
-        if (filterClientItem(item, DateFilter::DIR_OUT)) {
-            // First normalize exceptions (for appointment).
-            if (!wcscmp(getName(), APPOINTMENT)) {
-                normalizeExceptions(item, allItems, allItemsPaths);
-            }
-            listItems.push_back(item->getID());
-            listItemsPaths.push_back(item->getParentPath());
-            SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_REFRESH_STATUSBAR, (WPARAM)listItems.size(), (LPARAM)SBAR_CHECK_ALL_ITEMS);
-        }
-        else {
+        if (item != NULL && filterClientItem(item, DateFilter::DIR_OUT)) {
+            existingItems.push_back(item->getID());
+        } else {
             // We save the list of filteredItems ID, because we may use them later (see manageModifications())
             if (item) { 
                 filteredItems.push_back(item->getID()); 
             }
         }
+    }
 
-        for (int i=1; i < itemsCount; i++) {
-            item = folder->getNextItem();
-            if (LOG.getLevel() >= LOG_LEVEL_DEBUG) {
-                LOG.debug("Reading item: \"%ls\"", getSafeItemName(item).c_str());
-            }
+    itemKeyList::iterator it;
+    int count = 0;
 
-            // Item could be NULL if type not correct! -> ignore it.
-            // Filter items here, based on the active filters for this source.
-            // Filter only if direction is OUTPUT (outgoing items).
-            if (filterClientItem(item, DateFilter::DIR_OUT)) {
+    for (it = existingItems.begin(); it != existingItems.end(); it++) {
+        item = outlook->getItemFromID(*it, getName());
 
-                // First normalize exceptions (for appointment).
-                if (!wcscmp(getName(), APPOINTMENT)) {
-                    normalizeExceptions(item, allItems, allItemsPaths);
-                }
-                listItems.push_back(item->getID());
-                listItemsPaths.push_back(item->getParentPath());
-                SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_REFRESH_STATUSBAR, (WPARAM)listItems.size(), (LPARAM)SBAR_CHECK_ALL_ITEMS);
-
-                // Check aborted once every 5 (normalize exc may take more time)
-                if ((listItems.size() % 5) == 0) {
-                    checkAbortedSync();
+        // SHOULD NEVER FAIL
+        if (item) {
+            // First normalize exceptions (for appointment).
+            if (!wcscmp(getName(), APPOINTMENT)) {
+                int current = listItems.size();
+                if (normalizeExceptions(item, listItems, listItemsPaths))
+                {
+                    char temp[500];
+                    char * subject = toMultibyte(item->getProperty(L"Subject").c_str());
+                    sprintf(temp, "Unable to normalize appointment: %s.  Please check this event", subject);
+                    throwClientException(temp,0,0,true);
                 }
             }
-            else {
-                // We save the list of filteredItems ID, because we may use them later (see manageModifications())
-                if (item) { 
-                    filteredItems.push_back(item->getID()); 
-                }
-            }
+
+            std::wstring modtime = item->getProperty(L"LastModificationTime");
+            long modtimestamp = variantTimeToTimeStamp(_wtof(modtime.c_str()));
+            std::wstring itemID = item->getID();
+            std::wstring parentPath = item->getParentPath();
+            cacheItem(itemID,modtimestamp,parentPath);
+
+            listItems.push_back(item->getID());
+            listItemsPaths.push_back(item->getParentPath());
+            SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_REFRESH_STATUSBAR, (WPARAM)listItems.size(), (LPARAM)SBAR_CHECK_ALL_ITEMS);
+        } else {
+            throwClientException("Unable to access all items from outlook",0,0,true);
         }
+
+        // Check aborted once every 5 (normalize exc may take more time)
+        if ((count % 5) == 0) {
+            checkAbortedSync();
+        }
+
+        count++;
     }
 }
 
@@ -1334,6 +1486,58 @@ void WindowsSyncSource::updateFilters()
     }
 }
 
+/**
+ * Updates the list of all items and paths by removing and adding items.
+ * The lists of items and paths must be the same length, otherwise this
+ * would jeopardize the integrity of the list of all items.
+ */
+void WindowsSyncSource::updateAllItemsLists(itemKeyList &itemsToDelete, itemKeyList &itemPathsToDelete,
+    itemKeyList &itemsToAdd, itemKeyList &itemPathsToAdd) {
+
+    if (itemsToDelete.size() != itemPathsToDelete.size()) {
+        return;
+    }
+
+    if (itemsToAdd.size() != itemPathsToAdd.size()) {
+        return;
+    }
+
+    itemKeyIterator iDel;
+    itemKeyIterator iAdd;
+
+    itemKeyIterator iPathDel;
+    itemKeyIterator iPathAdd;
+
+    iDel = itemsToDelete.begin();
+    iPathDel = itemPathsToDelete.begin();
+    while (iDel != itemsToDelete.end()) {
+
+        iAll = allItems.begin();
+        iAllPaths = allItemsPaths.begin();
+        while (iAll != allItems.end()) {
+            if (*iAll == *iDel) {
+                iAll = allItems.erase(iAll);
+                iAllPaths = allItemsPaths.erase(iAllPaths);
+            }
+            if (iAll != allItems.end()) {
+                iAll++;
+                iAllPaths++;
+            }
+        }
+
+        iDel++;
+        iPathDel++;
+    }
+
+    iAdd = itemsToAdd.begin();
+    iPathAdd = itemPathsToAdd.begin();
+    while (iAdd != itemsToAdd.end()) {
+        allItems.push_back(*iAdd);
+        allItemsPaths.push_back(*iPathAdd);
+        iAdd++;
+        iPathAdd++;
+    }
+}
 
 
 
@@ -1345,6 +1549,7 @@ void WindowsSyncSource::updateFilters()
  *
  * @return  0 if no errors.
  *          In case of error, all items will be set as modified items.
+ *          -1 if there was a large number of deletes
  */
 int WindowsSyncSource::manageModificationsFromLastSync() {
 
@@ -1354,6 +1559,18 @@ int WindowsSyncSource::manageModificationsFromLastSync() {
     wstring lastSyncTime = EMPTY_WSTRING;
     itemKeyList oldItemsFolders;                // List of old items folder paths.
     itemKeyIterator iFol;
+
+    long lastModTimeStamp  = 0;
+    double lastModVarTime  = 0;
+    std::wstring parentPath;
+
+    std::wstring idMapFile;
+
+    itemKeyList allItemsDeletes;
+    itemKeyList allItemsAdds;
+
+    itemKeyList allItemPathsDeletes;
+    itemKeyList allItemPathsAdds;
 
     // Refresh status bar on UI.
     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_REFRESH_STATUSBAR, NULL, (LPARAM)SBAR_CHECK_MOD_ITEMS);
@@ -1373,6 +1590,14 @@ int WindowsSyncSource::manageModificationsFromLastSync() {
         goto error;
     }
 
+    idMapFile = this->getIdMapFile();
+    if (idMapFile.compare(L"") == 0) {
+        // Error getting file path.
+        manageSourceError(ERR_CODE_ID_MAP_PATH, getLastErrorMsg());
+        goto error;
+    }
+
+    constructIdMaps(idMapFile);
 
     //
     // Parse XML file with old items keys -> use 'delItems' for list of old items.
@@ -1397,7 +1622,6 @@ int WindowsSyncSource::manageModificationsFromLastSync() {
         goto finally;
     }
 
-
     // Last sync timestamp to compare each item's mod time (read from oldItems file).
     if (getElementContent(fileContent, L"LastSyncTime", lastSyncTime)) {
         setErrorF(getLastErrorCode(), ERR_SOURCE_LASTSYNCTIME_NOT_FOUND, oldItemsPath);
@@ -1405,9 +1629,6 @@ int WindowsSyncSource::manageModificationsFromLastSync() {
         goto error;
     }
     long lastSyncTimeStamp = _wtoi(lastSyncTime.c_str());
-    long lastModTimeStamp  = 0;
-    double lastModVarTime  = 0;
-
 
     //
     // Fill NEW/MOD/DEL lists of ClientItem keys.
@@ -1427,14 +1648,20 @@ int WindowsSyncSource::manageModificationsFromLastSync() {
         iDel = delItems.begin();
         iFol = oldItemsFolders.begin();
         while (iDel != delItems.end()) {
+
+            std::wstring itemId = *iAll;
+
+            // The item is not deleted - the id has changed (moved)
+            if (isNewIdInMap(itemId) && getOldIdFromNewId(itemId) == *iDel){
+                itemId = *iDel;
+            }
             
             // Found!
-            if (*iAll == *iDel) {
+            if (itemId == *iDel) {
+                bool clearDelete = true;
                 found = true;
-                cItem = outlook->getItemFromID(*iAll, getName());
-                if (cItem) {
-                    lastModVarTime = _wtof(cItem->getProperty(L"LastModificationTime").c_str());
-                    lastModTimeStamp = variantTimeToTimeStamp(lastModVarTime);
+                cItem = NULL;
+                if (getItemDetails(*iAll, parentPath, lastModTimeStamp, cItem)) {
 
                     // 1. Check last modification time of the item.
                     // Note: saving items Outlook can introduce a delay of some seconds!
@@ -1445,17 +1672,43 @@ int WindowsSyncSource::manageModificationsFromLastSync() {
 
                     // 2. New since v.6.0.9: check if folder path is the same (ignore if foder info not exists)
                     else if ((*iFol) != EMPTY_WSTRING) {
-                        if (cItem->getParentPath() != (*iFol)) {
+                        if (parentPath != (*iFol)) {
                             // *** Modified item: the folder name has changed ;) ***
-                            modItems.push_back(*iAll);
+
+                            // We send items that were modified by a folder change
+                            // by copying the item, and deleting the original,
+                            // so that moves between folders work better on some servers
+                            if (DLLCustomization::sendMovedAsNew) {
+                                if (!cItem) {
+                                    cItem = outlook->getItemFromID(*iAll, getName());
+                                }
+                                if (cItem && !cItem->isReadOnly()) {
+                                    LOG.info("Item with write permissions moved between folders - copying");
+                                    ClientItem * newItem = cItem->copyItem();
+                                    newItem->clearUserProperties();
+                                    newItem->saveItem();
+                                    newItems.push_back(newItem->getID());
+                                    allItemsDeletes.push_back(cItem->getID());
+                                    allItemPathsDeletes.push_back(cItem->getParentPath());
+                                    allItemsAdds.push_back(newItem->getID());
+                                    allItemPathsAdds.push_back(newItem->getParentPath());
+                                    cItem->deleteItem();
+                                    clearDelete = false;
+                                }
+                            } else {
+                                modItems.push_back(*iAll);
+                            }
                         }
                     }
                 }
 
-                delItems.erase(iDel);         // Remove the old item found from delItems list! (so won't be checked again)
-                oldItemsFolders.erase(iFol);
-                break;                        // Go directly to next allItems key (iDel is invalid)
-            }
+                // Dont clear the deleted item for folder moves
+                if (clearDelete) {
+                    delItems.erase(iDel);         // Remove the old item found from delItems list! (so won't be checked again)
+                    oldItemsFolders.erase(iFol);
+                    break;                        // Go directly to next allItems key (iDel is invalid)
+                }
+            } 
             iDel++;
             iFol++;
         }
@@ -1463,6 +1716,9 @@ int WindowsSyncSource::manageModificationsFromLastSync() {
         if (!found) {
             // We didn't find it in oldItems -> *** New item ***
             newItems.push_back(*iAll);
+
+            // New item - never been synced, entry in idMap is useless - clear it
+            removeNewIdFromMap(*iAll);
         }
         iAll ++;
         i++;
@@ -1474,8 +1730,8 @@ int WindowsSyncSource::manageModificationsFromLastSync() {
     // Some of these items could result 'deleted' because of a new filter, we don't
     // want to send the <Delete> for filtered out items, so we remove them.
     // For example, we don't send all the deletes the first time the user enables
-    // the filtering on appointment dates.
-    if (DONT_SEND_FILTERED_DEL_ITEMS) {
+    // the filtering on appointment dates..
+    if (DLLCustomization::dontSendFilteredItemsAsDeleted) {
         iDel = delItems.begin();
         while (iDel != delItems.end()) {
             iFiltered = filteredItems.begin();
@@ -1521,9 +1777,17 @@ int WindowsSyncSource::manageModificationsFromLastSync() {
         }
     }
 
-    ret = 0;
-    goto finally;
+    // If more than half are deleted, return delete warning
+    if (delItems.size() > 0 && ((double)allItems.size())/((double)delItems.size()) <= 2) {
+        ret = -1;
+    } else {
+        ret = 0;
+    }
 
+    // Update the allItems lists
+    updateAllItemsLists(allItemsDeletes, allItemPathsDeletes, allItemsAdds, allItemPathsAdds);
+
+    goto finally;
 error:
     // consider all items as modified.
     newItems.clear();
@@ -1722,6 +1986,9 @@ wstring WindowsSyncSource::createOldItems() {
     iAll = allItems.begin();
     iAllPaths = allItemsPaths.begin();
     int j=1;
+
+    LOG.debug("Generating list for deleted/updated/unchanged items");
+
     while (iAll != allItems.end()) {
 
         // Check aborted once every 100...
@@ -1751,17 +2018,18 @@ wstring WindowsSyncSource::createOldItems() {
         j++;
     }
     
+    LOG.debug("Generating list for added items");
+
     // Plus items added successfully.
     for (int i=0; i < clientAddedCount; i++) {
         itemAdded = report->getItemReport(CLIENT, COMMAND_ADD, i);
         if ( !isErrorStatus(itemAdded->getStatus()) ) {
-            ClientItem* cItem = outlook->getItemFromID(itemAdded->getId(), getName());
-            if (cItem) {
-                wstring folder = cItem->getParentPath();
-
+            std::wstring wid = itemAdded->getId();
+            std::wstring folder;
+            if (getItemDetails(wid, folder)) {
                 data += L"<Item>\n";
-                data += L"    <ID>";       data += itemAdded->getId();   data += L"</ID>\n";
-                data += L"    <Folder>";   data += folder;               data += L"</Folder>\n";
+                data += L"    <ID>";       data += wid;       data += L"</ID>\n";
+                data += L"    <Folder>";   data += folder;    data += L"</Folder>\n";
                 data += L"</Item>\n";
             }
         }
@@ -1975,7 +2243,7 @@ int WindowsSyncSource::deleteAppointment(ClientItem* cItem, const wstring& prope
     ClientFolder* folder = NULL;
 
     try {
-        outlook = ClientApplication::getInstance();
+        outlook = ClientApplication::getInstance(true);
     }
     catch (ClientException* e) {
         manageClientException(e);
@@ -1994,6 +2262,9 @@ int WindowsSyncSource::deleteAppointment(ClientItem* cItem, const wstring& prope
 
     // It's just created, so should be the last one ;)
     ClientItem* newApp = folder->getLastItem();
+    if (!newApp)
+        return 1;
+
     if (newApp->getProperty(L"Start") == cItem->getProperty(propertyName)) {        // 1. start = birthday/anniversary date
         if (subject.size() > 0) {
             pos = newApp->getProperty(L"Subject").find(subject);                    // 2. subject contains contact's subject (not empty)
@@ -2074,7 +2345,11 @@ void WindowsSyncSource::extractFolder(const wstring dataString, const wstring da
         // Replace "DEFAULT_FOLDER" with "\\Personal Folders\Contacts"
         // So the default folder is preserved even if path is different
         if (path.find(DEFAULT_FOLDER, 0) == 0) {
-            path.replace(0, wcslen(DEFAULT_FOLDER), defaultFolderPath);
+            path.replace(0, wcslen(DEFAULT_FOLDER), this->getStartFolder()->getPath());
+        } else {
+            if (path.find_first_of(L"\\",0) != 0)
+                path = L"\\" + path;
+            path = this->getStartFolder()->getPath() + path;
         }
     }
 
@@ -2086,9 +2361,6 @@ void WindowsSyncSource::extractFolder(const wstring dataString, const wstring da
         delete [] tmp;
     }
 }
-
-
-
 
 
 /**
@@ -2143,3 +2415,447 @@ void WindowsSyncSource::manageSourceErrorF(const int errorCode, const char *msgF
     manageSourceError(errorCode, msg.c_str());
 }
 
+void WindowsSyncSource::cacheItem(std::wstring itemID, long lastModified, std::wstring parentPath)
+{
+    cache[itemID] = CacheData(lastModified, parentPath);
+}
+
+void WindowsSyncSource::clearCache() {
+    cache.clear();
+}
+
+bool WindowsSyncSource::getItemDetails(const std::wstring & itemID, std::wstring & parentPath) {
+    long temp;
+    return getItemDetails(itemID, parentPath, temp);
+}
+
+bool WindowsSyncSource::getItemDetails(const std::wstring & itemID, std::wstring & parentPath, long & lastModified) {
+    ClientItem * cItem = NULL;
+    return getItemDetails(itemID, parentPath, lastModified, cItem);
+}
+
+bool WindowsSyncSource::getItemDetails(const std::wstring & itemID, std::wstring & parentPath, long & lastModified, ClientItem * & cItem) {
+    bool result = true;
+    if (!getItemDetailsFromCache(itemID, parentPath, lastModified)) {
+        cItem = outlook->getItemFromID(itemID, getName());
+
+        if (cItem) {// Cache failed, get data
+            double lastModVarTime = _wtof(cItem->getProperty(L"LastModificationTime").c_str());
+            lastModified = variantTimeToTimeStamp(lastModVarTime);
+            parentPath = cItem->getParentPath();
+        } else {
+            result = false;
+        }
+    }
+
+    return result;
+}
+
+bool WindowsSyncSource::getItemDetailsFromCache(const std::wstring & itemID, std::wstring & parentPath, long & lastModified) {
+    std::map<std::wstring, WindowsSyncSource::CacheData>::iterator it;
+    it = cache.find(itemID);
+
+    if (it == cache.end())
+        return false;
+
+    lastModified = (it->second).lastModified;
+    parentPath = (it->second).parentPath;
+    return true;
+}
+
+void WindowsSyncSource::itemAdded(ClientItem * item) {
+    std::wstring itemID = item->getID();
+    std::wstring parentPath = item->getParentPath();
+            
+    addedItems[itemID] = CacheData(0, parentPath);
+}
+
+// move all items (and subfolder items) into Shared/
+int WindowsSyncSource::upgradeCalendarFolders(bool fixMyCalendar) {
+
+    OutlookConfig * config = OutlookConfig::getInstance();
+    LOG.setLevel(LOG_LEVEL_DEBUG);
+    LOG.setLogPath(config->getLogDir());
+    LOG.setLogName(OL_PLUGIN_LOG_NAME);
+
+    LOG.info("Upgrading calendar folders");
+
+    if (wcscmp(getName(), APPOINTMENT) != 0) {
+        LOG.info("Not appt source");
+        return -1;
+    }
+
+    LOG.info("Is appointments source");
+
+    forceOpenOutlook = true;
+    LOG.info("About to set report");
+    setReport(new SyncSourceReport(APPOINTMENT_));
+    LOG.info("Just set report");
+    if (beginSync() != 0) {
+        LOG.info("beginSync failed");
+        return 1;
+    }
+    forceOpenOutlook = false;
+
+    LOG.info("beginSync successful");
+
+    std::map<std::wstring, std::wstring> folderChanges;
+
+    bool fail = false;
+
+    std::wstring mapFile = getIdMapFile();
+    LOG.info("Got ID map file");
+    if (mapFile.length() == 0) {
+        LOG.info("Map file path not available");
+        return 2;
+    }
+    
+    constructIdMaps(mapFile);
+
+    LOG.info("Id map read");
+
+    // traverse all the items
+    iAll = allItems.begin();
+    iAllPaths = allItemsPaths.begin();
+    itemKeyList uniqueItemPaths(allItemsPaths);
+
+    LOG.info("Moving items");
+
+    int count = 0;
+
+    while (iAll != allItems.end()) {
+
+        count++;
+        if (count % 100 == 0) { 
+            writeIdMap(idMap);
+        }
+
+        if (!fixMyCalendar) {
+            if (!isNewIdInMap(*iAll)) {
+
+                LOG.info("Moving item %ls", iAll->c_str());
+
+                // check that the item is not already in Calendar/Shared/
+                // the item is allowed to be in Calendar/Subfolder/Shared, so
+                // check that, too
+                ClientAppointment * cItem;
+                try {
+                    cItem = (ClientAppointment*)outlook->getItemFromID(*iAll, getName());
+                } catch (...) {
+                    fail = true;
+                    break;
+                }
+
+                wstring newPath = L"";
+
+                LOG.info("Calculating new folder name");
+
+                if ((*iAllPaths) != defaultFolderPath) {
+                    int sharedFolderPosition = (*iAllPaths).find(L"\\Shared\\");
+                    if (sharedFolderPosition == string::npos ||
+                        (size_t)sharedFolderPosition > (defaultFolderPath.size() + 1)) {
+                            wstring parentPath = cItem->getParentPath();
+                            wstring tempPath = parentPath.substr(defaultFolderPath.size());
+                            if (tempPath.find(L" - ") == wstring::npos) {
+                                newPath = defaultFolderPath + L"\\Shared" + tempPath + L" - My Calendar";
+                            } else {
+                                newPath = defaultFolderPath + L"\\Shared" + tempPath;
+                            }
+                    }
+
+                    LOG.info("New folder: %ls", newPath.c_str());
+
+                    folderChanges[(*iAllPaths)] = newPath;
+
+                    std::wstring originalId;
+                    std::wstring newId;
+                    try {
+                        LOG.info("Performing move");
+                        ClientFolder* dest = outlook->getFolderFromPath(getName(), newPath);
+
+                        // Move the item
+                        originalId = cItem->getID();
+                        cItem->moveItem(dest);
+                        newId = cItem->getID();
+
+                        idMap[newId] = originalId;
+
+                        LOG.info("Move successful");
+                    } catch (...) {
+                        LOG.info("Move failed");
+                        fail = true;
+                        break;
+                    }
+
+                }
+
+                *iAllPaths = newPath;
+
+            } else {
+                LOG.info("Item already been moved %ls", iAll->c_str());
+            }
+        
+        } else {
+            LOG.info("Checking to see if we should move item back: %ls", iAll->c_str());
+
+            std::wstring badFolderPath = defaultFolderPath + L"\\My Calendar";
+
+            ClientAppointment * cItem;
+            try {
+                cItem = (ClientAppointment*)outlook->getItemFromID(*iAll, getName());
+            } catch (...) {
+                fail = true;
+                break;
+            }
+
+            std::wstring oldOriginalId;
+            if (isNewIdInMap(*iAll)) {
+                oldOriginalId = getOldIdFromNewId(*iAll);
+            } else {
+                oldOriginalId = *iAll;
+            }
+
+            if (cItem->getParentPath().compare(badFolderPath) == 0) {
+
+                std::wstring newId;
+                std::wstring newPath = defaultFolderPath;
+
+                try {
+                    LOG.info("Performing move");
+                    ClientFolder* dest = outlook->getFolderFromPath(getName(), newPath);
+
+                    // Move the item
+                    cItem->moveItem(dest);
+                    newId = cItem->getID();
+
+                    removeIdFromMap(oldOriginalId);
+                    idMap[newId] = oldOriginalId;
+
+                    LOG.info("Move successful");
+                } catch (...) {
+                    LOG.info("Move failed");
+                    fail = true;
+                    break;
+                }
+
+            }
+
+        }
+
+        iAll++;
+        iAllPaths++;
+    }
+
+    int success = this->writeIdMap(idMap);
+
+    if (success != 0) {
+        LOG.error("Unable to write id map");
+        return 3;
+    }
+
+    if (!fail) {
+        uniqueItemPaths.unique();
+        itemKeyIterator iUniquePaths = uniqueItemPaths.begin();
+        while (iUniquePaths != uniqueItemPaths.end()) {
+            if ((*iUniquePaths) != defaultFolderPath) {
+                int sharedFolderPosition = (*iUniquePaths).find(L"\\Shared\\");
+                if (sharedFolderPosition == string::npos ||
+                    (size_t)sharedFolderPosition > (defaultFolderPath.size() + 1)) {
+                    ClientFolder* itemFolder = NULL;
+                    try { 
+                        itemFolder = outlook->getFolderFromPath(getName(), (*iUniquePaths));
+                    } catch (...) {
+                        LOG.info("Unable to get folder %ls", (*iUniquePaths).c_str());
+                    }
+                    if (itemFolder) {
+                        LOG.info("Checking if folder is empty for delete: %ls", (*iUniquePaths).c_str());
+
+                        int itemCount = 1;
+                        try {
+                            itemCount = itemFolder->getItemsCount();
+                            LOG.info("Folder has %d items", itemCount);
+                        } catch (...) {
+                            LOG.error("Item count unavailable, defaulting to 1");
+                        }
+                        
+                        if (itemCount == 0) {
+                            LOG.info("Deleting folder");
+                            try {
+                                itemFolder->deleteFolder();
+                            } catch (...) {
+                                LOG.info("Delete failed");
+                            }
+                        } else {
+                            LOG.info("Not deleting folder");
+                        }
+                    }
+                }
+            }
+            iUniquePaths++;
+        }
+    }
+
+    WCHAR* oldItemsPath = readDataPath(getName());
+    if (!oldItemsPath) {
+        LOG.error("Unable to find items database");
+        manageSourceError(ERR_CODE_OLD_ITEMS_PATH, getLastErrorMsg());
+        return 4;
+    }
+
+    std::wstring fileContent = readFromFile(oldItemsPath);
+
+    std::map<std::wstring, std::wstring>::iterator iter;
+    for (iter = folderChanges.begin(); iter != folderChanges.end(); iter++) {
+        std::wstring originalContent = L"<Folder>" + iter->first + L"</Folder>";
+        std::wstring newContent = L"<Folder>" + iter->second + L"</Folder>";
+        replaceAll(originalContent, newContent, fileContent);
+    }
+
+    if (writeToFile(fileContent, oldItemsPath) != 0) {
+        LOG.error("Unable to write items database");
+        return 5;
+    }
+
+    if (fail) {
+        return -2;
+    }
+
+    LOG.info("Folder upgrade complete");
+
+    return 0;
+}
+
+std::wstring WindowsSyncSource::getIdMapFile() {
+    std::wstring idMapName = getName();
+    idMapName += L"_ids";
+    WCHAR * idMapFile = readDataPath(idMapName.c_str());
+    std::wstring result = L"";
+    if (!idMapFile) {
+        // Error getting file path.
+        manageSourceError(ERR_CODE_OLD_ITEMS_PATH, getLastErrorMsg());
+    } else {
+        result = idMapFile;
+        delete idMapFile;
+    }
+    return result;
+}
+
+
+std::map<std::wstring, std::wstring> WindowsSyncSource::readIdMap(const std::wstring & idMapFile) {
+    
+    std::map<std::wstring, std::wstring> tempIdMap;
+
+    std::wstring idMapContent = readFromFile(idMapFile);
+    if (!idMapContent.length()) {
+        return tempIdMap;
+    }
+
+    std::wstring itemTag = L"Item";
+    std::wstring originalIdTag = L"OriginalId";
+    std::wstring newIdTag = L"NewId";
+
+    std::wstring item, originalId, newId;
+    std::wstring::size_type pos = 0, start, end;
+    while (getElementContent(idMapContent, itemTag, item, pos, start, end) == 0) {
+        pos = end;
+        int foundOriginal = getElementContent(item, originalIdTag, originalId, 0);
+        int foundNew = getElementContent(item, newIdTag, newId, 0);
+        if (foundOriginal == 0 && foundNew == 0) {
+            tempIdMap[newId] = originalId;
+        }
+        originalId = L"";
+        newId = L"";
+    }
+
+    return tempIdMap;
+}
+
+int WindowsSyncSource::writeIdMap(const std::map<std::wstring, std::wstring> & tempIdMap) {
+
+
+    std::wstring mapFile = getIdMapFile();
+    if (mapFile.compare(L"") == 0) {
+        return -1;
+    }
+
+    if (tempIdMap.size() == 0) {
+        _wremove(mapFile.c_str());
+        return 0;
+    }
+
+    std::wstring content = L"";
+    std::map<std::wstring, std::wstring>::const_iterator it;
+    for (it = tempIdMap.begin(); it != tempIdMap.end(); it++) {
+        content += L"<Item>\n";
+        content += L"\t<NewId>";
+        content += it->first;
+        content += L"</NewId>\n";
+        content += L"\t<OriginalId>";
+        content += it->second;
+        content += L"</OriginalId>\n";
+        content += L"</Item>\n";
+    }
+
+    int result = writeToFile(content, mapFile);
+
+    return result;
+}
+
+void WindowsSyncSource::constructIdMaps(std::wstring idMapFile) {
+    idMap.clear();
+    idMapReverse.clear();
+
+    idMap = readIdMap(idMapFile);
+    std::map<std::wstring, std::wstring>::iterator it;
+    for (it = idMap.begin(); it != idMap.end(); it++) {
+        idMapReverse[it->second] = it->first;
+    }
+}
+
+void WindowsSyncSource::addToIdMap(const std::wstring & oldId, const std::wstring & newId) {
+    wstring actualOldId = oldId;
+    // Its already been mapped once, remap it
+    if (isNewIdInMap(oldId)) {
+        actualOldId = getOldIdFromNewId(oldId);
+        removeNewIdFromMap(oldId);
+    }
+    idMap[newId] = actualOldId;
+    idMapReverse[actualOldId] = newId;
+}
+
+bool WindowsSyncSource::isNewIdInMap(const std::wstring & id) {
+    return (idMap.count(id) != 0);
+}
+
+bool WindowsSyncSource::isOldIdInMap(const std::wstring & id) {
+    return (idMapReverse.count(id) != 0);
+}
+
+std::wstring WindowsSyncSource::getOldIdFromNewId(const std::wstring & id) {
+    return idMap[id];
+}
+
+std::wstring WindowsSyncSource::getNewIdFromOldId(const std::wstring & id) {
+    return idMapReverse[id];
+}
+
+void WindowsSyncSource::removeOldIdFromMap(const std::wstring & id) {
+    if (isOldIdInMap(id)) {
+        std::wstring newId = getNewIdFromOldId(id);
+        idMapReverse.erase(id);
+        removeNewIdFromMap(newId);
+    }
+}
+
+void WindowsSyncSource::removeNewIdFromMap(const std::wstring & id) {
+    if (isNewIdInMap(id)) {
+        std::wstring newId = getOldIdFromNewId(id);
+        idMap.erase(id);
+        removeOldIdFromMap(newId);
+    }
+}
+
+void WindowsSyncSource::removeIdFromMap(const std::wstring & id) {
+    removeOldIdFromMap(id);
+    removeNewIdFromMap(id);
+}

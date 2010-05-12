@@ -42,14 +42,14 @@
 
 #include "outlook/defs.h"
 #include "outlook/ClientItem.h"
-#include "outlook/ClientMail.h"
-#include "outlook/ClientContact.h"
-#include "outlook/ClientAppointment.h"
-#include "outlook/ClientTask.h"
-#include "outlook/ClientNote.h"
-
 #include <string>
 
+// Forward declarations for items
+class ClientContact;
+class ClientTask;
+class ClientAppointment;
+class ClientMail;
+class ClientNote;
 
 
 /**
@@ -160,6 +160,8 @@ public:
     ClientItem* getItem(const int index);
 
     ClientItem* addItem();
+
+    void deleteFolder();
 };
 
 /** @} */

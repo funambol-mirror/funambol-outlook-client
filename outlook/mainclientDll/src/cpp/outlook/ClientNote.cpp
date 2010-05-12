@@ -43,6 +43,7 @@
 #include "outlook/ClientApplication.h"
 #include "outlook/ClientNote.h"
 #include "outlook/ClientException.h"
+#include "outlook/ClientFolder.h"
 #include "outlook/utils.h"
 #include "outlook/itemProps.h"
 
@@ -83,8 +84,13 @@ void ClientNote::setCOMPtr(_NoteItemPtr& ptr, const wstring& itemID) {
     pNote = ptr;
 
     try {
+        userPropertiesCount = 0;
+
         pItemProperties = pNote->ItemProperties;
         propertiesCount = pItemProperties->Count;
+
+        propertiesCount -= userPropertiesCount;
+
         if (propertiesCount) {
             pItemProperty = pItemProperties->Item(0);
         }
@@ -248,40 +254,34 @@ error:
  * @param   destFolder  the destination ClientFolder to move this object to
  * @return              0 if no errors
  */
-//int ClientNote::moveItem(ClientFolder* destFolder) {
-//
-//    if (!pNote) {
-//        goto error;
-//    }
-//
-//    // Get destination folder
-//    MAPIFolder* pDestFolder = destFolder->getCOMPtr();
-//    if (!pDestFolder) {
-//        goto error;
-//    }
-//
-//    // Move item
-//    try {
-//        _bstr_t a = pNote->GetEntryID();
-//        hr = pNote->Move(pDestFolder);
-//        _bstr_t b = pNote->GetEntryID();
-//        
-//        MAPIFolderPtr parentFolder = (MAPIFolderPtr)pNote->GetParent();
-//        parentPath = (WCHAR*)parentFolder->GetFullFolderPath();
-//        LOG.debug("");
-//    }
-//    catch(_com_error &e) {
-//        manageComErrors(e);
-//        goto error;
-//    }
-//
-//    //parentPath = destFolder->getPath();
-//    return 0;
-//
-//error:
-//    LOG.error("Error moving item '%ls'", ID.c_str());
-//    return 1;
-//}
+int ClientNote::moveItem(ClientFolder* destFolder) {
+
+    if (!pNote) {
+        goto error;
+    }
+
+    // Get destination folder
+    MAPIFolder* pDestFolder = destFolder->getCOMPtr();
+    if (!pDestFolder) {
+        goto error;
+    }
+
+    // Move item
+    try {
+        this->setCOMPtr((_NoteItemPtr)pNote->Move(pDestFolder));
+    }
+    catch(_com_error &e) {
+        manageComErrors(e);
+        goto error;
+    }
+
+    parentPath = destFolder->getPath();
+    return 0;
+
+error:
+    LOG.error("Error moving item '%ls'", ID.c_str());
+    return 1;
+}
 
 
 //
@@ -334,8 +334,11 @@ const wstring ClientNote::getSafeProperty(const wstring& propertyName) {
     if (propertyName == L"Body") {
         // Use Redemption MAPIUtils object, from ClientApplication.
         // (there is no safeNote object)
-        ClientApplication* ol = ClientApplication::getInstance();
+        ClientApplication* ol = ClientApplication::getInstance(true);
         propertyValue = ol->getBodyFromID(ID);
+
+        // Manage error in API to read item's body: one newline is always appended.
+        removeLastNewLine(propertyValue);
     }
 
     return propertyValue;
@@ -377,7 +380,7 @@ const wstring ClientNote::getComplexProperty(const wstring& propertyName) {
     // "Color" is deprecated from Outlook2007 ("Categories" is used)
     // In that case we ignore it.
     else if (propertyName == L"Color") {
-        ClientApplication* ol = ClientApplication::getInstance();
+        ClientApplication* ol = ClientApplication::getInstance(true);
         int majorVersion = _wtoi(ol->getVersion().c_str());
         if (majorVersion < 12) {                                // '12.x.y' is Outlook 2007
             WCHAR tmp[4];
@@ -423,7 +426,7 @@ int ClientNote::setComplexProperty(const wstring& propertyName, const wstring& p
     // "Color" is deprecated from Outlook2007 ("Categories" is used)
     // In that case we ignore it.
     else if (propertyName == L"Color") {
-        ClientApplication* ol = ClientApplication::getInstance();
+        ClientApplication* ol = ClientApplication::getInstance(true);
         int majorVersion = _wtoi(ol->getVersion().c_str());
         if (majorVersion < 12) {                                // '12.x.y' is Outlook 2007
             int color = _wtoi(propertyValue.c_str());
@@ -462,6 +465,9 @@ ClientNote::ClientNote(const ClientNote& c) {
     propertiesIndex = c.propertiesIndex;
     propertiesCount = c.propertiesCount;
     propertyMap     = c.propertyMap;
+
+    userPropertyMap     = c.userPropertyMap;
+    userPropertiesCount = c.userPropertiesCount;
 }
 
 
@@ -482,6 +488,9 @@ ClientNote ClientNote::operator=(const ClientNote& c) {
     cnew.propertiesIndex = c.propertiesIndex;
     cnew.propertiesCount = c.propertiesCount;
     cnew.propertyMap     = c.propertyMap;
+
+    cnew.userPropertyMap     = c.userPropertyMap;
+    cnew.userPropertiesCount = c.userPropertiesCount;
 
     return cnew;
 }

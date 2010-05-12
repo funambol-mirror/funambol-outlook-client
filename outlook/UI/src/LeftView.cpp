@@ -365,22 +365,38 @@ BOOL CLeftView::PreTranslateMessage(MSG* pMsg){
  */
 void CLeftView::setBkgImage(int itemNumber) { 
 
-    int dpiX = ((CMainSyncFrame*)AfxGetMainWnd())->getDpiX();
-    int dpiY = ((CMainSyncFrame*)AfxGetMainWnd())->getDpiY();
+    HICON icon;
 
-    // compute bk image offset
-    CRect rect1, rect2;
-    GetDlgItem(IDC_LEFT_LIST)->GetWindowRect(&rect1);
-    ScreenToClient(&rect1);
-    GetDlgItem(IDC_SEP1)->GetWindowRect(&rect2);
-    ScreenToClient(&rect2);
+    for (int x = 0; x < 2; x++)
+    {
+        if (x != -1)
+        {
+            switch (x)
+            {
+            default:
+            case 0:
+                    icon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ACCOUNT_GREY));
+                break;
+            case 1:
+                    icon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_GREY));
+                break;
+            }
+            imgList.Replace(x, icon);
+        }
+    }
 
-    yOffset =  itemNumber * (int)(rect2.BottomRight().y / ((double)rect1.Height() -64) * 100.0);
+    switch (currentSelectedItem)
+    {
+    default:
+    case 0:
+            icon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ACCOUNT));
+        break;
+    case 1:
+            icon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC));
+        break;
 
-    
-   //lstConfig.SetBkImage(((CMainSyncFrame*)AfxGetMainWnd())->hBkgImageConfig, 0, 3, yOffset);
-   HBITMAP hBmpBkg = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_LEFT_BUTTON));
-   lstConfig.SetBkImage(hBmpBkg, 0, 3, yOffset);
-   DeleteObject(hBmpBkg);
-   
+    }
+    imgList.Replace(currentSelectedItem, icon);
+
+    lstConfig.SetImageList(&imgList, LVSIL_NORMAL);
 }

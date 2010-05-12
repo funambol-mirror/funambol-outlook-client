@@ -46,6 +46,8 @@
 #include "Client/DMTClientConfig.h"
 #include "WindowsSyncSourceConfig.h"
 #include "updater/UpdaterConfig.h"
+#include "WindowsDeviceConfig.h"
+
 #include <string>
 
 
@@ -67,14 +69,10 @@
 #define PROPERTY_FUNAMBOL_SWV                   "funambol_swv"
 #define PROPERTY_CUSTOMER                       "Customer"
 
+/// Path in DMTree
+#define APPLICATION_URI                         PROGRAM_NAME "/OutlookClient"
+
 #define TIMEZONE_CONTEXT                       L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones"
-
-// it must be in the format
-// #define PASS_KEY<4 blanks>NULL
-#define PASS_KEY    NULL
-
-// to use the pass key customized also if no portal
-#define CARED_KEY    false
 
 /// Timezone informations.
 /// This is a more complete structure than 'TIME_ZONE_INFORMATION' because we need
@@ -119,11 +117,16 @@ private:
     StringBuffer funambolSwv;                   // The Funambol product sw version (can be different in branded clients).
     int   oldFunambolSwv;                       // The old Funambol product sw version value in case of upgrade.
 
+    bool  attach;                               // Flag to require outlook be open to sync
+
     /// The structure with current timezone informations.
     TimeZoneInformation currentTimezone;
 
     /// Array of specific SSConfig.
     WindowsSyncSourceConfig* winSourceConfigs;
+
+    //
+    WindowsDeviceConfig* winDC;
 
     /// Counter for winSourceConfigs array.
     /// (internal use, should be equal to 'sourceConfigsCount' member)
@@ -182,14 +185,10 @@ protected:
     /// Constructor
     OutlookConfig();
 
-    // Replace setSyncSourceConfig() of SyncManagerConfig (set specific winSourceConfig)
-    BOOL setSyncSourceConfig(WindowsSyncSourceConfig& wsc);
-    BOOL addSyncSourceConfig(WindowsSyncSourceConfig& wsc);
-
-
 public:
     
     /// Method to get the sole instance of OutlookConfig
+    _declspec(dllexport)
     static OutlookConfig* getInstance();
 
     /// Returns true if static instance is not NULL.
@@ -242,6 +241,11 @@ public:
     bool removeSourceVisible(const char* sourceName);
 
 
+    // Replace setSyncSourceConfig() of SyncManagerConfig (set specific winSourceConfig)
+    bool setSyncSourceConfig(WindowsSyncSourceConfig& wsc);
+    bool addSyncSourceConfig(WindowsSyncSourceConfig& wsc);
+
+
     // get/set of internal members
     void setWorkingDir   (const char* v);
     void setLogDir       (const char* v);
@@ -250,6 +254,7 @@ public:
     void setAbortSync    (const  bool v);
     void setFunambolSwv  (const StringBuffer& v);
 
+
     const bool  getScheduledSync() const;
     const bool  getAbortSync()     const;
     _declspec(dllexport) const char* getWorkingDir()    const;
@@ -257,7 +262,7 @@ public:
     _declspec(dllexport) const bool  getFullSync()      const;
     const StringBuffer& getFunambolSwv();
 
-
+    _declspec(dllexport)
     const TimeZoneInformation* getCurrentTimezone() const;
 
 
@@ -265,6 +270,7 @@ public:
     void createDefaultConfig();
 
     /// Checks if the config is to upgrade.
+    _declspec(dllexport)
     bool checkToUpgrade();
 
     /// Update config with values from HKLM (set by installer).
@@ -274,6 +280,7 @@ public:
     bool isUpgraded();
 
     /// Returns the old installed swv (for upgrades). '0' if not an upgrade.
+    _declspec(dllexport)
     int getOldSwv();
     int getOldFunambolSwv();
 
@@ -289,8 +296,9 @@ public:
     ///Creates and set a unique 'devID' property for current configuration.
     int setUniqueDevID();
 
-    /// Check if it's a normal/portal build (from HKLM keys).
-    bool checkPortalBuild();
+    // Check if it's a normal/portal build (from HKLM keys).
+    // DEPRECATED: portal build is now a normal build.
+    //bool checkPortalBuild();
 
     /// Save only "beginSync" property to win registry.
     void saveBeginSync();
@@ -315,6 +323,14 @@ public:
     
     /// initialize oldSwv, oldFunambol_swv and the transport agent
     void initializeVersionsAndUserAgent();
+
+
+    void setDeviceConfig(const WindowsDeviceConfig & wdc);
+    _declspec(dllexport) WindowsDeviceConfig & getWindowsDeviceConfig();
+    WindowsDeviceConfig & getDeviceConfig();
+
+    void saveDeviceConfig(ManagementNode& n, bool server = false);
+    bool readDeviceConfig(ManagementNode& n, bool server = false);
 
 };
 

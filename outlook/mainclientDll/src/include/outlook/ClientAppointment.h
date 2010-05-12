@@ -43,6 +43,8 @@
 #include "outlook/defs.h"
 #include "outlook/ClientItem.h"
 #include "outlook/ClientRecurrence.h"
+#include "outlook/ClientFolder.h"
+#include "outlook/ClientRecipient.h"
 
 #include <string>
 
@@ -118,7 +120,7 @@ public:
     int saveItem();
     int deleteItem();
     ClientItem* copyItem();
-    //int moveItem(ClientFolder* destFolder);
+    int moveItem(ClientFolder* destFolder);
 
     // set the timezone information of the appointment
     void setRecurringTimezone(const TIME_ZONE_INFORMATION* tz) {timeZoneInfo = *tz; }
@@ -132,6 +134,12 @@ public:
     DATE localStartDate;
     DATE localEndDate;
 
+    std::map<int, ClientRecipient> getAttendees();
+    ClientRecipient getAttendee(int index);
+    bool addAttendee(const ClientRecipient & attendee);
+    bool removeAttendee(int index);
+    void clearAttendees();
+    int getNumAttendees();
 
     /**
      * Returns the item's creation time, in variant format (double).
