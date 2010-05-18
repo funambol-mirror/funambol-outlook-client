@@ -1,3 +1,6 @@
+2010-05-18
+  - maria: created tag: Funambol Outlook Sync Client v.8.5.6 to brand (linked
+    to SDK C++ v.8.5.2) [v.8.5 GA]
 
 2010-04-28
   - magi : Added the value of the scheduled values in the customization.h
