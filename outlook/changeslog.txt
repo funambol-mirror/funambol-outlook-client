@@ -12,6 +12,7 @@
                 #8578 - outlook adds an empty note field to any contact
                 #8198 - Deleted field on portal does't update outlook
                 #5441 - Error syncing recurring SIF task
+                #9393 - [Babel] vCalendar STATUS field is not correctly mapped on MeetingStatus attribute into Meeting object (Outlook)
            
            New features (enabled):
                 - Support for events' ATTENDEES (appointment recipients) - see bug 946
@@ -82,10 +83,11 @@
            for appointment and task. The sourceURI are "event" and "task".
            For an upgrade the sourceURI remain the same as before (scal and stask) but using the
            vCalendar format.
+           Fixed bug #9373  - Due date is not removed in a server->OL sync when Data format = SIF
            Updated the UI accordling to remove sif choice
            Added support of ctcaps capabilities for all the sources (vcard and vcalendar) 
            Added the support for using compression by default
-           Fixed the build.xml, funambol-outlook-client-forge.properties and outlook-client-forge.nsi to be used with VS2008   
+           Fixed the build.xml, funambol-outlook-client-forge.properties and outlook-client-forge.nsi to be used with VS2008
 
 2010-05-03
   - toccy: fixed build.xml (target generate-upd-info) to safely work on both DOS and UNIX systems
