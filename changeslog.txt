@@ -83,7 +83,6 @@
            for appointment and task. The sourceURI are "event" and "task".
            For an upgrade the sourceURI remain the same as before (scal and stask) but using the
            vCalendar format.
-           Fixed bug #9373  - Due date is not removed in a server->OL sync when Data format = SIF
            Updated the UI accordling to remove sif choice
            Added support of ctcaps capabilities for all the sources (vcard and vcalendar) 
            Added the support for using compression by default
