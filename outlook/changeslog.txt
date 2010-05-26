@@ -1,3 +1,6 @@
+2010-05-26
+  - toccy: fixed bug #9384 - Outlook Client crashes if the server defined a datastore like "./contacts" (APIs C++)
+
 2010-05-12
   - toccy: Imported Vietnamese translations (now 3 languages are supported: English, German, Vietnamese)
   
