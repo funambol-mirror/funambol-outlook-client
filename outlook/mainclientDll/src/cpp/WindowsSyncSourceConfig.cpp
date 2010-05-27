@@ -148,6 +148,9 @@ WindowsSyncSourceConfig& WindowsSyncSourceConfig::operator = (const WindowsSyncS
     setUseSubfolders (wsc.getUseSubfolders ()); 
     setEndTimestamp  (wsc.getEndTimestamp  ());
     setIsSynced      (wsc.getIsSynced      ());
+
+
+    dateFilter = ((WindowsSyncSourceConfig&)wsc).getDateFilter();
 	
 	populateCTCap();
 

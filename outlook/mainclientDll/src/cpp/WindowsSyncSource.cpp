@@ -1372,8 +1372,13 @@ void WindowsSyncSource::pushAllItemsToList(ClientFolder* folder, itemKeyList& li
 
     item = folder->getFirstItem();
     // Item could be NULL if type not correct! -> ignore it.
-    if (item != NULL) {
+    if (item != NULL && filterClientItem(item, DateFilter::DIR_OUT)) {
         existingItems.push_back(item->getID());
+    } else {
+        // We save the list of filteredItems ID, because we may use them later (see manageModifications())
+        if (item) { 
+            filteredItems.push_back(item->getID()); 
+        }
     }
 
     for (int i = 1; i < itemsCount; i++) {
