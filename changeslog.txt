@@ -1,3 +1,6 @@
+2010-05-27
+  - toccy: fixed appointments date filtering: it was disabled on a fresh install
+
 2010-05-26
   - toccy: fixed bug #9384 - Outlook Client crashes if the server defined a datastore like "./contacts" (APIs C++)
 
