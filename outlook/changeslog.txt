@@ -1,4 +1,7 @@
 2010-05-28
+  - magi : fixed bug #9429 - Autoupdate pop-up remains in bg and client stops working. Modification into
+           winmaincpp to put in foreground the client when an update popup comes up.  
+
   - toccy: fixed bug #8671  - Issue on recurring events on Outlook
            The 'change-day' flag is set to FALSE, so the events recurrence are always expected in local time.
            This is used ONLY when syncing against a Server that doesn't support events timezones (TZ).

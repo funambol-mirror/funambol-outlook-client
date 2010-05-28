@@ -1137,7 +1137,15 @@ int OpenMessageBox(HWND hwnd, UINT type, UINT msg){
     if(!hwnd){        
         created = true;
         launchSyncClient();
-        hwnd = HwndFunctions::getWindowHandle();        
+		for (int i = 0; i < 3; i++) {
+			hwnd = HwndFunctions::getWindowHandle();    
+			if (hwnd != NULL) {
+				SetForegroundWindow(hwnd);
+				break;
+			} else {
+				Sleep(1000);
+			}
+		}
     }
 
     //int ret = SendMessage(hwnd, ID_MYMSG_POPUP, buttons, msg);
