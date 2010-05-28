@@ -1,3 +1,10 @@
+2010-05-28
+  - toccy: fixed bug #8671  - Issue on recurring events on Outlook
+           The 'change-day' flag is set to FALSE, so the events recurrence are always expected in local time.
+           This is used ONLY when syncing against a Server that doesn't support events timezones (TZ).
+           It's consistent, since the client always sends the events in local time + TZ, even if the
+           Server doesn't support TZ.
+
 2010-05-27
   - toccy: fixed appointments date filtering: it was disabled on a fresh install
 

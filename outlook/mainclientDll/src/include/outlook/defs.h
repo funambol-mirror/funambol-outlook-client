@@ -51,7 +51,7 @@
 
 // Date/time definitions
 #define USE_UTC                             TRUE                            /**< Use time format in UTC = YYYYMMDDThhmmssZ                          */
-#define USE_CHANGE_DAY                      TRUE                            /**< Use change-day option for Recurrence pattern properties            */
+#define USE_CHANGE_DAY                      FALSE                           /**< Use change-day option for Recurrence pattern properties            */
 #define REFERRED_MAX_DATE                   949998.000000                   /**< this is "4501-01-01" in double format: the error date of Outlook   */
 #define LIMIT_MAX_DATE                      767011.000000                   /**< this is "4000-01-01" in double format: the max date accepted       */
 
