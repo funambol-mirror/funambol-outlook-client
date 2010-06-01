@@ -1,3 +1,7 @@
+2010-06-01
+  - toccy: fixed bug #9324 -  Only the first exception in a recurring event is syncronized correctly from server to Outlook
+           (APIs) The EXDATE and RDATE properties were not parsed correctly in WinEvent (only the first element was read)
+
 2010-05-28
   - magi : fixed bug #9429 - Autoupdate pop-up remains in bg and client stops working. Modification into
            winmaincpp to put in foreground the client when an update popup comes up.  
