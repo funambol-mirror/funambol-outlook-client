@@ -216,20 +216,16 @@ int ClientRecurrence::read() {
     if (patternStartTime > LIMIT_MAX_DATE && patternEndTime > LIMIT_MAX_DATE) {
         isAppointmentRecurrence = false; // this recurrence is for a task
     }
+
     //
     // --------- Conversions ---------
     //
-    if (recurrenceType == 5) {
-        // Yearly recurrence.
-        if ((interval > 12) && (interval%12 == 0)) {
-            // It's a monthly recurrence, like "every 24 months". 
-            // Outlook bug, fix: recType 5 -> recType 2.
-            recurrenceType = 2;
-        }
-        else {
-            // It's the normal "yearly" recurrence.
-            // Outlook bug, fix: interval 12 -> interval 1.
-            interval = 1;
+            
+    // Outlook APIs bug!
+    // yearly OR yearNth, interval returned is 12, 24, 36 instead of 1, 2, 3...
+    if (recurrenceType == 5 || recurrenceType == 6) {
+        if ((interval >= 12) && (interval%12 == 0)) {
+            interval = interval / 12;
         }
     }
     // For compatibility: weekly with interval = 0 is not correct...
