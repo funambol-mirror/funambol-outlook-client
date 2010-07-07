@@ -104,7 +104,6 @@ var ICONS_GROUP
 !insertmacro MUI_PAGE_INSTFILES
 
 ; Finish page
-!define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_FINISHPAGE_RUN
 !define MUI_FINISHPAGE_RUN_FUNCTION             ExecAppFile
 !ifdef FINISHPAGE_SHOW_README
@@ -117,7 +116,6 @@ var ICONS_GROUP
 !define MUI_UNABORTWARNING
 UninstPage custom un.RemoveUserData             ; Custom page, to ask if deleting users files/settings.
 !insertmacro MUI_UNPAGE_INSTFILES
-!define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 ; Language files
 !insertmacro MUI_LANGUAGE                       "English"
@@ -522,9 +520,9 @@ Function installDll
       ClearErrors
       SetOutPath "$INSTDIR"
       RegDLL "$INSTDIR\FunambolAddin.dll"
-      ;IfErrors errorDLL1
+      IfErrors errorDLL1
       RegDLL "$INSTDIR\Redemption.dll"
-      ;IfErrors errorDLL2
+      IfErrors errorDLL2
 
       Return
 
@@ -555,7 +553,6 @@ Function .onInit
       Call CheckFunClientApp
       Call CheckOldFunClientApp
 FunctionEnd
-
 
 
 ; --------------------------------- MAIN SECTION -----------------------------------
@@ -676,9 +673,9 @@ Section Uninstall
      ClearErrors
      SetOutPath "$INSTDIR"
      UnRegDLL "$INSTDIR\Redemption.dll"
-     ;IfErrors errorDLL1
+     IfErrors errorDLL1
      UnRegDLL "$INSTDIR\FunambolAddin.dll"
-     ;IfErrors errorDLL2
+     IfErrors errorDLL2
 
      ; Copy Addin to WinDir and register it.
      ; (MUST keep it after uninstall, to be loaded at next Outlook startup
@@ -690,7 +687,7 @@ Section Uninstall
      CopyFiles /SILENT "$INSTDIR\${MSLIB_CRT}" "$WINDIR"          ; CRT is also required!
      
      RegDLL "$WINDIR\FunambolAddin.dll"
-     ;IfErrors errorDLL3
+     IfErrors errorDLL3
 
 
      ; Delete files from installDir.
