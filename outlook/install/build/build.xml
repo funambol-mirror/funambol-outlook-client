@@ -65,10 +65,11 @@ Forge file for Funambol Outlook Sync Client
        <echo message="docs            : to checkout + forge + generate docs"/>
        <echo message=""/>
        <echo message="work-all        : clean, build the installer, no checkout (build from dev working dirs). Both for comed and cared"/>
-       <echo message="work-all-noreg  : clean, build the installer, no checkout (build from dev working dirs), no reg DLL. Both for comed and cared"/>
        <echo message="work-dev        : no clean, build the installer, no checkout (build from dev working dirs). Comed"/>
+       <echo message="work-dev-x64    : no clean, build the installer, no checkout (build from dev working dirs). Comed - 64bit output package"/>
        <echo message="work-cared-dev  : no clean, build the installer, no checkout (build from dev working dirs). Cared"/>
        <echo message="docs-dev        : clean, to only generate doxygen docs, no checkout (build from dev working dirs)"/>
+       
     </target>
 
     <target name="release"        depends="init, clean, build, register-dll, checkout-src, create-docs, 
@@ -86,6 +87,8 @@ Forge file for Funambol Outlook Sync Client
     </target>
     <target name="work-dev"       depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install, generate-update-info"/>
     <target name="work-cared-dev" depends="init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install-cared, generate-update-info"/>
+    
+    <target name="work-dev-x64"   depends="set-x64-vars, init, build, register-dll, compile-no-checkout, forge-no-checkout, build-install, generate-update-info"/>
 
     <target name="work-all-noreg">
         <antcall target="clean"/>
@@ -96,6 +99,33 @@ Forge file for Funambol Outlook Sync Client
     <target name="work-cared-dev-noreg" depends="init, build, compile-no-checkout, forge-no-checkout, build-install-cared, generate-update-info"/>
     <target name="docs-dev"             depends="init, clean, build, create-docs-no-checkout, generate-update-info"/>
 
+
+    <!--
+    ========================================================================
+      SET-X64-VARS: set properties for 64bit output package
+    ========================================================================
+    -->
+    <target name="set-x64-vars">
+    
+        <condition property="client.targetbuild"
+            value="Release|x64"
+            else="Debug|x64">
+            <equals arg1="${build.debug}" arg2="false"/>
+        </condition>
+
+        <condition property="plugin.dir.obj"
+            value="Release-x64"
+            else="Debug-x64">
+            <equals arg1="${build.debug}" arg2="false"/>
+        </condition>
+
+        <condition property="addin.dir.obj"
+            value="ReleaseMinDependency-x64"
+            else="Debug-x64">
+            <equals arg1="${build.debug}" arg2="false"/>
+        </condition>
+        
+    </target>
 
     <!--
     ========================================================================
@@ -175,9 +205,9 @@ Forge file for Funambol Outlook Sync Client
         <echo message="MSLib.crt       = ${MSLib.crt}" />
        
 
-
+        <!-- If x64 build, these props are already defined (see set-x64-vars target) -->
         <condition property="client.targetbuild"
-            value="Release MinDependency|Win32"
+            value="Release|Win32"
             else="Debug|Win32">
             <equals arg1="${build.debug}" arg2="false"/>
         </condition>
@@ -193,6 +223,7 @@ Forge file for Funambol Outlook Sync Client
             else="Debug">
             <equals arg1="${build.debug}" arg2="false"/>
         </condition>
+        
     </target>
 
 
