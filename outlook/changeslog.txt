@@ -1,6 +1,3 @@
-2010-07-07
-  - toccy: [US4170] added targets 'x64' to all projects. Using VS2008.
-
 2010-06-29
   - toccy: fixed bug #9556 - Some yearly events in VCAL format are not synced to the server
            Outlook APIs have a bug: yearly and yearNth recurrences (rec types 5 and 6) are returned
