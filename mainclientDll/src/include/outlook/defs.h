@@ -129,7 +129,7 @@
 #define ERR_OUTLOOK_PROP_VALUE_REQUIRED     "Property '%ls' cannot be empty for %ls."
 #define ERR_OUTLOOK_REC_PROP_NOT_FOUND      "Recurrence property '%ls' not found."
 
-#define ERR_OUTLOOK_REC_SAVE                "Could not save recurrence property '%ls': wrong format."
+#define ERR_OUTLOOK_REC_SAVE                "Error inserting recurrence property '%ls' into Outlook."
 #define ERR_OUTLOOK_REC_NOT_SET             "Could not %ls recurrence pattern: recurrence not yet set."
 #define ERR_OUTLOOK_EXC_PROP_VALUE          "Error retrieving appointment exception property: %ls."
 #define ERR_OUTLOOK_CLEAR_REC               "Clould not clear the recurrence pattern of %ls item \"%ls\""

@@ -1,5 +1,14 @@
+2010-07-22
+  - toccy: merged from trunk, at revision 540:
+           * improved logging when error occurs saving a recurring event/task (print the list of all props)
+           * fixed bug #9556 - Some yearly events in VCAL format are not synced to the server
+             Outlook APIs have a bug: yearly and yearNth recurrences (rec types 5 and 6) are returned
+             with a wrong interval when read: interval 12,24,36... instead of 1,2,3.
+             So an appropriate patch is applied to the interval value in ClientRecurrence.cpp.
+
 2010-07-13
   - maria: Release 8.7.1.
+
 2010-06-01
   - toccy: fixed bug #9324 -  Only the first exception in a recurring event is syncronized correctly from server to Outlook
            (APIs) The EXDATE and RDATE properties were not parsed correctly in WinEvent (only the first element was read)

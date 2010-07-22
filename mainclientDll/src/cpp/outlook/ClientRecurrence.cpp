@@ -216,20 +216,16 @@ int ClientRecurrence::read() {
     if (patternStartTime > LIMIT_MAX_DATE && patternEndTime > LIMIT_MAX_DATE) {
         isAppointmentRecurrence = false; // this recurrence is for a task
     }
+
     //
     // --------- Conversions ---------
     //
-    if (recurrenceType == 5) {
-        // Yearly recurrence.
-        if ((interval > 12) && (interval%12 == 0)) {
-            // It's a monthly recurrence, like "every 24 months". 
-            // Outlook bug, fix: recType 5 -> recType 2.
-            recurrenceType = 2;
-        }
-        else {
-            // It's the normal "yearly" recurrence.
-            // Outlook bug, fix: interval 12 -> interval 1.
-            interval = 1;
+            
+    // Outlook APIs bug!
+    // yearly OR yearNth, interval returned is 12, 24, 36 instead of 1, 2, 3...
+    if (recurrenceType == 5 || recurrenceType == 6) {
+        if ((interval >= 12) && (interval%12 == 0)) {
+            interval = interval / 12;
         }
     }
     // For compatibility: weekly with interval = 0 is not correct...
@@ -543,7 +539,7 @@ wstring getStringDateWithTz(TIME_ZONE_INFORMATION& t, wstring start) {
 int ClientRecurrence::save() {
 
     HRESULT hr;
-    DATE patternStart, patternEnd;
+    DATE patternStart = 0, patternEnd = 0;
     int i = -1;    // index for 'recurrenceProps' array.
 
     // Check COM Ptr / Recurrence active
@@ -652,6 +648,8 @@ int ClientRecurrence::save() {
         }
 
     }
+
+
     //
     // -----------Put ALL ------------
     // (note that this order is mandatory to put props)
@@ -756,6 +754,24 @@ error:
     if (i>=0 && recurrenceProps[i]) {
         setErrorF(getLastErrorCode(), ERR_OUTLOOK_REC_SAVE, recurrenceProps[i]);
         LOG.error(getLastErrorMsg());
+
+        // Add some verbose logging, since recurrence issues are quite common
+        LOG.debug("List of Outlook recurrence properties that caused the error:");
+        LOG.debug("  * RecurrenceType  : %d", recurrenceType);
+        LOG.debug("  * Interval        : %d", interval);
+        LOG.debug("  * MonthOfYear     : %d", monthOfYear);
+        LOG.debug("  * DayOfMonth      : %d", dayOfMonth); 
+        LOG.debug("  * DayOfWeekMask   : %d", dayOfWeekMask); 
+        LOG.debug("  * Instance        : %d", instance); 
+        LOG.debug("  * PatternStartDate: %ls (%lf)", patternStartDate.c_str(), patternStart); 
+        LOG.debug("  * StartTime       : %ls", startTime.c_str());
+        LOG.debug("  * NoEndDate       : %s", noEndDate? "true":"false");
+        LOG.debug("  * Occurrences     : %d", occurrences);
+        LOG.debug("  * PatternEndDate  : %ls (%lf)", patternEndDate.c_str(), patternEnd);
+        LOG.debug("  * EndTime         : %ls", endTime.c_str());
+        LOG.debug("  * (hasTimezone)   : %s", getHasTimezone()? "true":"false");
+        LOG.debug("  * (useLocal)      : %s", useLocal? "true":"false");
+
         throwClientException(getLastErrorMsg());
     }
     return 1;

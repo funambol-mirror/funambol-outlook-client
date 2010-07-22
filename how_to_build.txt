@@ -49,7 +49,7 @@ How to build the Funambol Outlook Sync Client
     During the building process, all projects are compiled using the Visual Studio compiler.
     
     1) Checkout the Outlook Sync Client project from SVN.
-       The project repository is: https://core.forge.funambol.org/svn/core/
+       The project repository is: https://outlook-client.forge.funambol.org/svn/outlook-client/
        HEAD revision can be found under 'trunk/outlook' path, tags are located under 'tags' (use "guest" username with an empty password).
        Note: external projects (like Funambol C++ APIs) will be checkout automatically.
     2) Open file 'install\build\funambol-outlook-client-forge.properties'
