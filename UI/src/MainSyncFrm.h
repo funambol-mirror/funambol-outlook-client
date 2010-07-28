@@ -75,6 +75,7 @@ private:
     int tasksBegin;
     int notesBegin;
     int picturesBegin;
+    int filesBegin;
 	
 
 protected:
@@ -93,6 +94,7 @@ protected:
     int syncModeTasks;
     int syncModeNotes;
     int syncModePictures;
+    int syncModeFiles;
 
     // info about source enabled for sources, used on full sync (TODO: remove me)
     bool backupEnabledContacts;
@@ -100,6 +102,7 @@ protected:
     bool backupEnabledTasks;
     bool backupEnabledNotes;
     bool backupEnabledPictures;
+    bool backupEnabledFiles;
 
 
     // info about the sync in progress

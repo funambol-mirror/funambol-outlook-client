@@ -55,6 +55,7 @@
 #define SYNCSOURCE_NOTES        3
 #define SYNCSOURCE_TASKS        4
 #define SYNCSOURCE_PICTURES     5
+#define SYNCSOURCE_FILES        6
 
 
 
@@ -99,6 +100,12 @@ int    getWindowsUserEx(std::wstring& userName);
  * (shell folder 'pictures' for this user)
  */
 StringBuffer getDefaultPicturesPath();
+
+/**
+ * Returns the default path to store files 
+ * (shell folder 'my documents' for this user)
+ */
+StringBuffer getDefaultFilesPath();
 
 std::wstring readFromFile          (const std::wstring& filePath);
 int          writeToFile           (const std::wstring& content, const std::wstring& filePath, const WCHAR* mode = L"w");

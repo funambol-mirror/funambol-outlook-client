@@ -48,6 +48,7 @@
 #include "NotesSettings.h"
 #include "TaskSettings.h"
 #include "PicturesSettings.h"
+#include "FilesSettings.h"
 #include "UICustomization.h"
 #include "SettingsHelper.h"
 
@@ -205,12 +206,14 @@ void CSyncSettings::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_SYNC_CHECK_TASKS, checkTasks);
     DDX_Control(pDX, IDC_SYNC_CHECK_NOTES, checkNotes);
     DDX_Control(pDX, IDC_SYNC_CHECK_PICTURES, checkPictures);
+    DDX_Control(pDX, IDC_SYNC_CHECK_FILES,    checkFiles);
 
     DDX_Control(pDX, IDC_SYNC_BUT_CONTACTS, butContacts);
     DDX_Control(pDX, IDC_SYNC_BUT_CALENDAR, butCalendar);
     DDX_Control(pDX, IDC_SYNC_BUT_TASKS, butTasks);
     DDX_Control(pDX, IDC_SYNC_BUT_NOTES, butNotes);
     DDX_Control(pDX, IDC_SYNC_BUT_PICTURES, butPictures);
+    DDX_Control(pDX, IDC_SYNC_BUT_FILES,    butFiles);
 
     DDX_Control(pDX, IDC_SCHEDULER_CHECK_ENABLED, checkEnabled);
     DDX_Control(pDX, IDC_SCHEDULER_COMBO_VALUE, comboSchedulerValue);
@@ -228,6 +231,7 @@ BEGIN_MESSAGE_MAP(CSyncSettings, CFormView)
     ON_BN_CLICKED(IDC_SYNC_CHECK_TASKS, &CSyncSettings::OnBnClickedSyncCheckTasks)
     ON_BN_CLICKED(IDC_SYNC_CHECK_NOTES, &CSyncSettings::OnBnClickedSyncCheckNotes)
     ON_BN_CLICKED(IDC_SYNC_CHECK_PICTURES,  &CSyncSettings::OnBnClickedSyncCheckPictures)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_FILES,     &CSyncSettings::OnBnClickedSyncCheckFiles)
     ON_BN_CLICKED(IDC_SYNC_OK, &CSyncSettings::OnBnClickedSyncOk)
     ON_BN_CLICKED(IDC_SYNC_CANCEL, &CSyncSettings::OnBnClickedSyncCancel)
     ON_BN_CLICKED(IDC_SYNC_BUT_CONTACTS, &CSyncSettings::OnBnClickedSyncButContacts)
@@ -235,6 +239,7 @@ BEGIN_MESSAGE_MAP(CSyncSettings, CFormView)
     ON_BN_CLICKED(IDC_SYNC_BUT_TASKS, &CSyncSettings::OnBnClickedSyncButTasks)
     ON_BN_CLICKED(IDC_SYNC_BUT_NOTES, &CSyncSettings::OnBnClickedSyncButNotes)
     ON_BN_CLICKED(IDC_SYNC_BUT_PICTURES,    &CSyncSettings::OnBnClickedSyncButPictures)
+    ON_BN_CLICKED(IDC_SYNC_BUT_FILES,       &CSyncSettings::OnBnClickedSyncButFiles)
     ON_WM_NCPAINT()
     ON_BN_CLICKED(IDC_SCHEDULER_CHECK_ENABLED, &CSyncSettings::OnBnClickedSchedulerCheckEnabled)
     ON_CBN_SELCHANGE(IDC_SCHEDULER_COMBO_VALUE, &CSyncSettings::OnCbnSelchangeSchedulerComboValue)
@@ -296,6 +301,7 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     s1.LoadString(IDS_TASKS);       SetDlgItemText(IDC_SYNC_CHECK_TASKS,    s1);
     s1.LoadString(IDS_NOTES);       SetDlgItemText(IDC_SYNC_CHECK_NOTES,    s1);
     s1.LoadString(IDS_PICTURES);    SetDlgItemText(IDC_SYNC_CHECK_PICTURES, s1);
+    s1.LoadString(IDS_FILES);       SetDlgItemText(IDC_SYNC_CHECK_FILES,    s1);
     
     s1.LoadString(IDS_DETAILS);
     SetDlgItemText(IDC_SYNC_BUT_CONTACTS, s1);
@@ -303,6 +309,7 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     SetDlgItemText(IDC_SYNC_BUT_TASKS,    s1);
     SetDlgItemText(IDC_SYNC_BUT_NOTES,    s1);
     SetDlgItemText(IDC_SYNC_BUT_PICTURES, s1);
+    SetDlgItemText(IDC_SYNC_BUT_FILES,    s1);
 
     s1.LoadString(IDS_SYNC_SYNCHRONIZE_EVERY); SetDlgItemText(IDC_SCHEDULER_CHECK_ENABLED, s1);
     s1.LoadString(IDS_SYNC_ENABLE_ENCRYPTION); SetDlgItemText(IDC_SYNC_CHECK_ENCRYPTION, s1);
@@ -473,6 +480,35 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
         */
     }
 
+    // FILES
+    if (isSourceVisible(FILES)) {
+        saveSyncTypeFiles = true;
+        ssc = getConfig()->getSyncSourceConfig(FILES_);
+        if (!ssc->isEnabled()) {
+            checkFiles.SetCheck(BST_UNCHECKED);
+            butFiles.EnableWindow(FALSE);
+        }
+        else{
+            checkFiles.SetCheck(BST_CHECKED);
+        }
+
+        // Fix the source groupbox height (TODO: should be calculated dinamically)
+        CRect sep4Rect, sep5Rect, sourceGroupBoxRect;
+        GetDlgItem(IDC_SEPARATOR_4)->GetWindowRect(&sep4Rect);
+        GetDlgItem(IDC_SEPARATOR_5)->GetWindowRect(&sep5Rect);
+        int offset = sep5Rect.BottomRight().y - sep4Rect.BottomRight().y;
+        
+        CWnd* sourceGroupBox = GetDlgItem(IDC_SYNC_GROUP_ITEMS);
+        GetDlgItem(IDC_SYNC_GROUP_ITEMS)->GetWindowRect(&sourceGroupBoxRect);
+        sourceGroupBox->SetWindowPos(&CWnd::wndTop, 0, 0, 
+                                     sourceGroupBoxRect.Width(), sourceGroupBoxRect.Height() + offset, 
+                                     SWP_SHOWWINDOW | SWP_NOMOVE);
+    }
+    else {
+
+        hideSource(checkFiles, butFiles, &saveSyncTypeFiles, IDC_SEPARATOR_5, 0);
+    }
+
     
     // Load scheduler settings
     saveScheduler = false;
@@ -606,6 +642,16 @@ void CSyncSettings::OnBnClickedSyncCheckPictures()
     saveSyncTypePictures = true;
 }
 
+void CSyncSettings::OnBnClickedSyncCheckFiles()
+{
+    if(checkFiles.GetCheck() == BST_UNCHECKED)
+        butFiles.EnableWindow(FALSE);
+    else
+        butFiles.EnableWindow(TRUE);
+
+    saveSyncTypeFiles = true;
+}
+
 void CSyncSettings::OnBnClickedSyncOk()
 {
     // OK Button
@@ -656,6 +702,12 @@ void CSyncSettings::OnBnClickedSyncButPictures()
     saveSyncTypePictures = true;
 }
 
+void CSyncSettings::OnBnClickedSyncButFiles()
+{
+    CFilesSettings wndFiles;
+    INT_PTR result = wndFiles.DoModal();
+    saveSyncTypeFiles = true;
+}
 
 bool CSyncSettings::saveSettings(bool saveToDisk)
 {    
@@ -703,6 +755,10 @@ bool CSyncSettings::saveSettings(bool saveToDisk)
     if (saveSyncTypePictures) {
         bool enabled = (checkPictures.GetCheck() == BST_CHECKED);
         getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(enabled);
+    }
+    if (saveSyncTypeFiles) {
+        bool enabled = (checkFiles.GetCheck() == BST_CHECKED);
+        getConfig()->getSyncSourceConfig(FILES_)->setIsEnabled(enabled);
     }
 
     // save encryption, global property 

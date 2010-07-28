@@ -222,6 +222,7 @@
 #define IDS_CODE_FORBIDDEN_403          285
 #define IDD_WELCOME                     285
 #define IDS_LOG_DETAILS                 286
+#define IDD_FILES                       286
 #define IDS_WELCOME_MESSAGE             287
 #define IDS_WELCOME                     287
 #define IDS_CODE_FOLDER_PATH_NOT_FOUND  288
@@ -255,6 +256,16 @@
 #define IDS_PICTURES_OMA_FILEDATA       314
 #define IDS_PICTURES_RAW_FILEDATA       315
 #define IDS_ENDING_SYNC                 316
+#define IDS_FILES                       317
+#define IDS_ADVANCED_FILES              318
+#define IDS_TEXT_FILES                  319
+#define IDS_LEFTVIEW_FILES              320
+#define IDS_FILES_DETAILS               321
+#define IDS_FILES_FOLDER                322
+#define IDS_MAIN_FILES                  323
+#define IDS_SELECT_FILES_FOLDER         324
+#define IDS_FILES_OMA_FILEDATA          325
+#define IDS_FILES_RAW_FILEDATA          326
 #define IDS_HOURS2                      400
 #define IDS_DATE_FILTER_ALL             401
 #define IDS_REQUIRE_OUTLOOK_OPEN        410
@@ -270,6 +281,8 @@
 #define IDS_UPDATE_SOFTWARE             420
 #define IDS_UPDATE_SOFTWARE_TITLE       421
 #define IDB_POWERED_BY                  422
+#define IDI_FILES                       423
+#define IDI_FILES_GREY                  424
 #define IDC_TREE1                       1001
 #define IDC_SCHEDULER_SPIN              1002
 #define IDC_EDIT2                       1003
@@ -492,10 +505,13 @@
 #define IDC_MAIN_GROUP_SYNC             1222
 #define IDC_MAIN_ICON_PICTURES          1223
 #define IDC_MAIN_GROUP_SOURCES          1224
+#define IDC_MAIN_ICON_FILES             1224
 #define IDC_MAIN_STATIC_STATUS_PICTURES 1225
 #define IDC_MAIN_STATIC_PICTURES        1226
 #define IDC_MAIN_LINK_CALENDAR          1227
+#define IDC_MAIN_STATIC_STATUS_FILES    1227
 #define IDC_ABOUT_LINK                  1228
+#define IDC_MAIN_STATIC_FILES           1228
 #define IDC_MAIN_LINK_NOTES             1229
 #define IDC_MAIN_LINK_CONTACTS          1230
 #define IDC_MAIN_LINK_TASKS             1231
@@ -518,9 +534,11 @@
 #define IDC_SEP1                        1248
 #define IDC_MAIN_BK_PICTURES            1249
 #define IDC_SEP2                        1250
+#define IDC_MAIN_BK_FILES               1250
 #define IDC_TASKS_RADIO_VTODO           1251
 #define IDC_MAIN_ICON_STATUS_PICTURES   1252
 #define IDC_NOTES_RADIO_VNOTE           1253
+#define IDC_MAIN_ICON_STATUS_FILES      1253
 #define IDC_CONTACTS_CHECK_SHARED       1254
 #define IDC_LOG_EDIT_NUM_LOGS           1255
 #define IDC_UPDATE_STATIC_CURRENT_VERSION 1256
@@ -540,12 +558,16 @@
 #define IDC_SEPARATOR_3                 1271
 #define IDC_FULLSYNC_CHECK_PICTURES     1272
 #define IDC_SYNC_BUT_NOTES2             1273
+#define IDC_FULLSYNC_CHECK_FILES        1273
 #define IDC_SYNC_BUT_PICTURES           1274
 #define IDC_SYNC_CHECK_PICTURES         1275
 #define IDC_SEPARATOR_4                 1276
 #define IDC_PICTURES_GROUP_DIRECTION    1277
+#define IDC_SYNC_CHECK_FILES            1277
 #define IDC_PICTURES_STATIC_FOLDER      1278
+#define IDC_SYNC_BUT_FILES              1278
 #define IDC_PICTURES_EDIT_FOLDER        1279
+#define IDC_SEPARATOR_5                 1279
 #define IDC_PICTURES_BUT_SELECT         1280
 #define IDC_PICTURES_GROUP_FOLDER       1281
 #define IDC_PICTURES_GROUP_ADVANCED     1282
@@ -560,6 +582,19 @@
 #define IDC_TASKS_DATA_FORMAT           1291
 #define IDC_POPUP_TEXT                  1301
 #define IDC_POWERED_BY                  1302
+#define IDC_FILES_GROUP_DIRECTION       1303
+#define IDC_FILES_STATIC_FOLDER         1304
+#define IDC_FILES_EDIT_FOLDER           1305
+#define IDC_FILES_BUT_SELECT            1306
+#define IDC_FILES_GROUP_FOLDER          1307
+#define IDC_FILES_GROUP_ADVANCED        1308
+#define IDC_FILES_STATIC_REMOTE         1309
+#define IDC_FILES_EDIT_REMOTE           1310
+#define IDC_FILES_STATIC_DATAFORMAT     1311
+#define IDC_FILES_MIME_TYPE             1312
+#define IDC_FILES_OK                    1313
+#define IDC_FILES_CANCEL                1314
+#define IDC_FILES_EDIT_SYNCTYPE         1315
 #define ID_FILE_CONFIGURATION           32771
 #define ID_FILE_ZZZZ                    32772
 #define ID_FILE_SYNCHRONIZE             32773
@@ -575,13 +610,13 @@
 #define ID_HELP_UPDATES                 32791
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        423
+#define _APS_NEXT_RESOURCE_VALUE        425
 #define _APS_NEXT_COMMAND_VALUE         32793
-#define _APS_NEXT_CONTROL_VALUE         1303
+#define _APS_NEXT_CONTROL_VALUE         1316
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

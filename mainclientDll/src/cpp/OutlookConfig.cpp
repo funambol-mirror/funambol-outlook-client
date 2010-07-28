@@ -1017,14 +1017,14 @@ void OutlookConfig::createDefaultConfig() {
     //       object (inside constructor of WindowsSyncSourceConfig).
     // NOTE: create sources alphabetically sorted, because this will be the order of 
     //       nodes inside Win registry (and they must match)!
-    WCHAR* sourceNames[5] = {APPOINTMENT, CONTACT, NOTE, PICTURE, TASK};
-    for (int i=0; i<5; i++) {
+    WCHAR* sourceNames[6] = {APPOINTMENT, CONTACT, FILES, NOTE, PICTURE, TASK};
+    for (int i=0; i<6; i++) {
         WCHAR* wname = sourceNames[i];
         SyncSourceConfig* sc = DefaultWinConfigFactory::getSyncSourceConfig(wname);
         DMTClientConfig::setSyncSourceConfig(*sc);
         delete sc;
     }
-    for (int i=0; i<5; i++) {
+    for (int i=0; i<6; i++) {
         WCHAR* wname = sourceNames[i];
         char*   name = toMultibyte(wname);
 
@@ -1244,6 +1244,20 @@ void OutlookConfig::upgradeConfig() {
 
 		getAccessConfig().setCompression(ENABLE_COMPRESSION);
     }
+
+
+	// Old version < 9.0.0
+    if (oldFunambolSwv < 90000) {
+
+        // Files source added.
+        if (!addWindowsSyncSourceConfig(FILES)) {
+            LOG.error("upgradeConfig - error adding the config for %s source", FILES_);
+        }
+
+        accessConfig.setMaxMsgSize(800000);
+    }
+
+
 
     // ALWAYS force the GET of Server capabilities at next sync.
     // (to make sure all server caps are parsed, even the new ones) 

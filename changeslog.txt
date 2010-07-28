@@ -1,3 +1,15 @@
+2010-07-28
+  - toccy: created branch "files_sync".
+           Added Files sync (like pictures sync, Server-to-Client only):
+           - main screen: fixed UI pane, cannot be hidden
+           - settings: source can be enabled/disabled, destination folder (default = user's documents dir), 
+             remote URI (default = "file")
+           - recover: only from server to client
+           Notes:
+           - Using VS2008 projects
+           - Pictures source is fixed on UI too (no dynamically hidden)
+           - set MaxMessageSize = 800kB
+
 2010-07-20
   - toccy: improved logging when error occurs saving a recurring event/task (print the list of all props)
 

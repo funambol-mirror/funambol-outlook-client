@@ -174,6 +174,15 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setSync             ("one-way-from-server");                 // FIXED for pictures
         sc->setIsEnabled        (PICTURE_SOURCE_ENABLED);
     }
+    else if (wname == FILES){
+        sc->setURI              (DLLCustomization::sourceFilesUri);
+        sc->setType             ("application/vnd.omads-file+xml");      // not really used, as it's detected from each item received
+        sc->setVersion          ("");
+        sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
+        sc->setSupportedTypes   ("application/vnd.omads-file+xml:,application/*:");
+        sc->setSync             ("one-way-from-server");
+        sc->setIsEnabled        (FILE_SOURCE_ENABLED);
+    }
 
     if (name) delete [] name;
     return sc;

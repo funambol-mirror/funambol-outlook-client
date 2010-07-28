@@ -56,6 +56,7 @@
 #include "OutlookConfig.h"
 #include "utils.h"
 #include "PicturesSyncSource.h"
+#include "WinFileSyncSource.h"
 #include "customization.h"
 
 #include "base/adapter/PlatformAdapter.h"
@@ -336,6 +337,17 @@ StringBuffer getDefaultPicturesPath() {
     return path;
 }
 
+StringBuffer getDefaultFilesPath() {
+
+    StringBuffer path;
+    WCHAR buf[MAX_PATH];
+
+    SHGetSpecialFolderPath(NULL, buf, CSIDL_MYDOCUMENTS, 0); 
+    if (buf && wcslen(buf) > 0) {
+        path.convert(buf);
+    }
+    return path;
+}
 
 
 /**
@@ -761,6 +773,9 @@ int syncSourceNameToIndex(const StringBuffer& sourceName)
     else if (sourceName == PICTURE_) {
         id = SYNCSOURCE_PICTURES;
     }
+    else if (sourceName == FILES_) {
+        id = SYNCSOURCE_FILES;
+    }
 
     return id;
 }
@@ -773,6 +788,7 @@ StringBuffer syncSourceIndexToName(const int sourceID)
         case (SYNCSOURCE_TASKS):    return TASK_;
         case (SYNCSOURCE_NOTES):    return NOTE_;
         case (SYNCSOURCE_PICTURES): return PICTURE_;
+        case (SYNCSOURCE_FILES):    return FILES_;
         default:                    return "";
     }
 }
@@ -885,6 +901,10 @@ void printReport(SyncReport* sr, SyncSource** sources) {
             bool synced = false;
             if (sourceID == SYNCSOURCE_PICTURES) {
                 PicturesSyncSource* ss = (PicturesSyncSource*)sources[i];
+                if (ss->getIsSynced()) synced = true;
+            }
+            else if (sourceID == SYNCSOURCE_FILES) {
+                WinFileSyncSource* ss = (WinFileSyncSource*)sources[i];
                 if (ss->getIsSynced()) synced = true;
             }
             else {
@@ -1004,6 +1024,9 @@ char* friendlyName(const char* sourceName) {
     }
     else if (!strcmp(sourceName, PICTURE_)) {
         return "Pictures";
+    }
+    else if (!strcmp(sourceName, FILES_)) {
+        return "Files";
     }
     return EMPTY_STRING;
 }

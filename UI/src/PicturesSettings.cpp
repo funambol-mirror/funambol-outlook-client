@@ -304,7 +304,7 @@ void CPicturesSettings::OnBnClickedPicturesButSelect() {
 
 
 /// Callback fuction for the 'browse for folder' window. Sets the default folder.
-int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData) {
+static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData) {
 
     if (uMsg == BFFM_INITIALIZED) {
         SendMessage(hwnd, BFFM_SETSELECTION, TRUE, (LPARAM)(defaultBrowseFolder.c_str()));

@@ -41,6 +41,7 @@
 #include "winmaincpp.h"
 #include "WindowsSyncSource.h"
 #include "PicturesSyncSource.h"
+#include "WinFileSyncSource.h"
 #include "WindowsSyncClient.h"
 #include "utils.h"
 #include "HwndFunctions.h"
@@ -356,6 +357,7 @@ int startSync() {
     // 3. "Tasks"
     // 4. "Notes"
     // 5. "Pictures"
+    // 6. "Files"
     int j=0;
     const ArrayList& sourcesOrder = config->getSourcesVisible();
     for (int j=0; j<sourcesOrder.size(); j++) {
@@ -371,8 +373,9 @@ int startSync() {
                     wname = *name;
                     if (wname == PICTURE) {
                         sources[sourcesActive] = new PicturesSyncSource(wname.c_str(), config->getSyncSourceConfig(i));
-                    }
-                    else {
+                    } else if (wname == FILES) {
+                        sources[sourcesActive] = new WinFileSyncSource(wname.c_str(), config->getSyncSourceConfig(i));
+                    } else {
                         sources[sourcesActive] = new WindowsSyncSource(wname.c_str(), config->getSyncSourceConfig(i));
                     }
                     sourcesActive++;
@@ -506,6 +509,12 @@ finally:
                             // Hide the UI warning, if 'picture' source not found. 
                             sourceState = SYNCSOURCE_STATE_OK;
                             ret = 0;
+                        }
+                    }
+                    else if (sourceID == SYNCSOURCE_FILES) {
+                        WinFileSyncSource* ss = (WinFileSyncSource*)sources[i];
+                        if ((ssReport->getState() != SOURCE_ERROR) && ss->getIsSynced()) {
+                            sourceState = SYNCSOURCE_STATE_OK;
                         }
                     }
                     else {

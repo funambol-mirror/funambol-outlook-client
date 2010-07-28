@@ -80,6 +80,7 @@
 #define JOURNAL                            L"journal"
 #define NOTE                               L"note"
 #define PICTURE                            L"picture"
+#define FILES                              L"files"
 #define POST                               L"post"
 #define DISTRIBUTION_LIST                  L"distribution list"
 
@@ -90,6 +91,7 @@
 #define JOURNAL_                           "journal"
 #define NOTE_                              "note"
 #define PICTURE_                           "picture"
+#define FILES_                             "files"
 #define POST_                              "post"
 #define DISTRIBUTION_LIST_                 "distribution list"
 

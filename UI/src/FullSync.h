@@ -82,6 +82,7 @@ public:
     CButton checkTasks;
     CButton checkNotes;
     CButton checkPictures;
+    CButton checkFiles;
     CButton radio1;
     CButton radio2;
     CButton radio3;

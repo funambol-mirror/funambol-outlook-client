@@ -46,3 +46,4 @@ const char * DLLCustomization::sourceTasksVcalUri       = "task";
 const char * DLLCustomization::sourceCalendarVcalUri    = "event";
 const char * DLLCustomization::sourceContactsVcardUri   = "card";
 const char * DLLCustomization::sourcePicturesUri        = "picture";
+const char * DLLCustomization::sourceFilesUri           = "file";
