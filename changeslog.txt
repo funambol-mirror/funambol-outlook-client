@@ -1,3 +1,8 @@
+2010-07-29
+  - toccy: (APIs windows/vocl): added patternEndDate info to vCalendar, for outgoing items (WM and OL clients)
+           Now patternEndDate and Occurrences are both included in vCalendar, for compatibility.
+           Some refactoring on the WinRecurrence::toString() method.
+
 2010-07-22
   - toccy: merged from trunk, at revision 540:
            * improved logging when error occurs saving a recurring event/task (print the list of all props)
