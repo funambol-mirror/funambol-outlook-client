@@ -246,6 +246,13 @@ protected:
      */
     void updateFilters();
 
+    /**
+     * Read the X-FUNAMBOL-FOLDER property value.
+     * Some optimization to avoid parsing the whole data!
+     * 
+     */
+    bool smartGetFolderTag(const std::wstring& dataString, bool isSifFormat, std::wstring& propertyValue);
+
 public:
 
     /**

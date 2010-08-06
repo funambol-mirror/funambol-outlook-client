@@ -46,6 +46,7 @@
 #include "outlook/ClientException.h"
 #include "outlook/ClientContact.h"
 #include "SyncException.h"
+#include "vocl/VConverter.h"
 #include "vocl/AppDefs.h"
 #include "spds/constants.h"
 
@@ -2328,22 +2329,15 @@ void WindowsSyncSource::extractFolder(const wstring dataString, const wstring da
         replaceAll(L"&amp;", L"&", path);
     }
     else {
-        // creating the WinItem just to take the x-funambol-folder in the proper way without
-        // duplicate code
+
+        // Read the X-FUNAMBOL-FOLDER property value.
+        // Some optimization to avoid parsing the whole data!
         wstring propertyValue;
-        WCHAR* fields[] = {{L"Folder"}};
-        // Internally switch to the correct WinObject and
-        // fill it (parse data string + fill propertyMap).
-        WinItem* winItem = createWinItem(isSifFormat, getName(), dataString, (const WCHAR**)fields);
-        bool res = winItem->getProperty(L"Folder", propertyValue);
-        if (res) {
+        if (smartGetFolderTag(dataString, isSifFormat, propertyValue)) {
             path = propertyValue;
-            delete winItem;
         } else {
             LOG.debug("extractFolder method: failed to get the folder. use the default");
         }
-        // vCard/vCalendar: parse the string.
-        //path = getVPropertyValue(dataString, L"X-FUNAMBOL-FOLDER");
     }
 
     if (path != EMPTY_WSTRING) {
@@ -2365,6 +2359,52 @@ void WindowsSyncSource::extractFolder(const wstring dataString, const wstring da
         path = tmp;
         delete [] tmp;
     }
+}
+
+bool WindowsSyncSource::smartGetFolderTag(const wstring& dataString, 
+                                          bool isSifFormat, 
+                                          wstring& propertyValue) {
+    bool res = false;
+    if (isSifFormat) {
+        WCHAR* fields[] = {{L"Folder"}};
+        WinItem* winItem = createWinItem(true, getName(), dataString, (const WCHAR**)fields);
+        
+        if (winItem->getProperty(L"Folder", propertyValue)) {
+            res = true;
+        }
+        delete winItem;
+    }
+    else {
+        // substr only the desired property, to speed up
+        wstring tag(TEXT("X-FUNAMBOL-FOLDER"));
+        size_t start = dataString.find(tag);
+        if (start == wstring::npos) {
+            return false;
+        }
+        size_t end = dataString.find_first_of(TEXT("\r\n"), start + tag.size());
+        wstring vprop = dataString.substr(start, end-start);
+
+        // create a valid (but fake) vObject
+        wstring subData;
+        subData.append(TEXT("BEGIN:VTEST\r\n"));
+        subData.append(vprop);
+        subData.append(TEXT("\r\nEND:VTEST\r\n"));
+
+        // use the VConverter parse, to keep the correct transformations
+        VObject* vo = VConverter::parse(subData.c_str());
+        if (vo) {
+            VProperty* vp = vo->getProperty(tag.c_str());
+            if (vp) {
+                propertyValue = vp->getValue(0);
+                if (!propertyValue.empty()) {
+                    res = true;
+                }
+            }
+            delete vo;
+        }
+    }
+
+    return res;
 }
 
 
