@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="OutlookUI"
 	ProjectGUID="{5DC153AB-2BD2-4D12-A3C4-4C7578919237}"
 	RootNamespace="OutlookPlugin"
 	Keyword="MFCProj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -87,6 +88,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/OutlookPlugin.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=""
 				TargetMachine="1"
 			/>
@@ -109,9 +112,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -185,6 +185,8 @@
 				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				ProgramDatabaseFile=".\Release/OutlookPlugin.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -208,9 +210,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -218,11 +217,9 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{7459AF2F-7B82-4153-B9E1-E4A71DC61821}"
-			RelativePathToProject=".\mainclientDll\build\winmainclientdll.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{D279EE74-36FB-4C4C-8F29-04947825C53E}"
-			RelativePathToProject=".\cpp-sdk\build\win32\win32.vcproj"
 		/>
 	</References>
 	<Files>

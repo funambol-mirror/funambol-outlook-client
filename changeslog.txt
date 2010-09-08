@@ -1,3 +1,6 @@
+2010-09-08
+   - toccy: updated projects and build.properties: the default environment is now Visual Studio 2008.
+
 2010-08-06
   - toccy: improved parsing of X-FUNAMBOL-FOLDER property, server to client (speed up).
            (added smartGetFolderTag in WindowsSyncSource)

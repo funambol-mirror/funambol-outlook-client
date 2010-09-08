@@ -147,16 +147,16 @@ Forge file for Funambol Outlook Sync Client
             <isset property="env.PROGRAMFILES"/>
             <then>
                 <!-- If running under cygwin -->
-                <property name="vs2005.devenv"       value = "${env.PROGRAMFILES}\Microsoft Visual Studio 8\Common7\IDE"/>
-                <property name="dir.VCpp2005Lib"     value = "${env.PROGRAMFILES}\Microsoft Visual Studio 8\VC\redist\x86"/>
+                <property name="vs2005.devenv"       value = "${env.PROGRAMFILES}\Microsoft Visual Studio 9.0\Common7\IDE"/>
+                <property name="dir.VCpp2005Lib"     value = "${env.PROGRAMFILES}\Microsoft Visual Studio 9.0\VC\redist\x86"/>
                 <property name="install-builder.dir" value = "${env.PROGRAMFILES}\NSIS"/>
             </then>
         <elseif>
             <isset property="env.ProgramFiles"/>
             <then>
                 <!-- If running from cmd.exe  -->
-                <property name="vs2005.devenv"       value = "${env.ProgramFiles}\Microsoft Visual Studio 8\Common7\IDE"/>
-                <property name="dir.VCpp2005Lib"     value = "${env.ProgramFiles}\Microsoft Visual Studio 8\VC\redist\x86"/>
+                <property name="vs2005.devenv"       value = "${env.ProgramFiles}\Microsoft Visual Studio 9.0\Common7\IDE"/>
+                <property name="dir.VCpp2005Lib"     value = "${env.ProgramFiles}\Microsoft Visual Studio 9.0\VC\redist\x86"/>
                 <property name="install-builder.dir" value = "${env.ProgramFiles}\NSIS"/>
             </then>        
         </elseif>
@@ -166,9 +166,9 @@ Forge file for Funambol Outlook Sync Client
         <echo message="dir.VCpp2005Lib     = ${dir.VCpp2005Lib}" />
         <echo message="install-builder.nsi = ${install-builder.nsi}" />
         
-        <property name="MSLib.atl"        value="Microsoft.VC80.ATL"/>
-        <property name="MSLib.mfc"        value="Microsoft.VC80.MFC"/>
-        <property name="MSLib.crt"        value="Microsoft.VC80.CRT"/>
+        <property name="MSLib.atl"        value="Microsoft.VC90.ATL"/>
+        <property name="MSLib.mfc"        value="Microsoft.VC90.MFC"/>
+        <property name="MSLib.crt"        value="Microsoft.VC90.CRT"/>
                 
         <echo message="MSLib.atl       = ${MSLib.atl}" />
         <echo message="MSLib.mfc       = ${MSLib.mfc}" />
