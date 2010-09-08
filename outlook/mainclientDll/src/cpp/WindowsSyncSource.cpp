@@ -852,6 +852,10 @@ int WindowsSyncSource::addItem(SyncItem& item) {
         manageClientException(e);
         goto errorSave;
     }
+    catch (...) {
+        LOG.error("Unexpected exception has occurred saving an item");
+        goto errorSave;
+    }
 
     // Adjustment for Contacts: check if birthday/anniversary created
     // -> notify user on LOG.
@@ -1056,6 +1060,10 @@ int WindowsSyncSource::updateItem(SyncItem& item) {
     }
     catch (ClientException* e) {
         manageClientException(e);
+        goto errorSave;
+    }
+    catch (...) {
+        LOG.error("Unexpected exception has occurred saving an item");
         goto errorSave;
     }
 
