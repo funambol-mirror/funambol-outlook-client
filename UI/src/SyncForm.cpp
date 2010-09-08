@@ -368,7 +368,9 @@ void CSyncForm::refreshSources() {
         paneNotes.SetBitmap   (((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
         panePictures.SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
     }
-    
+
+    // This is done to correctly refresh also disabled sources!
+    Invalidate();
 }
 
 BOOL CSyncForm::OnEraseBkgnd(CDC* pDC)
