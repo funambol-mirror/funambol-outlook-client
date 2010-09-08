@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="FunambolAddin"
 	ProjectGUID="{7816CD18-985C-499A-8B2B-C5C4F9476C42}"
 	RootNamespace="FunambolAddin"
 	Keyword="AtlProj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -23,7 +24,7 @@
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			UseOfATL="2"
-			ATLMinimizesCRunTimeLibraryUsage="true"
+			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
 			>
 			<Tool
@@ -84,6 +85,8 @@
 				ModuleDefinitionFile=".\FunambolAddin.def"
 				ProgramDatabaseFile=".\Release/FunambolAddin.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=".\Release/FunambolAddin.lib"
 				TargetMachine="1"
 			/>
@@ -106,9 +109,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -183,6 +183,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\DebugU/FunambolAddin.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=".\DebugU/FunambolAddin.lib"
 				TargetMachine="1"
 			/>
@@ -207,9 +209,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -221,7 +220,7 @@
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			UseOfATL="1"
-			ATLMinimizesCRunTimeLibraryUsage="true"
+			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="1"
 			>
 			<Tool
@@ -282,6 +281,8 @@
 				ModuleDefinitionFile=".\FunambolAddin.def"
 				ProgramDatabaseFile=".\ReleaseUMinDependency/FunambolAddin.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=".\ReleaseUMinDependency/FunambolAddin.lib"
 				TargetMachine="1"
 			/>
@@ -306,9 +307,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -320,7 +318,7 @@
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			UseOfATL="1"
-			ATLMinimizesCRunTimeLibraryUsage="true"
+			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
 			>
 			<Tool
@@ -383,6 +381,8 @@
 				ModuleDefinitionFile=".\FunambolAddin.def"
 				ProgramDatabaseFile=".\ReleaseMinDependency/FunambolAddin.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=".\ReleaseMinDependency/FunambolAddin.lib"
 				TargetMachine="1"
 			/>
@@ -407,9 +407,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -421,7 +418,7 @@
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			UseOfATL="2"
-			ATLMinimizesCRunTimeLibraryUsage="true"
+			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="1"
 			>
 			<Tool
@@ -482,6 +479,8 @@
 				ModuleDefinitionFile=".\FunambolAddin.def"
 				ProgramDatabaseFile=".\ReleaseUMinSize/FunambolAddin.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=".\ReleaseUMinSize/FunambolAddin.lib"
 				TargetMachine="1"
 			/>
@@ -504,9 +503,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -584,6 +580,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/FunambolAddin.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=".\Debug/FunambolAddin.lib"
 				TargetMachine="1"
 			/>
@@ -606,9 +604,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

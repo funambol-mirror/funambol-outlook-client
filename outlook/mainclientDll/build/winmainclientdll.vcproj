@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="OutlookDLL"
 	ProjectGUID="{7459AF2F-7B82-4153-B9E1-E4A71DC61821}"
 	RootNamespace="winmainclientdll"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -85,6 +86,8 @@
 				ModuleDefinitionFile="..\src\cpp\winmaincpp.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/winmainclientdll.pdb"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=".\Debug/winmainclientdll.lib"
 				TargetMachine="1"
 			/>
@@ -107,9 +110,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -184,6 +184,8 @@
 				IgnoreDefaultLibraryNames="LIBCD"
 				ModuleDefinitionFile="..\src\cpp\winmaincpp.def"
 				ProgramDatabaseFile=".\Release/winmainclientdll.pdb"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=".\Release/winmainclientdll.lib"
 				TargetMachine="1"
 			/>
@@ -206,9 +208,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
