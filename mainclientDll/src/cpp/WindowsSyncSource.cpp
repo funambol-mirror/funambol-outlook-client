@@ -2284,7 +2284,13 @@ int WindowsSyncSource::deleteAppointment(ClientItem* cItem, const wstring& prope
     }
 
     // Hmm, strange... let's check also all the others.
+    int counter = 0;
     while (folder->getItemsIndex() > 0) {
+        counter++;
+        if (counter > 20) {
+            LOG.debug("Event created by the contact was not found");
+            break;
+        }
         pos = wstring::npos;
         newApp = folder->getPreviousItem();
         if (!newApp) return 1;

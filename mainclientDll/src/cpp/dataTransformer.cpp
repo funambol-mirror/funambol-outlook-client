@@ -59,6 +59,7 @@
 #include "outlook/ClientException.h"
 #include "SIFFields.h"
 #include "customization.h"
+#include "spds/spdsutils.h"
 
 #include "syncml\core\Property.h"
 #include "syncml\core\PropParam.h"
@@ -69,6 +70,8 @@ using namespace std;
 void initWinItems() {
     WinItem::setDefaultValidateFunction(&(DLLCustomization::validateExtraProperty));
 }
+
+wstring getEmptyVCard();
 
 /**
  * Creates an empty WinItem object of the desired type (Client to Server).
@@ -118,7 +121,44 @@ WinItem* createWinItem(bool useSIF, const wstring itemType, const wstring& data,
 
     if (itemType == CONTACT) {
         if (useSIF) item = new WinContactSIF(data, sifFields);
-        else        item = new WinContact(data);
+        else {               
+            const char* v = getConfig()->getServerConfig().getNoFieldLevelReplace();
+            if (v) {
+                StringBuffer values(v);
+                if (values.ifind(getConfig()->getSyncSourceConfig(CONTACT_)->getURI()) != StringBuffer::npos) {
+                    wstring emptyVCard = getEmptyVCard();
+                    WinContact* itemTmp = new WinContact(emptyVCard);        
+                    itemTmp->parseMapReset(data, false);
+                    itemTmp->setPhotoType(L"JPEG");
+
+                    wstring newData;
+                    wstring photo;
+                    bool exists = itemTmp->getProperty(L"Photo", photo);
+                    if (exists && !photo.empty()) {
+                        StringBuffer s; 
+                        s.convert(photo.c_str());
+                        char* b64tmp = new char[s.length()];
+                        int len = b64_decode(b64tmp, s.c_str());
+                        b64tmp[len] = 0;
+                        char* result = b64EncodeWithSpaces(b64tmp, len);
+                        WCHAR* tt = toWideChar(result);
+                        itemTmp->setProperty(L"Photo", tt);
+                        itemTmp->setPhotoType(L"JPEG");
+                        delete [] b64tmp;
+                        delete [] result;
+                        delete [] tt;
+                    }
+                    //newData = itemTmp->toString();
+                    //delete itemTmp;
+                    //item = new WinContact(newData);
+                    item = (WinItem*)itemTmp;                    
+                } else {
+                    item = new WinContact(data);
+                }
+            } else {
+                item = new WinContact(data);
+            }
+        }
     }
     else if (itemType == APPOINTMENT) {
         if (useSIF) item = new WinEventSIF(data, sifFields, (const WCHAR**)recurrenceFields);
@@ -1719,4 +1759,66 @@ ArrayList* getVNoteProperties() {
     
 	return p;
 
+}
+
+wstring getEmptyVCard() {
+
+    wstring emptyVCard;
+    emptyVCard.append(L"BEGIN:VCARD\r\n\r\n");
+    emptyVCard.append(L"VERSION:2.1\r\n");
+    emptyVCard.append(L"N:;;;;\r\n");
+    emptyVCard.append(L"BDAY:\r\n");
+    emptyVCard.append(L"NOTE:\r\n");
+    emptyVCard.append(L"TEL;WORK;FAX:\r\n");
+    emptyVCard.append(L"TEL;VOICE;WORK:\r\n");
+    emptyVCard.append(L"TEL;VOICE;WORK:\r\n");
+    emptyVCard.append(L"TEL;CAR;VOICE:\r\n");
+    emptyVCard.append(L"CATEGORIES:\r\n");
+    emptyVCard.append(L"TEL;WORK;PREF:\r\n");
+    emptyVCard.append(L"FN:\r\n");
+    emptyVCard.append(L"EMAIL;INTERNET:\r\n");
+    emptyVCard.append(L"EMAIL;INTERNET;HOME:\r\n");
+    emptyVCard.append(L"EMAIL;INTERNET;WORK:\r\n");
+    emptyVCard.append(L"TITLE:\r\n");
+    emptyVCard.append(L"TEL;VOICE;HOME:\r\n");
+    emptyVCard.append(L"TEL;VOICE;HOME:\r\n");
+    emptyVCard.append(L"TEL;HOME;FAX:\r\n");
+    emptyVCard.append(L"URL;HOME:\r\n");
+    emptyVCard.append(L"PRIORITY:1\r\n");
+    emptyVCard.append(L"TEL;CELL:\r\n");
+    emptyVCard.append(L"NICKNAME:\r\n");
+    emptyVCard.append(L"TEL;FAX:\r\n");
+    emptyVCard.append(L"TEL;VOICE:\r\n");
+    emptyVCard.append(L"TEL;PAGER:\r\n");
+    emptyVCard.append(L"TEL;PREF;VOICE:\r\n");
+    emptyVCard.append(L"ROLE:\r\n");
+    emptyVCard.append(L"CLASS:PUBLIC\r\n");
+    emptyVCard.append(L"URL:\r\n");
+    emptyVCard.append(L"ORG:;;\r\n");
+    emptyVCard.append(L"ADR;HOME:;;;;;;\r\n");
+    emptyVCard.append(L"ADR:;;;;;;\r\n");
+    emptyVCard.append(L"ADR;WORK:;;;;;;\r\n");
+    emptyVCard.append(L"PHOTO:\r\n");
+    emptyVCard.append(L"X-ANNIVERSARY:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-BILLINGINFO:\r\n");
+    emptyVCard.append(L"TEL;X-FUNAMBOL-CALLBACK:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-CHILDREN:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-COMPANIES:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-FOLDER:DEFAULT_FOLDER\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-HOBBIES:\r\n");
+    emptyVCard.append(L"EMAIL;INTERNET;HOME;X-FUNAMBOL-INSTANTMESSENGER:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-INITIALS:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-LANGUAGES:\r\n");
+    emptyVCard.append(L"X-MANAGER:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-MILEAGE:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-ORGANIZATIONALID:\r\n");
+    emptyVCard.append(L"TEL;X-FUNAMBOL-RADIO:\r\n");
+    emptyVCard.append(L"X-SPOUSE:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-SUBJECT:\r\n");
+    emptyVCard.append(L"TEL;X-FUNAMBOL-TELEX:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-YOMICOMPANYNAME:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-YOMIFIRSTNAME:\r\n");
+    emptyVCard.append(L"X-FUNAMBOL-YOMILASTNAME:\r\n");
+    emptyVCard.append(L"END:VCARD");
+    return emptyVCard;
 }
