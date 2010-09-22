@@ -1,3 +1,10 @@
+2010-09-22
+  - magi: added support for the noFieldLevelReplace capability only for contact x-text/vcard
+          Modified the dataTransformer for contact
+          Added unit test for Contact against the backend using WinUnit (http://msdn.microsoft.com/en-us/magazine/cc136757.aspx)
+          and added readme to use it
+          Modified the project with new test
+
 2010-09-08
    - toccy: fixed bug 8918 - Task icon appears in dark before the first sync
    - toccy: updated projects and build.properties: the default environment is now Visual Studio 2008.
@@ -5,7 +12,8 @@
 2010-08-06
   - toccy: improved parsing of X-FUNAMBOL-FOLDER property, server to client (speed up).
            (added smartGetFolderTag in WindowsSyncSource)
-
+2010-08-03
+  - maria: Release 8.7.2
 2010-07-29
   - toccy: merged from branch v87:
            (APIs windows/vocl): added patternEndDate info to vCalendar, for outgoing items (WM and OL clients)

@@ -2293,7 +2293,13 @@ int WindowsSyncSource::deleteAppointment(ClientItem* cItem, const wstring& prope
     }
 
     // Hmm, strange... let's check also all the others.
+    int counter = 0;
     while (folder->getItemsIndex() > 0) {
+        counter++;
+        if (counter > 20) {
+            LOG.debug("Event created by the contact was not found");
+            break;
+        }
         pos = wstring::npos;
         newApp = folder->getPreviousItem();
         if (!newApp) return 1;
@@ -2911,4 +2917,27 @@ void WindowsSyncSource::removeNewIdFromMap(const std::wstring & id) {
 void WindowsSyncSource::removeIdFromMap(const std::wstring & id) {
     removeOldIdFromMap(id);
     removeNewIdFromMap(id);
+}
+
+
+/**
+ * Just for testing pourpose. It return a SyncItem give the right key. NULL otherwise
+ */
+
+SyncItem* WindowsSyncSource::getItemFromId(const wstring& id) {
+    
+    ClientItem* cItem = NULL;
+    SyncItem*   sItem = NULL;    
+    try {
+        cItem = outlook->getItemFromID(id, getName());
+        sItem = convertToSyncItem(cItem, winConfig.getType(), defaultFolderPath);
+        LOG.info(INFO_GET_ITEM, getName(), getSafeItemName(cItem).c_str());
+    }
+    catch (ClientException* e) {
+        manageClientException(e);
+        manageSourceErrorF(ERR_CODE_ITEM_GET, ERR_ITEM_GET, getSafeItemName(cItem).c_str(), getName());
+        sItem = NULL;
+    }
+    
+    return sItem; 
 }
