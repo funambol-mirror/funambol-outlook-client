@@ -1,3 +1,5 @@
+2010-09-23
+  - maria: Release 8.7.3
 2010-09-20
   - magi: added support for the noFieldLevelReplace capability only for contact x-text/vcard
           Modified the dataTransformer for contact
