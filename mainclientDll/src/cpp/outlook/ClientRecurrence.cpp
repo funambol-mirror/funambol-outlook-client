@@ -573,6 +573,26 @@ int ClientRecurrence::save() {
     if (interval < 1) {
         interval = 1;
     }
+
+
+    // Patch for yearly events: interval property is only supported on Outlook 2010 or later.
+    // Some older Outlook versions throw an exception if we put the interval value (bug 10260).
+    if (recurrenceType == 5 || recurrenceType == 6) {
+        ClientApplication* cApp = ClientApplication::getInstance();
+        int majorVersion = _wtoi(cApp->getVersion().c_str());
+        if (majorVersion <= 12) { 
+            // Old Outlook versions (v.12 = Outlook 2007)
+            // interval is not supported so we won't put it
+            // http://msdn.microsoft.com/en-us/library/microsoft.office.interop.outlook.recurrencepattern.interval%28v=office.12%29.aspx
+            if (interval > 1) {
+                LOG.info("Warning, data loss: yearly recurrences every %d years are not supported on %ls.", 
+                    interval, cApp->getName().c_str());
+                LOG.info("The recurrence is changed to occur every year");
+            }
+            interval = -1;
+        }
+    }
+
     
     if (getHasTimezone() || useLocal) {
         
@@ -659,8 +679,10 @@ int ClientRecurrence::save() {
     if (FAILED(hr)) goto error;
     
     i++;
-    hr = pRec->put_Interval((long)interval);
-    if (FAILED(hr)) goto error;
+    if (interval != -1) {
+        hr = pRec->put_Interval((long)interval);
+        if (FAILED(hr)) goto error;
+    }
     
     i++; 
     // Ignore if '0' (default) or '-1' (tag not found)
