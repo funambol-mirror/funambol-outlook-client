@@ -1,3 +1,8 @@
+2010-10-26
+  - toccy: fixed bug 10260 - Yearly recurring events not added in Outlook 2003 and 2007 (Error inserting recurrence property 'Interval')
+           On Outlook 2003 and 2007 the "interval" property is not set in yearly events,
+           since it's not supported and may cause an error saving the recurrence pattern.
+
 2010-09-22
   - magi: added support for the noFieldLevelReplace capability only for contact x-text/vcard
           Modified the dataTransformer for contact
