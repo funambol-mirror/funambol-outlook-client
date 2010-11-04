@@ -88,8 +88,15 @@ protected:
     /// disable a source (it remaining visible by greyed) given its components
     void disableSource(CButton& button1, CButton& button2, bool* synctype, int sep1, int sep2);
  
+    /**
+     * Creates and returns a string to be displayed in the source checkbox
+     * like "Contacts", or "Pictures (Download only)".
+     * Checks the config to know the current syncmode set.
+     */
+    CString composeCheckboxText(const char* sourceName);
 
 	DECLARE_MESSAGE_MAP()
+
 public:
     
     CButton checkContacts;

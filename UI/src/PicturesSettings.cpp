@@ -1,34 +1,34 @@
 /*
- * Funambol is a mobile platform developed by Funambol, Inc. 
+ * Funambol is a mobile platform developed by Funambol, Inc.
  * Copyright (C) 2003 - 2009 Funambol, Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
- * the Free Software Foundation with the addition of the following permission 
+ * the Free Software Foundation with the addition of the following permission
  * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
- * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE 
+ * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT  OF THIRD PARTY RIGHTS.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  * details.
- * 
- * You should have received a copy of the GNU Affero General Public License 
+ *
+ * You should have received a copy of the GNU Affero General Public License
  * along with this program; if not, see http://www.gnu.org/licenses or write to
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301 USA.
- * 
- * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite 
+ *
+ * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite
  * 305, Redwood City, CA 94063, USA, or at email address info@funambol.com.
- * 
+ *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
  * Section 5 of the GNU Affero General Public License version 3.
- * 
+ *
  * In accordance with Section 7(b) of the GNU Affero General Public License
  * version 3, these Appropriate Legal Notices must retain the display of the
- * "Powered by Funambol" logo. If the display of the logo is not reasonably 
+ * "Powered by Funambol" logo. If the display of the logo is not reasonably
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by Funambol".
  */
@@ -58,14 +58,14 @@ static int getPicturesSyncTypeID(const char* syncType) {
 
     int ret = IDS_SYNCTYPE2;    // default
 
-    if (!strcmp(syncType, SYNC_MODE_TWO_WAY_TEXT)) {
+    if (!strcmp(syncType, SYNC_MODE_TWO_WAY)) {
         ret = IDS_SYNCTYPE1;
     }
-    else if (!strcmp(syncType, SYNC_MODE_ONE_WAY_FROM_SERVER_TEXT) ||
-        !strcmp(syncType, SYNC_MODE_SMART_ONE_WAY_FROM_SERVER_TEXT)) {
+    else if (!strcmp(syncType, SYNC_MODE_ONE_WAY_FROM_SERVER) ||
+        !strcmp(syncType, SYNC_MODE_SMART_ONE_WAY_FROM_SERVER)) {
         ret = IDS_SYNCTYPE2;
     }
-    else if (!strcmp(syncType, SYNC_MODE_ONE_WAY_FROM_CLIENT_TEXT)) {
+    else if (!strcmp(syncType, SYNC_MODE_ONE_WAY_FROM_CLIENT)) {
         // this is actually not used, for pictures
         ret = IDS_SYNCTYPE3;
     }
@@ -132,9 +132,11 @@ BOOL CPicturesSettings::OnInitDialog() {
     editSyncType.SetLimitText(EDIT_TEXT_MAXLENGTH);
     editFolder.SetLimitText  (EDIT_TEXT_MAXLENGTH);
     editRemote.SetLimitText  (EDIT_TEXT_MAXLENGTH);
-    
+
+    // Load the syncmodes in the editbox/dropdown
+    loadSyncModesBox(PICTURE_);
+
     // load string resources
-    s1.LoadString(IDS_SYNCTYPE2);           SetDlgItemText(IDC_PICTURES_EDIT_SYNCTYPE,      s1);    // "One-way: Server -> Outlook"
     s1.LoadString(IDS_SYNC_DIRECTION);      SetDlgItemText(IDC_PICTURES_GROUP_DIRECTION,    s1);
     s1.LoadString(IDS_PICTURES_FOLDER);     SetDlgItemText(IDC_PICTURES_GROUP_FOLDER,       s1);
     s1.LoadString(IDS_CURRENT);             SetDlgItemText(IDC_PICTURES_STATIC_FOLDER,      s1);
@@ -181,7 +183,7 @@ BOOL CPicturesSettings::OnInitDialog() {
     }
     SetDlgItemText(IDC_PICTURES_MIME_TYPE, s1);
 
-    
+
     //
     // Hide Advanced settings (remote URI) if defined in customization.h
     //
@@ -289,7 +291,7 @@ void CPicturesSettings::OnBnClickedPicturesButSelect() {
 
     CString caption;
     caption.LoadString(IDS_SELECT_PICTURES_FOLDER);
-    
+
     // Open the browse for folder window (modal)
     wstring newPath;
     if ( browseFolder(newPath, defaultPath, caption.GetBuffer(), GetSafeHwnd()) ) {
@@ -352,4 +354,49 @@ bool CPicturesSettings::browseFolder(wstring& folderpath, const WCHAR* defaultFo
     return retVal;
 }
 
+void CPicturesSettings::loadSyncModesBox(const char* sourceName)
+{
+    OutlookConfig* config = getConfig();
+    WindowsSyncSourceConfig* ssconf = config->getSyncSourceConfig(sourceName);
+    if (!ssconf) return;
 
+    // TODO: use a switch on sourceName when refactoring
+    int editBoxResourceID = IDC_PICTURES_EDIT_SYNCTYPE;
+    int comboBoxResourceID = IDC_PICTURES_COMBO_SYNCTYPE;
+
+    CEdit* editbox = (CEdit*)GetDlgItem(editBoxResourceID);
+    CComboBox* combobox = (CComboBox*)GetDlgItem(comboBoxResourceID);
+    if (!combobox || !editbox) return;
+
+    //
+    // Load the syncmodes in the editbox/dropdown
+    //
+    CString s1 = "";
+    StringBuffer syncModes(ssconf->getSyncModes());
+    if (syncModes.find(SYNC_MODE_TWO_WAY) != StringBuffer::npos) {
+        s1.LoadString(IDS_SYNCTYPE1);
+        combobox->AddString(s1);
+    }
+    if (syncModes.find(SYNC_MODE_ONE_WAY_FROM_SERVER) != StringBuffer::npos ||
+        syncModes.find(SYNC_MODE_SMART_ONE_WAY_FROM_SERVER) != StringBuffer::npos) {
+        s1.LoadString(IDS_SYNCTYPE2);
+        combobox->AddString(s1);
+    }
+    if (syncModes.find(SYNC_MODE_ONE_WAY_FROM_CLIENT) != StringBuffer::npos ||
+        syncModes.find(SYNC_MODE_SMART_ONE_WAY_FROM_CLIENT) != StringBuffer::npos) {
+        s1.LoadString(IDS_SYNCTYPE3);
+        combobox->AddString(s1);
+    }
+
+    if (combobox->GetCount() > 1) {
+        // More than 1 syncmode available: use the dropdown box
+        editbox->ShowWindow(SW_HIDE);
+        combobox->ShowWindow(SW_SHOW);
+    }
+    else {
+        // Only 1 syncmode available: use the editbox
+        editbox->ShowWindow(SW_SHOW);
+        combobox->ShowWindow(SW_HIDE);
+        SetDlgItemText(editBoxResourceID, s1);
+    }
+}

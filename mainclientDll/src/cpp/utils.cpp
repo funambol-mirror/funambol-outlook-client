@@ -1,34 +1,34 @@
 /*
- * Funambol is a mobile platform developed by Funambol, Inc. 
+ * Funambol is a mobile platform developed by Funambol, Inc.
  * Copyright (C) 2003 - 2007 Funambol, Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
- * the Free Software Foundation with the addition of the following permission 
+ * the Free Software Foundation with the addition of the following permission
  * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
- * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE 
+ * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT  OF THIRD PARTY RIGHTS.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  * details.
- * 
- * You should have received a copy of the GNU Affero General Public License 
+ *
+ * You should have received a copy of the GNU Affero General Public License
  * along with this program; if not, see http://www.gnu.org/licenses or write to
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301 USA.
- * 
- * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite 
+ *
+ * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite
  * 305, Redwood City, CA 94063, USA, or at email address info@funambol.com.
- * 
+ *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
  * Section 5 of the GNU Affero General Public License version 3.
- * 
+ *
  * In accordance with Section 7(b) of the GNU Affero General Public License
  * version 3, these Appropriate Legal Notices must retain the display of the
- * "Powered by Funambol" logo. If the display of the logo is not reasonably 
+ * "Powered by Funambol" logo. If the display of the logo is not reasonably
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by Funambol".
  */
@@ -192,7 +192,7 @@ bool isAcceptedDataType(const string& dataType) {
     if ( dataType == "text/x-s4j-sifc"  ||
          dataType == "text/x-s4j-sife"  ||
          dataType == "text/x-s4j-sift"  ||
-         dataType == "text/x-s4j-sifn"  || 
+         dataType == "text/x-s4j-sifn"  ||
          dataType == "text/x-vcard"     ||
          dataType == "text/x-vnote"     ||
          dataType == "text/x-vcalendar" ) {
@@ -282,8 +282,8 @@ void toWindows(char* str) {
 
 
 /**
- * Returns the path of current user's application data folder. 
- * For example: 
+ * Returns the path of current user's application data folder.
+ * For example:
  * "C:\Documents And Settings\Settimio\Application Data"
  * The string returned is allocated new, so MUST be freed by caller.
  * Returns NULL in case of errors (set lastErrorMessage).
@@ -291,16 +291,16 @@ void toWindows(char* str) {
  * @return   path of current user's tmp folder under 'application data'
  */
 WCHAR* readAppDataPath() {
-    
-    static const StringBuffer& pt = PlatformAdapter::getConfigFolder();    
+
+    static const StringBuffer& pt = PlatformAdapter::getConfigFolder();
     WCHAR* dataPath = toWideChar(pt.c_str());
     return dataPath;
 }
 
 
 /**
- * Returns the path of file where data files for current user are stored. 
- * It is located under 'application data' folder. For example: 
+ * Returns the path of file where data files for current user are stored.
+ * It is located under 'application data' folder. For example:
  * "C:\Documents And Settings\Settimio\Application Data\Funambol\Outlook Client"
  * The string returned is allocated new, so MUST be freed by caller.
  * Returns NULL in case of errors (set lastErrorMessage).
@@ -308,7 +308,7 @@ WCHAR* readAppDataPath() {
  * @return   path of current user's tmp folder under 'application data'
  */
 WCHAR* readDataPath(const WCHAR* itemType) {
-    
+
     WCHAR* dataPath = readAppDataPath();
     if (!dataPath || !itemType) {
         return NULL;
@@ -329,7 +329,7 @@ StringBuffer getDefaultPicturesPath() {
     StringBuffer path;
     WCHAR buf[MAX_PATH];
 
-    SHGetSpecialFolderPath(NULL, buf, CSIDL_MYPICTURES, 0); 
+    SHGetSpecialFolderPath(NULL, buf, CSIDL_MYPICTURES, 0);
     if (buf && wcslen(buf) > 0) {
         path.convert(buf);
     }
@@ -346,7 +346,7 @@ StringBuffer getDefaultPicturesPath() {
  *                   data into WCHAR, because we MUST use UTF-8 charset.
  */
 wstring readFromFile(const wstring& filePath) {
-    
+
     FILE* f;
     if ((f  = _wfopen(filePath.c_str(), L"r")) == NULL) {
         // File does not exists...
@@ -361,7 +361,7 @@ wstring readFromFile(const wstring& filePath) {
 
     WCHAR* tmp = toWideChar(content.c_str());
     wstring wcontent = tmp;
-    
+
     if (tmp) delete [] tmp;
     fflush(f);
     fclose(f);
@@ -385,7 +385,7 @@ int writeToFile(const wstring& content, const wstring& filePath, const WCHAR* mo
         setErrorF(getLastErrorCode(), ERR_FILE_OPEN_MODE);
         return 1;
     }
-    
+
     FILE* f;
     if ((f  = _wfopen(filePath.c_str(), mode)) == NULL) {
         setErrorF(getLastErrorCode(), ERR_WFILE_OPEN, filePath.c_str());
@@ -415,7 +415,7 @@ int writeToFile(const wstring& content, const wstring& filePath, const WCHAR* mo
  * @return           0 if no errors
  */
 int writeToFile(const string& content, const string& filePath, const char* mode) {
-    
+
     if (!mode) {
         setErrorF(getLastErrorCode(), ERR_FILE_OPEN_MODE);
         return 1;
@@ -443,12 +443,12 @@ int writeToFile(const string& content, const string& filePath, const char* mode)
  */
 int makeDataDirs() {
     int err = 0;
-    
-    static const StringBuffer& pt = PlatformAdapter::getConfigFolder();    
+
+    static const StringBuffer& pt = PlatformAdapter::getConfigFolder();
     err = createFolder(pt.c_str());
     if (err) {
         setErrorF(getLastErrorCode(), ERR_DIR_CREATE, pt.c_str());
-        return 1;   
+        return 1;
     }
     return err;
 }
@@ -479,7 +479,7 @@ int getWindowsUser(wstring& userName) {
 }
 
 /**
- * Gets the Windows current user (the one now active) in the 
+ * Gets the Windows current user (the one now active) in the
  * extended format "Machine\User".
  * @param   [OUT] the Windows current user
  * @return  0 if no errors
@@ -554,7 +554,7 @@ char* readSystemErrorMsg(DWORD errorCode) {
     if (!errorCode) {
         errorCode = GetLastError();
     }
-    
+
     char* errorMessage = new char[512];
     memset(errorMessage, 0, 512);
 
@@ -563,8 +563,8 @@ char* readSystemErrorMsg(DWORD errorCode) {
                 NULL,
                 errorCode,
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                errorMessage, 
-                512, 
+                errorMessage,
+                512,
                 NULL);
 
     if (!errorMessage || strlen(errorMessage) == 0) {
@@ -578,7 +578,7 @@ char* readSystemErrorMsg(DWORD errorCode) {
  * Function used to display a message-box with a message for the user.
  * The message-box is displayed only if this is NOT a scheduled sync
  * (otherwise the message will be redirected to LOG file)
- * 
+ *
  * @param message : the message to display
  * @param title   : [OPTIONAL] the title of the message box (default = MSGBOX_ERROR_TITLE)
  * @param flags   : [OPTIONAL] flags for the message-box    (default = MB_OK | MB_ICONEXCLAMATION)
@@ -628,7 +628,7 @@ int safeMessageBox(const char* message, const char* title, unsigned int flags) {
  * Function used to display a message-box with a message for the user. (WCHAR version)
  * The message-box is displayed only if this is NOT a scheduled sync
  * (otherwise the message will be redirected to LOG file)
- * 
+ *
  * @param message : the message to display
  * @param title   : [OPTIONAL] the title of the message box (default = MSGBOX_ERROR_TITLE)
  * @param flags   : [OPTIONAL] flags for the message-box    (default = MB_OK | MB_ICONEXCLAMATION)
@@ -742,7 +742,7 @@ wstring getSafeItemName(ClientItem* cItem) {
 
 
 
-int syncSourceNameToIndex(const StringBuffer& sourceName) 
+int syncSourceNameToIndex(const StringBuffer& sourceName)
 {
     int id = 0;
 
@@ -775,6 +775,20 @@ StringBuffer syncSourceIndexToName(const int sourceID)
         case (SYNCSOURCE_PICTURES): return PICTURE_;
         default:                    return "";
     }
+}
+
+
+StringBuffer getDefaultSyncMode(const char* sourceName) {
+
+    if (!sourceName) return "";
+
+    if (!strcmp(sourceName, CONTACT_))     return DEFAULT_CONTACTS_SYNC_MODE;
+    if (!strcmp(sourceName, APPOINTMENT_)) return DEFAULT_APPOINTMENTS_SYNC_MODE;
+    if (!strcmp(sourceName, TASK_))        return DEFAULT_TASKS_SYNC_MODE;
+    if (!strcmp(sourceName, NOTE_))        return DEFAULT_NOTES_SYNC_MODE;
+    if (!strcmp(sourceName, PICTURE_))     return DEFAULT_PICTURES_SYNC_MODE;
+
+    return SYNC_MODE_TWO_WAY;
 }
 
 
@@ -1012,7 +1026,7 @@ char* friendlyName(const char* sourceName) {
 
 /**
  * Returns an integer value rapresenting the build number read from
- * the string version passed (e.g. "6.1.12" -> 60112). 
+ * the string version passed (e.g. "6.1.12" -> 60112).
  */
 int getBuildNumberFromVersion(const char* swv) {
 
@@ -1021,7 +1035,7 @@ int getBuildNumberFromVersion(const char* swv) {
         return 0;
     }
     sscanf(swv, "%d.%d.%d", &major, &minor, &build);
-    
+
     if (build > 1000) {
         // Fix for build numbers like "20091022" = date of today :)
         build = 0;

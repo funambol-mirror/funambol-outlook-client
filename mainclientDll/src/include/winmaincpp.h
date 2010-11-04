@@ -108,17 +108,6 @@
 #define ERR_CODE_DROPPED_ITEMS_SERVER       2101
 #define ERR_CODE_NO_SOURCES                 2102
 
-// Sync modes values, as they're stored in the registry.
-#define SYNC_MODE_TWO_WAY_TEXT                      "two-way"
-#define SYNC_MODE_ONE_WAY_FROM_CLIENT_TEXT          "one-way-from-client"
-#define SYNC_MODE_ONE_WAY_FROM_SERVER_TEXT          "one-way-from-server"
-#define SYNC_MODE_REFRESH_FROM_CLIENT_TEXT          "refresh-from-client"
-#define SYNC_MODE_REFRESH_FROM_SERVER_TEXT          "refresh-from-server"
-#define SYNC_MODE_SLOW_TEXT                         "slow"
-#define SYNC_MODE_NONE_TEXT                         "none"                       // deprecated: use 'enabled = 0' instead
-#define SYNC_MODE_SMART_ONE_WAY_FROM_CLIENT_TEXT    "smart-one-way-from-client"  // not used (only mobile clients, for pictures)
-#define SYNC_MODE_SMART_ONE_WAY_FROM_SERVER_TEXT    "smart-one-way-from-server"  // not used (future, for pictures)
-
 /** @endcond */
 
 

@@ -115,6 +115,7 @@ long         variantTimeToTimeStamp   (const double vTime);
 int          syncSourceNameToIndex(const StringBuffer& sourceName);
 StringBuffer syncSourceIndexToName(const int sourceID);
 
+StringBuffer getDefaultSyncMode(const char* sourceName);
 
 /**
  * Used to quicky check if a specific source is visible or not.

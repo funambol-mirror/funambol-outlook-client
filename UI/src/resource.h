@@ -52,7 +52,9 @@
 #define IDD_FORMVIEW                    153
 #define IDS_ADVANCED_CONTACTS           154
 #define IDI_ARROWS32A                   155
+#define IDS_DOWNLOAD_ONLY               155
 #define IDI_ARROWS32B                   156
+#define IDS_UPLOAD_ONLY                 156
 #define IDS_FULLSYNC_PERFORM            158
 #define IDS_CONTACTS                    159
 #define IDS_CALENDAR                    160
@@ -560,6 +562,11 @@
 #define IDC_TASKS_DATA_FORMAT           1291
 #define IDC_POPUP_TEXT                  1301
 #define IDC_POWERED_BY                  1302
+#define IDC_CONTACTS_EDIT_SYNCTYPE      1303
+#define IDC_CALENDAR_EDIT_SYNCTYPE      1304
+#define IDC_TASKS_EDIT_SYNCTYPE         1305
+#define IDC_NOTES_EDIT_SYNCTYPE         1306
+#define IDC_PICTURES_COMBO_SYNCTYPE     1307
 #define ID_FILE_CONFIGURATION           32771
 #define ID_FILE_ZZZZ                    32772
 #define ID_FILE_SYNCHRONIZE             32773
@@ -575,13 +582,13 @@
 #define ID_HELP_UPDATES                 32791
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        423
 #define _APS_NEXT_COMMAND_VALUE         32793
-#define _APS_NEXT_CONTROL_VALUE         1303
+#define _APS_NEXT_CONTROL_VALUE         1308
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -291,12 +291,13 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     
     s1.LoadString(IDS_ITEMS);       SetDlgItemText(IDC_SYNC_GROUP_ITEMS,    s1);
     s1.LoadString(IDS_SCHEDULER);   SetDlgItemText(IDC_SCHEDULER_GROUP,     s1);
-    s1.LoadString(IDS_CONTACTS);    SetDlgItemText(IDC_SYNC_CHECK_CONTACTS, s1);
-    s1.LoadString(IDS_CALENDAR);    SetDlgItemText(IDC_SYNC_CHECK_CALENDAR, s1);
-    s1.LoadString(IDS_TASKS);       SetDlgItemText(IDC_SYNC_CHECK_TASKS,    s1);
-    s1.LoadString(IDS_NOTES);       SetDlgItemText(IDC_SYNC_CHECK_NOTES,    s1);
-    s1.LoadString(IDS_PICTURES);    SetDlgItemText(IDC_SYNC_CHECK_PICTURES, s1);
-    
+
+    s1 = composeCheckboxText(CONTACT_);      SetDlgItemText(IDC_SYNC_CHECK_CONTACTS, s1);
+    s1 = composeCheckboxText(APPOINTMENT_);  SetDlgItemText(IDC_SYNC_CHECK_CALENDAR, s1);
+    s1 = composeCheckboxText(TASK_);         SetDlgItemText(IDC_SYNC_CHECK_TASKS,    s1);
+    s1 = composeCheckboxText(NOTE_);         SetDlgItemText(IDC_SYNC_CHECK_NOTES,    s1);
+    s1 = composeCheckboxText(PICTURE_);      SetDlgItemText(IDC_SYNC_CHECK_PICTURES, s1);
+
     s1.LoadString(IDS_DETAILS);
     SetDlgItemText(IDC_SYNC_BUT_CONTACTS, s1);
     SetDlgItemText(IDC_SYNC_BUT_CALENDAR, s1);
@@ -625,6 +626,11 @@ void CSyncSettings::OnBnClickedSyncButContacts()
 {
     CContactSettings wndContacts;
     INT_PTR result = wndContacts.DoModal();
+
+    // Update the UI checkbox
+    CString s1 = composeCheckboxText(CONTACT_);
+    SetDlgItemText(IDC_SYNC_CHECK_CONTACTS, s1);
+
     saveSyncTypeContacts = true;
 }
 
@@ -632,6 +638,11 @@ void CSyncSettings::OnBnClickedSyncButCalendar()
 {
     CCalendarSettings wndCalendar;
     INT_PTR result = wndCalendar.DoModal();
+
+    // Update the UI checkbox
+    CString s1 = composeCheckboxText(APPOINTMENT_);
+    SetDlgItemText(IDC_SYNC_CHECK_CALENDAR, s1);
+
     saveSyncTypeCalendar = true;
 }
 
@@ -639,6 +650,11 @@ void CSyncSettings::OnBnClickedSyncButTasks()
 {
     CTaskSettings wndTasks;
     INT_PTR result = wndTasks.DoModal();
+
+    // Update the UI checkbox
+    CString s1 = composeCheckboxText(TASK_);
+    SetDlgItemText(IDC_SYNC_CHECK_TASKS, s1);
+
     saveSyncTypeTasks = true;
 }
 
@@ -646,6 +662,11 @@ void CSyncSettings::OnBnClickedSyncButNotes()
 {
     CNotesSettings wndNotes;
     INT_PTR result = wndNotes.DoModal();
+
+    // Update the UI checkbox
+    CString s1 = composeCheckboxText(NOTE_);
+    SetDlgItemText(IDC_SYNC_CHECK_NOTES, s1);
+
     saveSyncTypeNotes = true;
 }
 
@@ -653,6 +674,11 @@ void CSyncSettings::OnBnClickedSyncButPictures()
 {
     CPicturesSettings wndPictures;
     INT_PTR result = wndPictures.DoModal();
+
+    // Update the UI checkbox
+    CString s1 = composeCheckboxText(PICTURE_);
+    SetDlgItemText(IDC_SYNC_CHECK_PICTURES, s1);
+
     saveSyncTypePictures = true;
 }
 
@@ -795,4 +821,49 @@ void CSyncSettings::OnCbnSelchangeSchedulerComboValue()
 void CSyncSettings::OnBnClickedSyncCheckOutlookOpen()
 {
     saveAttach = true;
+}
+
+
+CString CSyncSettings::composeCheckboxText(const char* sourceName)
+{
+    CString ret;
+
+    //
+    // Add the name of the source
+    //
+    if      (!strcmp(sourceName, CONTACT_))      { ret.LoadString(IDS_CONTACTS); }
+    else if (!strcmp(sourceName, APPOINTMENT_))  { ret.LoadString(IDS_CALENDAR); }
+    else if (!strcmp(sourceName, TASK_))         { ret.LoadString(IDS_TASKS); }
+    else if (!strcmp(sourceName, NOTE_))         { ret.LoadString(IDS_NOTES); }
+    else if (!strcmp(sourceName, PICTURE_))      { ret.LoadString(IDS_PICTURES); }
+
+    //
+    // Append the "(Download/Upload Only)" if a one-way is currently set
+    //
+    OutlookConfig* config = getConfig();
+    WindowsSyncSourceConfig* wssc = config->getSyncSourceConfig(sourceName);
+    if (!wssc) {
+        return ret;
+    }
+
+    const char* syncMode = wssc->getSync();
+
+    if (!strcmp(syncMode, SYNC_MODE_ONE_WAY_FROM_CLIENT) ||
+        !strcmp(syncMode, SYNC_MODE_SMART_ONE_WAY_FROM_CLIENT)) {
+        CString s1;
+        s1.LoadString(IDS_UPLOAD_ONLY);
+        ret += " (";
+        ret += s1;
+        ret += ")";
+    }
+    else if (!strcmp(syncMode, SYNC_MODE_ONE_WAY_FROM_SERVER) ||
+             !strcmp(syncMode, SYNC_MODE_SMART_ONE_WAY_FROM_SERVER)) {
+        CString s1;
+        s1.LoadString(IDS_DOWNLOAD_ONLY);
+        ret += " (";
+        ret += s1;
+        ret += ")";
+    }
+
+    return ret;
 }
