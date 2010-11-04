@@ -104,6 +104,22 @@
 #define NOTE_SOURCE_ENABLED                 true
 #define PICTURE_SOURCE_ENABLED              true
 
+// List of available sync modes for each source (comma separated values).
+// These are the values available from the client's settings for each source.
+#define CONTACTS_SYNC_MODES                 SYNC_MODE_TWO_WAY
+#define APPOINTMENTS_SYNC_MODES             SYNC_MODE_TWO_WAY
+#define TASKS_SYNC_MODES                    SYNC_MODE_TWO_WAY
+#define NOTES_SYNC_MODES                    SYNC_MODE_TWO_WAY
+#define PICTURES_SYNC_MODES                 SYNC_MODE_ONE_WAY_FROM_SERVER
+
+// Default sync mode for each source.
+// It MUST be one of the values specified in the list of available sync modes above.
+#define DEFAULT_CONTACTS_SYNC_MODE          SYNC_MODE_TWO_WAY
+#define DEFAULT_APPOINTMENTS_SYNC_MODE      SYNC_MODE_TWO_WAY
+#define DEFAULT_TASKS_SYNC_MODE             SYNC_MODE_TWO_WAY
+#define DEFAULT_NOTES_SYNC_MODE             SYNC_MODE_TWO_WAY
+#define DEFAULT_PICTURES_SYNC_MODE          SYNC_MODE_ONE_WAY_FROM_SERVER
+
 #define SCHEDULED_MINUTES_VALUES            "5,10,15(default),30,45"
 #define SCHEDULED_HOURS_VALUES              "1,2,4,6,8,12,24"
 
@@ -139,7 +155,7 @@ public:
     /// to validate custom X-foo properties
     static bool validateExtraProperty(const std::wstring & name) {
         const wchar_t * n = name.c_str();
-        return 
+        return
             (!wcsncmp(n,X_PREFIX,wcslen(X_PREFIX)) && // any X- Properties
             wcsncmp(n,X_FUNAMBOL_PREFIX,wcslen(X_FUNAMBOL_PREFIX)) && // any non-funambol X- Properties
             wcsncmp(n,X_MICROSOFT_PREFIX,wcslen(X_MICROSOFT_PREFIX)) && // any non-microsoft properties

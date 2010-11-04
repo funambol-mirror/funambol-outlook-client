@@ -1245,6 +1245,40 @@ void OutlookConfig::upgradeConfig() {
 		getAccessConfig().setCompression(ENABLE_COMPRESSION);
     }
 
+	// Old version < 9.0.0
+    if (oldFunambolSwv < 90000) {
+
+        // Changed the syncModes param for all sources
+        WindowsSyncSourceConfig* ssc = getSyncSourceConfig(CONTACT_);
+        if (ssc) ssc->setSyncModes(CONTACTS_DEVINFO_SYNC_MODES); 
+
+        ssc = getSyncSourceConfig(APPOINTMENT_);
+        if (ssc) ssc->setSyncModes(APPOINTMENTS_DEVINFO_SYNC_MODES); 
+
+        ssc = getSyncSourceConfig(TASK_);
+        if (ssc) ssc->setSyncModes(TASKS_DEVINFO_SYNC_MODES); 
+
+        ssc = getSyncSourceConfig(NOTE_);
+        if (ssc) ssc->setSyncModes(NOTES_DEVINFO_SYNC_MODES); 
+
+        ssc = getSyncSourceConfig(PICTURE_);
+        if (ssc) ssc->setSyncModes(PICTURES_DEVINFO_SYNC_MODES); 
+    }
+
+    // ALWAYS - if a syncmode currently unavailable was in use, 
+    // the source will be disabled and the default is set.
+    for (unsigned int i=0; i<sourceConfigsCount; i++) {
+        WindowsSyncSourceConfig* sc = getSyncSourceConfig(i);
+        if (sc) {
+            const char* modeInUse = sc->getSync();
+            StringBuffer modes = sc->getSyncModes();
+            if (modes.find(modeInUse) == StringBuffer::npos) {
+                sc->setSync(getDefaultSyncMode(sc->getName()));
+                sc->setIsEnabled(false);
+            }
+        }
+    }
+
     // ALWAYS force the GET of Server capabilities at next sync.
     // (to make sure all server caps are parsed, even the new ones) 
     setServerLastSyncURL("");

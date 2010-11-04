@@ -1,3 +1,14 @@
+2010-11-04
+  - toccy: reintegrated branch US6604: "1-way sync removal"
+           - removed the 1-way syncmode from PIM sources. In case of upgrade and the 
+             syncmode used was 1-way, the source is disabled.
+           - Added customization params for every source for:
+             * the default sync mode
+             * the list of available sync modes (comma separated values)
+           - SyncSettings UI changed: display the syncmode if it's a one-way
+           - Source settings UI changed: dynamically use the editbox instead of the
+             dropdown list if the available syncmode is only 1
+
 2010-10-26
   - toccy: fixed bug 10260 - Yearly recurring events not added in Outlook 2003 and 2007 (Error inserting recurrence property 'Interval')
            On Outlook 2003 and 2007 the "interval" property is not set in yearly events,

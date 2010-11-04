@@ -122,13 +122,13 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
     char* name = toMultibyte(wname.c_str());
 
     sc->setName                 (name);
-    sc->setSyncModes            ("slow,two-way,one-way-server,one-way-client,refresh-server,refresh-client");
     sc->setEncoding             (DLLCustomization::sourceDefaultEncoding);
     sc->setLast                 (0);
-    sc->setSync                 ("two-way");
     sc->setEncryption           ("");
 
-    if (wname == CONTACT){
+    if (wname == CONTACT) {
+        sc->setSync             (DEFAULT_CONTACTS_SYNC_MODE);
+        sc->setSyncModes        (CONTACTS_DEVINFO_SYNC_MODES);
         // since 7.1.2: default is vCard. Both still supported (for backw compaibility).
         sc->setURI              (DLLCustomization::sourceContactsVcardUri);
         sc->setType             ("text/x-vcard");
@@ -136,21 +136,27 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setSupportedTypes   ("text/x-vcard:2.1,text/x-s4j-sifc:1.0");
         sc->setIsEnabled        (CONTACT_SOURCE_ENABLED);
     }
-    else if (wname == APPOINTMENT){
+    else if (wname == APPOINTMENT) {
+        sc->setSync             (DEFAULT_APPOINTMENTS_SYNC_MODE);
+        sc->setSyncModes        (APPOINTMENTS_DEVINFO_SYNC_MODES);
         sc->setURI              (DLLCustomization::sourceCalendarVcalUri);
         sc->setType             ("text/x-vcalendar");
         sc->setVersion          ("1.0");
         sc->setSupportedTypes   ("text/x-vcalendar:1.0,text/x-s4j-sife:1.0");
         sc->setIsEnabled        (APPOINTMENT_SOURCE_ENABLED);
     }
-    else if (wname == TASK){
+    else if (wname == TASK) {
+        sc->setSync             (DEFAULT_TASKS_SYNC_MODE);
+        sc->setSyncModes        (TASKS_DEVINFO_SYNC_MODES);
         sc->setURI              (DLLCustomization::sourceTasksVcalUri);
         sc->setType             ("text/x-vcalendar");
         sc->setVersion          ("1.0");
         sc->setSupportedTypes   ("text/x-vcalendar:1.0,text/x-s4j-sift:1.0");
         sc->setIsEnabled        (TASK_SOURCE_ENABLED);
     }
-    else if (wname == NOTE){
+    else if (wname == NOTE) {
+        sc->setSync             (DEFAULT_NOTES_SYNC_MODE);
+        sc->setSyncModes        (NOTES_DEVINFO_SYNC_MODES);
         if (DLLCustomization::sourceNotesDefaultSif) {
             sc->setURI              (DLLCustomization::sourceNotesSifUri);
             sc->setType             ("text/x-s4j-sifn");
@@ -165,13 +171,14 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         }
         sc->setIsEnabled        (NOTE_SOURCE_ENABLED);
     }
-    else if (wname == PICTURE){
+    else if (wname == PICTURE) {
+        sc->setSync             (DEFAULT_PICTURES_SYNC_MODE);
+        sc->setSyncModes        (PICTURES_DEVINFO_SYNC_MODES);
         sc->setURI              (DLLCustomization::sourcePicturesUri);
         sc->setType             ("application/vnd.omads-file+xml");      // not really used, as it's detected from each item received
         sc->setVersion          ("");
         sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
         sc->setSupportedTypes   ("application/vnd.omads-file+xml:,application/*:");
-        sc->setSync             ("one-way-from-server");                 // FIXED for pictures
         sc->setIsEnabled        (PICTURE_SOURCE_ENABLED);
     }
 
