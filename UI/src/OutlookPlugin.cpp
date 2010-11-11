@@ -431,9 +431,18 @@ BOOL COutlookPluginApp::InitInstance()
                     MessageBox(NULL, L"Upgrade aborted", WPROGRAM_NAME, failFlags);
                     exit(0);
                 }
-
                 if (showWait) {
                     upgrade.CloseWindow();
+                }
+
+                // Popup a warning in case a source's syncmode was one-way and
+                // now the one-way is no more supported, upon upgrade.
+                if (getConfig()->getOneWayRemoval()) {
+                    CString msg;
+                    msg.LoadString(IDS_WARNING_ONEWAY_REMOVAL);
+                    int flags = flags = MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_APPLMODAL;
+                    MessageBox(NULL, msg, WPROGRAM_NAME, flags);
+                    getConfig()->setOneWayRemoval(false);
                 }
             }
             else{
