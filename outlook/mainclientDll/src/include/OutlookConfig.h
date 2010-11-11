@@ -119,6 +119,11 @@ private:
 
     bool  attach;                               // Flag to require outlook be open to sync
 
+    /// If true, the one-way syncmode was removed upon upgrade 
+    /// and there was at least one source with a one-way syncmode set.
+    /// It will cause a warning popup + the source is disabled + next sync is slow.
+    bool oneWayRemoval;
+
     /// The structure with current timezone informations.
     TimeZoneInformation currentTimezone;
 
@@ -331,6 +336,12 @@ public:
 
     void saveDeviceConfig(ManagementNode& n, bool server = false);
     bool readDeviceConfig(ManagementNode& n, bool server = false);
+
+    /// Sets the flag "oneWayRemoval"
+    void setOneWayRemoval(const bool val) { oneWayRemoval = val; }
+    
+    /// Gets the "oneWayRemoval" flag
+    bool getOneWayRemoval() { return oneWayRemoval; }
 
 };
 

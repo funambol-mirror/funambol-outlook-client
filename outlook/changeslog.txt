@@ -1,3 +1,8 @@
+2010-11-11
+  - toccy: reintegrated branch US6508: "1-way sync removal upgrade"
+           - fixed upgrade (reset anchors for sources involved, so a slow sync will be done)
+           - added a warning popup in case of upgrade
+
 2010-11-04
   - toccy: reintegrated branch US6604: "1-way sync removal"
            - removed the 1-way syncmode from PIM sources. In case of upgrade and the 
