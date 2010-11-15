@@ -1,3 +1,6 @@
+2010-11-15
+  - toccy: updated icons: main icon, sync all button, about logo, addin icon
+
 2010-11-11
   - toccy: reintegrated branch US6508: "1-way sync removal upgrade"
            - fixed upgrade (reset anchors for sources involved, so a slow sync will be done)
