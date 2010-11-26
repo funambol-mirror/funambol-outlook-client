@@ -18,8 +18,10 @@ How to build the Funambol Outlook Sync Client
    To build Outlook Sync Client, make sure you have installed all the following into your Windows machine.
    Note: only Windows XP or later can be used.
 
-    - Microsoft Visual Studio 2005. 
-      The build process has been automated using Microsoft Visual Studio 2005 C++ compiler. 
+    - Microsoft Visual Studio 2008. 
+      The build process is automated using Microsoft Visual Studio 2008 C++ compiler.
+      Note: a different version of Visual Studio can be used as well, changing accordingly the build
+            properties inside the install/build/funambol-outlook-client-forge.properties file.
 
     - Microsoft Outlook 2003 or later. 
       Outlook Sync Client uses some Microsoft Outlook libraries, so you need to install 
@@ -28,7 +30,7 @@ How to build the Funambol Outlook Sync Client
     - "Apache Ant" version 1.6.3 or higher (recommended v.1.7.1) 
       Downloadable from: http://ant.apache.org/
       Note: Apache Ant needs the Java Development Kit (JDK) installed in order to work 
-      (see http://ant.apache.org/manual/install.html#sysrequirements Note #2).
+            (see http://ant.apache.org/manual/install.html#sysrequirements Note #2).
 
     - Ant contrib 0.6, required to run some ant tasks
       * Download "ant-contrib-0.6.jar" from 
@@ -69,4 +71,5 @@ How to build the Funambol Outlook Sync Client
     Output files will be placed in 'install\output'.
     Doxygen documentation is generated in 'docs\html'; the start page is 'index.html'.
     
-    Note: with "ant release" you can build the Outlook Sync Client installer as well, but all source files will be downloaded from SVN by the script.
+    Note: with "ant release" you can build the Outlook Sync Client installer as well, 
+          but all source files will be downloaded from SVN by the script.

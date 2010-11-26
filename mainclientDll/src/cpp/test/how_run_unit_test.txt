@@ -1,0 +1,29 @@
+How to enable the tests. The project configuration must be in Debug
+
+1) Download the WinUnit tool from http://msdn.microsoft.com/en-us/magazine/cc136757.aspx
+2) Unzip the .exe pakckage (i.e. in WinUnit folder) 
+3) Open the WinUnitComplete.sln and build the project
+3) Copy the WinUnit\Debug\WinUnit.exe file into the "testRunner" directory of the Outlook client
+4) Copy the WinUnit\Include folder into the "testRunner" directory of the Outlook client
+
+you should have something like
+   outlook
+      |_ addin
+      |_ cpp-sdk
+      |_ install
+      |_ mainclientDll
+      |_ testRunner
+             |_ WinUnit.exe
+             |_ Include\WinUnit.h
+             |_ Include\WinUnitLogger.h
+      |_UI
+      changeslog.txt
+
+5) Enable the build of the test of the files under "test" folder
+   * open the folder
+   * select all the files (ctrl + click on everyone)
+   * right click of mouse -> Properties and change "Exclude from build" to No
+6) Read the article at http://msdn.microsoft.com/en-us/magazine/cc136757.aspx#S2 
+   (Figure 3 Adding WinUnit to External Tools)
+7) Configure the OutlookDLL as "set as startup project"
+8) Run the WinUnit from External Tool

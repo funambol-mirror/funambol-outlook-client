@@ -68,6 +68,12 @@ private:
                       const WCHAR* szCaption = NULL, 
                       const HWND hOwner = NULL);
 
+    /**
+     * Loads the string data into the syncmode editbox/dropdown box.
+     * If only 1 syncmode is available, the editbox is used.
+     * Otherwise the dropdown box is used.
+     */
+    void loadSyncModesBox(const char* sourceName);
 
 protected:
 

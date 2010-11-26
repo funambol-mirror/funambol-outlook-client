@@ -83,7 +83,7 @@ bool OutlookConfig::isInstantiated() {
 
 /// Constructor
 //OutlookConfig::OutlookConfig() : DMTClientConfig(PLUGIN_ROOT_CONTEXT) {
-OutlookConfig::OutlookConfig() : updaterConfig(PLUGIN_ROOT_CONTEXT) {
+OutlookConfig::OutlookConfig() : updaterConfig(PLUGIN_ROOT_CONTEXT), oneWayRemoval(false) {
     
     DMTClientConfig::initialize();
     winSourceConfigs      = NULL;
@@ -1245,9 +1245,44 @@ void OutlookConfig::upgradeConfig() {
 		getAccessConfig().setCompression(ENABLE_COMPRESSION);
     }
 
-
 	// Old version < 9.0.0
     if (oldFunambolSwv < 90000) {
+
+        // Changed the syncModes param for all sources
+        WindowsSyncSourceConfig* ssc = getSyncSourceConfig(CONTACT_);
+        if (ssc) ssc->setSyncModes(CONTACTS_DEVINFO_SYNC_MODES); 
+
+        ssc = getSyncSourceConfig(APPOINTMENT_);
+        if (ssc) ssc->setSyncModes(APPOINTMENTS_DEVINFO_SYNC_MODES); 
+
+        ssc = getSyncSourceConfig(TASK_);
+        if (ssc) ssc->setSyncModes(TASKS_DEVINFO_SYNC_MODES); 
+
+        ssc = getSyncSourceConfig(NOTE_);
+        if (ssc) ssc->setSyncModes(NOTES_DEVINFO_SYNC_MODES); 
+
+        ssc = getSyncSourceConfig(PICTURE_);
+        if (ssc) ssc->setSyncModes(PICTURES_DEVINFO_SYNC_MODES); 
+
+        // One-way syncmodes have been removed for PIM sources.
+        // (the action of setting the default syncmode and force a slow is done below)
+        for (unsigned int i=0; i<sourceConfigsCount; i++) {
+            ssc = getSyncSourceConfig(i);
+            if (ssc) {
+                const char* name = ssc->getName();
+                if (!strcmp(name, CONTACT_) || !strcmp(name, APPOINTMENT_) ||
+                    !strcmp(name, TASK_)    || !strcmp(name, NOTE_)) {
+                    const char* modeInUse = ssc->getSync();
+                    if (!strcmp(modeInUse, "one-way-client") ||                 // that's the old style syncmode
+                        !strcmp(modeInUse, "one-way-server") ||                 // that's the old style syncmode
+                        !strcmp(modeInUse, SYNC_MODE_ONE_WAY_FROM_CLIENT) ||
+                        !strcmp(modeInUse, SYNC_MODE_ONE_WAY_FROM_SERVER)) {
+                        oneWayRemoval = true;
+                        break;
+                    }
+                }
+            }
+        }
 
         // Files source added.
         if (!addWindowsSyncSourceConfig(FILES)) {
@@ -1258,6 +1293,20 @@ void OutlookConfig::upgradeConfig() {
     }
 
 
+    // ALWAYS - if a syncmode currently unavailable was in use, 
+    // the source is disabled and the default is set + last anchor reset (SLOW).
+    for (unsigned int i=0; i<sourceConfigsCount; i++) {
+        WindowsSyncSourceConfig* sc = getSyncSourceConfig(i);
+        if (sc) {
+            const char* modeInUse = sc->getSync();
+            StringBuffer modes = sc->getSyncModes();
+            if (modes.find(modeInUse) == StringBuffer::npos) {
+                sc->setSync(getDefaultSyncMode(sc->getName()));
+                sc->setIsEnabled(false);
+                sc->setLast(0);
+            }
+        }
+    }
 
     // ALWAYS force the GET of Server capabilities at next sync.
     // (to make sure all server caps are parsed, even the new ones) 

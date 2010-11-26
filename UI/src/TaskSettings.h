@@ -61,6 +61,13 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
+    /**
+     * Loads the string data into the syncmode editbox/dropdown box.
+     * If only 1 syncmode is available, the editbox is used.
+     * Otherwise the dropdown box is used.
+     */
+    void loadSyncModesBox(const char* sourceName);
+
 
 public:
 

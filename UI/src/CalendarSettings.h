@@ -73,6 +73,13 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
     virtual BOOL OnInitDialog();
 
+    /**
+     * Loads the string data into the syncmode editbox/dropdown box.
+     * If only 1 syncmode is available, the editbox is used.
+     * Otherwise the dropdown box is used.
+     */
+    void loadSyncModesBox(const char* sourceName);
+
 	DECLARE_MESSAGE_MAP()
 public:
     CComboBox lstSyncType;              // sync types

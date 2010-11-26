@@ -246,6 +246,13 @@ protected:
      */
     void updateFilters();
 
+    /**
+     * Read the X-FUNAMBOL-FOLDER property value.
+     * Some optimization to avoid parsing the whole data!
+     * 
+     */
+    bool smartGetFolderTag(const std::wstring& dataString, bool isSifFormat, std::wstring& propertyValue);
+
 public:
 
     /**
@@ -302,6 +309,14 @@ public:
     DateFilter& getDateFilter() { return getConfig().getDateFilter(); }
 
     int upgradeCalendarFolders(bool fixMyCalendar = false);
+
+    /**
+    * Just for testing pourpose. It is not used by the sync client. 
+    * It is used only during the test of inserting item.
+    * @param - the key of the item to be retrieved.
+    * @return - a SyncItem given the right key. NULL if it fails 
+    */
+    SyncItem* getItemFromId(const std::wstring& id);
 };
 
 /** @} */

@@ -58,15 +58,15 @@ static int getFilesSyncTypeID(const char* syncType) {
 
     int ret = IDS_SYNCTYPE2;    // default
 
-    if (!strcmp(syncType, SYNC_MODE_TWO_WAY_TEXT)) {
+    if (!strcmp(syncType, SYNC_MODE_TWO_WAY)) {
         ret = IDS_SYNCTYPE1;
     }
-    else if (!strcmp(syncType, SYNC_MODE_ONE_WAY_FROM_SERVER_TEXT) ||
-        !strcmp(syncType, SYNC_MODE_SMART_ONE_WAY_FROM_SERVER_TEXT)) {
+    else if (!strcmp(syncType, SYNC_MODE_ONE_WAY_FROM_SERVER) ||
+        !strcmp(syncType, SYNC_MODE_SMART_ONE_WAY_FROM_SERVER)) {
         ret = IDS_SYNCTYPE2;
     }
-    else if (!strcmp(syncType, SYNC_MODE_ONE_WAY_FROM_CLIENT_TEXT)) {
-        // this is actually not used, for files
+    else if (!strcmp(syncType, SYNC_MODE_ONE_WAY_FROM_CLIENT)) {
+        // this is actually not used, for pictures
         ret = IDS_SYNCTYPE3;
     }
     return ret;
@@ -133,8 +133,10 @@ BOOL CFilesSettings::OnInitDialog() {
     editFolder.SetLimitText  (EDIT_TEXT_MAXLENGTH);
     editRemote.SetLimitText  (EDIT_TEXT_MAXLENGTH);
     
+    // Load the syncmodes in the editbox/dropdown
+    loadSyncModesBox(FILES_);
+
     // load string resources
-    s1.LoadString(IDS_SYNCTYPE2);           SetDlgItemText(IDC_FILES_EDIT_SYNCTYPE,      s1);    // "One-way: Server -> Outlook"
     s1.LoadString(IDS_SYNC_DIRECTION);      SetDlgItemText(IDC_FILES_GROUP_DIRECTION,    s1);
     s1.LoadString(IDS_FILES_FOLDER);     SetDlgItemText(IDC_FILES_GROUP_FOLDER,       s1);
     s1.LoadString(IDS_CURRENT);             SetDlgItemText(IDC_FILES_STATIC_FOLDER,      s1);
@@ -352,4 +354,49 @@ bool CFilesSettings::browseFolder(wstring& folderpath, const WCHAR* defaultFolde
     return retVal;
 }
 
+void CFilesSettings::loadSyncModesBox(const char* sourceName)
+{
+    OutlookConfig* config = getConfig();
+    WindowsSyncSourceConfig* ssconf = config->getSyncSourceConfig(sourceName);
+    if (!ssconf) return;
 
+    // TODO: use a switch on sourceName when refactoring
+    int editBoxResourceID = IDC_FILES_EDIT_SYNCTYPE;
+    int comboBoxResourceID = IDC_FILES_COMBO_SYNCTYPE;
+
+    CEdit* editbox = (CEdit*)GetDlgItem(editBoxResourceID);
+    CComboBox* combobox = (CComboBox*)GetDlgItem(comboBoxResourceID);
+    if (!combobox || !editbox) return;
+
+    //
+    // Load the syncmodes in the editbox/dropdown
+    //
+    CString s1 = "";
+    StringBuffer syncModes(ssconf->getSyncModes());
+    if (syncModes.find(SYNC_MODE_TWO_WAY) != StringBuffer::npos) {
+        s1.LoadString(IDS_SYNCTYPE1);
+        combobox->AddString(s1);
+    }
+    if (syncModes.find(SYNC_MODE_ONE_WAY_FROM_SERVER) != StringBuffer::npos ||
+        syncModes.find(SYNC_MODE_SMART_ONE_WAY_FROM_SERVER) != StringBuffer::npos) {
+        s1.LoadString(IDS_SYNCTYPE2);
+        combobox->AddString(s1);
+    }
+    if (syncModes.find(SYNC_MODE_ONE_WAY_FROM_CLIENT) != StringBuffer::npos ||
+        syncModes.find(SYNC_MODE_SMART_ONE_WAY_FROM_CLIENT) != StringBuffer::npos) {
+        s1.LoadString(IDS_SYNCTYPE3);
+        combobox->AddString(s1);
+    }
+
+    if (combobox->GetCount() > 1) {
+        // More than 1 syncmode available: use the dropdown box
+        editbox->ShowWindow(SW_HIDE);
+        combobox->ShowWindow(SW_SHOW);
+    }
+    else {
+        // Only 1 syncmode available: use the editbox
+        editbox->ShowWindow(SW_SHOW);
+        combobox->ShowWindow(SW_HIDE);
+        SetDlgItemText(editBoxResourceID, s1);
+    }
+}

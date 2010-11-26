@@ -50,7 +50,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src/include;&quot;../../cpp-sdk/src/include/windows&quot;;&quot;../../cpp-sdk/src/include/common&quot;"
+				AdditionalIncludeDirectories="../src/include;&quot;../../cpp-sdk/src/include/windows&quot;;&quot;../../cpp-sdk/src/include/common&quot;;..\..\testRunner\Include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;WINMAINCLIENTDLL_EXPORTS;UNICODE;DEBUG;_CRT_SECURE_NO_DEPRECATE;_WIN32_DCOM;ENABLE_FUNAMBOL_NAMESPACE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -564,6 +564,74 @@
 				Name="Resource Files"
 				Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 				>
+			</Filter>
+			<Filter
+				Name="test"
+				>
+				<File
+					RelativePath="..\src\cpp\test\dataTransformerTest.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\src\cpp\test\helper.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\src\include\test\helper.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\src\cpp\test\how_run_unit_test.txt"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>
