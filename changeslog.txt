@@ -1,3 +1,6 @@
+2010-11-29
+  - magi: updated copyright info from 2010 to 2011
+
 2010-11-15
   - toccy: updated icons: main icon, sync all button, about logo, addin icon
 

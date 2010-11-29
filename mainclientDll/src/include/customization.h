@@ -68,7 +68,7 @@
 
 // About screen customization
 #define ABOUT_SCREEN_SHOW_COPYRIGHT         1                       /**< if 1, will show the copyright text below */
-#define ABOUT_SCREEN_TEXT_COPYRIGHT         "Copyright © 2003 - 2010 Funambol, Inc.\nAll rights reserved."
+#define ABOUT_SCREEN_TEXT_COPYRIGHT         "Copyright © 2003 - 2011 Funambol, Inc.\nAll rights reserved."
 
 #define ABOUT_SCREEN_SHOW_MAIN_WEB_SITE     1                       /**< if 1, will show the main web address below */
 #define ABOUT_SCREEN_TEXT_MAIN_WEB_SITE     "www.funambol.com"
