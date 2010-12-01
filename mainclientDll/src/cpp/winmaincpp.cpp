@@ -235,6 +235,7 @@ int startSync() {
     WCHAR* wname      = NULL;
     SyncReport* report= NULL;
     string mutexName  = "";
+    StringBuffer reportMsg;
 
     // Open current configuration: call initialize(0) if not called yet!
     // (reset abortSync flag)
@@ -271,27 +272,6 @@ int startSync() {
         */
     }
 
-    try {
-        ClientApplication * outlook = ClientApplication::getInstance(isScheduledSync);
-    }
-    catch (ClientException* e) {
-        // Must set the errors, here could be a fatal exception
-        setErrorF(0, e->getErrorMsg());
-        bool display = 
-            !isScheduledSync && getConfig()->getWindowsDeviceConfig().getAttach()
-            ||
-            !getConfig()->getWindowsDeviceConfig().getAttach();
-        if (display)
-        {
-            e->setExceptionData(e->getErrorMsg(), e->getErrorCode(), false, true);
-            manageClientException(e);
-            return 1;
-        }
-        else
-        {
-            return 2;
-        }
-    }
 
     // Update log level: could be changed from initialize().
     LOG.setLevel(config->getClientConfig().getLogLevel());
@@ -359,6 +339,7 @@ int startSync() {
     // 5. "Pictures"
     // 6. "Files"
     int j=0;
+    bool syncingPIM = false;
     const ArrayList& sourcesOrder = config->getSourcesVisible();
     for (int j=0; j<sourcesOrder.size(); j++) {
         for (int i=0; i<sourcesCount; i++) {
@@ -379,11 +360,43 @@ int startSync() {
                         sources[sourcesActive] = new WindowsSyncSource(wname.c_str(), config->getSyncSourceConfig(i));
                     }
                     sourcesActive++;
+
+                    if (isPIMSource(name->c_str())) {
+                        syncingPIM = true;
+                    }
                 }
             }
         }
     }
     sources[sourcesActive] = NULL;
+
+
+    if (syncingPIM) {
+        //
+        // If not syncing PIM sources, Outlook is not even accessed.
+        //
+        try {
+            ClientApplication * outlook = ClientApplication::getInstance(isScheduledSync);
+        }
+        catch (ClientException* e) {
+            // Must set the errors, here could be a fatal exception
+            setErrorF(0, e->getErrorMsg());
+            bool display = 
+                !isScheduledSync && getConfig()->getWindowsDeviceConfig().getAttach()
+                ||
+                !getConfig()->getWindowsDeviceConfig().getAttach();
+            if (display)
+            {
+                e->setExceptionData(e->getErrorMsg(), e->getErrorCode(), false, true);
+                manageClientException(e);
+                return 1;
+            }
+            else
+            {
+                return 2;
+            }
+        }
+    }
 
 
     // Create the SyncClient passing pointer of SyncSources vector,  
@@ -445,7 +458,8 @@ int startSync() {
 
     // Print sync results.
     report = winClient.getSyncReport();
-    printReport(report, sources);
+    report->toString(reportMsg);
+    LOG.info("\n%s", reportMsg.c_str());
 
 
     //

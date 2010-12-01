@@ -1,34 +1,34 @@
 /*
- * Funambol is a mobile platform developed by Funambol, Inc. 
- * Copyright (C) 2009 Funambol, Inc.
- * 
+ * Funambol is a mobile platform developed by Funambol, Inc.
+ * Copyright (C) 2003 - 2009 Funambol, Inc.
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
- * the Free Software Foundation with the addition of the following permission 
+ * the Free Software Foundation with the addition of the following permission
  * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
- * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE 
+ * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT  OF THIRD PARTY RIGHTS.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  * details.
- * 
- * You should have received a copy of the GNU Affero General Public License 
+ *
+ * You should have received a copy of the GNU Affero General Public License
  * along with this program; if not, see http://www.gnu.org/licenses or write to
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301 USA.
- * 
- * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite 
+ *
+ * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite
  * 305, Redwood City, CA 94063, USA, or at email address info@funambol.com.
- * 
+ *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
  * Section 5 of the GNU Affero General Public License version 3.
- * 
+ *
  * In accordance with Section 7(b) of the GNU Affero General Public License
  * version 3, these Appropriate Legal Notices must retain the display of the
- * "Powered by Funambol" logo. If the display of the logo is not reasonably 
+ * "Powered by Funambol" logo. If the display of the logo is not reasonably
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by Funambol".
  */
@@ -41,33 +41,27 @@
 /** @{ */
 
 #include "base/fscapi.h"
-#include "WindowsSyncSource.h"
+#include "spds/constants.h"
+#include "spds/SyncItem.h"
+#include "spds/SyncMap.h"
+#include "spds/SyncStatus.h"
+#include "base/util/ItemContainer.h"
 #include "spds/FileData.h"
 #include "client/CacheSyncSource.h"
-#include "client/FileSyncSource.h"
+#include "client/MediaSyncSource.h"
+#include "WindowsSyncSource.h"
 
 BEGIN_NAMESPACE
 
 /**
- * This class extends the FileSyncSource class, it's specialized for pictures items. 
- * The sync direction is fixed on "one-way-from-server", so the method getAllItemList()
- * symply does nothing. 
- * Deletes coming from Server are not expected, so th method
- * removeItem() is not implemented (we don't want to delete pictures on Client).
- * "picturesConfig::folderPath" and "dir" have the same meaning, so they are set at
- * the same value in the constructor.
- * Configuration paramenters that need to be saved inside the registry are stored in the
- * WindowsSyncSourceConfig& picturesConfig object, owned by OutlookConfig.
+ * This class extends the MediaSyncSource class, to sync for pictures.
+ * It just defines specific filterings for pictures:
+ * - by size (< 50MB)
+ * - by date (last modif date)
+ * - by type (jpg jpeg gif png)
  */
-class PicturesSyncSource : public FileSyncSource
+class PicturesSyncSource : public MediaSyncSource
 {
-
-protected:
-
-    /// Configuration object for the source. It's a reference to WindowsSyncSourceConfig
-    /// object owned by OutlookConfig. It's automatically initialized in the constructor.
-    WindowsSyncSourceConfig& picturesConfig;
-
 
 public:
 
@@ -79,7 +73,6 @@ public:
      */
     PicturesSyncSource(const WCHAR* name, WindowsSyncSourceConfig* sc);
     ~PicturesSyncSource() {};
-
 
     const WindowsSyncSourceConfig& getConfig() const;
     WindowsSyncSourceConfig& getConfig();
@@ -104,11 +97,34 @@ public:
     int removeItem(SyncItem& item);
     int removeAllItems();
 
-
-
     // Proxy to the picturesConfig methods.
     bool getIsSynced() const { return picturesConfig.getIsSynced(); }
     void setIsSynced(bool v) { picturesConfig.setIsSynced(v);       }
+
+
+protected:
+
+    /// Configuration object for the source. It's a reference to WindowsSyncSourceConfig
+    /// object owned by OutlookConfig. It's automatically initialized in the constructor.
+    WindowsSyncSourceConfig& picturesConfig;
+
+    /**
+     * Overrides MediaSyncSource::getKeyAndSignature().
+     * Utility method that populates the keyValuePair with
+     * the couple key/signature starting from the SyncItem.
+     * The SyncItem key set is the LUID of this item.
+     * Used in the addItem and updateItem
+     *
+     * @param item - IN:  the SyncItem
+     * @param kvp  - OUT: the KeyValuePair to be populate
+     */
+    virtual void getKeyAndSignature(SyncItem& item, KeyValuePair& kvp);
+
+
+    /**
+     * Filter out unwanted folders, and files that are not images.
+     */
+    bool filterOutgoingItem(const StringBuffer& fullName, struct stat& st);
 
 };
 

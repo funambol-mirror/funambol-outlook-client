@@ -235,6 +235,12 @@ char* syncModeName(SyncMode code) {
         case SYNC_ONE_WAY_FROM_SERVER_BY_SERVER:
 			return "one-way-from-server";
 			break;
+		case SYNC_SMART_ONE_WAY_FROM_CLIENT:
+			return "smart-one-way-from-client";
+			break;
+		case SYNC_SMART_ONE_WAY_FROM_SERVER:
+			return "smart-one-way-from-server";
+			break;
 		case SYNC_REFRESH_FROM_SERVER:
         case SYNC_REFRESH_FROM_SERVER_BY_SERVER:
 			return "refresh-from-server";
@@ -262,6 +268,20 @@ bool isFullSyncMode(SyncMode mode) {
     }
 }
 
+
+bool isPIMSource(const char* sourceName) {
+    
+    if (!sourceName) return false;
+
+    if (!strcmp(sourceName, CONTACT_) ||
+        !strcmp(sourceName, APPOINTMENT_) ||
+        !strcmp(sourceName, TASK_) ||
+        !strcmp(sourceName, NOTE_)) {
+        return true;
+    }
+
+    return false;
+}
 
 
 

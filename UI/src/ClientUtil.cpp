@@ -228,18 +228,22 @@ int getSyncModeCode(const char* syncMode){
 
     if(strcmp(syncMode, "none") == 0)
         code = SYNC_NONE;
-    if(strcmp(syncMode, "two-way") == 0)
+    else if(strcmp(syncMode, "two-way") == 0)
         code = SYNC_TWO_WAY;
-    if(strcmp(syncMode, "slow") == 0)
+    else if(strcmp(syncMode, "slow") == 0)
         code = SYNC_SLOW;
-    if(strcmp(syncMode, "one-way-from-client") == 0)
+    else if(strcmp(syncMode, "one-way-from-client") == 0)
         code = SYNC_ONE_WAY_FROM_CLIENT;
-    if(strcmp(syncMode, "refresh-from-client") == 0)
+    else if(strcmp(syncMode, "refresh-from-client") == 0)
         code = SYNC_REFRESH_FROM_CLIENT;
-    if(strcmp(syncMode, "one-way-from-server") == 0)
+    else if(strcmp(syncMode, "one-way-from-server") == 0)
         code = SYNC_ONE_WAY_FROM_SERVER;
-    if(strcmp(syncMode, "refresh-from-server") == 0)
+    else if(strcmp(syncMode, "refresh-from-server") == 0)
         code = SYNC_REFRESH_FROM_SERVER;
+    else if(strcmp(syncMode, "smart-one-way-from-client") == 0)
+        code = SYNC_SMART_ONE_WAY_FROM_CLIENT;
+    else if(strcmp(syncMode, "smart-one-way-from-server") == 0)
+        code = SYNC_SMART_ONE_WAY_FROM_SERVER;
 
     return code;
 }

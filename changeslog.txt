@@ -1,3 +1,8 @@
+2010-12-01
+  - toccy: Pictures sync can be either one-way from client (smart) or one way from server.
+           2way and slow are also supported.
+           Cache files are stored inside the config folder.
+
 2010-11-26
   - toccy: merged from trunk @rev 569
 

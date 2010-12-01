@@ -88,6 +88,9 @@ bool isAcceptedDataType(const std::string&  dataType);
 char* syncModeName     (SyncMode code);
 bool isFullSyncMode    (SyncMode mode);
 
+/// Returns true if the source is a PIM source (contacts, calendar, tasks or notes)
+bool isPIMSource(const char* sourceName);
+
 void  toWindows        (char* str);
 WCHAR* readAppDataPath ();
 WCHAR* readDataPath    (const WCHAR* itemType);
