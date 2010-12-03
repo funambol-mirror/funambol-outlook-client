@@ -211,20 +211,24 @@ int PicturesSyncSource::modifyItem(SyncItem& item)
 
     // Fix the LUID mapping: for updates and deletes, the item's key sent by the
     // Server is the luid, which must be converted to the local file name.
-    if (item.getKey()) {
-        StringBuffer luid;
-        luid.convert(item.getKey());
-        StringBuffer fullName = getPathFromLUID(luid);
+    WString wluid = item.getKey();
+    StringBuffer luid;
+    luid.convert(wluid.c_str());
+    StringBuffer fullName = getPathFromLUID(luid);
 
-        StringBuffer name = getFileNameFromPath(fullName);
+    StringBuffer name = getFileNameFromPath(fullName);
 
-        LOG.debug("PicturesSyncSource::modifyItem - LUID '%s' is associated to %s", luid.c_str(), name.c_str());
-        WCHAR* wname = toWideChar(name.c_str());
-        item.setKey(wname);     // only the file name is required
-        delete [] wname;
-    }
+    LOG.debug("PicturesSyncSource::modifyItem - LUID '%s' is associated to %s", luid.c_str(), name.c_str());
+    WCHAR* wname = toWideChar(name.c_str());
+    item.setKey(wname);     // only the file name is required
+    delete [] wname;
 
-    return FileSyncSource::modifyItem(item);
+
+    ret = FileSyncSource::modifyItem(item);
+
+    // restore the original key (the luid)
+    item.setKey(wluid.c_str());
+    return ret;
 }
 
 

@@ -235,7 +235,6 @@ int startSync() {
     WCHAR* wname      = NULL;
     SyncReport* report= NULL;
     string mutexName  = "";
-    StringBuffer reportMsg;
 
     // Open current configuration: call initialize(0) if not called yet!
     // (reset abortSync flag)
@@ -398,7 +397,6 @@ int startSync() {
         }
     }
 
-
     // Create the SyncClient passing pointer of SyncSources vector,  
     // used to check SyncMode in 'continueAfterPrepareSync()'.
     WindowsSyncClient winClient(sources);
@@ -449,103 +447,30 @@ int startSync() {
 
 
     // --------------------------------------------------
-    // Create the SyncClient object and kick off the sync
-    //
-    LOG.debug("Start SyncClient::Sync() with %d sources", sourcesActive);
-    ret = winClient.sync(*config, sources);
-    // --------------------------------------------------
+    // Kick off the sync: one source at time!
+    for (int i=0; sources[i]; i++) 
+    {
+        ret |= startSync(winClient, sources[i]);
 
-
-    // Print sync results.
-    report = winClient.getSyncReport();
-    report->toString(reportMsg);
-    LOG.info("\n%s", reportMsg.c_str());
-
-
-    //
-    // enable/disable pictures source (check Server datastores)
-    // The source name and the preferred data type must match.
-    //
-    bool removedPictures = false;
-    if (DYNAMICALLY_SHOW_PICTURES) {
-        DataStore* dataStore = config->getServerDataStore(PICTURE_);
-        if ( dataStore && !strcmp(dataStore->getRxPref()->getCTType(), OMA_MIME_TYPE) ) {
-            config->safeAddSourceVisible(PICTURE_);
-        }
-        else {
-            removedPictures = config->removeSourceVisible(PICTURE_);
+        // for these codes, we stop all the queued syncs
+        if (ret == 401  || ret == 407 ||        // authentication error
+            ret == 2001 || ret == 2060) {       // host/server name is wrong
+            break;
         }
     }
-
-    //
-    // Save configuration to win registry. (TBD: manage dirty flag!)
-    // Note: source configs will not be saved if not successfull...
-    // Note: we MUST lock the buttons during the save(), to avoid users to cancel sync.
-    //
-    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_REFRESH_STATUSBAR, NULL, (LPARAM)SBAR_ENDING_SYNC);
-    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_LOCK_BUTTONS,      NULL, NULL);
-    LOG.debug("Saving configuration to winRegistry");
-    config->save(report);
+    // --------------------------------------------------
 
 
 finally:
 
     endSync();
 
-    //
-    // Send msg to UI to refresh status icon (source state)
-    //
-    int sourceID = -1;
-
+    report = winClient.getSyncReport();
     if(report){  // check if the sync report is valid
         // Update the errors from SyncReport
         setErrorF(report->getLastErrorCode(), "%s", report->getLastErrorMsg());
         ret = getLastErrorCode();
-
-        //
-        // Fire the SOURCE_STATE message to the UI, to tell the state of sources synced
-        //
-
-        int i=0;
-        while (sources[i]) {
-            SyncSourceReport* ssReport = NULL;
-            ssReport = sources[i]->getReport();
-            LPARAM sourceState = SYNCSOURCE_STATE_NOT_SYNCED;
-
-            if (ssReport) {
-                sourceID = syncSourceNameToIndex(ssReport->getSourceName());
-                if (sourceID) {
-                    if (sourceID == SYNCSOURCE_PICTURES) {
-                        PicturesSyncSource* pss = (PicturesSyncSource*)sources[i];
-                        if ((ssReport->getState() != SOURCE_ERROR) && pss->getIsSynced()) {
-                            sourceState = SYNCSOURCE_STATE_OK;
-                        } else if (removedPictures && (ret == STC_NOT_FOUND)) {
-                            // Hide the UI warning, if 'picture' source not found. 
-                            sourceState = SYNCSOURCE_STATE_OK;
-                            ret = 0;
-                        }
-                    }
-                    else if (sourceID == SYNCSOURCE_FILES) {
-                        WinFileSyncSource* ss = (WinFileSyncSource*)sources[i];
-                        if ((ssReport->getState() != SOURCE_ERROR) && ss->getIsSynced()) {
-                            sourceState = SYNCSOURCE_STATE_OK;
-                        }
-                    }
-                    else {
-                        // All other ssources are WindowsSyncSources
-                        WindowsSyncSource* wss = (WindowsSyncSource*)sources[i];
-                        if ((ssReport->getState() != SOURCE_ERROR) && wss->getConfig().getIsSynced()) {
-                            sourceState = SYNCSOURCE_STATE_OK;
-                        }
-                    }
-                }
-
-                SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SOURCE_STATE, (WPARAM)sourceID, sourceState);
-            }
-            i++;
-        }
     }
-
 
     // Clean up SyncSources...
     LOG.debug("Delete SyncSources...");
@@ -568,15 +493,135 @@ finally:
     else
         LOG.info(INFO_SYNC_COMPLETED_ERRORS, ret);
 
-    // Finally: unlock buttons
-    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_UNLOCK_BUTTONS, NULL, NULL);
-
     // check for updates
     if (checkUpdate()) {
         updateProcedure(HwndFunctions::getWindowHandle(), false);
     }
     return ret;
 }
+
+
+int startSync(WindowsSyncClient& winClient, SyncSource* source) {
+
+    if (source == NULL) {
+        return -1;
+    }
+
+    StringBuffer reportMsg;
+    SyncReport* report = winClient.getSyncReport();
+    OutlookConfig* config = getConfig();
+    StringBuffer name = source->getConfig().getName();
+    LOG.info("*** Start sync for source '%s' ***", name.c_str());
+
+    // *** Added for Marvell demo ***
+    SyncMode originalSyncMode = source->getSyncMode();
+    if (name == PICTURE_) {
+        source->setSyncMode(SYNC_ONE_WAY_FROM_SERVER);
+    }
+    // ******************************
+
+
+    // ----------------------------------------------
+    SyncSource* oneSourceArray[2];
+    oneSourceArray[0] = source;
+    oneSourceArray[1] = NULL;
+    int ret = winClient.sync(*config, oneSourceArray);
+    // ----------------------------------------------
+
+
+    // Print sync session results.
+    report->toString(reportMsg);
+    LOG.info("\n%s", reportMsg.c_str());
+
+
+    // *** Added for Marvell demo ***
+    if (name == PICTURE_) {
+        if (ret == 0) {
+            // only if 1st sync successful
+            source->setSyncMode(SYNC_SMART_ONE_WAY_FROM_CLIENT);
+            ret = winClient.sync(*config, oneSourceArray);
+            
+            reportMsg = "";
+            report->toString(reportMsg);
+            LOG.info("\n%s", reportMsg.c_str());
+        }
+        source->setSyncMode(originalSyncMode);
+    }
+    // ******************************
+
+
+    //
+    // enable/disable pictures source (check Server datastores)
+    // The source name and the preferred data type must match.
+    //
+    bool removedPictures = false;
+    if (DYNAMICALLY_SHOW_PICTURES) {
+        DataStore* dataStore = config->getServerDataStore(PICTURE_);
+        if ( dataStore && !strcmp(dataStore->getRxPref()->getCTType(), OMA_MIME_TYPE) ) {
+            config->safeAddSourceVisible(PICTURE_);
+        }
+        else {
+            removedPictures = config->removeSourceVisible(PICTURE_);
+        }
+    }
+
+
+    //
+    // Save configuration to win registry. (TBD: manage dirty flag!)
+    // Note: source configs will not be saved if not successfull...
+    // Note: we MUST lock the buttons during the save(), to avoid users to cancel sync.
+    //
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_REFRESH_STATUSBAR, NULL, (LPARAM)SBAR_ENDING_SYNC);
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_LOCK_BUTTONS,      NULL, NULL);
+    LOG.debug("Saving configuration to winRegistry");    
+    config->save(report);
+
+
+    //
+    // Fire the SOURCE_STATE message to the UI, to tell the state of sources synced
+    //
+    int i=0;
+    SyncSourceReport* ssReport = NULL;
+    ssReport = source->getReport();
+    LPARAM sourceState = SYNCSOURCE_STATE_NOT_SYNCED;
+
+    if (ssReport) {
+        int sourceID = syncSourceNameToIndex(ssReport->getSourceName());
+        if (sourceID) {
+            if (sourceID == SYNCSOURCE_PICTURES) {
+                PicturesSyncSource* pss = (PicturesSyncSource*)source;
+                if ((ssReport->getState() != SOURCE_ERROR) && pss->getIsSynced()) {
+                    sourceState = SYNCSOURCE_STATE_OK;
+                } else if (removedPictures && (ret == STC_NOT_FOUND)) {
+                    // Hide the UI warning, if 'picture' source not found. 
+                    sourceState = SYNCSOURCE_STATE_OK;
+                    ret = 0;
+                }
+            }
+            else if (sourceID == SYNCSOURCE_FILES) {
+                WinFileSyncSource* ss = (WinFileSyncSource*)source;
+                if ((ssReport->getState() != SOURCE_ERROR) && ss->getIsSynced()) {
+                    sourceState = SYNCSOURCE_STATE_OK;
+                }
+            }
+            else {
+                // All other ssources are WindowsSyncSources
+                WindowsSyncSource* wss = (WindowsSyncSource*)source;
+                if ((ssReport->getState() != SOURCE_ERROR) && wss->getConfig().getIsSynced()) {
+                    sourceState = SYNCSOURCE_STATE_OK;
+                }
+            }
+        }
+
+        SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SOURCE_STATE, (WPARAM)sourceID, sourceState);
+    }
+
+    // Finally: unlock buttons
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_UNLOCK_BUTTONS, NULL, NULL);
+
+    return ret;
+}
+
 
 
 /**
