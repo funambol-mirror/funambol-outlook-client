@@ -51,7 +51,7 @@
 #define ID_MYMSG_STARTSYNC_ENDED      (WM_APP+8)
 #define ID_MYMSG_REFRESH_STATUSBAR    (WM_APP+9)
 //#define ID_MYMSG_MODAL              (WM_APP+10)     not used
-#define ID_MYMSG_SOURCE_STATE         (WM_APP+11)
+//#define ID_MYMSG_SOURCE_STATE       (WM_APP+11)     obsolete
 #define ID_MYMSG_SYNC_STARTSYNC_BEGIN (WM_APP+12)
 #define ID_MYMSG_UNLOCK_BUTTONS       (WM_APP+13)
 #define ID_MYMSG_LOCK_BUTTONS         (WM_APP+14)

@@ -42,19 +42,19 @@
 void OutlookSyncSourceListener::syncSourceBegin(SyncSourceEvent &event) {
 
     char* syncMode = syncModeName((SyncMode)event.getSyncMode());
-	LOG.debug("---------------------- %s BEGIN (mode \"%s\") ----------------------", event.getSourceName(), syncMode);
+	LOG.debug("%s begin (mode \"%s\")", event.getSourceName(), syncMode);
 
-    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_BEGIN, 
-                NULL, (LPARAM) syncSourceNameToIndex(event.getSourceName()));
+    //SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_BEGIN, 
+    //            NULL, (LPARAM) syncSourceNameToIndex(event.getSourceName()));
 }
 
 void OutlookSyncSourceListener::syncSourceEnd(SyncSourceEvent &event) {
 
     char* syncMode = syncModeName((SyncMode)event.getSyncMode());
-	LOG.debug("---------------------- %s END (mode \"%s\") ----------------------", event.getSourceName(), syncMode);
+	LOG.debug("%s end (mode \"%s\")", event.getSourceName(), syncMode);
 
-    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_END, 
-                NULL, (LPARAM) syncSourceNameToIndex(event.getSourceName()));
+    //SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_END, 
+    //            NULL, (LPARAM) syncSourceNameToIndex(event.getSourceName()));
 }
 
 

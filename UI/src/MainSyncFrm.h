@@ -66,18 +66,6 @@ DWORD WINAPI syncThreadKiller(LPVOID lpParam);
 class CMainSyncFrame : public CFrameWnd
 {
 
-private:
-
-    // Counters, incremented each time a source has begun.
-    // (1 when begin sending data, 2 when begin receiving data)
-    int contactsBegin;
-    int calendarBegin;
-    int tasksBegin;
-    int notesBegin;
-    int picturesBegin;
-    int filesBegin;
-	
-
 protected:
 
     CMainSyncFrame();
@@ -172,7 +160,7 @@ public:
     afx_msg LRESULT OnMsgStartSyncBegin (WPARAM , LPARAM); 
     afx_msg LRESULT OnMsgStartsyncEnded (WPARAM , LPARAM); 
     afx_msg LRESULT OnMsgRefreshStatusBar(WPARAM, LPARAM);
-    afx_msg LRESULT OnMsgSyncSourceState(WPARAM, LPARAM);
+    //afx_msg LRESULT OnMsgSyncSourceState(WPARAM, LPARAM);
     afx_msg LRESULT OnMsgUnlockButtons  (WPARAM, LPARAM);
     afx_msg LRESULT OnMsgLockButtons    (WPARAM, LPARAM);
 

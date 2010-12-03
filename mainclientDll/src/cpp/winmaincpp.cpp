@@ -511,7 +511,15 @@ int startSync(WindowsSyncClient& winClient, SyncSource* source) {
     SyncReport* report = winClient.getSyncReport();
     OutlookConfig* config = getConfig();
     StringBuffer name = source->getConfig().getName();
+    int sourceID = syncSourceNameToIndex(name);
+    if (!sourceID) {
+        return -1;
+    }
+
     LOG.info("*** Start sync for source '%s' ***", name.c_str());
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_BEGIN, 
+                NULL, (LPARAM)sourceID);
+
 
     // *** Added for Marvell demo ***
     SyncMode originalSyncMode = source->getSyncMode();
@@ -586,34 +594,32 @@ int startSync(WindowsSyncClient& winClient, SyncSource* source) {
     LPARAM sourceState = SYNCSOURCE_STATE_NOT_SYNCED;
 
     if (ssReport) {
-        int sourceID = syncSourceNameToIndex(ssReport->getSourceName());
-        if (sourceID) {
-            if (sourceID == SYNCSOURCE_PICTURES) {
-                PicturesSyncSource* pss = (PicturesSyncSource*)source;
-                if ((ssReport->getState() != SOURCE_ERROR) && pss->getIsSynced()) {
-                    sourceState = SYNCSOURCE_STATE_OK;
-                } else if (removedPictures && (ret == STC_NOT_FOUND)) {
-                    // Hide the UI warning, if 'picture' source not found. 
-                    sourceState = SYNCSOURCE_STATE_OK;
-                    ret = 0;
-                }
+
+        if (sourceID == SYNCSOURCE_PICTURES) {
+            PicturesSyncSource* pss = (PicturesSyncSource*)source;
+            if ((ssReport->getState() != SOURCE_ERROR) && pss->getIsSynced()) {
+                sourceState = SYNCSOURCE_STATE_OK;
+            } else if (removedPictures && (ret == STC_NOT_FOUND)) {
+                // Hide the UI warning, if 'picture' source not found. 
+                sourceState = SYNCSOURCE_STATE_OK;
+                ret = 0;
             }
-            else if (sourceID == SYNCSOURCE_FILES) {
-                WinFileSyncSource* ss = (WinFileSyncSource*)source;
-                if ((ssReport->getState() != SOURCE_ERROR) && ss->getIsSynced()) {
-                    sourceState = SYNCSOURCE_STATE_OK;
-                }
+        }
+        else if (sourceID == SYNCSOURCE_FILES) {
+            WinFileSyncSource* ss = (WinFileSyncSource*)source;
+            if ((ssReport->getState() != SOURCE_ERROR) && ss->getIsSynced()) {
+                sourceState = SYNCSOURCE_STATE_OK;
             }
-            else {
-                // All other ssources are WindowsSyncSources
-                WindowsSyncSource* wss = (WindowsSyncSource*)source;
-                if ((ssReport->getState() != SOURCE_ERROR) && wss->getConfig().getIsSynced()) {
-                    sourceState = SYNCSOURCE_STATE_OK;
-                }
+        }
+        else {
+            // All other ssources are WindowsSyncSources
+            WindowsSyncSource* wss = (WindowsSyncSource*)source;
+            if ((ssReport->getState() != SOURCE_ERROR) && wss->getConfig().getIsSynced()) {
+                sourceState = SYNCSOURCE_STATE_OK;
             }
         }
 
-        SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SOURCE_STATE, (WPARAM)sourceID, sourceState);
+        SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_END, (WPARAM)sourceID, sourceState);
     }
 
     // Finally: unlock buttons

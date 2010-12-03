@@ -54,15 +54,48 @@ void OutlookSyncItemListener::itemUpdatedByServer(SyncItemEvent &event) {
 }
 
 void OutlookSyncItemListener::itemAddedByClient(SyncItemEvent &event) {
-    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM) -1, (LPARAM) syncSourceNameToIndex(event.getSourceName()));
+
+    int sourceID = syncSourceNameToIndex(event.getSourceName());
+    if (sourceID == SYNCSOURCE_PICTURES || 
+        sourceID == SYNCSOURCE_FILES) {
+        if (OutlookConfig::getInstance()->getServerMediaHttpUpload()) {
+            // Ignore this event: it's just the syncML metadata (no item content)
+            return;
+        }
+    }
+
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, 
+               (WPARAM)-1, (LPARAM)sourceID);
 }
 
 void OutlookSyncItemListener::itemUpdatedByClient(SyncItemEvent &event) {
-    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM) -1, (LPARAM) syncSourceNameToIndex(event.getSourceName()));
+    
+    int sourceID = syncSourceNameToIndex(event.getSourceName());
+    if (sourceID == SYNCSOURCE_PICTURES || 
+        sourceID == SYNCSOURCE_FILES) {
+        if (OutlookConfig::getInstance()->getServerMediaHttpUpload()) {
+            // Ignore this event: it's just the syncML metadata (no item content)
+            return;
+        }
+    }
+    
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, 
+               (WPARAM)-1, (LPARAM)sourceID);
+}
+
+void OutlookSyncItemListener::itemUploadedByClient(SyncItemEvent &event) {
+    
+    int sourceID = syncSourceNameToIndex(event.getSourceName());
+    if (sourceID == SYNCSOURCE_PICTURES || 
+        sourceID == SYNCSOURCE_FILES) {
+        if (OutlookConfig::getInstance()->getServerMediaHttpUpload()) {
+            // A media item has been uploaded to the server
+            SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, 
+                       (WPARAM)-1, (LPARAM)sourceID);
+        }
+    }
 }
 
 void OutlookSyncItemListener::itemDeletedByClient(SyncItemEvent &event) {
     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM) -1, (LPARAM) syncSourceNameToIndex(event.getSourceName()));
 }
-
-

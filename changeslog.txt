@@ -1,8 +1,11 @@
 2010-12-03
-  - toccy: syncall now starts separate sync sessions for each source under sync.
-           This makes the source progress management easier and the UI messages clearer.
-           Sync of pictures triggers 2 sync sessions, ignoring the current syncmode: 
-           1st is one-way-from-server, 2nd is smart-one-way-from-client.
+  - toccy: * some UI cleanup: removed message "ID_MYMSG_SOURCE_STATE", using syncsource_begin
+             and syncsource_end as the real start and stop of each syncsource section.
+           * fixed UI syncitem progress messages for pictures.
+           * syncall now starts separate sync sessions for each source under sync.
+             This makes the source progress management easier and the UI messages clearer.
+           * Sync of pictures triggers 2 sync sessions, ignoring the current syncmode: 
+             1st is one-way-from-server, 2nd is smart-one-way-from-client.
 
 2010-12-01
   - toccy: Pictures sync can be either one-way from client (smart) or one way from server.

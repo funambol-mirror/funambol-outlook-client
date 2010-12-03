@@ -327,6 +327,9 @@ void CSyncForm::changeNotesStatus(CString& status){
     notesStatusLabel = status;
 }
 void CSyncForm::changePicturesStatus(CString& status){
+    //StringBuffer msg(">>>>> status: ");
+    //msg.append(toMultibyte(status.GetBuffer()));
+    //printLog(msg.c_str());
     picturesStatusLabel = status;
 }
 void CSyncForm::changeFilesStatus(CString& status){

@@ -55,6 +55,7 @@ class OutlookSyncItemListener : public SyncItemListener {
 	void itemAddedByClient  (SyncItemEvent &event);
 	void itemDeletedByClient(SyncItemEvent &event);
 	void itemUpdatedByClient(SyncItemEvent &event);
+	void itemUploadedByClient(SyncItemEvent &event);
 };
 
 /** @} */
