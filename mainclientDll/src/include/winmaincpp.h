@@ -310,7 +310,7 @@
 int  initializeClient   (bool isScheduled, bool justRead = false);
 int  initLog            (bool isScheduled);
 int  startSync          ();
-int  startSync          (WindowsSyncClient& winClient, SyncSource* source);
+int  synchronize        (WindowsSyncClient& winClient, SyncSource* source);
 int  closeClient        ();
 void closeOutlook       ();
 void checkAbortedSync   ();

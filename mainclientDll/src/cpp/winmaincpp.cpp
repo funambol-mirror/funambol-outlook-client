@@ -450,7 +450,7 @@ int startSync() {
     // Kick off the sync: one source at time!
     for (int i=0; sources[i]; i++) 
     {
-        ret |= startSync(winClient, sources[i]);
+        ret |= synchronize(winClient, sources[i]);
 
         // for these codes, we stop all the queued syncs
         if (ret == 401  || ret == 407 ||        // authentication error
@@ -501,7 +501,7 @@ finally:
 }
 
 
-int startSync(WindowsSyncClient& winClient, SyncSource* source) {
+int synchronize(WindowsSyncClient& winClient, SyncSource* source) {
 
     if (source == NULL) {
         return -1;
