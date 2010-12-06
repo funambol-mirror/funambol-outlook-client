@@ -95,8 +95,10 @@ protected:
 
     // info about the sync in progress
     int currentSource;
-    int totalItems;
-    int currentItem;
+    int totalClientItems;
+    int totalServerItems;
+    int currentClientItem;
+    int currentServerItem;
     
     CFont fontBold;
 

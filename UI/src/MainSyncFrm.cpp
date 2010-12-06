@@ -593,7 +593,8 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
 
     CString s1;
     currentSource = lParam;
-    currentItem = 0;
+    currentClientItem = 0;
+    currentServerItem = 0;
     
     // if it is scheduled, we change only status bar text
     bool isScheduled = getConfig()->getScheduledSync();
@@ -707,17 +708,23 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
 // UI received a item synced message
 LRESULT CMainSyncFrame::OnMsgItemSynced( WPARAM wParam, LPARAM ) {
 
-    currentItem++;
-
     //
     // Format message: "Sending/Receiving contacts x[/y]..."
     //
+    int currentItem = 0;
+    int totalItems = 0;
     CString statusBarText;
     if(wParam == -1) {
         statusBarText = "Sending ";
+        totalItems = totalClientItems;
+        currentClientItem ++;
+        currentItem = currentClientItem;
     }
     else {
         statusBarText = "Receiving ";
+        totalItems = totalServerItems;
+        currentServerItem ++;
+        currentItem = currentServerItem;
     }
 
     CString s1;
@@ -885,7 +892,11 @@ afx_msg LRESULT CMainSyncFrame::OnMsgRefreshStatusBar( WPARAM wParam, LPARAM lPa
 
 afx_msg LRESULT CMainSyncFrame::OnMsgTotalItems( WPARAM wParam, LPARAM lParam)
 {
-    totalItems = lParam;
+    if (wParam == 0) {
+        totalClientItems = lParam;
+    } else {
+        totalServerItems = lParam;
+    }
    
     CString source;
     CString msg; 
@@ -1097,8 +1108,10 @@ void CMainSyncFrame::StartSync(){
 
     CString s1;
     currentSource = 0;
-    currentItem = 0;
-    totalItems = 0;
+    currentClientItem = 0;
+    currentServerItem = 0;
+    totalClientItems = 0;
+    totalServerItems = 0;
     printLog("StartSync begin", LOG_DEBUG);
 
     // Check on sync in progress.
@@ -1292,8 +1305,10 @@ int CMainSyncFrame::CancelSync(bool confirm){
 
         Invalidate();
         currentSource = 0;
-        currentItem = 0;
-        totalItems = 0;
+        currentClientItem = 0;
+        currentServerItem = 0;
+        totalClientItems = 0;
+        totalServerItems = 0;
     }    
     
     return ret;    
