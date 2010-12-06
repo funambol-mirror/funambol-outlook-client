@@ -523,7 +523,8 @@ int synchronize(WindowsSyncClient& winClient, SyncSource* source) {
 
     // *** Added for Marvell demo ***
     SyncMode originalSyncMode = source->getSyncMode();
-    if (name == PICTURE_) {
+    if (name == PICTURE_ || 
+        name == FILES_) {
         source->setSyncMode(SYNC_ONE_WAY_FROM_SERVER);
     }
     // ******************************
@@ -543,8 +544,9 @@ int synchronize(WindowsSyncClient& winClient, SyncSource* source) {
 
 
     // *** Added for Marvell demo ***
-    if (name == PICTURE_) {
-        if (ret == 0) {
+    if (name == PICTURE_ ||
+        name == FILES_) {
+            if (ret == 0 && source->getSyncMode() != SYNC_SLOW) {
             // only if 1st sync successful
             source->setSyncMode(SYNC_SMART_ONE_WAY_FROM_CLIENT);
             ret = winClient.sync(*config, oneSourceArray);

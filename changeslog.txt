@@ -1,3 +1,6 @@
+2010-12-06
+  - toccy: * added files sync 2-way (like pictures sync)
+
 2010-12-03
   - toccy: * some UI cleanup: removed message "ID_MYMSG_SOURCE_STATE", using syncsource_begin
              and syncsource_end as the real start and stop of each syncsource section.

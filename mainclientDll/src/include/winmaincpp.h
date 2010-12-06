@@ -310,6 +310,10 @@
 int  initializeClient   (bool isScheduled, bool justRead = false);
 int  initLog            (bool isScheduled);
 int  startSync          ();
+
+/// Starts the sync of a single source.
+/// Fires the syncsource_start and syncsource_end events to refresh the
+/// UI, before and after the sync process.
 int  synchronize        (WindowsSyncClient& winClient, SyncSource* source);
 int  closeClient        ();
 void closeOutlook       ();
