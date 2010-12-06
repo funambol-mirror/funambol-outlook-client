@@ -181,6 +181,16 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setSupportedTypes   ("application/vnd.omads-file+xml:,application/*:");
         sc->setIsEnabled        (PICTURE_SOURCE_ENABLED);
     }
+    else if (wname == VIDEO){
+        sc->setSync             (DEFAULT_VIDEOS_SYNC_MODE);
+        sc->setSyncModes        (VIDEOS_DEVINFO_SYNC_MODES);
+        sc->setURI              (DLLCustomization::sourceVideosUri);
+        sc->setType             ("application/vnd.omads-file+xml");      // not really used, as it's detected from each item received
+        sc->setVersion          ("");
+        sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
+        sc->setSupportedTypes   ("application/vnd.omads-file+xml:,application/*:");
+        sc->setIsEnabled        (VIDEO_SOURCE_ENABLED);
+    }
     else if (wname == FILES){
         sc->setSync             (DEFAULT_FILES_SYNC_MODE);
         sc->setSyncModes        (FILES_DEVINFO_SYNC_MODES);

@@ -99,7 +99,7 @@
 #define MAX_VIDEO_SIZE                      0                           /**< max size of videos to upload [KBytes]. 0 means unlimited. */
 #define MAX_FILE_SIZE                       0                           /**< max size of files to upload [KBytes]. 0 means unlimited. */
 
-#define SOURCE_ORDER_IN_REGISTRY            "contact,appointment,task,note,picture,files"
+#define SOURCE_ORDER_IN_REGISTRY            "contact,appointment,task,note,picture,video,files"
 
 // set if the sources are enabled/disabled (meaning they can be enabled by settings)
 #define CONTACT_SOURCE_ENABLED              true
@@ -107,6 +107,7 @@
 #define TASK_SOURCE_ENABLED                 true
 #define NOTE_SOURCE_ENABLED                 true
 #define PICTURE_SOURCE_ENABLED              true
+#define VIDEO_SOURCE_ENABLED                true
 #define FILE_SOURCE_ENABLED                 true
 
 // List of available sync modes for each source (comma separated values).
@@ -181,6 +182,7 @@ public:
     static const char *  sourceCalendarVcalUri;         /**< the default sources URI for vTodo */
     static const char *  sourceContactsVcardUri;        /**< the default sources URI for vCard */
     static const char *  sourcePicturesUri;             /**< the default sources URI for pictures */
+    static const char *  sourceVideosUri;               /**< the default sources URI for videos */
     static const char *  sourceFilesUri;                /**< the default sources URI for files */
 
     // For upgrades

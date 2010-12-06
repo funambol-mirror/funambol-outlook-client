@@ -816,8 +816,10 @@ bool OutlookConfig::addWindowsSyncSourceConfig(const wstring& sourceName)
 
     }
     catch (char* e) {
-        setErrorF(getLastErrorCode(), ERR_DEFAULT_SSCONFIG, PICTURE_, e);
+        char* name = toMultibyte(sourceName.c_str());
+        setErrorF(getLastErrorCode(), ERR_DEFAULT_SSCONFIG, name, e);
         safeMessageBox(getLastErrorMsg());
+        delete [] name;
         return false;
     }
     return true;
@@ -1017,14 +1019,14 @@ void OutlookConfig::createDefaultConfig() {
     //       object (inside constructor of WindowsSyncSourceConfig).
     // NOTE: create sources alphabetically sorted, because this will be the order of 
     //       nodes inside Win registry (and they must match)!
-    WCHAR* sourceNames[6] = {APPOINTMENT, CONTACT, FILES, NOTE, PICTURE, TASK};
-    for (int i=0; i<6; i++) {
+    WCHAR* sourceNames[7] = {APPOINTMENT, CONTACT, FILES, NOTE, PICTURE, TASK, VIDEO};
+    for (int i=0; i<7; i++) {
         WCHAR* wname = sourceNames[i];
         SyncSourceConfig* sc = DefaultWinConfigFactory::getSyncSourceConfig(wname);
         DMTClientConfig::setSyncSourceConfig(*sc);
         delete sc;
     }
-    for (int i=0; i<6; i++) {
+    for (int i=0; i<7; i++) {
         WCHAR* wname = sourceNames[i];
         char*   name = toMultibyte(wname);
 
@@ -1287,6 +1289,11 @@ void OutlookConfig::upgradeConfig() {
         // Files source added.
         if (!addWindowsSyncSourceConfig(FILES)) {
             LOG.error("upgradeConfig - error adding the config for %s source", FILES_);
+        }
+
+        // VIdeos source added.
+        if (!addWindowsSyncSourceConfig(VIDEO)) {
+            LOG.error("upgradeConfig - error adding the config for %s source", VIDEO_);
         }
 
         accessConfig.setMaxMsgSize(800000);

@@ -36,11 +36,13 @@
 
 #include "event/OutlookSyncItemListener.h"
 #include "base/Log.h"
-
 #include "HwndFunctions.h"
 #include "utils.h"
-/* wParam = -1 -> sending items
-   wParam = 1  -> receiving items */
+
+/* 
+   wParam = -1 -> sending items
+   wParam = 1  -> receiving items 
+ */
 void OutlookSyncItemListener::itemAddedByServer(SyncItemEvent &event) {
     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM) 1 , (LPARAM) syncSourceNameToIndex(event.getSourceName()));
 }
@@ -57,6 +59,7 @@ void OutlookSyncItemListener::itemAddedByClient(SyncItemEvent &event) {
 
     int sourceID = syncSourceNameToIndex(event.getSourceName());
     if (sourceID == SYNCSOURCE_PICTURES || 
+        sourceID == SYNCSOURCE_VIDEOS   ||
         sourceID == SYNCSOURCE_FILES) {
         if (OutlookConfig::getInstance()->getServerMediaHttpUpload()) {
             // Ignore this event: it's just the syncML metadata (no item content)
@@ -72,6 +75,7 @@ void OutlookSyncItemListener::itemUpdatedByClient(SyncItemEvent &event) {
     
     int sourceID = syncSourceNameToIndex(event.getSourceName());
     if (sourceID == SYNCSOURCE_PICTURES || 
+        sourceID == SYNCSOURCE_VIDEOS   ||
         sourceID == SYNCSOURCE_FILES) {
         if (OutlookConfig::getInstance()->getServerMediaHttpUpload()) {
             // Ignore this event: it's just the syncML metadata (no item content)
@@ -87,6 +91,7 @@ void OutlookSyncItemListener::itemUploadedByClient(SyncItemEvent &event) {
     
     int sourceID = syncSourceNameToIndex(event.getSourceName());
     if (sourceID == SYNCSOURCE_PICTURES || 
+        sourceID == SYNCSOURCE_VIDEOS   ||
         sourceID == SYNCSOURCE_FILES) {
         if (OutlookConfig::getInstance()->getServerMediaHttpUpload()) {
             // A media item has been uploaded to the server

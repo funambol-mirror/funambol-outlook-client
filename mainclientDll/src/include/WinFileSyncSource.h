@@ -97,7 +97,7 @@ public:
     int removeItem(SyncItem& item);
     int removeAllItems();
 
-    // Proxy to the picturesConfig methods.
+    // Proxy to the filesConfig methods.
     bool getIsSynced() const { return filesConfig.getIsSynced(); }
     void setIsSynced(bool v) { filesConfig.setIsSynced(v);       }
 

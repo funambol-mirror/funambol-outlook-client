@@ -41,6 +41,7 @@
 #include "winmaincpp.h"
 #include "WindowsSyncSource.h"
 #include "PicturesSyncSource.h"
+#include "VideosSyncSource.h"
 #include "WinFileSyncSource.h"
 #include "WindowsSyncClient.h"
 #include "utils.h"
@@ -336,7 +337,8 @@ int startSync() {
     // 3. "Tasks"
     // 4. "Notes"
     // 5. "Pictures"
-    // 6. "Files"
+    // 6. "Videos"
+    // 7. "Files"
     int j=0;
     bool syncingPIM = false;
     const ArrayList& sourcesOrder = config->getSourcesVisible();
@@ -353,6 +355,8 @@ int startSync() {
                     wname = *name;
                     if (wname == PICTURE) {
                         sources[sourcesActive] = new PicturesSyncSource(wname.c_str(), config->getSyncSourceConfig(i));
+                    } else if (wname == VIDEO) {
+                        sources[sourcesActive] = new VideosSyncSource(wname.c_str(), config->getSyncSourceConfig(i));
                     } else if (wname == FILES) {
                         sources[sourcesActive] = new WinFileSyncSource(wname.c_str(), config->getSyncSourceConfig(i));
                     } else {
@@ -523,7 +527,8 @@ int synchronize(WindowsSyncClient& winClient, SyncSource* source) {
 
     // *** Added for Marvell demo ***
     SyncMode originalSyncMode = source->getSyncMode();
-    if (name == PICTURE_ || 
+    if (name == PICTURE_ ||
+        name == VIDEO_   ||
         name == FILES_) {
         source->setSyncMode(SYNC_ONE_WAY_FROM_SERVER);
     }
@@ -545,6 +550,7 @@ int synchronize(WindowsSyncClient& winClient, SyncSource* source) {
 
     // *** Added for Marvell demo ***
     if (name == PICTURE_ ||
+        name == VIDEO_   ||
         name == FILES_) {
             if (ret == 0 && source->getSyncMode() != SYNC_SLOW) {
             // only if 1st sync successful
@@ -605,6 +611,12 @@ int synchronize(WindowsSyncClient& winClient, SyncSource* source) {
                 // Hide the UI warning, if 'picture' source not found. 
                 sourceState = SYNCSOURCE_STATE_OK;
                 ret = 0;
+            }
+        }
+        else if (sourceID == SYNCSOURCE_VIDEOS) {
+            VideosSyncSource* ss = (VideosSyncSource*)source;
+            if ((ssReport->getState() != SOURCE_ERROR) && ss->getIsSynced()) {
+                sourceState = SYNCSOURCE_STATE_OK;
             }
         }
         else if (sourceID == SYNCSOURCE_FILES) {

@@ -56,6 +56,7 @@
 #include "OutlookConfig.h"
 #include "utils.h"
 #include "PicturesSyncSource.h"
+#include "VIdeosSyncSource.h"
 #include "WinFileSyncSource.h"
 #include "customization.h"
 
@@ -369,6 +370,17 @@ StringBuffer getDefaultFilesPath() {
     return path;
 }
 
+StringBuffer getDefaultVideosPath() {
+
+    StringBuffer path;
+    WCHAR buf[MAX_PATH];
+
+    SHGetSpecialFolderPath(NULL, buf, CSIDL_MYVIDEO, 0); 
+    if (buf && wcslen(buf) > 0) {
+        path.convert(buf);
+    }
+    return path;
+}
 
 /**
  * Reads a file from filesystem and write its content into a string.
@@ -793,6 +805,9 @@ int syncSourceNameToIndex(const StringBuffer& sourceName)
     else if (sourceName == PICTURE_) {
         id = SYNCSOURCE_PICTURES;
     }
+    else if (sourceName == VIDEO_) {
+        id = SYNCSOURCE_VIDEOS;
+    }
     else if (sourceName == FILES_) {
         id = SYNCSOURCE_FILES;
     }
@@ -808,6 +823,7 @@ StringBuffer syncSourceIndexToName(const int sourceID)
         case (SYNCSOURCE_TASKS):    return TASK_;
         case (SYNCSOURCE_NOTES):    return NOTE_;
         case (SYNCSOURCE_PICTURES): return PICTURE_;
+        case (SYNCSOURCE_VIDEOS):   return VIDEO_;
         case (SYNCSOURCE_FILES):    return FILES_;
         default:                    return "";
     }
@@ -823,6 +839,8 @@ StringBuffer getDefaultSyncMode(const char* sourceName) {
     if (!strcmp(sourceName, TASK_))        return DEFAULT_TASKS_SYNC_MODE;
     if (!strcmp(sourceName, NOTE_))        return DEFAULT_NOTES_SYNC_MODE;
     if (!strcmp(sourceName, PICTURE_))     return DEFAULT_PICTURES_SYNC_MODE;
+    if (!strcmp(sourceName, VIDEO_))       return DEFAULT_VIDEOS_SYNC_MODE;
+    if (!strcmp(sourceName, FILES_))       return DEFAULT_FILES_SYNC_MODE;
 
     return SYNC_MODE_TWO_WAY;
 }
@@ -833,6 +851,7 @@ StringBuffer getDefaultSyncMode(const char* sourceName) {
  * Prints a smart synchronization report table into LOG file.
  * TODO: use SyncReport::toString() ?
  */
+/*   -- obsolete. remove --
 void printReport(SyncReport* sr, SyncSource** sources) {
 
     if (sr == NULL) {
@@ -1034,7 +1053,7 @@ void printReport(SyncReport* sr, SyncSource** sources) {
 
     LOG.info("\n%s", res.c_str());
 }
-
+*/
 
 /**
  * Returns a friendly name for the passed syncsource name.
@@ -1058,6 +1077,9 @@ char* friendlyName(const char* sourceName) {
     }
     else if (!strcmp(sourceName, PICTURE_)) {
         return "Pictures";
+    }
+    else if (!strcmp(sourceName, VIDEO_)) {
+        return "Videos";
     }
     else if (!strcmp(sourceName, FILES_)) {
         return "Files";

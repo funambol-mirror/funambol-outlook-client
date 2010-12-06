@@ -435,6 +435,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\cpp\VideosSyncSource.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\cpp\WindowsDeviceConfig.cpp"
 				>
 			</File>
