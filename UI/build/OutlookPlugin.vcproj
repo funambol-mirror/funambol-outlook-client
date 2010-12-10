@@ -456,6 +456,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\VideosSettings.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Welcome.cpp"
 				>
 			</File>
@@ -650,11 +654,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\files.ico"
+				RelativePath="..\src\res\files.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\src\res\files.ico"
+				RelativePath=".\res\files.ico"
 				>
 			</File>
 			<File
@@ -779,6 +783,22 @@
 			</File>
 			<File
 				RelativePath="..\src\res\updates_grey.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\src\res\videos.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\videos.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\src\res\videos_grey.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\videos_grey.ico"
 				>
 			</File>
 		</Filter>

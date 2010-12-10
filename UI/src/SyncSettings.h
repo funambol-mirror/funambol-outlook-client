@@ -104,6 +104,7 @@ public:
     CButton checkTasks;
     CButton checkNotes;
     CButton checkPictures;
+    CButton checkVideos;
     CButton checkFiles;
 
     CButton butContacts;
@@ -111,6 +112,7 @@ public:
     CButton butTasks;
     CButton butNotes;
     CButton butPictures;
+    CButton butVideos;
     CButton butFiles;
 
     bool saveSyncTypeContacts;
@@ -118,6 +120,7 @@ public:
     bool saveSyncTypeTasks;
     bool saveSyncTypeNotes;
     bool saveSyncTypePictures;
+    bool saveSyncTypeVideos;
     bool saveSyncTypeFiles;
     bool saveScheduler; // true if scheduler settings have changed
     bool saveAttach; // true if the checkbox to require outlook open is changed
@@ -138,6 +141,7 @@ public:
     afx_msg void OnBnClickedSyncCheckTasks();
     afx_msg void OnBnClickedSyncCheckNotes();
     afx_msg void OnBnClickedSyncCheckPictures();
+    afx_msg void OnBnClickedSyncCheckVideos();
     afx_msg void OnBnClickedSyncCheckFiles();
     afx_msg void OnBnClickedSyncOk();
     afx_msg void OnBnClickedSyncCancel();
@@ -146,6 +150,7 @@ public:
     afx_msg void OnBnClickedSyncButTasks();
     afx_msg void OnBnClickedSyncButNotes();
     afx_msg void OnBnClickedSyncButPictures();
+    afx_msg void OnBnClickedSyncButVideos();
     afx_msg void OnBnClickedSyncButFiles();
     afx_msg void OnNcPaint();   
   

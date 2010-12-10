@@ -1,6 +1,6 @@
 /*
  * Funambol is a mobile platform developed by Funambol, Inc. 
- * Copyright (C) 2003 - 2007 Funambol, Inc.
+ * Copyright (C) 2003 - 2009 Funambol, Inc.
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -33,75 +33,84 @@
  * the words "Powered by Funambol".
  */
 
-#pragma once
-
 /** @cond OLPLUGIN */
 /** @addtogroup UI */
 /** @{ */
 
-
-// CFullSync dialog
-#include "OutlookPlugin.h"
+#pragma once
+#include "winmaincpp.h"
 #include "afxwin.h"
+#include <string>
 
 
 /**
- * Recover sync window.
+ * Videos options window.
  */
-class CFullSync : public CDialog
-{
-	DECLARE_DYNAMIC(CFullSync)
+class CVideosSettings : public CDialog {
 
-public:
-	CFullSync(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CFullSync();
-    virtual BOOL OnInitDialog();
-
-// Dialog Data
-	enum { IDD = IDD_FULLSYNC };
+	DECLARE_DYNCREATE(CVideosSettings)
 
 private:
 
-    /**
-     * Resize/move dynamically the source checkboxes, based on the number of
-     * sources visible.
-     */
-    void adjustCheckboxes();
+    /// The SyncSource configuration for videos
+    WindowsSyncSourceConfig* ssconf;
 
-    /// Returns true if at least one source checkbox is checked.
-    bool isAtLeastOneSourceChecked();
+    /**
+     * Opens the default Windows dialog to select a folder in the file system.
+     * @param folderpath    [IN-OUT] the user selected folder path, untouched if the user cancelled
+     * @param defaultFolder [OPTIONAL] the default folder to start browsing
+     * @param szCaption     [OPTIONAL] the caption of the dialog to display
+     * @param hOwner        [OPTIONAL] handle to the parent window. Set it in order to make the dialog modal
+     * @return              true if successful, false if cancelled or an error occurs
+     */
+    bool browseFolder(std::wstring& folderpath, 
+                      const WCHAR* defaultFolder = NULL, 
+                      const WCHAR* szCaption = NULL, 
+                      const HWND hOwner = NULL);
+
+    /**
+     * Loads the string data into the syncmode editbox/dropdown box.
+     * If only 1 syncmode is available, the editbox is used.
+     * Otherwise the dropdown box is used.
+     */
+    void loadSyncModesBox(const char* sourceName);
 
 protected:
+
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+    virtual BOOL OnInitDialog();
 
-	DECLARE_MESSAGE_MAP()
+    DECLARE_MESSAGE_MAP()
+
+    CEdit     editSyncType;
+    CEdit     editFolder;
+    CButton   checkInclude;
+    CButton   butSelectFolder;
+    CEdit     editRemote;
+    CStatic   groupDirection;
+    CStatic   groupFolder;
+    CStatic   groupAdvanced;
+
 public:
-    CComboBox lstSyncType;
-    CButton checkContacts;
-    CButton checkCalendar;
-    CButton checkTasks;
-    CButton checkNotes;
-    CButton checkPictures;
-    CButton checkVideos;
-    CButton checkFiles;
-    CButton radio1;
-    CButton radio2;
-    CButton radio3;
-    CStatic groupDirection;
-    CStatic groupItems;
-    
-    afx_msg void OnBnClickedOk();
-    afx_msg void OnBnClickedCancel();
 
-    /// Enable/disable the 'Recover' button, checking if at least one source is selected.
-    afx_msg void OnBnClickedSourceCheckBox();
+	CVideosSettings();           
+	virtual ~CVideosSettings();
 
-    /// Disables and unchecks the 'picture' source checkbox.
-    afx_msg void OnBnClickedRefreshC2S();
+	enum { IDD = IDD_VIDEOS };
 
-    /// Enables the 'picture' source checkbox.
-    afx_msg void OnBnClickedRefreshS2C();
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+#ifndef _WIN32_WCE
+	virtual void Dump(CDumpContext& dc) const;
+#endif
+#endif
+
+    bool saveSettings(bool);
+    afx_msg void OnBnClickedVideosOk();
+    afx_msg void OnBnClickedVideosCancel();
+    afx_msg void OnBnClickedVideosButSelect();
 };
 
 /** @} */
 /** @endcond */
+

@@ -82,6 +82,7 @@ protected:
     int syncModeTasks;
     int syncModeNotes;
     int syncModePictures;
+    int syncModeVideos;
     int syncModeFiles;
 
     // info about source enabled for sources, used on full sync (TODO: remove me)
@@ -90,6 +91,7 @@ protected:
     bool backupEnabledTasks;
     bool backupEnabledNotes;
     bool backupEnabledPictures;
+    bool backupEnabledVideos;
     bool backupEnabledFiles;
 
 

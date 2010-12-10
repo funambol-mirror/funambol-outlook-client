@@ -45,9 +45,9 @@ using namespace std;
 
 // Default dimensions of frames (in case of 96dpi)
 #define FRAME_CONFIG_X      435
-#define FRAME_CONFIG_Y      480
+#define FRAME_CONFIG_Y      500
 #define FRAME_MAIN_X        350
-#define FRAME_MAIN_Y        390
+#define FRAME_MAIN_Y        435
 #define SOURCE_PANE_SIZE_Y  45      // height of each source pane on main screen
 
 #define MAIN_PROGRESSBAR_COLOR RGB(255,255,255)
@@ -57,9 +57,9 @@ using namespace std;
 
 #define SYNCTYPE_NONE "none"
 
-//#define LAST_SYNC_TIME_FORMAT TEXT("%A %#d %b %Y %#I:%M%p")
+#define LAST_SYNC_TIME_FORMAT TEXT("%A %#d %b %Y %#I:%M%p")
 //#define LAST_SYNC_TIME_FORMAT TEXT("%#d %b %Y %#I:%M%p")
-#define LAST_SYNC_TIME_FORMAT TEXT("%A, %#I:%M%p")
+//#define LAST_SYNC_TIME_FORMAT TEXT("%A, %#I:%M%p")
 
 
 int getSyncTypeIndex(const char* syncType);

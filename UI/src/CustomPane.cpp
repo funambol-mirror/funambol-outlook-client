@@ -119,6 +119,11 @@ void CCustomPane::OnMouseMove(UINT nFlags, CPoint point) {
             mainForm->iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
             mainForm->iconStatusPictures.ShowWindow(SW_SHOW);
         }
+        if (type == PANE_TYPE_VIDEOS){
+            hPrevStatusIcon = mainForm->iconStatusVideos.GetIcon();
+            mainForm->iconStatusVideos.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
+            mainForm->iconStatusVideos.ShowWindow(SW_SHOW);
+        }
         if (type == PANE_TYPE_FILES){
             hPrevStatusIcon = mainForm->iconStatusFiles.GetIcon();
             mainForm->iconStatusFiles.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL)));
@@ -219,6 +224,10 @@ LRESULT CCustomPane::OnMouseLeave(WPARAM wParam, LPARAM lParam) {
                 }
                 if ( (type == PANE_TYPE_PICTURES) && (state != STATE_SYNC) ) {
                     mainForm->iconStatusPictures.SetIcon(hPrevStatusIcon);
+                    Invalidate();
+                }
+                if ( (type == PANE_TYPE_VIDEOS) && (state != STATE_SYNC) ) {
+                    mainForm->iconStatusVideos.SetIcon(hPrevStatusIcon);
                     Invalidate();
                 }
                 if ( (type == PANE_TYPE_FILES) && (state != STATE_SYNC) ) {

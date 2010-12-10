@@ -65,8 +65,8 @@ static int getFilesSyncTypeID(const char* syncType) {
         !strcmp(syncType, SYNC_MODE_SMART_ONE_WAY_FROM_SERVER)) {
         ret = IDS_SYNCTYPE2;
     }
-    else if (!strcmp(syncType, SYNC_MODE_ONE_WAY_FROM_CLIENT)) {
-        // this is actually not used, for pictures
+    else if (!strcmp(syncType, SYNC_MODE_ONE_WAY_FROM_CLIENT) ||
+             !strcmp(syncType, SYNC_MODE_SMART_ONE_WAY_FROM_CLIENT)) {
         ret = IDS_SYNCTYPE3;
     }
     return ret;
