@@ -256,6 +256,7 @@ BOOL CAboutDlg::OnInitDialog(){
     this->SetWindowPos(&CWnd::wndTop, xx, yy, rectDialog.Width(), newHeight, SWP_SHOWWINDOW);
 
     brush.CreateSolidBrush(RGB(255,255,255));
+    Invalidate();
 
     return TRUE;
 }
