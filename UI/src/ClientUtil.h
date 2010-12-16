@@ -57,9 +57,9 @@ using namespace std;
 
 #define SYNCTYPE_NONE "none"
 
-//#define LAST_SYNC_TIME_FORMAT TEXT("%A %#d %b %Y %#I:%M%p")
+#define LAST_SYNC_TIME_FORMAT TEXT("%A %#d %b %Y %#I:%M%p")
 //#define LAST_SYNC_TIME_FORMAT TEXT("%#d %b %Y %#I:%M%p")
-#define LAST_SYNC_TIME_FORMAT TEXT("%A, %#I:%M%p")
+//#define LAST_SYNC_TIME_FORMAT TEXT("%A, %#I:%M%p")
 
 
 int getSyncTypeIndex(const char* syncType);
