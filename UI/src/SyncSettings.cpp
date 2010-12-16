@@ -89,14 +89,14 @@ void populateArrays() {
     StringBuffer value, completeValue;
     int res = 0, minSize = 0, hourSize = 0, totalSize = 0;
 
-    // safe check to remove element that are number <5 and >59
+    // safe check to remove element that are number <1 and >59
     if (!minutesString.empty()) {
     minutesString.split(tmp, ",");    
     for (el = (StringBuffer *)tmp.front(); el; el = (StringBuffer *)tmp.next() ) {
         completeValue = el->c_str();
         value = removeDefaultString(completeValue);
         res = atoi(value.c_str());
-        if (res >= 5 && res <= 59) {
+        if (res >= 1 && res <= 59) {
             minutesA.add(completeValue);
         }
     }
