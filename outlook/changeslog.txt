@@ -1,7 +1,12 @@
+2010-12-16
+  - toccy: fixed bug 9716 - Outlook Sync Client: Last sync information is not sufficiently detailed
+
 2010-12-15
   - toccy: fixed bug 10459 - About page formatting on Windows XP
+  
 2010-12-10
   - magi: added redemption.readme.txt file. Updated how_to_build with redemption info
+  
 2010-11-29
   - magi: updated copyright info from 2010 to 2011
 
