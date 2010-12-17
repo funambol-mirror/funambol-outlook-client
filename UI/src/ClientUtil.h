@@ -45,7 +45,7 @@ using namespace std;
 
 // Default dimensions of frames (in case of 96dpi)
 #define FRAME_CONFIG_X      435
-#define FRAME_CONFIG_Y      500
+#define FRAME_CONFIG_Y      510
 #define FRAME_MAIN_X        350
 #define FRAME_MAIN_Y        435
 #define SOURCE_PANE_SIZE_Y  45      // height of each source pane on main screen
