@@ -1156,13 +1156,11 @@ ArrayList* getVCalendarProperties(){
     props->add(*p);
     p->setPropName("X-MICROSOFT-CDO-REPLYTIME");
     props->add(*p);
-    p->setPropName("DALARM");
+    p->setPropName("AALARM");
     props->add(*p);
 	p->setPropName("PRIORITY"); 
     props->add(*p);
     p->setPropName("DTSTART");
-    props->add(*p);
-    p->setPropName("SUMMARY");
     props->add(*p);
     p->setPropName("RRULE");
     props->add(*p);
