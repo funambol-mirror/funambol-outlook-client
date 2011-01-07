@@ -1158,8 +1158,7 @@ ArrayList* getVCalendarProperties(){
     props->add(*p);
     p->setPropName("DALARM");
     props->add(*p);
-	p->setPropName("PRIORITY");
-    props->add(*p);    
+	p->setPropName("PRIORITY"); 
     props->add(*p);
     p->setPropName("DTSTART");
     props->add(*p);
