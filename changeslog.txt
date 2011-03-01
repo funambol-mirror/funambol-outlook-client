@@ -1,3 +1,7 @@
+2011-03-01
+  - toccy: Release 9.0.3
+  - gibi: fixed German language strings
+
 2010-01-21
   - maria: Release 9.0.2 and create branch v9
 
