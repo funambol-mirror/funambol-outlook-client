@@ -1,3 +1,9 @@
+2011-03-10
+  - toccy: fixed bug 10289: Yearly all-day events are not updated on outlook 2010 and outlook 2007 SP2
+           It is a patch for a MS Outlook issue on yearly recurring events, that are 
+           differently managed on different Outlook versions.
+           In case of error inserting a (right) interval like 1,2,3 we try again with 12,24,36.
+
 2010-01-21
   - maria: Release 9.0.2 and create branch v9
 

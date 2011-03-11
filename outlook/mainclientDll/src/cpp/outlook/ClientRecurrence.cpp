@@ -575,15 +575,34 @@ int ClientRecurrence::save() {
     }
 
 
-    // Patch for yearly events: interval property is only supported on Outlook 2010 or later.
+    // Patch for yearly events: interval property is only supported on Outlook 2007 SP2 or later.
     // Some older Outlook versions throw an exception if we put the interval value (bug 10260).
+    // http://msdn.microsoft.com/en-us/library/microsoft.office.interop.outlook.recurrencepattern.interval%28v=office.12%29.aspx
+    // This is a super patch for a MS Outlook bug that's occurring on some OL versions.
     if (recurrenceType == 5 || recurrenceType == 6) {
+        bool ignoreInterval = false;
         ClientApplication* cApp = ClientApplication::getInstance();
-        int majorVersion = _wtoi(cApp->getVersion().c_str());
-        if (majorVersion <= 12) { 
-            // Old Outlook versions (v.12 = Outlook 2007)
-            // interval is not supported so we won't put it
-            // http://msdn.microsoft.com/en-us/library/microsoft.office.interop.outlook.recurrencepattern.interval%28v=office.12%29.aspx
+        StringBuffer version;
+        version.convert(cApp->getVersion().c_str());
+        int major=0, minor=0, build1=0, build2=0;
+        sscanf(version.c_str(), "%d.%d.%d.%d", &major, &minor, &build1, &build2);
+        if (major < 12) {
+            ignoreInterval = true;          // Outlook 2003
+        }
+        else if (major == 12) {
+            // 12.0.0.4518 = original
+            // 12.0.0.6212 = SP1
+            // 12.0.0.6423 = SP2
+            if (minor == 0 && build1 == 0 && build2 < 6423) {
+                ignoreInterval = true;      // Outlook 2007 original or SP1
+            } else {
+                ignoreInterval = false;     // Outlook 2007 SP2
+            }
+        } else {
+            ignoreInterval = false;         // Outlook 2010 or later
+        }
+
+        if (ignoreInterval) {
             if (interval > 1) {
                 LOG.info("Warning, data loss: yearly recurrences every %d years are not supported on %ls.", 
                     interval, cApp->getName().c_str());
@@ -681,7 +700,20 @@ int ClientRecurrence::save() {
     i++;
     if (interval != -1) {
         hr = pRec->put_Interval((long)interval);
-        if (FAILED(hr)) goto error;
+        if (FAILED(hr)) {
+            // Bug 10289: some OL versions expect an yearly interval
+            // like 12,24,36 instead of 1,2,3 - so let's try again.
+            // MS bug - see MS issue and hotfix here:
+            // http://support.microsoft.com/kb/981048/en-us
+            if (recurrenceType == 5 || recurrenceType == 6) {
+                interval = interval*12;
+                LOG.debug("Interval issue for yearly recs: try again with interval = %d", interval);
+                hr = pRec->put_Interval((long)interval);
+            }
+        }
+        if (FAILED(hr)) {
+            goto error;
+        }
     }
     
     i++; 
