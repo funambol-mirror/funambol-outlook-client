@@ -40,6 +40,14 @@
 #include "DateFilter.h"
 #include <string>
 
+#include "sapi/SapiSyncSource.h"
+#include "sapi/FileSapiSyncSource.h"
+
+#define PICT_EXTENSION   ".jpg,.jpeg,.jpe,.gif,.png,.jfif,.jif,.bmp,.tiff,.tif"
+#define VIDEO_EXTENSION  ".wmv,.mp4,.mov,.3g2,.mpeg,.mpg,.mpe,.asf,.movie,.avi,.mpa,.mp2,.m4u,.m4v,.swf,.flv"
+#define FILE_EXTENSION   "!" PICT_EXTENSION "," VIDEO_EXTENSION
+
+
 using namespace std;
 
 
@@ -115,6 +123,18 @@ WindowsDeviceConfig* DefaultWinConfigFactory::getWindowsDeviceConfig(DeviceConfi
 }
 
 
+SapiConfig* DefaultWinConfigFactory::getSapiConfig() {
+
+    SapiConfig* c = new SapiConfig();
+
+    c->setRequestTimeout        (30);       // 30 sec
+    c->setResponseTimeout       (30);       // 30 sec
+    c->setUploadChunkSize       (30000);    // 30 KByte
+    c->setDownloadChunkSize     (30000);    // 30 KByte
+
+    return c;
+}
+
 
 SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wname) {
 
@@ -171,15 +191,56 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         }
         sc->setIsEnabled        (NOTE_SOURCE_ENABLED);
     }
+
+    // SAPI
     else if (wname == PICTURE) {
-        sc->setSync             (DEFAULT_PICTURES_SYNC_MODE);
+        sc->setSync             (SYNC_MODE_TWO_WAY);
         sc->setSyncModes        (PICTURES_DEVINFO_SYNC_MODES);
         sc->setURI              (DLLCustomization::sourcePicturesUri);
-        sc->setType             ("application/vnd.omads-file+xml");      // not really used, as it's detected from each item received
+        sc->setType             ("image/*");      
         sc->setVersion          ("");
         sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
-        sc->setSupportedTypes   ("application/vnd.omads-file+xml:,application/*:");
+        sc->setSupportedTypes   ("application/*");
         sc->setIsEnabled        (PICTURE_SOURCE_ENABLED);
+        
+        sc->setProperty         (PROPERTY_USE_SAPI, "1");
+        sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP, "0");
+        sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
+        sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
+        sc->setProperty         (PROPERTY_EXTENSION, PICT_EXTENSION);
+        sc->setProperty         (PROPERTY_FOLDER_PATH, "c:/temp/A-Media-Hub");  
+    }
+    else if (wname == VIDEO){
+        sc->setSync             (SYNC_MODE_TWO_WAY);
+        sc->setSyncModes        (VIDEOS_DEVINFO_SYNC_MODES);
+        sc->setURI              (DLLCustomization::sourceVideosUri);
+        sc->setType             ("video/*");      
+        sc->setVersion          ("");
+        sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
+        sc->setSupportedTypes   ("application/*");
+        sc->setIsEnabled        (VIDEO_SOURCE_ENABLED);        
+        sc->setProperty         (PROPERTY_USE_SAPI, "1");
+        sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP, "0");
+        sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
+        sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
+        sc->setProperty         (PROPERTY_EXTENSION, VIDEO_EXTENSION);
+        sc->setProperty         (PROPERTY_FOLDER_PATH, "c:/temp/A-Media-Hub");  
+    }
+    else if (wname == FILES){
+        sc->setSync             (DEFAULT_FILES_SYNC_MODE);
+        sc->setSyncModes        (FILES_DEVINFO_SYNC_MODES);
+        sc->setURI              (DLLCustomization::sourceFilesUri);
+        sc->setType             ("application/*");      
+        sc->setVersion          ("");
+        sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
+        sc->setSupportedTypes   ("application/*");
+        sc->setIsEnabled        (FILE_SOURCE_ENABLED);        
+        sc->setProperty         (PROPERTY_USE_SAPI, "1");
+        sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP, "0");
+        sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
+        sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
+        sc->setProperty         (PROPERTY_EXTENSION, FILE_EXTENSION);
+        sc->setProperty         (PROPERTY_FOLDER_PATH, "c:/temp/A-Media-Hub");  
     }
 
     if (name) delete [] name;

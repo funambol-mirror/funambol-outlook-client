@@ -228,18 +228,22 @@ int getSyncModeCode(const char* syncMode){
 
     if(strcmp(syncMode, "none") == 0)
         code = SYNC_NONE;
-    if(strcmp(syncMode, "two-way") == 0)
+    else if(strcmp(syncMode, "two-way") == 0)
         code = SYNC_TWO_WAY;
-    if(strcmp(syncMode, "slow") == 0)
+    else if(strcmp(syncMode, "slow") == 0)
         code = SYNC_SLOW;
-    if(strcmp(syncMode, "one-way-from-client") == 0)
+    else if(strcmp(syncMode, "one-way-from-client") == 0)
         code = SYNC_ONE_WAY_FROM_CLIENT;
-    if(strcmp(syncMode, "refresh-from-client") == 0)
+    else if(strcmp(syncMode, "refresh-from-client") == 0)
         code = SYNC_REFRESH_FROM_CLIENT;
-    if(strcmp(syncMode, "one-way-from-server") == 0)
+    else if(strcmp(syncMode, "one-way-from-server") == 0)
         code = SYNC_ONE_WAY_FROM_SERVER;
-    if(strcmp(syncMode, "refresh-from-server") == 0)
+    else if(strcmp(syncMode, "refresh-from-server") == 0)
         code = SYNC_REFRESH_FROM_SERVER;
+    else if(strcmp(syncMode, "smart-one-way-from-client") == 0)
+        code = SYNC_SMART_ONE_WAY_FROM_CLIENT;
+    else if(strcmp(syncMode, "smart-one-way-from-server") == 0)
+        code = SYNC_SMART_ONE_WAY_FROM_SERVER;
 
     return code;
 }
@@ -328,4 +332,15 @@ wstring formatDate(StringBuffer& date) {
     GetDateFormat(LOCALE_USER_DEFAULT, NULL, &timeDest, dd.c_str(), formatDate, 80); 
     dd = formatDate;
     return dd;
+}
+
+StringBuffer ConvertToChar(const CString &s)
+{
+    int nSize = s.GetLength();
+    char *pAnsiString = new char[nSize+1];
+    memset(pAnsiString,0,nSize+1);
+    wcstombs(pAnsiString, s, nSize+1);
+    StringBuffer r(pAnsiString);
+    delete [] pAnsiString;
+    return r;
 }

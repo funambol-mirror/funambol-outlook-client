@@ -55,6 +55,8 @@
 #define SYNCSOURCE_NOTES        3
 #define SYNCSOURCE_TASKS        4
 #define SYNCSOURCE_PICTURES     5
+#define SYNCSOURCE_FILES        6
+#define SYNCSOURCE_VIDEOS       7
 
 
 
@@ -87,6 +89,12 @@ bool isAcceptedDataType(const std::string&  dataType);
 char* syncModeName     (SyncMode code);
 bool isFullSyncMode    (SyncMode mode);
 
+/// Returns true if the source is a PIM source (contacts, calendar, tasks or notes)
+bool isPIMSource(const char* sourceName);
+
+/// Returns true if the source is a Media source (pictures, videos or files)
+bool isMediaSource(const char* sourceName);
+
 void  toWindows        (char* str);
 WCHAR* readAppDataPath ();
 WCHAR* readDataPath    (const WCHAR* itemType);
@@ -100,13 +108,25 @@ int    getWindowsUserEx(std::wstring& userName);
  */
 StringBuffer getDefaultPicturesPath();
 
+/**
+ * Returns the default path to store files 
+ * (shell folder 'my documents' for this user)
+ */
+StringBuffer getDefaultFilesPath();
+
+/**
+ * Returns the default path to store videos 
+ * (shell folder 'my videos' for this user)
+ */
+StringBuffer getDefaultVideosPath();
+
 std::wstring readFromFile          (const std::wstring& filePath);
 int          writeToFile           (const std::wstring& content, const std::wstring& filePath, const WCHAR* mode = L"w");
 int          writeToFile           (const std::string&  content, const std::string&  filePath, const char*  mode = "w");
 std::string  getSyncMutexName      ();
 char*        readSystemErrorMsg    (DWORD errorCode = 0);
 std::wstring getSafeItemName       (ClientItem* cItem);
-void         printReport           (SyncReport* sr, SyncSource** sources);
+//void         printReport           (SyncReport* sr, SyncSource** sources);
 char*        friendlyName          (const char* sourceName);
 
 int          getBuildNumberFromVersion(const char* swv);

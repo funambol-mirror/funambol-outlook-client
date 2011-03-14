@@ -1,34 +1,34 @@
 /*
- * Funambol is a mobile platform developed by Funambol, Inc. 
+ * Funambol is a mobile platform developed by Funambol, Inc.
  * Copyright (C) 2003 - 2007 Funambol, Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
- * the Free Software Foundation with the addition of the following permission 
+ * the Free Software Foundation with the addition of the following permission
  * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
- * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE 
+ * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT  OF THIRD PARTY RIGHTS.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  * details.
- * 
- * You should have received a copy of the GNU Affero General Public License 
+ *
+ * You should have received a copy of the GNU Affero General Public License
  * along with this program; if not, see http://www.gnu.org/licenses or write to
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301 USA.
- * 
- * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite 
+ *
+ * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite
  * 305, Redwood City, CA 94063, USA, or at email address info@funambol.com.
- * 
+ *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
  * Section 5 of the GNU Affero General Public License version 3.
- * 
+ *
  * In accordance with Section 7(b) of the GNU Affero General Public License
  * version 3, these Appropriate Legal Notices must retain the display of the
- * "Powered by Funambol" logo. If the display of the logo is not reasonably 
+ * "Powered by Funambol" logo. If the display of the logo is not reasonably
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by Funambol".
  */
@@ -41,6 +41,8 @@
 #include "winmaincpp.h"
 #include "WindowsSyncSource.h"
 #include "PicturesSyncSource.h"
+#include "VideosSyncSource.h"
+#include "WinFileSyncSource.h"
 #include "WindowsSyncClient.h"
 #include "utils.h"
 #include "HwndFunctions.h"
@@ -61,7 +63,12 @@
 #include "http/Proxy.h"
 #include "http/URL.h"
 #include "http/TransportAgentFactory.h"
+#include "http/WinTransportAgent.h"
 #include "base/util/XMLProcessor.h"
+
+#include "sapi/FileSapiSyncSource.h" //SAPI
+#include "sapi/SapiSyncManager.h"
+
 
 #include <string>
 
@@ -77,6 +84,7 @@ bool isScheduledSync = false;
 bool resetLog        = false;
 void launchSyncClient();
 
+int synchronizeSapi(SapiSyncSource& sapiSource);
 
 /**
  * Returns a pointer to the OutlookConfig object (singleton).
@@ -97,7 +105,7 @@ __declspec(dllexport) OutlookConfig* getConfig() {
 
 /**
  * Initialize the client: open configuration, open LOG.
- * Configuration is a singleton object that MUST remain active during all 
+ * Configuration is a singleton object that MUST remain active during all
  * program life. Will be released with close() method.
  *
  * @param isScheduled true if it's a scheduled sync
@@ -157,7 +165,6 @@ int initializeClient(bool isScheduled, bool justRead) {
 
     HwndFunctions::initHwnd();
 
-
     if (strlen(logText) > 0) {
         LOG.info(logText);
     }
@@ -166,7 +173,7 @@ int initializeClient(bool isScheduled, bool justRead) {
 
 
 /**
- * Initialize the LOG. Log File is placed under 'app data' directory for 
+ * Initialize the LOG. Log File is placed under 'app data' directory for
  * current user, if directories not found they will be created.
  * Log file is reset and set level with this call.
  * @param reset  if scheduled, we don't reset the log
@@ -232,13 +239,15 @@ int startSync() {
     int sourcesActive = 0;
     int priority      = 0;
     WCHAR* wname      = NULL;
-    SyncReport* report= NULL;
     string mutexName  = "";
+
+    // The main sync report, to collect reports of all sources synced.
+    SyncReport report;
 
     // Open current configuration: call initialize(0) if not called yet!
     // (reset abortSync flag)
     OutlookConfig* config = getConfig();
-    config->setAbortSync(false);  
+    config->setAbortSync(false);
 
     // Check if log size is too big (>10MB).
     /*
@@ -270,27 +279,6 @@ int startSync() {
         */
     }
 
-    try {
-        ClientApplication * outlook = ClientApplication::getInstance(isScheduledSync);
-    }
-    catch (ClientException* e) {
-        // Must set the errors, here could be a fatal exception
-        setErrorF(0, e->getErrorMsg());
-        bool display = 
-            !isScheduledSync && getConfig()->getWindowsDeviceConfig().getAttach()
-            ||
-            !getConfig()->getWindowsDeviceConfig().getAttach();
-        if (display)
-        {
-            e->setExceptionData(e->getErrorMsg(), e->getErrorCode(), false, true);
-            manageClientException(e);
-            return 1;
-        }
-        else
-        {
-            return 2;
-        }
-    }
 
     // Update log level: could be changed from initialize().
     LOG.setLevel(config->getClientConfig().getLogLevel());
@@ -300,12 +288,12 @@ int startSync() {
         LOG.info(" *** Scheduled sync started ***");
     }
 
-    // If here, this is the ONLY instance of sync process 
+    // If here, this is the ONLY instance of sync process
     // -> set the scheduled flag on win registry.
     config->setScheduledSync(isScheduledSync);
 
 
-    // Reads timeStamps from registry -> update the config. 
+    // Reads timeStamps from registry -> update the config.
     // (a scheduled sync could have completed with the UI open)
     config->readSourcesTimestamps();
 
@@ -343,20 +331,13 @@ int startSync() {
 
 
     //
-    // Create the array of SyncSources (only if source enabled)
-    // ----------------------------------------------------------
+    // Create the array of SyncSource names (only if source enabled)
+    // -------------------------------------------------------------
     LOG.debug("Creating SyncSources...");
     int sourcesCount = config->getSyncSourceConfigsCount();
-    SyncSource** sources = new SyncSource*[sourcesCount+1];
-
-    // Sources not icluded into the itemTypesUsed[] array will not be synced.
-    // Sources order is important: 
-    // 1. "Contacts"
-    // 2. "Calendar"
-    // 3. "Tasks"
-    // 4. "Notes"
-    // 5. "Pictures"
+    ArrayList sources;  // source names
     int j=0;
+    bool syncingPIM = false;
     const ArrayList& sourcesOrder = config->getSourcesVisible();
     for (int j=0; j<sourcesOrder.size(); j++) {
         for (int i=0; i<sourcesCount; i++) {
@@ -365,35 +346,49 @@ int startSync() {
             if (enabled || isRefresh) {
                 StringBuffer* name = (StringBuffer*)sourcesOrder.get(j);
                 if (*name == config->getSyncSourceConfig(i)->getName()) {
-                    // Here the right SyncSource is added to the source array.
-                    // The source is created passing the right SSConfig.
-                    WString wname;
-                    wname = *name;
-                    if (wname == PICTURE) {
-                        sources[sourcesActive] = new PicturesSyncSource(wname.c_str(), config->getSyncSourceConfig(i));
+                    // Here the right SyncSource is added to the array of sources to sync.
+                    sources.add(*name);
+                    if (isPIMSource(name->c_str())) {
+                        syncingPIM = true;
                     }
-                    else {
-                        sources[sourcesActive] = new WindowsSyncSource(wname.c_str(), config->getSyncSourceConfig(i));
-                    }
-                    sourcesActive++;
                 }
             }
         }
     }
-    sources[sourcesActive] = NULL;
-
-
-    // Create the SyncClient passing pointer of SyncSources vector,  
-    // used to check SyncMode in 'continueAfterPrepareSync()'.
-    WindowsSyncClient winClient(sources);
-
 
     // Exit if no sources to sync
-    if (sourcesActive == 0) {
+    if (sources.size() == 0) {
         //safeMessageBox(MSGBOX_NO_SOURCES_TO_SYNC);
         setError(ERR_CODE_NO_SOURCES, ERR_NO_SOURCES_TO_SYNC);
         ret = ERR_CODE_NO_SOURCES;
         goto finally;
+    }
+
+    if (syncingPIM) {
+        //
+        // If not syncing PIM sources, Outlook is not even accessed.
+        //
+        try {
+            ClientApplication * outlook = ClientApplication::getInstance(isScheduledSync);
+        }
+        catch (ClientException* e) {
+            // Must set the errors, here could be a fatal exception
+            setErrorF(0, e->getErrorMsg());
+            bool display =
+                !isScheduledSync && getConfig()->getWindowsDeviceConfig().getAttach()
+                ||
+                !getConfig()->getWindowsDeviceConfig().getAttach();
+            if (display)
+            {
+                e->setExceptionData(e->getErrorMsg(), e->getErrorCode(), false, true);
+                manageClientException(e);
+                return 1;
+            }
+            else
+            {
+                return 2;
+            }
+        }
     }
 
 
@@ -433,22 +428,197 @@ int startSync() {
 
 
     // --------------------------------------------------
-    // Create the SyncClient object and kick off the sync
-    //
-    LOG.debug("Start SyncClient::Sync() with %d sources", sourcesActive);
-    ret = winClient.sync(*config, sources);
+    // Kick off the sync: one source at time
+    for (int i=0; i< sources.size(); i++) {
+        StringBuffer* name = (StringBuffer*)sources.get(i);
+        if (!name) continue;
+
+        SyncSourceReport ssReport(name->c_str());
+        WindowsSyncSourceConfig* wssconfig = config->getSyncSourceConfig(name->c_str());
+        SyncSourceConfig* ssconfig = wssconfig->getCommonConfig();
+
+        if (isMediaSource(name->c_str()))
+        {
+            // --- Media source ---
+            FileSapiSyncSource source(*ssconfig, ssReport, 0);
+            ret |= synchronizeSapi(source);
+
+            report.addSyncSourceReport(source.getReport());
+        }
+        else
+        {   // --- PIM source ---
+            WString wname;
+            wname = *name;
+            WindowsSyncSource source(wname.c_str(), wssconfig);
+            WindowsSyncClient winClient(source);
+            ret |= synchronize(winClient, source);
+
+            report.addSyncSourceReport(*source.getReport());
+        }
+
+        if (ret) {
+            // Update the sync report
+            SyncSourceReport* ssr = report.getSyncSourceReport(name->c_str());
+            report.setLastErrorCode(ssr->getLastErrorCode());
+            report.setLastErrorMsg (ssr->getLastErrorMsg());
+            report.setLastErrorType(ERROR_TYPE_WINDOWS_CLIENT);
+            LOG.error("Sync of %s completed with error %s%d: %s", name->c_str(), ssr->getLastErrorType(),
+                                                        ssr->getLastErrorCode(), ssr->getLastErrorMsg());
+        } else {
+            LOG.info("Sync of %s completed successfully", name->c_str());
+        }
+
+        // for these codes, we stop all the queued syncs
+        if (ret == 401  || ret == 407 ||        // authentication error
+            ret == 2001 || ret == 2060) {       // host/server name is wrong
+            break;
+        }
+    }
     // --------------------------------------------------
 
 
-    // Print sync results.
-    report = winClient.getSyncReport();
-    printReport(report, sources);
+finally:
+
+    endSync();
+
+    if (ret && config->getAbortSync()) {
+        // Sync was canceled: fix the return code to avoid msgbox
+        ret = 2;
+        report.setLastErrorCode(ret);
+        report.setLastErrorMsg("Sync canceled by the user");
+    }
+
+    // set the last global error
+    config->setLastGlobalError(ret);
+    config->save();
+
+    // Print sync session results
+    StringBuffer reportMsg;
+    report.toString(reportMsg);
+    LOG.info("\n%s", reportMsg.c_str());
+
+    // check for updates (skip in case of network error / sync aborted)
+    if (ret != 2    && 
+        ret != 2050 && 
+        ret != 2001 && 
+        ret != 2060) {
+        if (checkUpdate()) {
+            updateProcedure(HwndFunctions::getWindowHandle(), false);
+        }
+    }
 
 
-    //
+#ifdef MALLOC_DEBUG
+    printMemLeaks();
+#endif
+    return ret;
+}
+
+
+int synchronizeSapi(SapiSyncSource& sapiSource) {
+
+    int ret = 0;
+    SyncMode syncMode = syncModeCode(sapiSource.getConfig().getSync());
+    OutlookConfig* config = getConfig();
+
+    StringBuffer name = sapiSource.getConfig().getName();
+    int sourceID = syncSourceNameToIndex(name);
+    if (!sourceID) {
+        return -1;
+    }
+
+    //LOG.debug("\n********** Start sync for source '%s' **********", name.c_str());
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_BEGIN, NULL, (LPARAM)sourceID);
+
+    // ---------------------------------------------
+    SapiSyncManager sapiManager(sapiSource, *config);
+    ret = sapiManager.beginSync();
+    config->saveSyncSourceConfig(name.c_str());
+    if (ret != 0) {
+        goto finally;
+    }
+
+    if (syncMode == SYNC_TWO_WAY || syncMode == SYNC_ONE_WAY_FROM_CLIENT) {
+        ret = sapiManager.upload();
+        config->saveSyncSourceConfig(name.c_str());
+    }
+
+    if (syncMode == SYNC_TWO_WAY || syncMode == SYNC_ONE_WAY_FROM_SERVER) {
+        ret = sapiManager.download();
+        config->saveSyncSourceConfig(name.c_str());
+    }
+
+    if (ret != ESSMCanceled && ret != ESSMNetworkError) {
+        ret = sapiManager.endSync();
+    }
+    // ---------------------------------------------
+
+finally:
+
+    if (ret) {
+        // filter SapiSyncManager errors at client level (for UI popups)
+        ret = manageSapiError(ret);
+    }
+
+    // set the last error for this source
+    sapiSource.getConfig().setLastSourceError(ret);
+
+    // SAVE CONFIG TO DISK.
+    // Saves also the last sync time (now), used to refresh UI
+    config->saveSyncSourceConfig(name.c_str());
+
+
+    // enable/disable dynamic sources (check Server datastores)
+    // The source name and the preferred data type must match.
+    bool removedPictures = false;
+    if (DYNAMICALLY_SHOW_PICTURES) {
+        DataStore* dataStore = config->getServerDataStore(PICTURE_);
+        if ( dataStore && !strcmp(dataStore->getRxPref()->getCTType(), OMA_MIME_TYPE) ) {
+            config->safeAddSourceVisible(PICTURE_);
+        }
+        else {
+            removedPictures = config->removeSourceVisible(PICTURE_);
+        }
+    }
+
+    // Fire the SOURCE_STATE message to the UI, to tell the state of sources synced
+    LPARAM sourceState = SYNCSOURCE_STATE_NOT_SYNCED;
+    if (ret == 0) {
+        sourceState = SYNCSOURCE_STATE_OK;
+    } 
+    else if (config->getAbortSync()) {
+        sourceState = SYNCSOURCE_STATE_CANCELED;
+    }
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_END, (WPARAM)sourceID, sourceState);
+
+    return ret;
+}
+
+
+int synchronize(WindowsSyncClient& winClient, WindowsSyncSource& source) {
+
+    SyncReport* report = winClient.getSyncReport();
+    if (!report) return -1;
+
+    OutlookConfig* config = getConfig();
+    StringBuffer name = source.getConfig().getName();
+    int sourceID = syncSourceNameToIndex(name);
+    if (!sourceID) {
+        return -1;
+    }
+
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_BEGIN, NULL, (LPARAM)sourceID);
+
+    // ----------------------------------------------
+    SyncSource* oneSourceArray[2];
+    oneSourceArray[0] = &source;
+    oneSourceArray[1] = NULL;
+    int ret = winClient.sync(*config, oneSourceArray);
+    // ----------------------------------------------
+
+
     // enable/disable pictures source (check Server datastores)
     // The source name and the preferred data type must match.
-    //
     bool removedPictures = false;
     if (DYNAMICALLY_SHOW_PICTURES) {
         DataStore* dataStore = config->getServerDataStore(PICTURE_);
@@ -462,7 +632,7 @@ int startSync() {
 
     //
     // Save configuration to win registry. (TBD: manage dirty flag!)
-    // Note: source configs will not be saved if not successfull...
+    // Note: source configs will not be saved if not successful...
     // Note: we MUST lock the buttons during the save(), to avoid users to cancel sync.
     //
     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_REFRESH_STATUSBAR, NULL, (LPARAM)SBAR_ENDING_SYNC);
@@ -471,89 +641,25 @@ int startSync() {
     config->save(report);
 
 
-finally:
-
-    endSync();
-
-    //
-    // Send msg to UI to refresh status icon (source state)
-    //
-    int sourceID = -1;
-
-    if(report){  // check if the sync report is valid
-        // Update the errors from SyncReport
-        setErrorF(report->getLastErrorCode(), "%s", report->getLastErrorMsg());
-        ret = getLastErrorCode();
-
-        //
-        // Fire the SOURCE_STATE message to the UI, to tell the state of sources synced
-        //
-
-        int i=0;
-        while (sources[i]) {
-            SyncSourceReport* ssReport = NULL;
-            ssReport = sources[i]->getReport();
-            LPARAM sourceState = SYNCSOURCE_STATE_NOT_SYNCED;
-
-            if (ssReport) {
-                sourceID = syncSourceNameToIndex(ssReport->getSourceName());
-                if (sourceID) {
-                    if (sourceID == SYNCSOURCE_PICTURES) {
-                        PicturesSyncSource* pss = (PicturesSyncSource*)sources[i];
-                        if ((ssReport->getState() != SOURCE_ERROR) && pss->getIsSynced()) {
-                            sourceState = SYNCSOURCE_STATE_OK;
-                        } else if (removedPictures && (ret == STC_NOT_FOUND)) {
-                            // Hide the UI warning, if 'picture' source not found. 
-                            sourceState = SYNCSOURCE_STATE_OK;
-                            ret = 0;
-                        }
-                    }
-                    else {
-                        // All other ssources are WindowsSyncSources
-                        WindowsSyncSource* wss = (WindowsSyncSource*)sources[i];
-                        if ((ssReport->getState() != SOURCE_ERROR) && wss->getConfig().getIsSynced()) {
-                            sourceState = SYNCSOURCE_STATE_OK;
-                        }
-                    }
-                }
-
-                SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SOURCE_STATE, (WPARAM)sourceID, sourceState);
-            }
-            i++;
+    // Fire the SOURCE_STATE message to the UI, to tell the state of sources synced
+    LPARAM sourceState = SYNCSOURCE_STATE_NOT_SYNCED;
+    SyncSourceReport* ssReport = source.getReport();
+    if (ssReport) {
+        if ((ssReport->getState() != SOURCE_ERROR) && source.getConfig().getIsSynced()) {
+            sourceState = SYNCSOURCE_STATE_OK;
         }
     }
-
-
-    // Clean up SyncSources...
-    LOG.debug("Delete SyncSources...");
-    if (sources) {
-        int i=0;
-        while(sources[i]) {
-            delete sources[i];
-            i++;
-        }
-        delete [] sources;
-        sources = NULL;
+    if (config->getAbortSync()) {
+        sourceState = SYNCSOURCE_STATE_CANCELED;
     }
-
-#ifdef MALLOC_DEBUG
-    printMemLeaks();
-#endif
-
-    if (ret == 0)
-        LOG.info(INFO_SYNC_COMPLETED);
-    else
-        LOG.info(INFO_SYNC_COMPLETED_ERRORS, ret);
 
     // Finally: unlock buttons
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_END, (WPARAM)sourceID, sourceState);
     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_UNLOCK_BUTTONS, NULL, NULL);
 
-    // check for updates
-    if (checkUpdate()) {
-        updateProcedure(HwndFunctions::getWindowHandle(), false);
-    }
     return ret;
 }
+
 
 
 /**
@@ -661,7 +767,7 @@ bool checkSyncInProgress() {
     if (!hMutex) {
         hMutex = OpenMutexA(MUTEX_ALL_ACCESS, FALSE, mutexName.c_str());
     }
-    
+
     // OpenMutex failed.
     if (hMutex == NULL) {
         if (GetLastError() == ERROR_FILE_NOT_FOUND) {
@@ -692,7 +798,7 @@ bool checkSyncInProgress() {
                 LOG.debug(DBG_LAST_SYNC_ABORTED);
             case WAIT_OBJECT_0: {
 
-                // ***TODO*** This has been commented cause not sure if correct to 
+                // ***TODO*** This has been commented cause not sure if correct to
                 //            release a pending mutex (owner could try to release it)
                 //if (!ReleaseMutex(hMutex)) {
                 //    char* msg = readSystemErrorMsg();
@@ -736,6 +842,12 @@ void softTerminateSync() {
 
     OutlookConfig* config = getConfig();
     config->setAbortSync(true);
+
+    // try to break internet connection, closing interfaces
+    // this will cause a transaction error, unblocking it, if connection is in use.
+    HttpConnection::closeConnection();
+    WinTransportAgent::closeConnection();
+
     LOG.debug(DBG_SYNC_ABORT_REQUEST);
 }
 
@@ -808,7 +920,7 @@ int exitSyncThread(int code) {
 void checkAbortedSync() {
 
     OutlookConfig* config = getConfig();
-    
+
     if (config->getAbortSync()) {
         LOG.info(INFO_SYNC_ABORTING);
 
@@ -839,7 +951,7 @@ wstring getDefaultFolderPath(const wstring& itemType) {
     wstring pathSelected = EMPTY_WSTRING;
     ClientApplication* outlook = NULL;
     ClientFolder*      folder  = NULL;
-    
+
     try {
         outlook = ClientApplication::getInstance(false);
         if (outlook) {
@@ -861,10 +973,10 @@ finally:
     // release the COM library to be correctly used by next thread.
     try {
         if (outlook) {
-            delete outlook; 
+            delete outlook;
             outlook = NULL;
         }
-    } 
+    }
     catch (ClientException* e) {
         manageClientException(e);
     }
@@ -892,7 +1004,7 @@ wstring pickOutlookFolder(const wstring& itemType) {
     ClientApplication* outlook = NULL;
     ClientFolder*      folder  = NULL;
 
-    
+
     // Pick the desired folder.
     try {
         outlook = ClientApplication::getInstance();
@@ -916,7 +1028,7 @@ finally:
     // release the COM library to be correctly used by next thread.
     try {
         closeOutlook();
-    } 
+    }
     catch (ClientException* e) {
         manageClientException(e);
     }
@@ -959,7 +1071,7 @@ int setScheduler(const bool enable, const int minutes) {
 
 
 /**
- * Get information about scheduled task of plugin. 
+ * Get information about scheduled task of plugin.
  * @param minutes   [OUT] the repeating minutes of task
  * @return          true if task is active.
  *                  false if task is disabled or not existing.
@@ -1024,7 +1136,7 @@ void upgradePlugin(const int oldVersion, const int oldFunambolVersion) {
 
         // Get 'application data' folder for current user.
         WCHAR appDataPath[MAX_PATH_LENGTH];
-        if ( FAILED(SHGetFolderPath(NULL, 
+        if ( FAILED(SHGetFolderPath(NULL,
                                     CSIDL_APPDATA | CSIDL_FLAG_CREATE,
                                     NULL,
                                     0,
@@ -1042,7 +1154,7 @@ void upgradePlugin(const int oldVersion, const int oldFunambolVersion) {
         oldDataPath += TEXT("\\");
         oldDataPath += TEXT("Outlook Plug-in");
 
-        static const StringBuffer& pt = PlatformAdapter::getConfigFolder();    
+        static const StringBuffer& pt = PlatformAdapter::getConfigFolder();
         WCHAR* dataPath = toWideChar(pt.c_str());
         wstring newDataPath(dataPath);
         delete [] dataPath;
@@ -1134,11 +1246,11 @@ int OpenMessageBox(HWND hwnd, UINT type, UINT msg){
         hwnd = HwndFunctions::getWindowHandle();
     }
     bool created = false;
-    if(!hwnd){        
+    if(!hwnd){
         created = true;
         launchSyncClient();
 		for (int i = 0; i < 3; i++) {
-			hwnd = HwndFunctions::getWindowHandle();    
+			hwnd = HwndFunctions::getWindowHandle();
 			if (hwnd != NULL) {
 				SetForegroundWindow(hwnd);
 				break;
@@ -1150,15 +1262,15 @@ int OpenMessageBox(HWND hwnd, UINT type, UINT msg){
 
     //int ret = SendMessage(hwnd, ID_MYMSG_POPUP, buttons, msg);
     int ret = SendMessage(hwnd, ID_MYMSG_POPUP, type, NULL);
-    
+
     if (created) {
         SendMessage(hwnd, WM_CLOSE, type, NULL);
     }
     return ret;
 }
 
-int updateProcedure(HWND hwnd, bool manual) {  
-   
+int updateProcedure(HWND hwnd, bool manual) {
+
     UpdateManager* up = getUpdateManager(CLIENT_PLATFORM, hwnd);
     up->setHwnd(hwnd);
 
@@ -1185,13 +1297,13 @@ bool isNewSwVersionAvailable() {
 
 int checkUpdate() {
 
-    UpdateManager* up = getUpdateManager(CLIENT_PLATFORM, NULL); 
+    UpdateManager* up = getUpdateManager(CLIENT_PLATFORM, NULL);
     return up->checkIsToUpdate();
 }
 
 bool checkForMandatoryUpdateBeforeStartingSync() {
 
-    UpdateManager* up = getUpdateManager(CLIENT_PLATFORM, NULL); 
+    UpdateManager* up = getUpdateManager(CLIENT_PLATFORM, NULL);
     return up->checkForMandatoryUpdateBeforeStarting();
 }
 
@@ -1201,21 +1313,21 @@ void launchSyncClient() {
     OutlookConfig* config = getConfig();
     const char* dir = config->getWorkingDir();
 
-    if (!dir || !strcmp(dir, "")) {        
+    if (!dir || !strcmp(dir, "")) {
         return;
     }
 
     // program = "C:\...\OutlookPlugin.exe [param]"
-    char* program = NULL;    
+    char* program = NULL;
     program = new char[strlen(dir) + strlen(PROGRAM_NAME_EXE) + 2];
-    sprintf(program, "%s\\%s", dir, PROGRAM_NAME_EXE);    
-    
+    sprintf(program, "%s\\%s", dir, PROGRAM_NAME_EXE);
+
     STARTUPINFOA         si;
     PROCESS_INFORMATION  pi;
     DWORD                processId;
     DWORD                dwWaitRes = 0;
-    DWORD                timeOut = 5 * 1000; // 10 secs of timeout    
-    
+    DWORD                timeOut = 5 * 1000; // 10 secs of timeout
+
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
@@ -1235,10 +1347,10 @@ void launchSyncClient() {
                          NULL,             // Use parent's starting directory.
                          &si,              // Pointer to STARTUPINFO structure.
                          &pi );            // Pointer to PROCESS_INFORMATION structure.
-    
+
     // Save process ID!
     processId = pi.dwProcessId;
-    
+
     dwWaitRes = WaitForSingleObject(pi.hProcess, timeOut);
 
     // Close process and thread handles.
@@ -1252,7 +1364,7 @@ void launchSyncClient() {
 __declspec(dllexport) StringBuffer getOutlookVersion() {
 
     StringBuffer name;
-    
+
     ClientApplication* outlook = ClientApplication::getInstance();
     if (outlook) {
         wstring wName = outlook->getName();
@@ -1263,4 +1375,42 @@ __declspec(dllexport) StringBuffer getOutlookVersion() {
     }
 
     return name;
+}
+
+int manageSapiError(const int code) {
+
+    ESapiSyncManagerError error = (ESapiSyncManagerError)code;
+
+    switch (error) {
+        case ESSMSuccess:
+        {
+            return 0;       // OK
+        }
+        case ESSMCanceled:
+        {
+            return 2;       // Sync aborted by the user
+        }
+        case ESSMNetworkError:
+        {
+            return 2050;    // Network error
+        }
+        case ESSMAuthenticationError:
+        {
+            return 401;     // Invalid credentials
+        }
+        case ESSMServerQuotaExceeded:       // TODO: manage quota
+        case ESSMClientQuotaExceeded:       // TODO: manage quota
+        case ESSMSourceNotSupported:
+        case ESSMConfigError:
+        case ESSMBeginSyncError:
+        case ESSMEndSyncError:
+        case ESSMGetItemError:
+        case ESSMSetItemError:
+        case ESSMGenericSyncError:
+        case ESSMSapiError:
+        default:
+        {
+            return 1;       // generic error
+        }
+    }
 }

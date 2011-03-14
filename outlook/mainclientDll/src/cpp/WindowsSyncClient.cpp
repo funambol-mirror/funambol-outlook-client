@@ -48,26 +48,19 @@ typedef list<wstring>               sourceNameList;
 typedef sourceNameList::iterator    sourceNameIterator;
 
 
-static bool checkSourceUnderSync(const WCHAR* sourceName, SyncSource** sources) {
-    for (int i=0; sources[i]; i++) {
-        if (!wcscmp(sources[i]->getName(), sourceName)) {
-            return true;
-        }
+static bool checkSourceUnderSync(const WCHAR* sourceName, SyncSource& source) {
+
+    if (!wcscmp(source.getName(), sourceName)) {
+        return true;
     }
     return false;
 }
 
 
 
-/**
- * Constructor. Set the pointer of (externally owned) SyncSources array.
- */
-WindowsSyncClient::WindowsSyncClient(SyncSource** sources) : SyncClient() {
-    syncSources = sources;
-}
+WindowsSyncClient::WindowsSyncClient(SyncSource& source) : SyncClient(), syncSource(source) {}
 
-WindowsSyncClient::~WindowsSyncClient() {
-}
+WindowsSyncClient::~WindowsSyncClient() {}
 
 
 
@@ -87,13 +80,10 @@ int WindowsSyncClient::continueAfterPrepareSync() {
     int ret = 0;
     LOG.debug("Checking for forced slow-sync...");
 
-    if (syncSources == NULL) {
-        return 0;
-    }
 
     // Only if synchronizing calendar. Don't want to open Outlook if we're syncing only pictures.
     // It sets to use the timezone in outgoing recurring appointment.
-    if (checkSourceUnderSync(APPOINTMENT, syncSources)) {
+    if (checkSourceUnderSync(APPOINTMENT, syncSource)) {
         ClientApplication* cApp = ClientApplication::getInstance();
         cApp->setOutgoingTimezone(true);
     }
@@ -110,21 +100,18 @@ int WindowsSyncClient::continueAfterPrepareSync() {
         //
         // Create a list of sources that will run a slow-sync (requested by server).
         //
-        int i=0;
-        while (syncSources[i]) {
-            currentSyncMode = syncSources[i]->getSyncMode();
-            initialSyncMode = syncModeCode(syncSources[i]->getConfig().getSync());
+        currentSyncMode = syncSource.getSyncMode();
+        initialSyncMode = syncModeCode(syncSource.getConfig().getSync());
 
-            if ( isFullSyncMode(currentSyncMode) && (initialSyncMode != currentSyncMode) ) {
-                slowSyncList.push_back(syncSources[i]->getName());
-            }
-            i++;
-
-            if (initialSyncMode == 202 || initialSyncMode == 204)
-            {
-                unpause = DLLCustomization::continueOnSlowWithOneWay;
-            }
+        if ( isFullSyncMode(currentSyncMode) && (initialSyncMode != currentSyncMode) ) {
+            slowSyncList.push_back(syncSource.getName());
         }
+
+        if (initialSyncMode == 202 || initialSyncMode == 204)
+        {
+            unpause = DLLCustomization::continueOnSlowWithOneWay;
+        }
+
 
 
         //
@@ -141,7 +128,7 @@ int WindowsSyncClient::continueAfterPrepareSync() {
             names += (*iter);
             names += L"s";
             iter ++;
-            i = 1;
+            int i = 1;
             while (iter != slowSyncList.end()) {
                 if (i == size-1)  names += L" and ";
                 else              names += L", ";

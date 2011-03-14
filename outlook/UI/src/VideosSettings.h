@@ -44,15 +44,15 @@
 
 
 /**
- * Pictures options window.
+ * Videos options window.
  */
-class CPicturesSettings : public CDialog {
+class CVideosSettings : public CDialog {
 
-	DECLARE_DYNCREATE(CPicturesSettings)
+	DECLARE_DYNCREATE(CVideosSettings)
 
 private:
 
-    /// The SyncSource configuration for pictures
+    /// The SyncSource configuration for videos
     WindowsSyncSourceConfig* ssconf;
 
     /**
@@ -85,16 +85,16 @@ protected:
     CEdit     editSyncType;
     CEdit     editFolder;
     CButton   checkInclude;
-    CButton   butSelectFolder;    
+    CButton   butSelectFolder;
     CStatic   groupDirection;
     CStatic   groupFolder;    
 
 public:
 
-	CPicturesSettings();           
-	virtual ~CPicturesSettings();
+	CVideosSettings();           
+	virtual ~CVideosSettings();
 
-	enum { IDD = IDD_PICTURES };
+	enum { IDD = IDD_VIDEOS };
 
 #ifdef _DEBUG
 	virtual void AssertValid() const;
@@ -104,11 +104,11 @@ public:
 #endif
 
     bool saveSettings(bool);
-    afx_msg void OnBnClickedPicturesOk();
-    afx_msg void OnBnClickedPicturesCancel();
-    afx_msg void OnBnClickedPicturesButSelect();
-    
-    afx_msg void OnCbnSelchangePicturesComboSynctype();
+    afx_msg void OnBnClickedVideosOk();
+    afx_msg void OnBnClickedVideosCancel();
+    afx_msg void OnBnClickedVideosButSelect();
+
+    afx_msg void OnCbnSelchangeVideosComboSynctype();
 };
 
 /** @} */

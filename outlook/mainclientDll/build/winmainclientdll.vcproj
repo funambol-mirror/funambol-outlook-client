@@ -51,7 +51,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../src/include;&quot;../../cpp-sdk/src/include/windows&quot;;&quot;../../cpp-sdk/src/include/common&quot;;..\..\testRunner\Include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;WINMAINCLIENTDLL_EXPORTS;UNICODE;DEBUG;_CRT_SECURE_NO_DEPRECATE;_WIN32_DCOM;ENABLE_NAMESPACE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;WINMAINCLIENTDLL_EXPORTS;UNICODE;DEBUG;_CRT_SECURE_NO_DEPRECATE;_WIN32_DCOM;ENABLE_FUNAMBOL_NAMESPACE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -286,6 +286,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\include\WinFileSyncSource.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\include\winmaincpp.h"
 				>
 			</File>
@@ -412,10 +416,6 @@
 			</File>
 			<File
 				RelativePath="..\src\cpp\OutlookScheduler.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\cpp\PicturesSyncSource.cpp"
 				>
 			</File>
 			<File

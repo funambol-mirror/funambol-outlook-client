@@ -69,8 +69,11 @@
 !define OLD_INSTALLDIR_CONTEXT                  "Funambol\Outlook Plug-in"
 !define OLD_PLUGIN_UI_TITLE                     "Funambol Outlook Plug-in"
 
+
+
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
+!include "FileFunc.nsh"
 
 ; MUI Settings
 !define MUI_ABORTWARNING                        ; Show a message box with a warning when the user wants to close the installer.
@@ -82,11 +85,17 @@
 !define MUI_WELCOMEFINISHPAGE_BITMAP            "${PRODUCT_WELCOME_BMP}"
 !insertmacro MUI_PAGE_WELCOME
 
+;
+; Page to show a custom dialog form
+;
+;Page custom nsDialogsPage nsDialogsPageLeave
+
 ; License page
 !ifdef SHOW_LICENSE
     !define MUI_LICENSEPAGE_CHECKBOX
     !insertmacro MUI_PAGE_LICENSE                   "fileset\LICENSES\License.txt"
 !endif
+
 
 ; Directory page, the first two define check if the install dir is correct
 !define MUI_DIRECTORYPAGE_VERIFYONLEAVE
@@ -117,10 +126,10 @@ var ICONS_GROUP
 UninstPage custom un.RemoveUserData             ; Custom page, to ask if deleting users files/settings.
 !insertmacro MUI_UNPAGE_INSTFILES
 
+
 ; Language files
 !insertmacro MUI_LANGUAGE                       "English"
 ; MUI end ------
-
 
 
 Name              "${PRODUCT_NAME} ${PRODUCT_VERSION}"                       ; PRODUCT_VERSION passed as parameter by build.xml
@@ -134,8 +143,103 @@ Icon              "${MUI_ICON}"
 
 RequestExecutionLevel user    /* RequestExecutionLevel REQUIRED! */
 
+
 Function .OnInstFailed
     ${UAC.Unload} ;Must call unload!
+FunctionEnd
+
+
+!include nsDialogs.nsh
+!include LogicLib.nsh
+
+Var Dialog
+Var Label
+Var GroupBox
+Var DirRequest
+Var Button
+Var EDIT
+Var mediaHubFolderChoosen
+
+Function nsDialogsPage
+
+        nsDialogs::Create 1018
+	Pop $Dialog
+
+	${If} $Dialog == error
+		Abort
+	${EndIf}
+
+        GetFunctionAddress $0 OnBack
+	nsDialogs::OnBack $0
+	
+        !insertmacro MUI_HEADER_TEXT "Choose Media Hub Location" "Choose the folder to use as media hub."
+        
+        ${NSD_CreateLabel} 0 0 100% 25u "Select the folder to be used as repository in which share pictures, videos and files with your cloud account."
+	Pop $Label
+	
+	${If} $mediaHubFolderChoosen == ""
+	        StrCpy $mediaHubFolderChoosen "$DOCUMENTS\A-Media-Hub" ;"c:\tmp\A-Media-Hub"
+	${EndIf}
+	
+	${NSD_CreateText} 0 82u 75% 13u $mediaHubFolderChoosen
+	Pop $DirRequest
+
+	${NSD_CreateButton} 80% 82u 20% 13u "Browse..."
+	Pop $Button
+	GetFunctionAddress $0 OnClick
+	nsDialogs::OnClick $Button $0
+	
+        ${NSD_CreateGroupBox} 0 68u 100% 40u "Folder Media Hub"
+	Pop $GroupBox
+ 
+        nsDialogs::Show
+
+FunctionEnd
+
+Function OnClick
+
+	Pop $0 # HWND
+        nsDialogs::SelectFolderDialog "Choose the folder to use as media hub." "c:\tmp\A-Media-Hub"
+        Pop $R1
+	MessageBox MB_OK $R1
+	
+	${NSD_SetText} $DirRequest $R1
+        StrLen $R2 $R1                                                  
+        StrCpy $mediaHubFolderChoosen $R1 $R2 0
+        
+FunctionEnd
+
+Function OnBack
+	${NSD_GetText} $DirRequest $0
+	StrCpy $mediaHubFolderChoosen $0
+	;MessageBox MB_OK "You typed:$\n$\n$0"
+FunctionEnd
+
+Function nsDialogsPageLeave
+
+	${NSD_GetText} $DirRequest $0
+	StrCpy $mediaHubFolderChoosen $0
+	MessageBox MB_OK "You typed:$\n$\n$mediaHubFolderChoosen"
+		
+	${DirState} "$mediaHubFolderChoosen" $R0
+       
+        ${If} $R0 == -1
+		MessageBox MB_OK "Dir doesn't exists. Create?"
+		;GetFullPathName $R1 $mediaHubFolderChoosen
+		StrCpy $R1 $mediaHubFolderChoosen
+                MessageBox MB_OK  "Var $R1"
+                
+                CreateDirectory $mediaHubFolderChoosen"
+               
+                ${DirState} "$mediaHubFolderChoosen" $R1
+                ${If} $R1 == -1
+                   MessageBox MB_ICONSTOP "Error creating the Media Hub Folder. Please check it and try again."
+                   Abort
+                ${EndIf}
+
+	${EndIf}
+
+
 FunctionEnd
 
 Function .OnInstSuccess
@@ -547,6 +651,7 @@ FunctionEnd
 
 
 Function .onInit
+      !insertmacro INSTALLOPTIONS_EXTRACT "MediaHubPanel.ini"
       Call CheckUserRights
       Call CheckAppInstalled
       Call CheckMicrosoftApp

@@ -43,6 +43,7 @@
 #include "spds/SyncSourceConfig.h"
 #include "DateFilter.h"
 #include "defs.h"
+#include "spdm/constants.h"
 
 using namespace Funambol;
 
@@ -68,9 +69,6 @@ private:
 
     /// 'true' if the source has been synced (TODO: use the SOURCE_STATE).
     bool isSynced;
-
-    /// Timestamp of the last finished sync.
-    long endTimestamp;
 
     /// Pointer to (external) original SyncSourceConfig object, to retrieve
     /// all common properties: we MUST get/set common properties from 
@@ -112,19 +110,19 @@ public:
 
     /// Return the pointer to external SyncSourceConfig object 
     /// used for common properties.
-    SyncSourceConfig* getCommonConfig();
+    _declspec(dllexport) SyncSourceConfig* getCommonConfig();
 
 
     //
     // ----------------------------- set/get methods -----------------------------
     //
+
+    // TODO: to be removed
     _declspec(dllexport) const char*   getFolderPath()     const;
     _declspec(dllexport) bool          getUseSubfolders()  const;
-    _declspec(dllexport) long          getEndTimestamp()   const;
 
     _declspec(dllexport)void setFolderPath    (const char*   v);
     _declspec(dllexport)void setUseSubfolders (bool          v);
-    _declspec(dllexport)void setEndTimestamp  (long          v);
 
     // Common properties: get original values in SSconfig 's'
     const char*   getName()           const     { return s->getName()          ; }
@@ -140,6 +138,13 @@ public:
     const char*   getEncryption()     const     { return s->getEncryption()    ; }
     const bool    isEnabled()         const     { return s->isEnabled()        ; }
 
+    _declspec(dllexport) long getEndTimestamp() const { 
+        bool err = false;
+        long ret = s->getLongProperty(PROPERTY_SYNC_END, &err);
+        if (err) ret = 0;
+        return ret;
+    }
+
     // Common properties: set original values in SSconfig 's'
     void setName          (const char*   v)     { s->setName(v)                ; }
     void setURI           (const char*   v)     { s->setURI(v)                 ; }
@@ -154,6 +159,9 @@ public:
     void setEncryption    (const char*   v)     { s->setEncryption(v)          ; }
     void setIsEnabled     (const bool    v)     { s->setIsEnabled(v)           ; }
 
+    _declspec(dllexport)void setEndTimestamp (long  v) {
+        s->setLongProperty(PROPERTY_SYNC_END, v);
+    }
 
     bool getIsSynced() const;
     void setIsSynced(bool v);

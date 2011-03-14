@@ -62,6 +62,8 @@ readSyncModes
 isSourceVisible
 countSourceVisible
 getDefaultPicturesPath
+getDefaultFilesPath
+getDefaultVideosPath
 isSourceEnabled
 getOutlookVersion
 

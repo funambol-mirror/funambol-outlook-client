@@ -179,7 +179,8 @@
 /// This is LIBID for 'msoutl.olb'
 #import "libid:00062FFF-0000-0000-C000-000000000046" outlookNamespace \
         rename("CopyFile", "OlCopyFile") \
-        rename("Folder", "FunambolFolder")
+        rename("Folder", "FunambolFolder") \
+        rename("PlaySound", "OlPlaySound")
 
 /// This is LIBID for 'Redemption.dll'
 #import "libid:2D5E2D34-BED5-4B9F-9793-A31E26E6806E" redemptionNamespace

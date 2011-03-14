@@ -48,6 +48,8 @@
 #include "NotesSettings.h"
 #include "TaskSettings.h"
 #include "PicturesSettings.h"
+#include "VideosSettings.h"
+#include "FilesSettings.h"
 #include "UICustomization.h"
 #include "SettingsHelper.h"
 
@@ -87,14 +89,14 @@ void populateArrays() {
     StringBuffer value, completeValue;
     int res = 0, minSize = 0, hourSize = 0, totalSize = 0;
 
-    // safe check to remove element that are number <5 and >59
+    // safe check to remove element that are number <1 and >59
     if (!minutesString.empty()) {
     minutesString.split(tmp, ",");    
     for (el = (StringBuffer *)tmp.front(); el; el = (StringBuffer *)tmp.next() ) {
         completeValue = el->c_str();
         value = removeDefaultString(completeValue);
         res = atoi(value.c_str());
-        if (res >= 5 && res <= 59) {
+        if (res >= 1 && res <= 59) {
             minutesA.add(completeValue);
         }
     }
@@ -205,12 +207,16 @@ void CSyncSettings::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_SYNC_CHECK_TASKS, checkTasks);
     DDX_Control(pDX, IDC_SYNC_CHECK_NOTES, checkNotes);
     DDX_Control(pDX, IDC_SYNC_CHECK_PICTURES, checkPictures);
+    DDX_Control(pDX, IDC_SYNC_CHECK_VIDEOS,   checkVideos);
+    DDX_Control(pDX, IDC_SYNC_CHECK_FILES,    checkFiles);
 
     DDX_Control(pDX, IDC_SYNC_BUT_CONTACTS, butContacts);
     DDX_Control(pDX, IDC_SYNC_BUT_CALENDAR, butCalendar);
     DDX_Control(pDX, IDC_SYNC_BUT_TASKS, butTasks);
     DDX_Control(pDX, IDC_SYNC_BUT_NOTES, butNotes);
     DDX_Control(pDX, IDC_SYNC_BUT_PICTURES, butPictures);
+    DDX_Control(pDX, IDC_SYNC_BUT_VIDEOS,   butVideos);
+    DDX_Control(pDX, IDC_SYNC_BUT_FILES,    butFiles);
 
     DDX_Control(pDX, IDC_SCHEDULER_CHECK_ENABLED, checkEnabled);
     DDX_Control(pDX, IDC_SCHEDULER_COMBO_VALUE, comboSchedulerValue);
@@ -228,6 +234,8 @@ BEGIN_MESSAGE_MAP(CSyncSettings, CFormView)
     ON_BN_CLICKED(IDC_SYNC_CHECK_TASKS, &CSyncSettings::OnBnClickedSyncCheckTasks)
     ON_BN_CLICKED(IDC_SYNC_CHECK_NOTES, &CSyncSettings::OnBnClickedSyncCheckNotes)
     ON_BN_CLICKED(IDC_SYNC_CHECK_PICTURES,  &CSyncSettings::OnBnClickedSyncCheckPictures)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_VIDEOS,    &CSyncSettings::OnBnClickedSyncCheckVideos)
+    ON_BN_CLICKED(IDC_SYNC_CHECK_FILES,     &CSyncSettings::OnBnClickedSyncCheckFiles)
     ON_BN_CLICKED(IDC_SYNC_OK, &CSyncSettings::OnBnClickedSyncOk)
     ON_BN_CLICKED(IDC_SYNC_CANCEL, &CSyncSettings::OnBnClickedSyncCancel)
     ON_BN_CLICKED(IDC_SYNC_BUT_CONTACTS, &CSyncSettings::OnBnClickedSyncButContacts)
@@ -235,6 +243,8 @@ BEGIN_MESSAGE_MAP(CSyncSettings, CFormView)
     ON_BN_CLICKED(IDC_SYNC_BUT_TASKS, &CSyncSettings::OnBnClickedSyncButTasks)
     ON_BN_CLICKED(IDC_SYNC_BUT_NOTES, &CSyncSettings::OnBnClickedSyncButNotes)
     ON_BN_CLICKED(IDC_SYNC_BUT_PICTURES,    &CSyncSettings::OnBnClickedSyncButPictures)
+    ON_BN_CLICKED(IDC_SYNC_BUT_VIDEOS,      &CSyncSettings::OnBnClickedSyncButVideos)
+    ON_BN_CLICKED(IDC_SYNC_BUT_FILES,       &CSyncSettings::OnBnClickedSyncButFiles)
     ON_WM_NCPAINT()
     ON_BN_CLICKED(IDC_SCHEDULER_CHECK_ENABLED, &CSyncSettings::OnBnClickedSchedulerCheckEnabled)
     ON_CBN_SELCHANGE(IDC_SCHEDULER_COMBO_VALUE, &CSyncSettings::OnCbnSelchangeSchedulerComboValue)
@@ -297,6 +307,8 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     s1 = composeCheckboxText(TASK_);         SetDlgItemText(IDC_SYNC_CHECK_TASKS,    s1);
     s1 = composeCheckboxText(NOTE_);         SetDlgItemText(IDC_SYNC_CHECK_NOTES,    s1);
     s1 = composeCheckboxText(PICTURE_);      SetDlgItemText(IDC_SYNC_CHECK_PICTURES, s1);
+    s1 = composeCheckboxText(VIDEO_);        SetDlgItemText(IDC_SYNC_CHECK_VIDEOS,   s1);
+    s1 = composeCheckboxText(FILES_);        SetDlgItemText(IDC_SYNC_CHECK_FILES,    s1);
 
     s1.LoadString(IDS_DETAILS);
     SetDlgItemText(IDC_SYNC_BUT_CONTACTS, s1);
@@ -304,6 +316,8 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     SetDlgItemText(IDC_SYNC_BUT_TASKS,    s1);
     SetDlgItemText(IDC_SYNC_BUT_NOTES,    s1);
     SetDlgItemText(IDC_SYNC_BUT_PICTURES, s1);
+    SetDlgItemText(IDC_SYNC_BUT_VIDEOS,   s1);
+    SetDlgItemText(IDC_SYNC_BUT_FILES,    s1);
 
     s1.LoadString(IDS_SYNC_SYNCHRONIZE_EVERY); SetDlgItemText(IDC_SCHEDULER_CHECK_ENABLED, s1);
     s1.LoadString(IDS_SYNC_ENABLE_ENCRYPTION); SetDlgItemText(IDC_SYNC_CHECK_ENCRYPTION, s1);
@@ -465,13 +479,71 @@ LRESULT CSyncSettings::OnInitForm(WPARAM, LPARAM){
     }
     else {
 
-        hideSource(checkPictures, butPictures, &saveSyncTypePictures, IDC_SEPARATOR_4, 0);
+        hideSource(checkPictures, butPictures, &saveSyncTypePictures, IDC_SEPARATOR_4, IDC_SEPARATOR_5);
         /*
         checkPictures.ShowWindow(SW_HIDE);
         butPictures.ShowWindow(SW_HIDE);
         saveSyncTypePictures = false;
         GetDlgItem(IDC_SEPARATOR_4)->ShowWindow(SW_HIDE);
         */
+    }
+
+    // VIDEOS
+    if (isSourceVisible(VIDEO)) {
+        saveSyncTypeVideos = true;
+        ssc = getConfig()->getSyncSourceConfig(VIDEO_);
+        if (!ssc->isEnabled()) {
+            checkVideos.SetCheck(BST_UNCHECKED);
+            butVideos.EnableWindow(FALSE);
+        }
+        else{
+            checkVideos.SetCheck(BST_CHECKED);
+        }
+
+        // Fix the source groupbox height (TODO: should be calculated dinamically)
+        CRect sep4Rect, sep5Rect, sourceGroupBoxRect;
+        GetDlgItem(IDC_SEPARATOR_4)->GetWindowRect(&sep4Rect);
+        GetDlgItem(IDC_SEPARATOR_5)->GetWindowRect(&sep5Rect);
+        int offset = sep5Rect.BottomRight().y - sep4Rect.BottomRight().y;
+        
+        CWnd* sourceGroupBox = GetDlgItem(IDC_SYNC_GROUP_ITEMS);
+        GetDlgItem(IDC_SYNC_GROUP_ITEMS)->GetWindowRect(&sourceGroupBoxRect);
+        sourceGroupBox->SetWindowPos(&CWnd::wndTop, 0, 0, 
+                                     sourceGroupBoxRect.Width(), sourceGroupBoxRect.Height() + offset, 
+                                     SWP_SHOWWINDOW | SWP_NOMOVE);
+    }
+    else {
+
+        hideSource(checkVideos, butVideos, &saveSyncTypeVideos, IDC_SEPARATOR_5, IDC_SEPARATOR_6);
+    }
+
+    // FILES
+    if (isSourceVisible(FILES)) {
+        saveSyncTypeFiles = true;
+        ssc = getConfig()->getSyncSourceConfig(FILES_);
+        if (!ssc->isEnabled()) {
+            checkFiles.SetCheck(BST_UNCHECKED);
+            butFiles.EnableWindow(FALSE);
+        }
+        else{
+            checkFiles.SetCheck(BST_CHECKED);
+        }
+
+        // Fix the source groupbox height (TODO: should be calculated dinamically)
+        CRect sep5Rect, sep6Rect, sourceGroupBoxRect;
+        GetDlgItem(IDC_SEPARATOR_5)->GetWindowRect(&sep5Rect);
+        GetDlgItem(IDC_SEPARATOR_6)->GetWindowRect(&sep6Rect);
+        int offset = sep6Rect.BottomRight().y - sep5Rect.BottomRight().y;
+        
+        CWnd* sourceGroupBox = GetDlgItem(IDC_SYNC_GROUP_ITEMS);
+        GetDlgItem(IDC_SYNC_GROUP_ITEMS)->GetWindowRect(&sourceGroupBoxRect);
+        sourceGroupBox->SetWindowPos(&CWnd::wndTop, 0, 0, 
+                                     sourceGroupBoxRect.Width(), sourceGroupBoxRect.Height() + offset, 
+                                     SWP_SHOWWINDOW | SWP_NOMOVE);
+    }
+    else {
+
+        hideSource(checkFiles, butFiles, &saveSyncTypeFiles, IDC_SEPARATOR_6, 0);
     }
 
     
@@ -607,6 +679,26 @@ void CSyncSettings::OnBnClickedSyncCheckPictures()
     saveSyncTypePictures = true;
 }
 
+void CSyncSettings::OnBnClickedSyncCheckVideos()
+{
+    if(checkVideos.GetCheck() == BST_UNCHECKED)
+        butVideos.EnableWindow(FALSE);
+    else
+        butVideos.EnableWindow(TRUE);
+
+    saveSyncTypeVideos = true;
+}
+
+void CSyncSettings::OnBnClickedSyncCheckFiles()
+{
+    if(checkFiles.GetCheck() == BST_UNCHECKED)
+        butFiles.EnableWindow(FALSE);
+    else
+        butFiles.EnableWindow(TRUE);
+
+    saveSyncTypeFiles = true;
+}
+
 void CSyncSettings::OnBnClickedSyncOk()
 {
     // OK Button
@@ -682,6 +774,29 @@ void CSyncSettings::OnBnClickedSyncButPictures()
     saveSyncTypePictures = true;
 }
 
+void CSyncSettings::OnBnClickedSyncButVideos()
+{
+    CVideosSettings wndVideos;
+    INT_PTR result = wndVideos.DoModal();
+
+    // Update the UI checkbox
+    CString s1 = composeCheckboxText(VIDEO_);
+    SetDlgItemText(IDC_SYNC_CHECK_VIDEOS, s1);
+
+    saveSyncTypeVideos = true;
+}
+
+void CSyncSettings::OnBnClickedSyncButFiles()
+{
+    CFilesSettings wndFiles;
+    INT_PTR result = wndFiles.DoModal();
+
+      // Update the UI checkbox
+    CString s1 = composeCheckboxText(FILES_);
+    SetDlgItemText(IDC_SYNC_CHECK_FILES, s1);
+
+    saveSyncTypeFiles = true;
+}
 
 bool CSyncSettings::saveSettings(bool saveToDisk)
 {    
@@ -730,9 +845,17 @@ bool CSyncSettings::saveSettings(bool saveToDisk)
         bool enabled = (checkPictures.GetCheck() == BST_CHECKED);
         getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(enabled);
     }
+    if (saveSyncTypeVideos) {
+        bool enabled = (checkVideos.GetCheck() == BST_CHECKED);
+        getConfig()->getSyncSourceConfig(VIDEO_)->setIsEnabled(enabled);
+    }
+    if (saveSyncTypeFiles) {
+        bool enabled = (checkFiles.GetCheck() == BST_CHECKED);
+        getConfig()->getSyncSourceConfig(FILES_)->setIsEnabled(enabled);
+    }
 
     // save encryption, global property 
-    // NOTE: pictures excluded: cannot DES a largeObject read chunk by chunk via input stream
+    // NOTE: only PIM: cannot DES a largeObject read chunk by chunk via input stream
     if(checkEncryption.GetCheck()){
         getConfig()->getSyncSourceConfig(CONTACT_)->setEncryption("des");
         getConfig()->getSyncSourceConfig(APPOINTMENT_)->setEncryption("des");
@@ -836,6 +959,8 @@ CString CSyncSettings::composeCheckboxText(const char* sourceName)
     else if (!strcmp(sourceName, TASK_))         { ret.LoadString(IDS_TASKS); }
     else if (!strcmp(sourceName, NOTE_))         { ret.LoadString(IDS_NOTES); }
     else if (!strcmp(sourceName, PICTURE_))      { ret.LoadString(IDS_PICTURES); }
+    else if (!strcmp(sourceName, VIDEO_))        { ret.LoadString(IDS_VIDEOS); }
+    else if (!strcmp(sourceName, FILES_))        { ret.LoadString(IDS_FILES); }
 
     //
     // Append the "(Download/Upload Only)" if a one-way is currently set

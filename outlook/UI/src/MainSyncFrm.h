@@ -66,17 +66,6 @@ DWORD WINAPI syncThreadKiller(LPVOID lpParam);
 class CMainSyncFrame : public CFrameWnd
 {
 
-private:
-
-    // Counters, incremented each time a source has begun.
-    // (1 when begin sending data, 2 when begin receiving data)
-    int contactsBegin;
-    int calendarBegin;
-    int tasksBegin;
-    int notesBegin;
-    int picturesBegin;
-	
-
 protected:
 
     CMainSyncFrame();
@@ -93,6 +82,8 @@ protected:
     int syncModeTasks;
     int syncModeNotes;
     int syncModePictures;
+    int syncModeVideos;
+    int syncModeFiles;
 
     // info about source enabled for sources, used on full sync (TODO: remove me)
     bool backupEnabledContacts;
@@ -100,13 +91,21 @@ protected:
     bool backupEnabledTasks;
     bool backupEnabledNotes;
     bool backupEnabledPictures;
+    bool backupEnabledVideos;
+    bool backupEnabledFiles;
 
 
     // info about the sync in progress
     int currentSource;
-    int totalItems;
-    int currentItem;
-    
+    int totalClientItems;
+    int totalServerItems;
+    int currentClientItem;
+    int currentServerItem;
+
+    int itemTotalSize;
+    int partialCompleted;
+    bool progressStarted;
+
     CFont fontBold;
 
     afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -169,9 +168,13 @@ public:
     afx_msg LRESULT OnMsgStartSyncBegin (WPARAM , LPARAM); 
     afx_msg LRESULT OnMsgStartsyncEnded (WPARAM , LPARAM); 
     afx_msg LRESULT OnMsgRefreshStatusBar(WPARAM, LPARAM);
-    afx_msg LRESULT OnMsgSyncSourceState(WPARAM, LPARAM);
+    //afx_msg LRESULT OnMsgSyncSourceState(WPARAM, LPARAM);
     afx_msg LRESULT OnMsgUnlockButtons  (WPARAM, LPARAM);
     afx_msg LRESULT OnMsgLockButtons    (WPARAM, LPARAM);
+
+    // progress percentage. wparam is the total size. lparam is the partial upload or download
+    afx_msg LRESULT OnMsgSapiProgress   (WPARAM , LPARAM);
+    
 
     afx_msg LRESULT CancelSync(WPARAM wParam, LPARAM lParam);
 

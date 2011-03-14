@@ -54,14 +54,33 @@ static char THIS_FILE[] = __FILE__;
 
 IMPLEMENT_DYNCREATE(CSyncForm, CFormView)
 
+
+static int getLastSourceState(const char* sourceName) {
+
+    int ret = SYNCSOURCE_STATE_OK;
+    WindowsSyncSourceConfig* ssc = getConfig()->getSyncSourceConfig(sourceName);
+    if (!ssc) return ret;
+
+    int error = ssc->getCommonConfig()->getLastSourceError(); 
+
+    if      (error == 0) { ret = SYNCSOURCE_STATE_OK; }
+    else if (error == 2) { ret = SYNCSOURCE_STATE_CANCELED; }
+    else                 { ret = SYNCSOURCE_STATE_NOT_SYNCED; }  // means "source error"
+
+    return ret;
+}
+
+
 CSyncForm::CSyncForm()
     : CFormView(CSyncForm::IDD)
 {
-    syncSourceContactState  = SYNCSOURCE_STATE_OK; 
-    syncSourceCalendarState = SYNCSOURCE_STATE_OK; 
-    syncSourceTaskState     = SYNCSOURCE_STATE_OK;    
-    syncSourceNoteState     = SYNCSOURCE_STATE_OK;
-    syncSourcePictureState  = SYNCSOURCE_STATE_OK; 
+    syncSourceContactState  = getLastSourceState(CONTACT_);
+    syncSourceCalendarState = getLastSourceState(APPOINTMENT_);
+    syncSourceTaskState     = getLastSourceState(TASK_);
+    syncSourceNoteState     = getLastSourceState(NOTE_);
+    syncSourcePictureState  = getLastSourceState(PICTURE_);
+    syncSourceVideoState    = getLastSourceState(VIDEO_);
+    syncSourceFileState     = getLastSourceState(FILES_);
 
     lockedUI = false;
 
@@ -83,6 +102,8 @@ void CSyncForm::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_MAIN_ICON_TASKS,    iconTasks);
     DDX_Control(pDX, IDC_MAIN_ICON_NOTES,    iconNotes);
     DDX_Control(pDX, IDC_MAIN_ICON_PICTURES, iconPictures);
+    DDX_Control(pDX, IDC_MAIN_ICON_VIDEOS,   iconVideos);
+    DDX_Control(pDX, IDC_MAIN_ICON_FILES,    iconFiles);
 
     DDX_Control(pDX, IDC_MAIN_ICON_STATUS_SYNC,     iconStatusSync);
     DDX_Control(pDX, IDC_MAIN_ICON_STATUS_CONTACTS, iconStatusContacts);
@@ -90,6 +111,8 @@ void CSyncForm::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_MAIN_ICON_STATUS_TASKS,    iconStatusTasks);
     DDX_Control(pDX, IDC_MAIN_ICON_STATUS_NOTES,    iconStatusNotes);
     DDX_Control(pDX, IDC_MAIN_ICON_STATUS_PICTURES, iconStatusPictures);
+    DDX_Control(pDX, IDC_MAIN_ICON_STATUS_VIDEOS,   iconStatusVideos);
+    DDX_Control(pDX, IDC_MAIN_ICON_STATUS_FILES,    iconStatusFiles);
 
     DDX_Control(pDX, IDC_MAIN_BK_SYNC,     paneSync);
     DDX_Control(pDX, IDC_MAIN_BK_CONTACTS, paneContacts);
@@ -97,6 +120,8 @@ void CSyncForm::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_MAIN_BK_TASKS,    paneTasks);
     DDX_Control(pDX, IDC_MAIN_BK_NOTES,    paneNotes);
     DDX_Control(pDX, IDC_MAIN_BK_PICTURES, panePictures);
+    DDX_Control(pDX, IDC_MAIN_BK_VIDEOS,   paneVideos);
+    DDX_Control(pDX, IDC_MAIN_BK_FILES,    paneFiles);
 }
 
 
@@ -113,6 +138,8 @@ BEGIN_MESSAGE_MAP(CSyncForm, CFormView)
     ON_STN_CLICKED(IDC_MAIN_BK_TASKS,    &CSyncForm::OnStnClickedMainBkTasks)
     ON_STN_CLICKED(IDC_MAIN_BK_NOTES,    &CSyncForm::OnStnClickedMainBkNotes)
     ON_STN_CLICKED(IDC_MAIN_BK_PICTURES, &CSyncForm::OnStnClickedMainBkPictures)
+    ON_STN_CLICKED(IDC_MAIN_BK_VIDEOS,   &CSyncForm::OnStnClickedMainBkVideos)
+    ON_STN_CLICKED(IDC_MAIN_BK_FILES,    &CSyncForm::OnStnClickedMainBkFiles)
 
 END_MESSAGE_MAP()
 
@@ -148,6 +175,8 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM) {
     tasksLabel.LoadString   (IDS_MAIN_TASKS);
     notesLabel.LoadString   (IDS_MAIN_NOTES);
     picturesLabel.LoadString(IDS_MAIN_PICTURES);
+    videosLabel.LoadString  (IDS_MAIN_VIDEOS);
+    filesLabel.LoadString   (IDS_MAIN_FILES);
 
     // TODO: for now icon states not really used anywhere
     iconContacts.state = STATE_INVISIBLE;
@@ -155,6 +184,8 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM) {
     iconTasks.state    = STATE_INVISIBLE;
     iconNotes.state    = STATE_INVISIBLE;
     iconPictures.state = STATE_INVISIBLE;
+    iconVideos.state   = STATE_INVISIBLE;
+    iconFiles.state    = STATE_INVISIBLE;
 
     butStart.SetIcon(::LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_LOGO)));
 
@@ -176,6 +207,8 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM) {
     GetDlgItem(IDC_MAIN_STATIC_TASKS)->SetFont(&fontBold);
     GetDlgItem(IDC_MAIN_STATIC_NOTES)->SetFont(&fontBold);
     GetDlgItem(IDC_MAIN_STATIC_PICTURES)->SetFont(&fontBold);
+    GetDlgItem(IDC_MAIN_STATIC_VIDEOS)->SetFont(&fontBold);
+    GetDlgItem(IDC_MAIN_STATIC_FILES)->SetFont(&fontBold);
     GetDlgItem(IDC_MAIN_MSG_PRESS)->SetFont(&fontBold);
 
     GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->SetFont(&fontNormal);
@@ -183,6 +216,8 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM) {
     GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->SetFont(&fontNormal);
     GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->SetFont(&fontNormal);
     GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->SetFont(&fontNormal);
+    GetDlgItem(IDC_MAIN_STATIC_STATUS_VIDEOS)->SetFont(&fontNormal);
+    GetDlgItem(IDC_MAIN_STATIC_STATUS_FILES)->SetFont(&fontNormal);
 
     iconStatusSync.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL_BLUE)));
     paneSync.type     = PANE_TYPE_SYNC; 
@@ -191,12 +226,16 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM) {
     paneTasks.type    = PANE_TYPE_TASKS; 
     paneNotes.type    = PANE_TYPE_NOTES;
     panePictures.type = PANE_TYPE_PICTURES;
+    paneVideos.type   = PANE_TYPE_VIDEOS;
+    paneFiles.type    = PANE_TYPE_FILES;
 
     paneContacts.state = STATE_NORMAL; 
     paneCalendar.state = STATE_NORMAL; 
     paneTasks.state    = STATE_NORMAL; 
     paneNotes.state    = STATE_NORMAL;
-    panePictures.state = STATE_NORMAL; 
+    panePictures.state = STATE_NORMAL;
+    paneVideos.state   = STATE_NORMAL;
+    paneFiles.state    = STATE_NORMAL;
 
     refreshSources();
     VERIFY(brushHollow.CreateStockObject(HOLLOW_BRUSH));
@@ -252,6 +291,20 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM) {
             (int)(dx - rectIcon.Width()- 70),
             rectIcon.TopLeft().y, rectIcon.Width(),
             rectIcon.Height(), SWP_SHOWWINDOW);
+
+        iconStatusVideos.GetWindowRect(&rectIcon);
+        ScreenToClient(&rectIcon);
+        iconStatusVideos.SetWindowPos(&CWnd::wndTop, 
+            (int)(dx - rectIcon.Width()- 70),
+            rectIcon.TopLeft().y, rectIcon.Width(),
+            rectIcon.Height(), SWP_SHOWWINDOW);
+
+        iconStatusFiles.GetWindowRect(&rectIcon);
+        ScreenToClient(&rectIcon);
+        iconStatusFiles.SetWindowPos(&CWnd::wndTop, 
+            (int)(dx - rectIcon.Width()- 70),
+            rectIcon.TopLeft().y, rectIcon.Width(),
+            rectIcon.Height(), SWP_SHOWWINDOW);
     }
 
     return 0;
@@ -265,18 +318,24 @@ void CSyncForm::showSyncControls( BOOL show )
         iconTasks.ShowWindow(SW_HIDE); 
         iconNotes.ShowWindow(SW_HIDE);
         iconPictures.ShowWindow(SW_HIDE);
+        iconVideos.ShowWindow(SW_HIDE);
+        iconFiles.ShowWindow(SW_HIDE);
 
         GetDlgItem(IDC_MAIN_STATIC_CONTACTS)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_CALENDAR)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_TASKS)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_NOTES)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_PICTURES)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_MAIN_STATIC_VIDEOS)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_MAIN_STATIC_FILES)->ShowWindow(SW_HIDE);
 
         GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_STATUS_CALENDAR)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_MAIN_STATIC_STATUS_VIDEOS)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_MAIN_STATIC_STATUS_FILES)->ShowWindow(SW_HIDE);
     }
 }
 
@@ -308,7 +367,12 @@ void CSyncForm::changeNotesStatus(CString& status){
 void CSyncForm::changePicturesStatus(CString& status){
     picturesStatusLabel = status;
 }
-
+void CSyncForm::changeVideosStatus(CString& status){
+    videosStatusLabel = status;
+}
+void CSyncForm::changeFilesStatus(CString& status){
+    filesStatusLabel = status;
+}
 
 HBRUSH CSyncForm::OnCtlColor( CDC* pDC, CWnd* pWnd, UINT nCtlColor) 
 {
@@ -358,6 +422,8 @@ void CSyncForm::refreshSources() {
     refreshSource(SYNCSOURCE_TASKS);
     refreshSource(SYNCSOURCE_NOTES);
     refreshSource(SYNCSOURCE_PICTURES);
+    refreshSource(SYNCSOURCE_VIDEOS);
+    refreshSource(SYNCSOURCE_FILES);
 
 
     // TODO: this is needed
@@ -367,6 +433,8 @@ void CSyncForm::refreshSources() {
         paneTasks.SetBitmap   (((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
         paneNotes.SetBitmap   (((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
         panePictures.SetBitmap(((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
+        paneVideos.SetBitmap  (((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
+        paneFiles.SetBitmap   (((CMainSyncFrame*)AfxGetMainWnd())->hBmpLight);
     }
 
     // This is done to correctly refresh also disabled sources!
@@ -443,6 +511,22 @@ void CSyncForm::repaintPaneControls(int paneType) {
         SetDlgItemText(IDC_MAIN_STATIC_STATUS_PICTURES, picturesStatusLabel);        // Use the buffer set by 'changePicturesStatus'
         GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->Invalidate();
     }
+    else if (paneType == PANE_TYPE_VIDEOS) {
+        iconStatusVideos.Invalidate();
+        iconVideos.Invalidate();
+        SetDlgItemText(IDC_MAIN_STATIC_VIDEOS, videosLabel);                     // Always fixed
+        GetDlgItem(IDC_MAIN_STATIC_VIDEOS)->Invalidate();
+        SetDlgItemText(IDC_MAIN_STATIC_STATUS_VIDEOS, videosStatusLabel);        // Use the buffer set by 'changeVideosStatus'
+        GetDlgItem(IDC_MAIN_STATIC_STATUS_VIDEOS)->Invalidate();
+    }
+    else if (paneType == PANE_TYPE_FILES) {
+        iconStatusFiles.Invalidate();
+        iconFiles.Invalidate();
+        SetDlgItemText(IDC_MAIN_STATIC_FILES, filesLabel);                     // Always fixed
+        GetDlgItem(IDC_MAIN_STATIC_FILES)->Invalidate();
+        SetDlgItemText(IDC_MAIN_STATIC_STATUS_FILES, filesStatusLabel);        // Use the buffer set by 'changeFilesStatus'
+        GetDlgItem(IDC_MAIN_STATIC_STATUS_FILES)->Invalidate();
+    }
 }
 
 
@@ -494,6 +578,8 @@ void CSyncForm::OnStnClickedMainBkContacts()
         getConfig()->getSyncSourceConfig(TASK_       )->setIsEnabled(false);
         getConfig()->getSyncSourceConfig(NOTE_       )->setIsEnabled(false);
         getConfig()->getSyncSourceConfig(PICTURE_    )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(VIDEO_      )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(FILES_      )->setIsEnabled(false);
 
         ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
     }
@@ -522,6 +608,8 @@ void CSyncForm::OnStnClickedMainBkCalendar()
         getConfig()->getSyncSourceConfig(TASK_   )->setIsEnabled(false);
         getConfig()->getSyncSourceConfig(NOTE_   )->setIsEnabled(false);
         getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(VIDEO_  )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(FILES_  )->setIsEnabled(false);
 
         ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
     }
@@ -549,6 +637,8 @@ void CSyncForm::OnStnClickedMainBkTasks()
         getConfig()->getSyncSourceConfig(CONTACT_    )->setIsEnabled(false);
         getConfig()->getSyncSourceConfig(NOTE_       )->setIsEnabled(false);
         getConfig()->getSyncSourceConfig(PICTURE_    )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(VIDEO_      )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(FILES_      )->setIsEnabled(false);
 
         ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
     }
@@ -576,6 +666,8 @@ void CSyncForm::OnStnClickedMainBkNotes()
         getConfig()->getSyncSourceConfig(CONTACT_    )->setIsEnabled(false);
         getConfig()->getSyncSourceConfig(TASK_       )->setIsEnabled(false);
         getConfig()->getSyncSourceConfig(PICTURE_    )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(VIDEO_      )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(FILES_      )->setIsEnabled(false);
 
         ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
     }
@@ -604,6 +696,68 @@ void CSyncForm::OnStnClickedMainBkPictures()
         getConfig()->getSyncSourceConfig(CONTACT_    )->setIsEnabled(false);
         getConfig()->getSyncSourceConfig(TASK_       )->setIsEnabled(false);
         getConfig()->getSyncSourceConfig(NOTE_       )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(VIDEO_      )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(FILES_      )->setIsEnabled(false);
+
+        ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
+    }
+}
+
+
+void CSyncForm::OnStnClickedMainBkVideos()
+{
+    if (lockedUI) {
+        return;
+    }
+
+    if ( (paneVideos.state == STATE_PANE_DISABLED) || (paneVideos.state == STATE_SYNC) )
+        return;
+
+    if (checkSyncInProgress()) {
+        // It's running a sync -> error msg.
+        CString s1;
+        s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
+        wsafeMessageBox(s1);
+    }
+    else {
+        // Start Sync of a single source
+        ((CMainSyncFrame*)AfxGetMainWnd())->backupSyncModeSettings();
+        getConfig()->getSyncSourceConfig(APPOINTMENT_)->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(CONTACT_    )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(TASK_       )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(NOTE_       )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(PICTURE_    )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(FILES_      )->setIsEnabled(false);
+
+        ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
+    }
+}
+
+
+void CSyncForm::OnStnClickedMainBkFiles()
+{
+    if (lockedUI) {
+        return;
+    }
+
+    if ( (paneFiles.state == STATE_PANE_DISABLED) || (paneFiles.state == STATE_SYNC) )
+        return;
+
+    if (checkSyncInProgress()) {
+        // It's running a sync -> error msg.
+        CString s1;
+        s1.LoadString(IDS_TEXT_SYNC_ALREADY_RUNNING);
+        wsafeMessageBox(s1);
+    }
+    else {
+        // Start Sync of a single source
+        ((CMainSyncFrame*)AfxGetMainWnd())->backupSyncModeSettings();
+        getConfig()->getSyncSourceConfig(APPOINTMENT_)->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(CONTACT_    )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(TASK_       )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(NOTE_       )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(PICTURE_    )->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(VIDEO_      )->setIsEnabled(false);
 
         ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
     }
@@ -981,6 +1135,150 @@ void CSyncForm::refreshSource( int sourceId )
         SetDlgItemText(IDC_MAIN_STATIC_PICTURES, picturesLabel);    // Set directly here, pane could be disabled
         SetDlgItemText(IDC_MAIN_STATIC_STATUS_PICTURES, s1);
         panePictures.Invalidate();
+    }
+
+
+    else if (sourceId == SYNCSOURCE_VIDEOS) {
+        
+        unsigned long lastSyncVideos = 0;
+        iconStatusVideos.StopAnim();
+
+        if (isSourceVisible(VIDEO)) {
+            // source visible
+            GetDlgItem(IDC_MAIN_STATIC_VIDEOS)->ShowWindow(SW_NORMAL);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_VIDEOS)->ShowWindow(SW_NORMAL);
+            iconVideos.ShowWindow(SW_NORMAL); 
+
+            WindowsSyncSourceConfig* ssc = getConfig()->getSyncSourceConfig(VIDEO_);
+            if (!ssc) {
+                printLog("configuration not found for source video", "ERROR");
+                // TODO: use string resources
+                wsafeMessageBox(L"Configuration error: please reinstall the application.");
+                exit(1);
+                return;
+            }
+
+            bool enabled = getConfig()->getSyncSourceConfig(VIDEO_)->isEnabled() || getConfig()->getSyncSourceConfig(VIDEO_)->getIsRefreshMode();
+            if(enabled) {
+                paneVideos.ShowWindow(SW_NORMAL);
+                paneVideos.state = STATE_NORMAL;
+                iconVideos.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_VIDEOS)));
+            }
+            else {
+                paneVideos.ShowWindow(SW_HIDE);
+                iconVideos.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_VIDEOS_GREY)));
+            }
+            iconVideos.EnableWindow(enabled);
+            GetDlgItem(IDC_MAIN_STATIC_VIDEOS)->EnableWindow(enabled);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_VIDEOS)->EnableWindow(enabled);
+        }
+        else {
+            // source not visible: hide the controls
+            hideSource(iconVideos, IDI_VIDEOS, 
+                       IDC_MAIN_STATIC_VIDEOS, IDC_MAIN_STATIC_STATUS_VIDEOS,
+                       paneVideos);
+        }
+
+        lastSyncVideos = 0;
+        if (config = getConfig()->getSyncSourceConfig(VIDEO_)) {
+            lastSyncVideos = config->getEndTimestamp();
+        }
+
+        // check if the last sync failed
+        if (syncSourceVideoState == SYNCSOURCE_STATE_NOT_SYNCED){
+            s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
+            iconStatusVideos.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+            paneVideos.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
+        }
+        // check if the last sync failed
+        else if (syncSourceVideoState == SYNCSOURCE_STATE_CANCELED){
+            s1.LoadString(IDS_MAIN_LAST_SYNC_CANCELED);
+            iconStatusVideos.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+            paneVideos.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
+        }
+        else if (lastSyncVideos == 0) {
+            s1.LoadString(IDS_NOT_SYNCHRONIZED); 
+        }
+        else {
+            CTime timeSyncVideos(lastSyncVideos);
+            s1.LoadString(IDS_SYNCHRONIZED); s1+= " ";
+            s1 += timeSyncVideos.Format(LAST_SYNC_TIME_FORMAT);
+        }
+        changeVideosStatus(s1);
+        SetDlgItemText(IDC_MAIN_STATIC_VIDEOS, videosLabel);    // Set directly here, pane could be disabled
+        SetDlgItemText(IDC_MAIN_STATIC_STATUS_VIDEOS, s1);
+        paneVideos.Invalidate();
+    }
+
+
+    else if (sourceId == SYNCSOURCE_FILES) {
+        
+        unsigned long lastSyncFiles = 0;
+        iconStatusFiles.StopAnim();
+
+        if (isSourceVisible(FILES)) {
+            // source visible
+            GetDlgItem(IDC_MAIN_STATIC_FILES)->ShowWindow(SW_NORMAL);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_FILES)->ShowWindow(SW_NORMAL);
+            iconFiles.ShowWindow(SW_NORMAL); 
+
+            WindowsSyncSourceConfig* ssc = getConfig()->getSyncSourceConfig(FILES_);
+            if (!ssc) {
+                printLog("configuration not found for source files", "ERROR");
+                // TODO: use string resources
+                wsafeMessageBox(L"Configuration error: please reinstall the application.");
+                exit(1);
+                return;
+            }
+
+            bool enabled = getConfig()->getSyncSourceConfig(FILES_)->isEnabled() || getConfig()->getSyncSourceConfig(FILES_)->getIsRefreshMode();
+            if(enabled) {
+                paneFiles.ShowWindow(SW_NORMAL);
+                paneFiles.state = STATE_NORMAL;
+                iconFiles.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_FILES)));
+            }
+            else {
+                paneFiles.ShowWindow(SW_HIDE);
+                iconFiles.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_FILES_GREY)));
+            }
+            iconFiles.EnableWindow(enabled);
+            GetDlgItem(IDC_MAIN_STATIC_FILES)->EnableWindow(enabled);
+            GetDlgItem(IDC_MAIN_STATIC_STATUS_FILES)->EnableWindow(enabled);
+        }
+        else {
+            // source not visible: hide the controls
+            hideSource(iconFiles, IDI_FILES, IDC_MAIN_STATIC_FILES, IDC_MAIN_STATIC_STATUS_FILES, paneFiles);
+        }
+
+        lastSyncFiles = 0;
+        if (config = getConfig()->getSyncSourceConfig(FILES_)) {
+            lastSyncFiles = config->getEndTimestamp();
+        }
+
+        // check if the last sync failed
+        if (syncSourceFileState == SYNCSOURCE_STATE_NOT_SYNCED){
+            s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
+            iconStatusFiles.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+            paneFiles.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
+        }
+        // check if the last sync failed
+        else if (syncSourceFileState == SYNCSOURCE_STATE_CANCELED){
+            s1.LoadString(IDS_MAIN_LAST_SYNC_CANCELED);
+            iconStatusFiles.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+            paneFiles.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
+        }
+        else if (lastSyncFiles == 0) {
+            s1.LoadString(IDS_NOT_SYNCHRONIZED); 
+        }
+        else {
+            CTime timeSyncFiles(lastSyncFiles);
+            s1.LoadString(IDS_SYNCHRONIZED); s1+= " ";
+            s1 += timeSyncFiles.Format(LAST_SYNC_TIME_FORMAT);
+        }
+        changeFilesStatus(s1);
+        SetDlgItemText(IDC_MAIN_STATIC_FILES, filesLabel);    // Set directly here, pane could be disabled
+        SetDlgItemText(IDC_MAIN_STATIC_STATUS_FILES, s1);
+        paneFiles.Invalidate();
     }
 }
 

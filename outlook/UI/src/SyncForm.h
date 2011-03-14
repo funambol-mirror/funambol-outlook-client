@@ -78,6 +78,8 @@ private:
     CString tasksStatusLabel;
     CString notesStatusLabel;
     CString picturesStatusLabel;
+    CString videosStatusLabel;
+    CString filesStatusLabel;
 
     // Buffers for source panel titles (fixed)
     CString contactsLabel;
@@ -85,6 +87,8 @@ private:
     CString tasksLabel;
     CString notesLabel;
     CString picturesLabel;
+    CString videosLabel;
+    CString filesLabel;
 
 
 protected:
@@ -122,6 +126,8 @@ public:
     CAnimatedIcon iconTasks;
     CAnimatedIcon iconNotes;
     CAnimatedIcon iconPictures;
+    CAnimatedIcon iconVideos;
+    CAnimatedIcon iconFiles;
 
     CBrush  brushHollow;
 
@@ -131,6 +137,8 @@ public:
     CAnimatedIcon iconStatusTasks;
     CAnimatedIcon iconStatusNotes;
     CAnimatedIcon iconStatusPictures;
+    CAnimatedIcon iconStatusVideos;
+    CAnimatedIcon iconStatusFiles;
     CAnimatedIcon iconStatusSync;
 
     // panes
@@ -140,6 +148,8 @@ public:
     CCustomPane paneTasks;
     CCustomPane paneNotes;
     CCustomPane panePictures;
+    CCustomPane paneVideos;
+    CCustomPane paneFiles;
 
     // sync source states {SYNCSOURCE_STATE_OK, SYNCSOURCE_STATE_NOT_SYNCED, SYNCSOURCE_STATE_CANCELED}
     // defined in winmaincpp.h        
@@ -148,6 +158,8 @@ public:
     int syncSourceTaskState;
     int syncSourceNoteState;
     int syncSourcePictureState;
+    int syncSourceVideoState;
+    int syncSourceFileState;
 
     
     /**
@@ -183,6 +195,13 @@ public:
     void changeTasksStatus   (CString& status);
     void changeNotesStatus   (CString& status);
     void changePicturesStatus(CString& status);
+    void changeVideosStatus  (CString& status);
+    void changeFilesStatus   (CString& status);
+
+    CString getPicturesStatusLabel () { return picturesStatusLabel; }
+    CString getVideosStatusLabel ()    { return videosStatusLabel;   }
+    CString getFilesStatusLabel ()    { return filesStatusLabel;    }
+
 
     afx_msg LRESULT OnInitForm(WPARAM, LPARAM);
     afx_msg void OnBnClickedMainButSync();
@@ -199,6 +218,8 @@ public:
     afx_msg void OnStnClickedMainBkTasks();
     afx_msg void OnStnClickedMainBkNotes();
     afx_msg void OnStnClickedMainBkPictures();
+    afx_msg void OnStnClickedMainBkVideos();
+    afx_msg void OnStnClickedMainBkFiles();
 };
 
 

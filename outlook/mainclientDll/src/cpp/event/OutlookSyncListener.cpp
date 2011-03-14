@@ -48,7 +48,7 @@ void OutlookSyncListener::syncEnd(SyncEvent &event) {
 }
 
 void OutlookSyncListener::sendInitialization( SyncEvent &event) {
-    LOG.debug("Initialization sent.");
+    LOG.debug("Initializing sync session.");
 }
 
 void OutlookSyncListener::sendModifications(SyncEvent &event) {
@@ -56,11 +56,12 @@ void OutlookSyncListener::sendModifications(SyncEvent &event) {
 }
 
 void OutlookSyncListener::sendFinalization(SyncEvent &event) {
-    LOG.debug("Finalization sent.");
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_REFRESH_STATUSBAR, NULL, (LPARAM)SBAR_ENDING_SYNC);
+    LOG.debug("Closing sync session.");
 }
 
 void OutlookSyncListener::syncError(SyncEvent &event) {
-    LOG.debug("Error occurred in sync: code %d = %s", event.getType(), event.getMessage());
+    //LOG.debug("Error occurred in sync: code %d = %s", event.getType(), event.getMessage());
 }
 
 

@@ -54,6 +54,8 @@ class OutlookTransportListener : public TransportListener {
 	void receiveDataBegin(TransportEvent &event);
 	void receivingData   (TransportEvent &event);
 	void receiveDataEnd  (TransportEvent &event);
+    void sendingData     (TransportEvent &event);
+    void partialData     (TransportEvent &event);
 };
 
 /** @} */

@@ -95,14 +95,6 @@ void WindowsSyncSourceConfig::setUseSubfolders(bool v) {
 }
 
 
-_declspec(dllexport) long WindowsSyncSourceConfig::getEndTimestamp() const {
-    return endTimestamp;
-}
-void WindowsSyncSourceConfig::setEndTimestamp(long v) {
-    endTimestamp = v;
-}
-
-
 bool WindowsSyncSourceConfig::getIsSynced() const {
     return isSynced;
 }
@@ -186,7 +178,6 @@ void WindowsSyncSourceConfig::initialize() {
     s               = NULL;
     folderPath      = NULL;
     useSubfolders   = false;
-    endTimestamp    = 0;
     isSynced        = false;
 }
 

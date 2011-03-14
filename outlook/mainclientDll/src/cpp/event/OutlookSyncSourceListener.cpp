@@ -40,27 +40,18 @@
 
 
 void OutlookSyncSourceListener::syncSourceBegin(SyncSourceEvent &event) {
-
     char* syncMode = syncModeName((SyncMode)event.getSyncMode());
-	LOG.debug("---------------------- %s BEGIN (mode \"%s\") ----------------------", event.getSourceName(), syncMode);
-
-    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_BEGIN, 
-                NULL, (LPARAM) syncSourceNameToIndex(event.getSourceName()));
+	LOG.debug("%s begin (mode \"%s\")", event.getSourceName(), syncMode);
 }
 
 void OutlookSyncSourceListener::syncSourceEnd(SyncSourceEvent &event) {
-
     char* syncMode = syncModeName((SyncMode)event.getSyncMode());
-	LOG.debug("---------------------- %s END (mode \"%s\") ----------------------", event.getSourceName(), syncMode);
-
-    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_END, 
-                NULL, (LPARAM) syncSourceNameToIndex(event.getSourceName()));
+	LOG.debug("%s end (mode \"%s\")", event.getSourceName(), syncMode);
 }
 
 
 
 void OutlookSyncSourceListener::syncSourceSyncModeRequested (SyncSourceEvent& event) {
-
     char* syncMode = syncModeName((SyncMode)event.getSyncMode());
     LOG.debug("Server requested syncmode \"%s\" for %s.", syncMode, event.getSourceName());
 }
@@ -68,7 +59,7 @@ void OutlookSyncSourceListener::syncSourceSyncModeRequested (SyncSourceEvent& ev
 
 void OutlookSyncSourceListener::syncSourceTotalClientItems (SyncSourceEvent& event) {
     
-    LOG.info("Total %s items to send: %d", event.getSourceName(), event.getData());
+    //LOG.info("Total %s items to send: %d", event.getSourceName(), event.getData());
 
     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_TOTALITEMS, 
                 (WPARAM) 0, (LPARAM)event.getData());
@@ -78,7 +69,7 @@ void OutlookSyncSourceListener::syncSourceTotalClientItems (SyncSourceEvent& eve
 void OutlookSyncSourceListener::syncSourceTotalServerItems (SyncSourceEvent& event) {
     
     if (event.getData() != -1) {
-        LOG.info("Total %s items to receive: %d", event.getSourceName(), event.getData());
+        //LOG.info("Total %s items to receive: %d", event.getSourceName(), event.getData());
         SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_TOTALITEMS, 
                     (WPARAM) 1, (LPARAM)event.getData());
     }

@@ -1,34 +1,34 @@
 /*
- * Funambol is a mobile platform developed by Funambol, Inc. 
+ * Funambol is a mobile platform developed by Funambol, Inc.
  * Copyright (C) 2003 - 2007 Funambol, Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
- * the Free Software Foundation with the addition of the following permission 
+ * the Free Software Foundation with the addition of the following permission
  * added to Section 15 as permitted in Section 7(a): FOR ANY PART OF THE COVERED
- * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE 
+ * WORK IN WHICH THE COPYRIGHT IS OWNED BY FUNAMBOL, FUNAMBOL DISCLAIMS THE
  * WARRANTY OF NON INFRINGEMENT  OF THIRD PARTY RIGHTS.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  * details.
- * 
- * You should have received a copy of the GNU Affero General Public License 
+ *
+ * You should have received a copy of the GNU Affero General Public License
  * along with this program; if not, see http://www.gnu.org/licenses or write to
  * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301 USA.
- * 
- * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite 
+ *
+ * You can contact Funambol, Inc. headquarters at 643 Bair Island Road, Suite
  * 305, Redwood City, CA 94063, USA, or at email address info@funambol.com.
- * 
+ *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
  * Section 5 of the GNU Affero General Public License version 3.
- * 
+ *
  * In accordance with Section 7(b) of the GNU Affero General Public License
  * version 3, these Appropriate Legal Notices must retain the display of the
- * "Powered by Funambol" logo. If the display of the logo is not reasonably 
+ * "Powered by Funambol" logo. If the display of the logo is not reasonably
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by Funambol".
  */
@@ -79,11 +79,11 @@ BEGIN_MESSAGE_MAP(CMainSyncFrame, CFrameWnd)
     ON_MESSAGE(ID_MYMSG_SYNCSOURCE_BEGIN,       &CMainSyncFrame::OnMsgSyncSourceBegin)
     ON_MESSAGE(ID_MYMSG_SYNCSOURCE_END,         &CMainSyncFrame::OnMsgSyncSourceEnd)
     ON_MESSAGE(ID_MYMSG_SYNC_ITEM_SYNCED,       &CMainSyncFrame::OnMsgItemSynced)
-    ON_MESSAGE(ID_MYMSG_SYNC_TOTALITEMS,        &CMainSyncFrame::OnMsgTotalItems) 
-    ON_MESSAGE(ID_MYMSG_SYNC_STARTSYNC_BEGIN,   &CMainSyncFrame::OnMsgStartSyncBegin) 
-    ON_MESSAGE(ID_MYMSG_STARTSYNC_ENDED,        &CMainSyncFrame::OnMsgStartsyncEnded) 
-    ON_MESSAGE(ID_MYMSG_REFRESH_STATUSBAR,      &CMainSyncFrame::OnMsgRefreshStatusBar) 
-    ON_MESSAGE(ID_MYMSG_SOURCE_STATE,           &CMainSyncFrame::OnMsgSyncSourceState) 
+    ON_MESSAGE(ID_MYMSG_SYNC_TOTALITEMS,        &CMainSyncFrame::OnMsgTotalItems)
+    ON_MESSAGE(ID_MYMSG_SYNC_STARTSYNC_BEGIN,   &CMainSyncFrame::OnMsgStartSyncBegin)
+    ON_MESSAGE(ID_MYMSG_STARTSYNC_ENDED,        &CMainSyncFrame::OnMsgStartsyncEnded)
+    ON_MESSAGE(ID_MYMSG_REFRESH_STATUSBAR,      &CMainSyncFrame::OnMsgRefreshStatusBar)
+    //ON_MESSAGE(ID_MYMSG_SOURCE_STATE,         &CMainSyncFrame::OnMsgSyncSourceState)
     ON_MESSAGE(ID_MYMSG_LOCK_BUTTONS,           &CMainSyncFrame::OnMsgLockButtons)
     ON_MESSAGE(ID_MYMSG_UNLOCK_BUTTONS,         &CMainSyncFrame::OnMsgUnlockButtons)
     ON_MESSAGE(ID_MYMSG_CANCEL_SYNC,            &CMainSyncFrame::CancelSync)
@@ -92,6 +92,7 @@ BEGIN_MESSAGE_MAP(CMainSyncFrame, CFrameWnd)
     ON_COMMAND(ID_FILE_SYNCHRONIZE,             &CMainSyncFrame::OnFileSynchronize)
     ON_COMMAND(ID_TOOLS_SETLOGLEVEL,            &CMainSyncFrame::OnToolsSetloglevel)
 
+    ON_MESSAGE(ID_MYMSG_SAPI_PROGRESS,          &CMainSyncFrame::OnMsgSapiProgress)
     ON_MESSAGE(ID_MYMSG_POPUP,                  &CMainSyncFrame::OnMsgPopup)
     ON_MESSAGE(ID_MYMSG_OK,                     &CMainSyncFrame::OnOKMsg)
 
@@ -119,6 +120,10 @@ void refreshStatusBar(CString& msg) {
 
     // Avoid updating the statusbar when canceling sync.
     if (!cancelingSync && msg.GetLength()) {
+        //StringBuffer tmp;
+        //tmp.convert(msg.GetBuffer());
+        //tmp.append(" <<<< statusBar");
+        //printLog(tmp.c_str(), LOG_DEBUG);
         ((CMainSyncFrame*)AfxGetMainWnd())->wndStatusBar.SetPaneText(0, msg);
     }
 }
@@ -140,24 +145,32 @@ void refreshSourceLabels(CString& msg, int sourceIndex) {
 
         switch(sourceIndex){
             case SYNCSOURCE_CONTACTS:
-                mainForm->changeContactsStatus(msg); 
+                mainForm->changeContactsStatus(msg);
                 mainForm->paneContacts.Invalidate();
                 break;
             case SYNCSOURCE_CALENDAR:
-                mainForm->changeCalendarStatus(msg); 
+                mainForm->changeCalendarStatus(msg);
                 mainForm->paneCalendar.Invalidate();
                 break;
             case SYNCSOURCE_TASKS:
-                mainForm->changeTasksStatus(msg);    
+                mainForm->changeTasksStatus(msg);
                 mainForm->paneTasks.Invalidate();
                 break;
             case SYNCSOURCE_NOTES:
                 mainForm->changeNotesStatus(msg);
                 mainForm->paneNotes.Invalidate();
-                break;  
+                break;
             case SYNCSOURCE_PICTURES:
                 mainForm->changePicturesStatus(msg);
                 mainForm->panePictures.Invalidate();
+                break;
+            case SYNCSOURCE_VIDEOS:
+                mainForm->changeVideosStatus(msg);
+                mainForm->paneVideos.Invalidate();
+                break;
+            case SYNCSOURCE_FILES:
+                mainForm->changeFilesStatus(msg);
+                mainForm->paneFiles.Invalidate();
                 break;
             default:
                 break;
@@ -174,13 +187,15 @@ CMainSyncFrame::CMainSyncFrame() {
     dwThreadId  = NULL;
     configOpened = false;
     cancelingSync = false;
-    
-    syncModeContacts = -1; 
-    syncModeCalendar = -1; 
+
+    syncModeContacts = -1;
+    syncModeCalendar = -1;
     syncModeTasks    = -1;
-    syncModeNotes    = -1; 
+    syncModeNotes    = -1;
     syncModePictures = -1;
-    dpiX = 0; 
+    syncModeVideos   = -1;
+    syncModeFiles    = -1;
+    dpiX = 0;
     dpiY = 0;
 
     // load bitmaps
@@ -188,12 +203,16 @@ CMainSyncFrame::CMainSyncFrame() {
     hBmpBlue     = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BK_BLUE));
     hBmpDark     = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BK_DARK));
     hBmpLight    = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BK_LIGHT));
+
+    itemTotalSize = 0;
+    partialCompleted = 0;
+    progressStarted = false;
 }
 
 CMainSyncFrame::~CMainSyncFrame() {
     if (dwThreadId) {
         CloseHandle(hSyncThread);
-    } 
+    }
     //closeClient();
     DeleteObject(hBmpDarkBlue);
     DeleteObject(hBmpBlue);
@@ -250,11 +269,11 @@ void CMainSyncFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMe
     if (nIndex == 2 && isNewSwVersionAvailable()) {
         UINT firstItemID = pPopupMenu->GetMenuItemID(0);
         if (firstItemID != ID_MENU_UPDATE_SW) {
-            CString s1; 
+            CString s1;
             s1.LoadString(IDS_UPDATE_SOFTWARE);
             pPopupMenu->InsertMenu(0, MF_BYPOSITION | MF_ENABLED, ID_MENU_UPDATE_SW, s1);
             // pPopupMenu->EnableMenuItem(ID_MENU_UPDATE_SW, MF_GRAYED);
-        }       
+        }
     }
 
 finally:
@@ -269,7 +288,7 @@ BOOL CMainSyncFrame::PreCreateWindow(CREATESTRUCT& cs)
 
     // TODO: set here main window size and style
     cs.style =  WS_SYSMENU  | WS_VISIBLE | WS_MINIMIZEBOX;
-    // cs.dwExStyle = 0 ; 
+    // cs.dwExStyle = 0 ;
     HDC hdc = ::GetDC(0);
     dpiX = ::GetDeviceCaps(hdc,LOGPIXELSX);
     dpiY = ::GetDeviceCaps(hdc,LOGPIXELSY);
@@ -307,14 +326,14 @@ void CMainSyncFrame::Dump(CDumpContext& dc) const
 
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL CMainSyncFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext) 
-{ 
+BOOL CMainSyncFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
+{
     if (!wndSplitter.CreateStatic(this,1,2,WS_CHILD | WS_VISIBLE | WS_MINIMIZEBOX))
 	{
 		TRACE(_T("failed to create the splitter"));
 		return FALSE;
 	}
-	
+
     if (!wndSplitter.CreateView(0,0,RUNTIME_CLASS(CSyncForm),CSize(100,100),pContext))
 	{
 		TRACE(_T("Failed to create view in first pane"));
@@ -325,7 +344,7 @@ BOOL CMainSyncFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContex
 	{
 		TRACE(_T("failed to create view in second pane"));
 		return FALSE;
-	} 
+	}
 
 	return TRUE;
 }
@@ -355,7 +374,7 @@ void CMainSyncFrame::OnToolsFullSync()
 
     // show full sync dialog
     CFullSync wndFullSync;
-    INT_PTR result = wndFullSync.DoModal();  
+    INT_PTR result = wndFullSync.DoModal();
 }
 
 
@@ -363,7 +382,7 @@ void CMainSyncFrame::OnToolsFullSync()
  * Thread to start the sync process.
  */
 DWORD WINAPI syncThread(LPVOID lpParam) {
-    
+
     int ret = 0;
 
     try {
@@ -484,14 +503,14 @@ void CMainSyncFrame::showSettingsWindow(const int paneToDisplay){
     CSingleDocTemplate* docSettings = ((COutlookPluginApp*)AfxGetApp())->docSettings;
 
     getConfig()->read();
-    
+
     pDoc = docSettings->CreateNewDocument();
     if (pDoc != NULL)
     {
         // If creation worked, use create a new frame for
         // that document.
         pConfigFrame = (CConfigFrame*)docSettings->CreateNewFrame(pDoc, NULL);
-        
+
         if (pConfigFrame != NULL)
         {
             docSettings->SetDefaultTitle(pDoc);
@@ -514,17 +533,17 @@ void CMainSyncFrame::showSettingsWindow(const int paneToDisplay){
     {
         delete pDoc;
         AfxMessageBox(AFX_IDP_FAILED_TO_CREATE_DOC);
-    } 
+    }
 
     pConfigFrame->wndSplitter.SetActivePane(0,0);
     pConfigFrame->wndSplitter.SetColumnInfo(0,65,40);
-    //pConfigFrame->wndSplitter.RecalcLayout();        
+    //pConfigFrame->wndSplitter.RecalcLayout();
     docSettings->InitialUpdateFrame(pConfigFrame, pDoc, TRUE);
-    
+
 
     //select the desired pane to be displayed.
     ((CLeftView*)pConfigFrame->wndSplitter.GetPane(0,0))->selectItem(paneToDisplay);
-    
+
     pConfigFrame->wndSplitter.GetPane(0,1)->SendMessage(WM_PAINT);
 
     this->BeginModalState(); // TODO: this is required
@@ -539,7 +558,7 @@ void CMainSyncFrame::OnToolsSetloglevel()
 }
 
 
-LRESULT CMainSyncFrame::OnMsgSyncBegin( WPARAM , LPARAM lParam) {  
+LRESULT CMainSyncFrame::OnMsgSyncBegin( WPARAM , LPARAM lParam) {
 
     CString s1;
     s1.LoadString(IDS_TEXT_STARTING_SYNC);
@@ -558,7 +577,7 @@ LRESULT CMainSyncFrame::OnMsgSyncBegin( WPARAM , LPARAM lParam) {
         CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
 
         mainForm->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CANCEL)));
-        s1.LoadString(IDS_MAIN_PRESS_TO_CANCEL); 
+        s1.LoadString(IDS_MAIN_PRESS_TO_CANCEL);
         mainForm->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
     }
     else{
@@ -566,6 +585,7 @@ LRESULT CMainSyncFrame::OnMsgSyncBegin( WPARAM , LPARAM lParam) {
     }
 
     bSyncStarted = true;
+    progressStarted = false;
     Invalidate();
 
     return 0;
@@ -579,7 +599,8 @@ LRESULT CMainSyncFrame::OnMsgSyncEnd( WPARAM , LPARAM ) {
     s1.LoadString(IDS_TEXT_SYNC_ENDED);
     wndStatusBar.SetPaneText(0,s1);
 
-    bSyncStarted = false; 
+    bSyncStarted = false;
+    progressStarted = false;
     return 0;
 }
 
@@ -588,8 +609,9 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
 
     CString s1;
     currentSource = lParam;
-    currentItem = 0;
-    
+    currentClientItem = 0;
+    currentServerItem = 0;
+
     // if it is scheduled, we change only status bar text
     bool isScheduled = getConfig()->getScheduledSync();
 
@@ -600,7 +622,6 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
         // change controls based on what source is currently syncing
         switch(currentSource) {
             case SYNCSOURCE_CONTACTS:
-                contactsBegin++;
                 mainForm->GetDlgItem(IDC_MAIN_STATIC_CONTACTS)->ShowWindow(SW_SHOW);
                 mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_CONTACTS)->ShowWindow(SW_SHOW);
                 mainForm->iconStatusContacts.Animate();
@@ -608,7 +629,6 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
                 break;
 
             case SYNCSOURCE_CALENDAR:
-                calendarBegin++;
                 mainForm->GetDlgItem(IDC_MAIN_STATIC_CALENDAR)->ShowWindow(SW_SHOW);
                 mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_CALENDAR)->ShowWindow(SW_SHOW);
                 mainForm->iconStatusCalendar.Animate();
@@ -616,7 +636,6 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
                 break;
 
             case SYNCSOURCE_TASKS:
-                tasksBegin++;
                 mainForm->GetDlgItem(IDC_MAIN_STATIC_TASKS)->ShowWindow(SW_SHOW);
                 mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_TASKS)->ShowWindow(SW_SHOW);
                 mainForm->iconStatusTasks.Animate();
@@ -624,7 +643,6 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
                 break;
 
             case SYNCSOURCE_NOTES:
-                notesBegin++;
                 mainForm->GetDlgItem(IDC_MAIN_STATIC_NOTES)->ShowWindow(SW_SHOW);
                 mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_NOTES)->ShowWindow(SW_SHOW);
                 mainForm->iconStatusNotes.Animate();
@@ -632,34 +650,35 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
                 break;
 
             case SYNCSOURCE_PICTURES:
-                picturesBegin++;
                 mainForm->GetDlgItem(IDC_MAIN_STATIC_PICTURES)->ShowWindow(SW_SHOW);
                 mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_PICTURES)->ShowWindow(SW_SHOW);
                 mainForm->iconStatusPictures.Animate();
                 mainForm->panePictures.SetBitmap(hBmpBlue);
                 break;
+
+            case SYNCSOURCE_VIDEOS:
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_VIDEOS)->ShowWindow(SW_SHOW);
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_VIDEOS)->ShowWindow(SW_SHOW);
+                mainForm->iconStatusVideos.Animate();
+                mainForm->paneVideos.SetBitmap(hBmpBlue);
+                break;
+
+            case SYNCSOURCE_FILES:
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_FILES)->ShowWindow(SW_SHOW);
+                mainForm->GetDlgItem(IDC_MAIN_STATIC_STATUS_FILES)->ShowWindow(SW_SHOW);
+                mainForm->iconStatusFiles.Animate();
+                mainForm->paneFiles.SetBitmap(hBmpBlue);
+                break;
         }
     }
 
 
-    //
-    // change text on labels to reflect sync status
-    //
+    // change sync status: "Connecting..."
     CString msg;
-    msg.LoadString(IDS_TEXT_CHECKING);
-    if(wParam == 1){
-        msg += " Server ";
-    }
-    else {
-        msg += " Outlook ";
-    }
+    msg.LoadString(IDS_CONNECTING);
 
-
-    CString source;
     switch(lParam) {
         case SYNCSOURCE_CONTACTS:
-            source.LoadString(IDS_TEXT_CONTACTS);
-            msg+=source;
             if (!isScheduled) {
                 mainForm->changeContactsStatus(msg);
             }
@@ -667,8 +686,6 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
             break;
 
         case SYNCSOURCE_CALENDAR:
-            source.LoadString(IDS_TEXT_APPOINTMENTS);
-            msg+=source;
             if (!isScheduled) {
                 mainForm->changeCalendarStatus(msg);
             }
@@ -676,8 +693,6 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
             break;
 
         case SYNCSOURCE_TASKS:
-            source.LoadString(IDS_TEXT_TASKS);
-            msg+=source;
             if (!isScheduled) {
                 mainForm->changeTasksStatus(msg);
             }
@@ -685,137 +700,37 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceBegin( WPARAM wParam, LPARAM lParam) {
             break;
 
         case SYNCSOURCE_NOTES:
-            source.LoadString(IDS_TEXT_NOTES);
-            msg+=source;
             if (!isScheduled) {
                 mainForm->changeNotesStatus(msg);
             }
             mainForm->paneNotes.Invalidate();
             break;
-        
+
         case SYNCSOURCE_PICTURES:
-            // Different behavior for pictures since we don't check the "Outlook pictures"
-            // so let's write we're starting to receive data from Server...
-            msg = SBAR_RECEIVING_DATA;
             if (!isScheduled) {
                 mainForm->changePicturesStatus(msg);
             }
             mainForm->panePictures.Invalidate();
             break;
+
+        case SYNCSOURCE_VIDEOS:
+            if (!isScheduled) {
+                mainForm->changeVideosStatus(msg);
+            }
+            mainForm->paneVideos.Invalidate();
+            break;
+
+        case SYNCSOURCE_FILES:
+            if (!isScheduled) {
+                mainForm->changeFilesStatus(msg);
+            }
+            mainForm->paneFiles.Invalidate();
+            break;
     }
-    
+
 
     // Update status-bar with the same message.
     refreshStatusBar(msg);
-
-    return 0; 
-}
-
-// UI received a sync source ended message
-LRESULT CMainSyncFrame::OnMsgSyncSourceEnd( WPARAM , LPARAM lParam) {
-
-    CString s1;
-    currentSource = lParam;
-
-    // if it is scheduled, we change only status bar text
-    if(getConfig()->getScheduledSync()) {
-        currentSource = 0;
-        return 0;
-    }
-
-    // TODO: move to class member?
-    CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
-
-    switch(currentSource) {
-     case SYNCSOURCE_CONTACTS:
-         mainForm->iconStatusContacts.StopAnim();
-         mainForm->iconContacts.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CONTACTS)));
-         mainForm->paneContacts.SetBitmap(hBmpLight);
-         if (contactsBegin == 2) {
-            mainForm->iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
-            mainForm->paneContacts.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
-            s1.LoadString(IDS_DONE);
-         }
-         else {
-             mainForm->iconStatusContacts.SetIcon(NULL);
-             s1.LoadString(IDS_FINISHED_SENDING);
-         }
-         mainForm->changeContactsStatus(s1);
-         mainForm->paneContacts.Invalidate();
-         break;
-     
-     case SYNCSOURCE_CALENDAR:
-         s1.LoadString(IDS_DONE);
-         mainForm->iconStatusCalendar.StopAnim();
-         mainForm->iconCalendar.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CALENDAR)));
-         mainForm->paneCalendar.SetBitmap(hBmpLight);
-         if (calendarBegin == 2) {
-            mainForm->iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
-            mainForm->paneCalendar.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
-            s1.LoadString(IDS_DONE);
-         }
-         else {
-             mainForm->iconStatusCalendar.SetIcon(NULL);
-             s1.LoadString(IDS_FINISHED_SENDING);
-         }
-         mainForm->changeCalendarStatus(s1);
-         mainForm->paneCalendar.Invalidate();
-         break;
-      
-     case SYNCSOURCE_TASKS:
-         s1.LoadString(IDS_DONE);
-         mainForm->iconStatusTasks.StopAnim();
-         mainForm->iconTasks.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_TASKS)));
-         mainForm->paneTasks.SetBitmap(hBmpLight);
-         if (tasksBegin == 2) {
-            mainForm->iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
-            mainForm->paneTasks.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
-            s1.LoadString(IDS_DONE);
-         }
-         else {
-             mainForm->iconStatusTasks.SetIcon(NULL);
-             s1.LoadString(IDS_FINISHED_SENDING);
-         }
-         mainForm->changeTasksStatus(s1);
-         mainForm->paneTasks.Invalidate();
-         break;
-
-     case SYNCSOURCE_NOTES:
-         s1.LoadString(IDS_DONE);
-         mainForm->iconStatusNotes.StopAnim();
-         mainForm->iconNotes.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_NOTES)));
-         mainForm->paneNotes.SetBitmap(hBmpLight);
-         if (notesBegin == 2) {
-            mainForm->iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
-            mainForm->paneNotes.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
-            s1.LoadString(IDS_DONE);
-         }
-         else {
-             mainForm->iconStatusNotes.SetIcon(NULL);
-             s1.LoadString(IDS_FINISHED_SENDING);
-         }
-         mainForm->changeNotesStatus(s1);
-         mainForm->paneNotes.Invalidate();
-         break;
-
-     case SYNCSOURCE_PICTURES:
-         s1.LoadString(IDS_DONE);
-         mainForm->iconStatusPictures.StopAnim();
-         mainForm->iconPictures.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_PICTURES)));
-         mainForm->panePictures.SetBitmap(hBmpLight);
-         if (picturesBegin == 2) {
-            mainForm->iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE)));
-            mainForm->panePictures.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_COMPLETE));
-            s1.LoadString(IDS_DONE);
-         }
-         else {
-             mainForm->iconStatusPictures.SetIcon(NULL);
-             s1.LoadString(IDS_FINISHED_SENDING);
-         }
-         mainForm->changePicturesStatus(s1);
-         mainForm->panePictures.Invalidate();
-         break;
-    }
 
     return 0;
 }
@@ -823,17 +738,23 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceEnd( WPARAM , LPARAM lParam) {
 // UI received a item synced message
 LRESULT CMainSyncFrame::OnMsgItemSynced( WPARAM wParam, LPARAM ) {
 
-    currentItem++;
-
     //
     // Format message: "Sending/Receiving contacts x[/y]..."
     //
+    int currentItem = 0;
+    int totalItems = 0;
     CString statusBarText;
     if(wParam == -1) {
         statusBarText = "Sending ";
+        totalItems = totalClientItems;
+        currentClientItem ++;
+        currentItem = currentClientItem;
     }
     else {
         statusBarText = "Receiving ";
+        totalItems = totalServerItems;
+        currentServerItem ++;
+        currentItem = currentServerItem;
     }
 
     CString s1;
@@ -856,6 +777,14 @@ LRESULT CMainSyncFrame::OnMsgItemSynced( WPARAM wParam, LPARAM ) {
             break;
         case SYNCSOURCE_PICTURES:
             s1.LoadString(IDS_TEXT_PICTURES);
+            statusBarText += s1;
+            break;
+        case SYNCSOURCE_VIDEOS:
+            s1.LoadString(IDS_TEXT_VIDEOS);
+            statusBarText += s1;
+            break;
+        case SYNCSOURCE_FILES:
+            s1.LoadString(IDS_TEXT_FILES);
             statusBarText += s1;
             break;
     }
@@ -887,16 +816,16 @@ LRESULT CMainSyncFrame::OnMsgItemSynced( WPARAM wParam, LPARAM ) {
     // change source status
     switch(currentSource){
         case SYNCSOURCE_CONTACTS:
-            mainForm->changeContactsStatus(statusBarText); 
+            mainForm->changeContactsStatus(statusBarText);
             //mainForm->repaintPaneControls(PANE_TYPE_CONTACTS);
             mainForm->paneContacts.Invalidate();
             break;
         case SYNCSOURCE_CALENDAR:
-            mainForm->changeCalendarStatus(statusBarText); 
+            mainForm->changeCalendarStatus(statusBarText);
             mainForm->paneCalendar.Invalidate();
             break;
         case SYNCSOURCE_TASKS:
-            mainForm->changeTasksStatus(statusBarText);    
+            mainForm->changeTasksStatus(statusBarText);
             mainForm->paneTasks.Invalidate();
             break;
         case SYNCSOURCE_NOTES:
@@ -904,9 +833,20 @@ LRESULT CMainSyncFrame::OnMsgItemSynced( WPARAM wParam, LPARAM ) {
             mainForm->paneNotes.Invalidate();
             break;
         case SYNCSOURCE_PICTURES:
+            statusBarText += CString(" (0%)");
             mainForm->changePicturesStatus(statusBarText);
             mainForm->panePictures.Invalidate();
-            break;      
+            break;
+        case SYNCSOURCE_VIDEOS:
+            statusBarText += CString(" (0%)");
+            mainForm->changeVideosStatus(statusBarText);
+            mainForm->paneVideos.Invalidate();
+            break;
+        case SYNCSOURCE_FILES:
+            statusBarText += CString(" (0%)");
+            mainForm->changeFilesStatus(statusBarText);
+            mainForm->paneFiles.Invalidate();
+            break;
     }
 
     //Invalidate(FALSE);
@@ -946,6 +886,8 @@ afx_msg LRESULT CMainSyncFrame::OnMsgRefreshStatusBar( WPARAM wParam, LPARAM lPa
             else if (currentSource == SYNCSOURCE_TASKS)    sourceName = TASK_;
             else if (currentSource == SYNCSOURCE_NOTES)    sourceName = NOTE_;
             else if (currentSource == SYNCSOURCE_PICTURES) sourceName = PICTURE_;
+            else if (currentSource == SYNCSOURCE_VIDEOS)   sourceName = VIDEO_;
+            else if (currentSource == SYNCSOURCE_FILES)    sourceName = FILES_;
             sprintf(text, SBAR_DELETING_ITEMS, sourceName);
             break;
         }
@@ -973,8 +915,10 @@ afx_msg LRESULT CMainSyncFrame::OnMsgRefreshStatusBar( WPARAM wParam, LPARAM lPa
     refreshStatusBar(s1);
 
     // Refresh source labels for some case
-    // Not for pictures, because items are big and we need to keep the items' number on the source pane.
-    if (currentSource != SYNCSOURCE_PICTURES) {
+    // Not for media, because items are big and we need to keep the items' number on the source pane.
+    if (currentSource != SYNCSOURCE_PICTURES &&
+        currentSource != SYNCSOURCE_VIDEOS   &&
+        currentSource != SYNCSOURCE_FILES) {
         if ( lParam == SBAR_SENDDATA_BEGIN ||
              lParam == SBAR_RECEIVE_DATA_BEGIN ||
              lParam == SBAR_SENDDATA_END ||
@@ -991,10 +935,14 @@ afx_msg LRESULT CMainSyncFrame::OnMsgRefreshStatusBar( WPARAM wParam, LPARAM lPa
 
 afx_msg LRESULT CMainSyncFrame::OnMsgTotalItems( WPARAM wParam, LPARAM lParam)
 {
-    totalItems = lParam;
-   
+    if (wParam == 0) {
+        totalClientItems = lParam;
+    } else {
+        totalServerItems = lParam;
+    }
+
     CString source;
-    CString msg; 
+    CString msg;
     switch (currentSource) {
         case SYNCSOURCE_CONTACTS:
             source.LoadString(IDS_TEXT_CONTACTS);
@@ -1008,11 +956,15 @@ afx_msg LRESULT CMainSyncFrame::OnMsgTotalItems( WPARAM wParam, LPARAM lParam)
         case SYNCSOURCE_NOTES:
             source.LoadString(IDS_TEXT_NOTES);
             break;
+
         case SYNCSOURCE_PICTURES:
-            source.LoadString(IDS_TEXT_PICTURES);
-            break;
+        case SYNCSOURCE_VIDEOS:
+        case SYNCSOURCE_FILES:
+            // No need to update the statusBar for the media sync
+            // (total items are fired together at beginning)
+            return 0;
     }
-    
+
     if(wParam == 1){
         msg.LoadString(IDS_TEXT_RECEIVING);
     }
@@ -1020,7 +972,7 @@ afx_msg LRESULT CMainSyncFrame::OnMsgTotalItems( WPARAM wParam, LPARAM lParam)
         msg.LoadString(IDS_TEXT_SENDING);
     }
 
-    msg+=" "; 
+    msg+=" ";
     msg+=source;
     refreshStatusBar(msg);
 
@@ -1050,20 +1002,24 @@ LRESULT CMainSyncFrame::OnMsgStartSyncBegin(WPARAM wParam, LPARAM lParam){
  * 'lParam' is the exitThread code (0 if no errors).
  * Here errors of sync process are managed, and then UI refreshed.
  */
-LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam){
-    
+LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam) {
+
+    //StringBuffer tmp;
+    //tmp.sprintf("[%s], lParam = %d", __FUNCTION__, lParam);
+    //printLog(tmp.c_str());
+
     CString s1;
     _bstr_t bst;
     int exitCode = lParam;
     const bool isScheduled = getConfig()->getScheduledSync();
-    
+
     // Sync has finished: unlock buttons
     cancelingSync = false;
 
     // TODO: move to class member?
     CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
     mainForm->unlockButtons();
-    
+
     //
     // Error occurred: display error message on a msgBox.
     //
@@ -1106,16 +1062,16 @@ LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam){
     mainForm->paneSync.SetBitmap(hBmpDark);
     mainForm->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SYNC_ALL_BLUE)));
 
-    s1.LoadString(IDS_MAIN_PRESS_TO_SYNC); 
+    s1.LoadString(IDS_MAIN_PRESS_TO_SYNC);
     mainForm->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
 
 
-    // Correct source status in case of ClientException (code 3), killed thread (code 4), 
+    // Correct source status in case of ClientException (code 3), killed thread (code 4),
     // unexpected exception (code 6 & 7)
     // TODO: change "notSynced" to "Failed"! or add a state
-    if (exitCode == 3 || 
-        exitCode == 4 || 
-        exitCode == 6 || 
+    if (exitCode == 3 ||
+        exitCode == 4 ||
+        exitCode == 6 ||
         exitCode == 7) {
         if (!getConfig()->getSyncSourceConfig(CONTACT_)->isEnabled()) {
             mainForm->syncSourceContactState = SYNCSOURCE_STATE_NOT_SYNCED;
@@ -1131,6 +1087,12 @@ LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam){
         }
         if (!getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled()) {
             mainForm->syncSourcePictureState = SYNCSOURCE_STATE_NOT_SYNCED;
+        }
+        if (!getConfig()->getSyncSourceConfig(VIDEO_)->isEnabled()) {
+            mainForm->syncSourceVideoState = SYNCSOURCE_STATE_NOT_SYNCED;
+        }
+        if (!getConfig()->getSyncSourceConfig(FILES_)->isEnabled()) {
+            mainForm->syncSourceFileState = SYNCSOURCE_STATE_NOT_SYNCED;
         }
     }
     else if (exitCode == 5) {
@@ -1150,6 +1112,12 @@ LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam){
         }
         if (getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled()) {
             mainForm->syncSourcePictureState = SYNCSOURCE_STATE_CANCELED;
+        }
+        if (getConfig()->getSyncSourceConfig(VIDEO_)->isEnabled()) {
+            mainForm->syncSourceVideoState = SYNCSOURCE_STATE_CANCELED;
+        }
+        if (getConfig()->getSyncSourceConfig(FILES_)->isEnabled()) {
+            mainForm->syncSourceFileState = SYNCSOURCE_STATE_CANCELED;
         }
     }
 
@@ -1187,6 +1155,7 @@ LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam){
     Invalidate(FALSE);
     currentSource = 0;          // Invalidating the currentSource, here it's finished.
     bSyncStarted = false;
+    progressStarted = false;
     return 0;
 }
 
@@ -1194,8 +1163,10 @@ void CMainSyncFrame::StartSync(){
 
     CString s1;
     currentSource = 0;
-    currentItem = 0;
-    totalItems = 0;
+    currentClientItem = 0;
+    currentServerItem = 0;
+    totalClientItems = 0;
+    totalServerItems = 0;
     printLog("StartSync begin", LOG_DEBUG);
 
     // Check on sync in progress.
@@ -1216,19 +1187,12 @@ void CMainSyncFrame::StartSync(){
     // TODO: move to class member?
     CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
 
-    // Lock the UI buttons.
-    mainForm->lockButtons();
-
-    // Reset counters.
-    contactsBegin = 0;
-    calendarBegin = 0;
-    tasksBegin = 0;
-    notesBegin = 0;
-    picturesBegin = 0;
+    // Lock the UI buttons. no, anymore!
+    //mainForm->lockButtons();
 
     // Hide the menu.
     printLog("Hide menu", LOG_DEBUG);
-    
+
     HMENU hMenu = ::GetMenu(GetSafeHwnd());
     int nCount = GetMenuItemCount(hMenu);
     for(int i = 0; i < nCount; i++){
@@ -1260,13 +1224,21 @@ void CMainSyncFrame::StartSync(){
         mainForm->syncSourcePictureState = SYNCSOURCE_STATE_OK;
         mainForm->iconStatusPictures.SetIcon(NULL);
     }
+    if (getConfig()->getSyncSourceConfig(VIDEO_)->isEnabled()) {
+        mainForm->syncSourceVideoState = SYNCSOURCE_STATE_OK;
+        mainForm->iconStatusVideos.SetIcon(NULL);
+    }
+    if (getConfig()->getSyncSourceConfig(FILES_)->isEnabled()) {
+        mainForm->syncSourceFileState = SYNCSOURCE_STATE_OK;
+        mainForm->iconStatusFiles.SetIcon(NULL);
+    }
 
     //
     // Refresh of main UI.
     //
     mainForm->refreshSources();
     mainForm->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CANCEL)));
-    s1.LoadString(IDS_MAIN_PRESS_TO_CANCEL); 
+    s1.LoadString(IDS_MAIN_PRESS_TO_CANCEL);
     mainForm->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
     mainForm->Invalidate();
 
@@ -1276,7 +1248,9 @@ void CMainSyncFrame::StartSync(){
     mainForm->paneTasks.state    = STATE_SYNC;
     mainForm->paneNotes.state    = STATE_SYNC;
     mainForm->panePictures.state = STATE_SYNC;
-    
+    mainForm->paneVideos.state   = STATE_SYNC;
+    mainForm->paneFiles.state    = STATE_SYNC;
+
 
     //
     // Start the sync thread.
@@ -1297,7 +1271,7 @@ LRESULT CMainSyncFrame::CancelSync(WPARAM wParam, LPARAM lParam){
     return CancelSync(false);
 }
 
-int CMainSyncFrame::CancelSync(bool confirm){
+int CMainSyncFrame::CancelSync(bool confirm) {
     int ret = 1;
     CString msg;
     CString s1;
@@ -1330,9 +1304,11 @@ int CMainSyncFrame::CancelSync(bool confirm){
         CString s1;
         s1.LoadString(IDS_TEXT_CANCELING_SYNC);
         refreshStatusBar(s1);
+        refreshSourceLabels(s1, currentSource);
 
         // LOCK the statusbar and other controls.
         cancelingSync = true;
+        progressStarted = false;
 
         // TODO: move to class member?
         CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
@@ -1340,7 +1316,7 @@ int CMainSyncFrame::CancelSync(bool confirm){
 
         // First we try to terminate the sync in a soft way.
         softTerminateSync();
-        
+
         // If it fails, this thread will kill the syncThread (after a timeout).
         DWORD killerThreadId;
         HANDLE h = CreateThread(NULL, 0, syncThreadKiller, hSyncThread, 0, &killerThreadId);
@@ -1357,42 +1333,52 @@ int CMainSyncFrame::CancelSync(bool confirm){
         }
         DrawMenuBar();
 
-        mainForm->refreshSources();
+        //mainForm->refreshSources();
 
         mainForm->iconStatusSync.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_CANCEL)));
-        s1.LoadString(IDS_MAIN_PRESS_TO_SYNC); 
+        s1.LoadString(IDS_MAIN_PRESS_TO_SYNC);
         mainForm->SetDlgItemText(IDC_MAIN_MSG_PRESS, s1);
 
-        // set sync source status
-        if (getConfig()->getSyncSourceConfig(CONTACT_)->isEnabled()){
-            mainForm->syncSourceContactState = SYNCSOURCE_STATE_CANCELED;
-        }
-        if (getConfig()->getSyncSourceConfig(APPOINTMENT_)->isEnabled()){
-            mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_CANCELED;
-        }
-        if (getConfig()->getSyncSourceConfig(TASK_)->isEnabled()){
-            mainForm->syncSourceTaskState = SYNCSOURCE_STATE_CANCELED;
-        }
-        if (getConfig()->getSyncSourceConfig(NOTE_)->isEnabled()){
-            mainForm->syncSourceNoteState = SYNCSOURCE_STATE_CANCELED;
-        }
-        if (getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled()){
-            mainForm->syncSourcePictureState = SYNCSOURCE_STATE_CANCELED;
+        // Sources have separate sync sessions, so only 1 is canceled!
+        switch (currentSource) {
+            case SYNCSOURCE_CONTACTS:
+                mainForm->syncSourceContactState = SYNCSOURCE_STATE_CANCELED;
+                break;
+            case SYNCSOURCE_CALENDAR:
+                mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_CANCELED;
+                break;
+            case SYNCSOURCE_TASKS:
+                mainForm->syncSourceTaskState = SYNCSOURCE_STATE_CANCELED;
+                break;
+            case SYNCSOURCE_NOTES:
+                mainForm->syncSourceNoteState = SYNCSOURCE_STATE_CANCELED;
+                break;
+            case SYNCSOURCE_PICTURES:
+                mainForm->syncSourcePictureState = SYNCSOURCE_STATE_CANCELED;
+                break;
+            case SYNCSOURCE_VIDEOS:
+                mainForm->syncSourceVideoState = SYNCSOURCE_STATE_CANCELED;
+                break;
+            case SYNCSOURCE_FILES:
+                mainForm->syncSourceFileState = SYNCSOURCE_STATE_CANCELED;
+                break;
         }
 
         //
         // ***TODO*** is this call necessary?
         // Restore of syncModes is (always) called on "OnMsgStartsyncEnded()"
         //
-        restoreSyncModeSettings(); // restore changes made by clicking 'sync' link
+        //restoreSyncModeSettings(); // restore changes made by clicking 'sync' link
 
         Invalidate();
         currentSource = 0;
-        currentItem = 0;
-        totalItems = 0;
-    }    
-    
-    return ret;    
+        currentClientItem = 0;
+        currentServerItem = 0;
+        totalClientItems = 0;
+        totalServerItems = 0;
+    }
+
+    return ret;
 }
 
 // handling for minimizing/restoring the UI when the config is opened
@@ -1401,8 +1387,8 @@ BOOL CMainSyncFrame::OnNcActivate(BOOL bActive) {
     // needs special handling only when the config window is opened
     if(configOpened){
         if( (bActive) && (pConfigFrame != NULL))
-            if( (! this->IsWindowEnabled()) && 
-                (pConfigFrame->IsWindowVisible() ) 
+            if( (! this->IsWindowEnabled()) &&
+                (pConfigFrame->IsWindowVisible() )
                 //(pConfigFrame->IsWindowVisible()) //&&
                 //(pConfigFrame->IsWindowEnabled())
                 )
@@ -1414,7 +1400,7 @@ BOOL CMainSyncFrame::OnNcActivate(BOOL bActive) {
 
     CFrameWnd::OnNcActivate(bActive);
     return TRUE;
-} 
+}
 
 void CMainSyncFrame::OnClose(){
 
@@ -1440,12 +1426,16 @@ void CMainSyncFrame::backupSyncModeSettings() {
     syncModeTasks    = getSyncModeCode(getConfig()->getSyncSourceConfig(TASK_)->getSync());
     syncModeNotes    = getSyncModeCode(getConfig()->getSyncSourceConfig(NOTE_)->getSync());
     syncModePictures = getSyncModeCode(getConfig()->getSyncSourceConfig(PICTURE_)->getSync());
+    syncModeVideos   = getSyncModeCode(getConfig()->getSyncSourceConfig(VIDEO_)->getSync());
+    syncModeFiles    = getSyncModeCode(getConfig()->getSyncSourceConfig(FILES_)->getSync());
 
     backupEnabledContacts = getConfig()->getSyncSourceConfig(CONTACT_)->isEnabled();
     backupEnabledCalendar = getConfig()->getSyncSourceConfig(APPOINTMENT_)->isEnabled();
     backupEnabledTasks    = getConfig()->getSyncSourceConfig(TASK_)->isEnabled();
     backupEnabledNotes    = getConfig()->getSyncSourceConfig(NOTE_)->isEnabled();
     backupEnabledPictures = getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled();
+    backupEnabledVideos   = getConfig()->getSyncSourceConfig(VIDEO_)->isEnabled();
+    backupEnabledFiles    = getConfig()->getSyncSourceConfig(FILES_)->isEnabled();
 }
 
 void CMainSyncFrame::restoreSyncModeSettings(){
@@ -1465,14 +1455,22 @@ void CMainSyncFrame::restoreSyncModeSettings(){
     if (syncModePictures != -1) {
         getConfig()->getSyncSourceConfig(PICTURE_)->setSync(syncModeName((SyncMode)syncModePictures));
     }
+    if (syncModeVideos != -1) {
+        getConfig()->getSyncSourceConfig(VIDEO_)->setSync(syncModeName((SyncMode)syncModeVideos));
+    }
+    if (syncModeFiles != -1) {
+        getConfig()->getSyncSourceConfig(FILES_)->setSync(syncModeName((SyncMode)syncModeFiles));
+    }
 
     // Save ONLY sync-modes of each source, if necessary.
     // (this check is done to know if source modes/enabled have been backup or not)
-    if ( syncModeContacts != -1 || 
+    if ( syncModeContacts != -1 ||
          syncModeCalendar != -1 ||
          syncModeTasks    != -1 ||
          syncModeNotes    != -1 ||
-         syncModePictures != -1 ) {
+         syncModePictures != -1 ||
+         syncModeVideos   != -1 ||
+         syncModeFiles    != -1) {
 
         // Restore the enabled flag
         getConfig()->getSyncSourceConfig(CONTACT_    )->setIsEnabled(backupEnabledContacts);
@@ -1480,15 +1478,19 @@ void CMainSyncFrame::restoreSyncModeSettings(){
         getConfig()->getSyncSourceConfig(TASK_       )->setIsEnabled(backupEnabledTasks);
         getConfig()->getSyncSourceConfig(NOTE_       )->setIsEnabled(backupEnabledNotes);
         getConfig()->getSyncSourceConfig(PICTURE_    )->setIsEnabled(backupEnabledPictures);
+        getConfig()->getSyncSourceConfig(VIDEO_      )->setIsEnabled(backupEnabledVideos);
+        getConfig()->getSyncSourceConfig(FILES_      )->setIsEnabled(backupEnabledFiles);
 
         getConfig()->saveSyncModes();
     }
-    
-    syncModeContacts = -1; 
-    syncModeCalendar = -1; 
-    syncModeTasks    = -1; 
+
+    syncModeContacts = -1;
+    syncModeCalendar = -1;
+    syncModeTasks    = -1;
     syncModeNotes    = -1;
     syncModePictures = -1;
+    syncModeVideos   = -1;
+    syncModeFiles    = -1;
 
 
 
@@ -1511,60 +1513,81 @@ bool CMainSyncFrame::checkConnectionSettings()
 }
 
 
-LRESULT CMainSyncFrame::OnMsgSyncSourceState(WPARAM wParam, LPARAM lParam) {
+LRESULT CMainSyncFrame::OnMsgSyncSourceEnd(WPARAM wParam, LPARAM lParam) {
 
-    // TODO: move to class member?
     CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+    CString s1;
+    s1.LoadString(IDS_DONE);
+
+    int iconStatusID = IDI_ALERT;
+    if (lParam == SYNCSOURCE_STATE_OK) {
+        iconStatusID = IDI_OK;
+    }
+    HICON iconStatus = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(iconStatusID));
 
     if (wParam == SYNCSOURCE_CONTACTS) {
+        mainForm->iconStatusContacts.SetIcon(NULL);
         mainForm->iconStatusContacts.StopAnim();
         mainForm->syncSourceContactState = lParam;
-        // Update the status icon (funzilla #2110)
-        if (lParam == SYNCSOURCE_STATE_OK)
-            mainForm->iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
-        else 
-            mainForm->iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+        mainForm->changeContactsStatus(s1);
+        mainForm->iconStatusContacts.SetIcon(iconStatus);
+        mainForm->paneContacts.SetBitmap(hBmpLight);
+        //mainForm->paneContacts.Invalidate();
     }
-
-    if (wParam == SYNCSOURCE_CALENDAR) {
+    else if (wParam == SYNCSOURCE_CALENDAR) {
+        mainForm->iconStatusCalendar.SetIcon(NULL);
         mainForm->iconStatusCalendar.StopAnim();
         mainForm->syncSourceCalendarState = lParam;
-        // Update the status icon (funzilla #2110)
-        if (lParam == SYNCSOURCE_STATE_OK)
-            mainForm->iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
-        else 
-            mainForm->iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+        mainForm->changeCalendarStatus(s1);
+        mainForm->iconStatusCalendar.SetIcon(iconStatus);
+        mainForm->paneCalendar.SetBitmap(hBmpLight);
+        //mainForm->paneCalendar.Invalidate();
     }
-
-    if (wParam == SYNCSOURCE_TASKS) {
+    else if (wParam == SYNCSOURCE_TASKS) {
+        mainForm->iconStatusTasks.SetIcon(NULL);
         mainForm->iconStatusTasks.StopAnim();
         mainForm->syncSourceTaskState = lParam;
-        // Update the status icon (funzilla #2110)
-        if (lParam == SYNCSOURCE_STATE_OK)
-            mainForm->iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
-        else 
-            mainForm->iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+        mainForm->changeTasksStatus(s1);
+        mainForm->iconStatusTasks.SetIcon(iconStatus);
+        mainForm->paneTasks.SetBitmap(hBmpLight);
+        //mainForm->paneTasks.Invalidate();
     }
-
-    if (wParam == SYNCSOURCE_NOTES) {
+    else if (wParam == SYNCSOURCE_NOTES) {
+        mainForm->iconStatusNotes.SetIcon(NULL);
         mainForm->iconStatusNotes.StopAnim();
         mainForm->syncSourceNoteState = lParam;
-        // Update the status icon (funzilla #2110)
-        if (lParam == SYNCSOURCE_STATE_OK)
-            mainForm->iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
-        else 
-            mainForm->iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+        mainForm->changeNotesStatus(s1);
+        mainForm->iconStatusNotes.SetIcon(iconStatus);
+        mainForm->paneNotes.SetBitmap(hBmpLight);
+        //mainForm->paneNotes.Invalidate();
     }
-
-    if (wParam == SYNCSOURCE_PICTURES) {
+    else if (wParam == SYNCSOURCE_PICTURES) {
+        mainForm->iconStatusPictures.SetIcon(NULL);
         mainForm->iconStatusPictures.StopAnim();
         mainForm->syncSourcePictureState = lParam;
-        // Update the status icon (funzilla #2110)
-        if (lParam == SYNCSOURCE_STATE_OK)
-            mainForm->iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_OK)));
-        else 
-            mainForm->iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
+        mainForm->changePicturesStatus(s1);
+        mainForm->iconStatusPictures.SetIcon(iconStatus);
+        mainForm->panePictures.SetBitmap(hBmpLight);
+        //mainForm->panePictures.Invalidate();
     }
+    else if (wParam == SYNCSOURCE_VIDEOS) {
+        mainForm->iconStatusVideos.SetIcon(NULL);
+        mainForm->iconStatusVideos.StopAnim();
+        mainForm->syncSourceVideoState = lParam;
+        mainForm->changeVideosStatus(s1);
+        mainForm->iconStatusVideos.SetIcon(iconStatus);
+        mainForm->paneVideos.SetBitmap(hBmpLight);
+        //mainForm->paneVideos.Invalidate();
+    }
+   else if (wParam == SYNCSOURCE_FILES) {
+        mainForm->iconStatusFiles.SetIcon(NULL);
+        mainForm->iconStatusFiles.StopAnim();
+        mainForm->syncSourceFileState = lParam;
+        mainForm->changeFilesStatus(s1);
+        mainForm->iconStatusFiles.SetIcon(iconStatus);
+        mainForm->paneFiles.SetBitmap(hBmpLight);
+        //mainForm->paneFiles.Invalidate();
+   }
 
     return 0;
 }
@@ -1617,14 +1640,14 @@ LRESULT CMainSyncFrame::OnMsgPopup(WPARAM wParam, LPARAM lParam) {
     int sizeOfString;
     WCHAR*  buffer;
     wstring formattedDate;
-    
+
     OutlookConfig* c = getConfig();
     if (c == NULL) {
         return 0;
     }
- 
+
     UpdaterConfig& config = c->getUpdaterConfig();
-    StringBuffer date = config.getReleaseDate();    
+    StringBuffer date = config.getReleaseDate();
     if (date.empty()) {
         c->readUpdaterConfig(true);
         config = c->getUpdaterConfig();
@@ -1645,25 +1668,25 @@ LRESULT CMainSyncFrame::OnMsgPopup(WPARAM wParam, LPARAM lParam) {
             break;
         case TYPE_NOW_LATER_MANDATORY:
             buttonval.LoadString(IDS_BUT_NOW_LATER);
-            msg.LoadString(IDS_UP_MANDATORY_MESSAGE);            
+            msg.LoadString(IDS_UP_MANDATORY_MESSAGE);
             sizeOfString = (msg.GetLength() + 1);
             buffer = new WCHAR[sizeOfString];
             wcsncpy(buffer, msg, sizeOfString);
-            formattedDate = formatDate((StringBuffer&)date);            
-            currentMsg = new WCHAR[sizeOfString + 100];            
-            wsprintf(currentMsg, buffer, formattedDate.c_str());            
+            formattedDate = formatDate((StringBuffer&)date);
+            currentMsg = new WCHAR[sizeOfString + 100];
+            wsprintf(currentMsg, buffer, formattedDate.c_str());
             msg = currentMsg;
             delete [] currentMsg;
             delete [] buffer;
             break;
         case TYPE_NOW_EXIT_MANDATORY:
             buttonval.LoadString(IDS_BUT_NOW_EXIT);
-            msg.LoadString(IDS_UP_MANDATORY_MESSAGE_EXIT);                                    
+            msg.LoadString(IDS_UP_MANDATORY_MESSAGE_EXIT);
             break;
         default:
             break;
     }
-    
+
     int b1 = buttonval.Find(L"*");
     int b2 = buttonval.Find(L"*",b1+1);
     if (b1 == -1 && b2 == -1) {
@@ -1680,7 +1703,90 @@ LRESULT CMainSyncFrame::OnMsgPopup(WPARAM wParam, LPARAM lParam) {
         button3 = swap.Right(swap.GetLength() - s -1);
         button2 = swap.Left(s);
     }
-    return CMessageBox(msg, button1, button2, button3);    
-    
-    
+    return CMessageBox(msg, button1, button2, button3);
+
+
 }
+
+/**
+ * wParam = -2  begin            -> lParam = total size
+ * wparam = -1  partial (resume) -> lParam = already exchanged size
+ * wparam =  0  in progress      -> lParam = partial exchanged size
+ * wParam =  1  end
+ */
+afx_msg LRESULT CMainSyncFrame::OnMsgSapiProgress(WPARAM wParam, LPARAM lParam) {
+
+    //StringBuffer msg;
+    //msg.sprintf("[%s] wParam = %d, lParam = %d", __FUNCTION__, wParam, lParam);
+    //printLog(msg, LOG_DEBUG);
+
+    if (wParam == -2) {
+        itemTotalSize = lParam;
+        partialCompleted = 0;
+        progressStarted = true;
+        return 1;
+    }
+
+    if (progressStarted == false) {
+        // progress events are accepted only after a begin event
+        return 1;
+    }
+
+    if (wParam == -1) {             // partially exchanged (download-upload)
+        partialCompleted += lParam;
+        return 1;
+    }
+
+    if (wParam == 1) {
+        progressStarted = false;
+        return 1;
+    }
+
+    // if here, wParam = 0 and progressStarted = true
+
+    partialCompleted += lParam;
+    int percentage = (int)((double)partialCompleted * (double)100 / (double)itemTotalSize);
+    if (percentage > 100) {
+        percentage = 100;
+    }
+
+    StringBuffer perc;
+    perc.sprintf(" (%i%%)", percentage);
+
+    CSyncForm* mainForm = (CSyncForm*)wndSplitter.GetPane(0,1);
+    // change source status
+    CString s;
+    StringBuffer ss, pp;
+    switch(currentSource){
+        case SYNCSOURCE_PICTURES:
+            s = mainForm->getPicturesStatusLabel();
+            pp = StringBuffer().convert(s.GetBuffer(0));
+            ss = pp.substr(0, pp.rfind(" ("));
+            ss += perc;
+            mainForm->changePicturesStatus(CString(ss.c_str()));
+            mainForm->panePictures.Invalidate();
+            break;
+
+        case SYNCSOURCE_VIDEOS:
+            s = mainForm->getVideosStatusLabel();
+            pp = StringBuffer().convert(s.GetBuffer(0));
+            ss = pp.substr(0, pp.rfind(" ("));
+            ss += perc;
+            mainForm->changeVideosStatus(CString(ss.c_str()));
+            mainForm->paneVideos.Invalidate();
+            break;
+        case SYNCSOURCE_FILES:
+            s = mainForm->getFilesStatusLabel();
+            pp = StringBuffer().convert(s.GetBuffer(0));
+            ss = pp.substr(0, pp.rfind(" ("));
+            ss += perc; ;
+            mainForm->changeFilesStatus(CString(ss.c_str()));
+            mainForm->paneFiles.Invalidate();
+            break;
+
+    }
+
+    return 0;
+
+}
+

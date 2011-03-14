@@ -33,8 +33,8 @@
  * the words "Powered by Funambol".
  */
 
-#ifndef INCL_PICTURES_SYNC_SOURCE
-#define INCL_PICTURES_SYNC_SOURCE
+#ifndef INCL_VIDEOS_SYNC_SOURCE
+#define INCL_VIDEOS_SYNC_SOURCE
 
 /** @cond OLPLUGIN */
 /** @addtogroup ClientDLL */
@@ -54,25 +54,25 @@
 BEGIN_NAMESPACE
 
 /**
- * This class extends the MediaSyncSource class, to sync for pictures.
- * It just defines specific filterings for pictures:
+ * This class extends the MediaSyncSource class, to sync for videos.
+ * It just defines specific filterings for videos:
  * - by size (< 50MB)
  * - by date (last modif date)
- * - by type (jpg jpeg gif png)
+ * - by type (mp4 avi mpeg...)
  */
-class PicturesSyncSource : public MediaSyncSource
+class VideosSyncSource : public MediaSyncSource
 {
 
 public:
 
     /**
      * Constructor. if folderPath is empty, here we read and set the default
-     * value, which is the shell folder for pictures (i.e. "C:\Users\<username>\Images")
+     * value, which is the shell folder for videos (i.e. "C:\Users\<username>\Videos")
      * "dir" is used by FileSyncSource during the sync process, so it's set to the same
      * value of "folderPath".
      */
-    PicturesSyncSource(const WCHAR* name, WindowsSyncSourceConfig* sc);
-    ~PicturesSyncSource() {};
+    VideosSyncSource(const WCHAR* name, WindowsSyncSourceConfig* sc);
+    ~VideosSyncSource() {};
 
     const WindowsSyncSourceConfig& getConfig() const;
     WindowsSyncSourceConfig& getConfig();
@@ -97,16 +97,16 @@ public:
     int removeItem(SyncItem& item);
     int removeAllItems();
 
-    // Proxy to the picturesConfig methods.
-    bool getIsSynced() const { return picturesConfig.getIsSynced(); }
-    void setIsSynced(bool v) { picturesConfig.setIsSynced(v);       }
+    // Proxy to the videosConfig methods.
+    bool getIsSynced() const { return videosConfig.getIsSynced(); }
+    void setIsSynced(bool v) { videosConfig.setIsSynced(v);       }
 
 
 protected:
 
     /// Configuration object for the source. It's a reference to WindowsSyncSourceConfig
     /// object owned by OutlookConfig. It's automatically initialized in the constructor.
-    WindowsSyncSourceConfig& picturesConfig;
+    WindowsSyncSourceConfig& videosConfig;
 
     /**
      * Overrides MediaSyncSource::getKeyAndSignature().
@@ -122,7 +122,7 @@ protected:
 
 
     /**
-     * Filter out unwanted folders, and files that are not images.
+     * Filter out unwanted folders, and files that are not videos.
      */
     bool filterOutgoingItem(const StringBuffer& fullName, struct stat& st);
 

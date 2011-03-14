@@ -72,9 +72,11 @@
                                         SYNC_MODE_REFRESH_FROM_SERVER "," \
                                         "slow"
 
-#define PICTURES_DEVINFO_SYNC_MODES     PICTURES_SYNC_MODES  "," \
-                                        SYNC_MODE_REFRESH_FROM_SERVER "," \
-                                        "slow"
+#define PICTURES_DEVINFO_SYNC_MODES     PICTURES_SYNC_MODES
+
+#define VIDEOS_DEVINFO_SYNC_MODES       VIDEOS_SYNC_MODES
+
+#define FILES_DEVINFO_SYNC_MODES        FILES_SYNC_MODES
 
 /**
  * This class is a factory of default configurations.
@@ -102,6 +104,13 @@ class DefaultWinConfigFactory : public DefaultConfigFactory {
         static DeviceConfig*  getDeviceConfig();
 
         static WindowsDeviceConfig * getWindowsDeviceConfig(DeviceConfig & dc);
+
+        /**
+         * Returns a default generated SapiConfig for Windows client.
+         * @return: SapiConfig pointer allocated new, so it must
+         *          be freed by the caller.
+         */
+        static SapiConfig* getSapiConfig();
 
         /**
          * Returns a default generated SyncSourceConfig for Win32 (common props of SyncSourceConfig).

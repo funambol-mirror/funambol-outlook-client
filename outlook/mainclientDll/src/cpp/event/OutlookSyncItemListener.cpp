@@ -36,11 +36,13 @@
 
 #include "event/OutlookSyncItemListener.h"
 #include "base/Log.h"
-
 #include "HwndFunctions.h"
 #include "utils.h"
-/* wParam = -1 -> sending items
-   wParam = 1  -> receiving items */
+
+/* 
+   wParam = -1 -> sending items
+   wParam = 1  -> receiving items 
+ */
 void OutlookSyncItemListener::itemAddedByServer(SyncItemEvent &event) {
     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM) 1 , (LPARAM) syncSourceNameToIndex(event.getSourceName()));
 }
@@ -54,11 +56,49 @@ void OutlookSyncItemListener::itemUpdatedByServer(SyncItemEvent &event) {
 }
 
 void OutlookSyncItemListener::itemAddedByClient(SyncItemEvent &event) {
-    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM) -1, (LPARAM) syncSourceNameToIndex(event.getSourceName()));
+
+    int sourceID = syncSourceNameToIndex(event.getSourceName());
+    if (sourceID == SYNCSOURCE_PICTURES || 
+        sourceID == SYNCSOURCE_VIDEOS   ||
+        sourceID == SYNCSOURCE_FILES) {
+        if (OutlookConfig::getInstance()->getServerMediaHttpUpload()) {
+            // Ignore this event: it's just the syncML metadata (no item content)
+            return;
+        }
+    }
+
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, 
+               (WPARAM)-1, (LPARAM)sourceID);
 }
 
 void OutlookSyncItemListener::itemUpdatedByClient(SyncItemEvent &event) {
-    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM) -1, (LPARAM) syncSourceNameToIndex(event.getSourceName()));
+    
+    int sourceID = syncSourceNameToIndex(event.getSourceName());
+    if (sourceID == SYNCSOURCE_PICTURES || 
+        sourceID == SYNCSOURCE_VIDEOS   ||
+        sourceID == SYNCSOURCE_FILES) {
+        if (OutlookConfig::getInstance()->getServerMediaHttpUpload()) {
+            // Ignore this event: it's just the syncML metadata (no item content)
+            return;
+        }
+    }
+    
+    SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, 
+               (WPARAM)-1, (LPARAM)sourceID);
+}
+
+void OutlookSyncItemListener::itemUploadedByClient(SyncItemEvent &event) {
+    
+    int sourceID = syncSourceNameToIndex(event.getSourceName());
+    if (sourceID == SYNCSOURCE_PICTURES || 
+        sourceID == SYNCSOURCE_VIDEOS   ||
+        sourceID == SYNCSOURCE_FILES) {
+        if (OutlookConfig::getInstance()->getServerMediaHttpUpload()) {
+            // A media item has been uploaded to the server
+            SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, 
+                       (WPARAM)-1, (LPARAM)sourceID);
+        }
+    }
 }
 
 void OutlookSyncItemListener::itemDeletedByClient(SyncItemEvent &event) {
@@ -66,3 +106,25 @@ void OutlookSyncItemListener::itemDeletedByClient(SyncItemEvent &event) {
 }
 
 
+// Media sync listeners
+void OutlookSyncItemListener::itemUploading(SyncItemEvent& event) {
+     int sourceID = syncSourceNameToIndex(event.getSourceName());
+     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM)-1, (LPARAM)sourceID);
+}
+void OutlookSyncItemListener::itemUploaded(SyncItemEvent& event) {
+    LOG.debug("end upload");
+}
+void OutlookSyncItemListener::itemDownloading(SyncItemEvent& event) {
+     int sourceID = syncSourceNameToIndex(event.getSourceName());
+     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM)1, (LPARAM)sourceID);
+    
+}
+void OutlookSyncItemListener::itemDownloaded(SyncItemEvent& event) {
+    LOG.debug("downloaded %d", event.getData());
+}
+void OutlookSyncItemListener::itemUploadingProgress(SyncItemEvent& event) {
+    LOG.debug("uploading progress: %d", event.getData());
+}
+void OutlookSyncItemListener::itemDownloadingProgress(SyncItemEvent& event) {
+    LOG.debug("downloading progress: %d", event.getData());
+}

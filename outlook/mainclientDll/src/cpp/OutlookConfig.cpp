@@ -92,7 +92,6 @@ OutlookConfig::OutlookConfig() : updaterConfig(PLUGIN_ROOT_CONTEXT), oneWayRemov
     logDir                = NULL;
     winSourceConfigsCount = 0;
     fullSync              = false;
-    abortSync             = false;
     upgraded              = false;
     oldSwv                = 0;
 }
@@ -215,7 +214,7 @@ bool OutlookConfig::read() {
 
     // Reset fullSync/abortSync flags
     fullSync  = false;
-    abortSync = false;
+    setToAbort(false);
 
 
     if (installPath) delete [] installPath;
@@ -498,6 +497,9 @@ bool OutlookConfig::save(SyncReport* report) {
     saveAccessConfig(*syncMLNode);
     saveDeviceConfig(*syncMLNode);
     saveDeviceConfig(*serverNode, true);
+    saveSapiConfig  (*syncMLNode);
+
+    DMTClientConfig::saveRootConfig();
 
     // If asked, we need to return clear data...
     decryptPrivateData();
@@ -556,6 +558,7 @@ bool OutlookConfig::save() {
 void OutlookConfig::saveWinSourceConfig(unsigned int i) {
 
     ManagementNode* node;
+    ManagementNode* nodeUpper;
     char nodeName[DIM_MANAGEMENT_PATH];
 
     if (!sourcesNode) {
@@ -568,12 +571,17 @@ void OutlookConfig::saveWinSourceConfig(unsigned int i) {
     if (sourcesNode->getChild(i) == NULL) {
         char* fn = sourcesNode->createFullName();
         sprintf(nodeName, "%s/%s", fn, winSourceConfigs[i].getName());
-        delete [] fn;
+        
         node = dmt->readManagementNode(nodeName);
+        nodeUpper = dmt->readManagementNode(fn);
+        delete [] fn;
         //LOG.debug(INFO_CONFIG_NODE_CREATED, nodeName);
     }
     else {
         node = (ManagementNode*)sourcesNode->getChild(winSourceConfigs[i].getName())->clone();
+        char* fn = sourcesNode->createFullName();
+        nodeUpper = dmt->readManagementNode(fn);
+        delete [] fn;
     }
 
 
@@ -588,7 +596,7 @@ void OutlookConfig::saveWinSourceConfig(unsigned int i) {
         node->setPropertyValue(PROPERTY_FOLDER_PATH,        winSourceConfigs[i].getFolderPath    ());
         timestampToAnchor(winSourceConfigs[i].getEndTimestamp(), buf); 
         node->setPropertyValue(PROPERTY_SYNC_END,           buf);
-
+/*
         // Common props:
         node->setPropertyValue(PROPERTY_SOURCE_NAME,        winSourceConfigs[i].getName          ());    
         node->setPropertyValue(PROPERTY_SOURCE_URI,         winSourceConfigs[i].getURI           ());
@@ -602,6 +610,10 @@ void OutlookConfig::saveWinSourceConfig(unsigned int i) {
 
         timestampToAnchor(winSourceConfigs[i].getLast(), buf); 
         node->setPropertyValue(PROPERTY_SOURCE_LAST_SYNC, buf);
+*/        
+        DMTClientConfig::saveSourceConfig(i, *nodeUpper);
+
+
 
         // If we are just after a sync and this is a full sync (slow/refresh), 
         // DO NOT save the 'sync' property (so won't be a restore again next time).
@@ -816,8 +828,10 @@ bool OutlookConfig::addWindowsSyncSourceConfig(const wstring& sourceName)
 
     }
     catch (char* e) {
-        setErrorF(getLastErrorCode(), ERR_DEFAULT_SSCONFIG, PICTURE_, e);
+        char* name = toMultibyte(sourceName.c_str());
+        setErrorF(getLastErrorCode(), ERR_DEFAULT_SSCONFIG, name, e);
         safeMessageBox(getLastErrorMsg());
+        delete [] name;
         return false;
     }
     return true;
@@ -961,13 +975,6 @@ const bool OutlookConfig::getScheduledSync() const {
     return ret;
 }
 
-void OutlookConfig::setAbortSync(const bool v) {
-    abortSync = v;
-}
-const bool OutlookConfig::getAbortSync() const {
-    return abortSync;
-}
-
 
 /**
  * Returns a pointer to the currentTimezone internal structure.
@@ -996,12 +1003,18 @@ void OutlookConfig::createDefaultConfig() {
     //
     // DeviceConfig
     //
-
     DeviceConfig * dc = DefaultWinConfigFactory::getDeviceConfig();
     DMTClientConfig::setDeviceConfig(*dc);
     WindowsDeviceConfig* wdc = DefaultWinConfigFactory::getWindowsDeviceConfig(DMTClientConfig::getDeviceConfig());
     setDeviceConfig(*wdc);
     delete dc;
+
+    //
+    // SapiConfig
+    //
+    SapiConfig* sapiConfig = DefaultWinConfigFactory::getSapiConfig();
+    setSapiConfig(*sapiConfig);
+    delete sapiConfig;
 
 
     // Set a unique deviceID = "FOL-<pcName>:<userName>"
@@ -1017,14 +1030,14 @@ void OutlookConfig::createDefaultConfig() {
     //       object (inside constructor of WindowsSyncSourceConfig).
     // NOTE: create sources alphabetically sorted, because this will be the order of 
     //       nodes inside Win registry (and they must match)!
-    WCHAR* sourceNames[5] = {APPOINTMENT, CONTACT, NOTE, PICTURE, TASK};
-    for (int i=0; i<5; i++) {
+    WCHAR* sourceNames[7] = {APPOINTMENT, CONTACT, FILES, NOTE, PICTURE, TASK, VIDEO};
+    for (int i=0; i<7; i++) {
         WCHAR* wname = sourceNames[i];
         SyncSourceConfig* sc = DefaultWinConfigFactory::getSyncSourceConfig(wname);
         DMTClientConfig::setSyncSourceConfig(*sc);
         delete sc;
     }
-    for (int i=0; i<5; i++) {
+    for (int i=0; i<7; i++) {
         WCHAR* wname = sourceNames[i];
         char*   name = toMultibyte(wname);
 
@@ -1047,7 +1060,7 @@ void OutlookConfig::createDefaultConfig() {
     
     // Reset flags
     fullSync  = false;
-    abortSync = false;
+    setToAbort(false);
 
     // Read the sources visible list (if specified from HKLM keys: customers builds)
     readSourcesVisible(HKEY_LOCAL_MACHINE);
@@ -1282,6 +1295,16 @@ void OutlookConfig::upgradeConfig() {
                     }
                 }
             }
+        }
+
+        // Files source added.
+        if (!addWindowsSyncSourceConfig(FILES)) {
+            LOG.error("upgradeConfig - error adding the config for %s source", FILES_);
+        }
+
+        // VIdeos source added.
+        if (!addWindowsSyncSourceConfig(VIDEO)) {
+            LOG.error("upgradeConfig - error adding the config for %s source", VIDEO_);
         }
     }
 

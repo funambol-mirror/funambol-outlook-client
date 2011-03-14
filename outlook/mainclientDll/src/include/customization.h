@@ -94,8 +94,12 @@
 #define MAX_LOG_SIZE                        3000000                     /**< 3 MB          */
 #define MAX_SYNCML_MSG_SIZE                 125000                      /**< [bytes], the max syncML message size. default = 125KB */
 #define RESPONSE_TIMEOUT                    900                         /**< [seconds], the HTTP timeout on Server response. default = 15 minutes */
-#define DYNAMICALLY_SHOW_PICTURES           1                           /**< if 1, will automatically show/hide the pictures panel, at the end of sync */
-#define SOURCE_ORDER_IN_REGISTRY            "contact,appointment,task,note"
+#define DYNAMICALLY_SHOW_PICTURES           0                           /**< if 1, will automatically show/hide the pictures panel, at the end of sync */
+#define MAX_IMAGE_SIZE                      0                           /**< max size of pictures to upload [KBytes]. 0 means unlimited. */
+#define MAX_VIDEO_SIZE                      0                           /**< max size of videos to upload [KBytes]. 0 means unlimited. */
+#define MAX_FILE_SIZE                       0                           /**< max size of files to upload [KBytes]. 0 means unlimited. */
+
+#define SOURCE_ORDER_IN_REGISTRY            "contact,appointment,task,note,picture,video,files"
 
 // set if the sources are enabled/disabled (meaning they can be enabled by settings)
 #define CONTACT_SOURCE_ENABLED              true
@@ -103,6 +107,8 @@
 #define TASK_SOURCE_ENABLED                 true
 #define NOTE_SOURCE_ENABLED                 true
 #define PICTURE_SOURCE_ENABLED              true
+#define VIDEO_SOURCE_ENABLED                true
+#define FILE_SOURCE_ENABLED                 true
 
 // List of available sync modes for each source (comma separated values).
 // These are the values available from the client's settings for each source.
@@ -110,7 +116,9 @@
 #define APPOINTMENTS_SYNC_MODES             SYNC_MODE_TWO_WAY
 #define TASKS_SYNC_MODES                    SYNC_MODE_TWO_WAY
 #define NOTES_SYNC_MODES                    SYNC_MODE_TWO_WAY
-#define PICTURES_SYNC_MODES                 SYNC_MODE_ONE_WAY_FROM_SERVER
+#define PICTURES_SYNC_MODES                 SYNC_MODE_TWO_WAY "," SYNC_MODE_ONE_WAY_FROM_CLIENT "," SYNC_MODE_ONE_WAY_FROM_SERVER
+#define VIDEOS_SYNC_MODES                   SYNC_MODE_TWO_WAY "," SYNC_MODE_ONE_WAY_FROM_CLIENT "," SYNC_MODE_ONE_WAY_FROM_SERVER
+#define FILES_SYNC_MODES                    SYNC_MODE_TWO_WAY "," SYNC_MODE_ONE_WAY_FROM_CLIENT "," SYNC_MODE_ONE_WAY_FROM_SERVER
 
 // Default sync mode for each source.
 // It MUST be one of the values specified in the list of available sync modes above.
@@ -118,7 +126,9 @@
 #define DEFAULT_APPOINTMENTS_SYNC_MODE      SYNC_MODE_TWO_WAY
 #define DEFAULT_TASKS_SYNC_MODE             SYNC_MODE_TWO_WAY
 #define DEFAULT_NOTES_SYNC_MODE             SYNC_MODE_TWO_WAY
-#define DEFAULT_PICTURES_SYNC_MODE          SYNC_MODE_ONE_WAY_FROM_SERVER
+#define DEFAULT_PICTURES_SYNC_MODE          SYNC_MODE_TWO_WAY
+#define DEFAULT_VIDEOS_SYNC_MODE            SYNC_MODE_TWO_WAY
+#define DEFAULT_FILES_SYNC_MODE             SYNC_MODE_TWO_WAY
 
 #define SCHEDULED_MINUTES_VALUES            "5,10,15(default),30,45"
 #define SCHEDULED_HOURS_VALUES              "1,2,4,6,8,12,24"
@@ -172,6 +182,8 @@ public:
     static const char *  sourceCalendarVcalUri;         /**< the default sources URI for vTodo */
     static const char *  sourceContactsVcardUri;        /**< the default sources URI for vCard */
     static const char *  sourcePicturesUri;             /**< the default sources URI for pictures */
+    static const char *  sourceVideosUri;               /**< the default sources URI for videos */
+    static const char *  sourceFilesUri;                /**< the default sources URI for files */
 
     // For upgrades
     static const bool shouldFakeOldFunambolSwv = false; /**< if true, the installed version is replaced by a custom value */

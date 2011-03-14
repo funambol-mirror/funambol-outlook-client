@@ -51,14 +51,13 @@ class  WindowsSyncClient : public SyncClient {
 
 protected:
 
-    /// Pointer to the NULL terminated vector of active SyncSources.
-    /// It's externally owned, must NOT be freed.
-    SyncSource** syncSources;
+    /// Reference to the active SyncSource
+    SyncSource& syncSource;
 
 
 public:
 
-    WindowsSyncClient(SyncSource** sources);
+    WindowsSyncClient(SyncSource& source);
     ~WindowsSyncClient();
 
     // To check if server requested a slow-sync -> display warning.

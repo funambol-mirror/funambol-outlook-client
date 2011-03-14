@@ -59,6 +59,8 @@ void CFullSync::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_FULLSYNC_CHECK_TASKS, checkTasks);
     DDX_Control(pDX, IDC_FULLSYNC_CHECK_NOTES, checkNotes);
     DDX_Control(pDX, IDC_FULLSYNC_CHECK_PICTURES,  checkPictures);
+    DDX_Control(pDX, IDC_FULLSYNC_CHECK_VIDEOS,    checkVideos);
+    DDX_Control(pDX, IDC_FULLSYNC_CHECK_FILES,     checkFiles);
     DDX_Control(pDX, IDC_FULLSYNC_RADIO1, radio1);
     DDX_Control(pDX, IDC_FULLSYNC_RADIO2, radio2);
     DDX_Control(pDX, IDC_FULLSYNC_RADIO3, radio3);
@@ -75,6 +77,8 @@ BEGIN_MESSAGE_MAP(CFullSync, CDialog)
     ON_BN_CLICKED(IDC_FULLSYNC_CHECK_TASKS,    &CFullSync::OnBnClickedSourceCheckBox)
     ON_BN_CLICKED(IDC_FULLSYNC_CHECK_NOTES,    &CFullSync::OnBnClickedSourceCheckBox)
     ON_BN_CLICKED(IDC_FULLSYNC_CHECK_PICTURES, &CFullSync::OnBnClickedSourceCheckBox)
+    ON_BN_CLICKED(IDC_FULLSYNC_CHECK_VIDEOS,   &CFullSync::OnBnClickedSourceCheckBox)
+    ON_BN_CLICKED(IDC_FULLSYNC_CHECK_FILES,    &CFullSync::OnBnClickedSourceCheckBox)
     ON_BN_CLICKED(IDC_FULLSYNC_RADIO3,         &CFullSync::OnBnClickedRefreshC2S)
     ON_BN_CLICKED(IDC_FULLSYNC_RADIO2,         &CFullSync::OnBnClickedRefreshS2C)
 END_MESSAGE_MAP()
@@ -96,6 +100,8 @@ BOOL CFullSync::OnInitDialog() {
     s1.LoadString(IDS_NOTES);               SetDlgItemText(IDC_FULLSYNC_CHECK_NOTES, s1);
     s1.LoadString(IDS_TASKS);               SetDlgItemText(IDC_FULLSYNC_CHECK_TASKS, s1);
     s1.LoadString(IDS_PICTURES);            SetDlgItemText(IDC_FULLSYNC_CHECK_PICTURES, s1);
+    s1.LoadString(IDS_VIDEOS);              SetDlgItemText(IDC_FULLSYNC_CHECK_VIDEOS, s1);
+    s1.LoadString(IDS_FILES);               SetDlgItemText(IDC_FULLSYNC_CHECK_FILES, s1);
     s1.LoadString(IDS_RECOVER);             SetDlgItemText(IDOK, s1);
     s1.LoadString(IDS_CANCEL);              SetDlgItemText(IDCANCEL, s1);
     
@@ -123,6 +129,8 @@ BOOL CFullSync::OnInitDialog() {
     if (isSourceEnabled(NOTE_))        { checkNotes.EnableWindow(TRUE);     }
     else                               { checkNotes.EnableWindow(FALSE);    }
     checkPictures.EnableWindow(FALSE);  // C2S not available for pictures!
+    checkVideos.EnableWindow(FALSE);    // C2S not available for videos!
+    checkFiles.EnableWindow(FALSE);     // C2S not available for files!
 
 
     // Show/hide checkboxes
@@ -146,7 +154,12 @@ BOOL CFullSync::OnInitDialog() {
     if (!isSourceVisible(PICTURE)) {
         checkPictures.ShowWindow(SW_HIDE);
     }
-
+    if (!isSourceVisible(VIDEO)) {
+        checkVideos.ShowWindow(SW_HIDE);
+    }
+    if (!isSourceVisible(FILES)) {
+        checkFiles.ShowWindow(SW_HIDE);
+    }
 
     GetDlgItem(IDOK)->EnableWindow(FALSE);
 
@@ -235,7 +248,21 @@ void CFullSync::OnBnClickedOk() {
         getConfig()->getSyncSourceConfig(PICTURE_)->setSync(fullSyncMode);
     }
     else {
-    getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(false);
+        getConfig()->getSyncSourceConfig(PICTURE_)->setIsEnabled(false);
+    }
+
+    if(checkVideos.GetCheck() == BST_CHECKED) {
+        getConfig()->getSyncSourceConfig(VIDEO_)->setSync(fullSyncMode);
+    }
+    else {
+        getConfig()->getSyncSourceConfig(VIDEO_)->setIsEnabled(false);
+    }
+
+    if(checkFiles.GetCheck() == BST_CHECKED) {
+        getConfig()->getSyncSourceConfig(FILES_)->setSync(fullSyncMode);
+    }
+    else {
+        getConfig()->getSyncSourceConfig(FILES_)->setIsEnabled(false);
     }
 
     getConfig()->setFullSync(true);
@@ -264,6 +291,13 @@ void CFullSync::OnBnClickedRefreshC2S() {
 
     checkPictures.EnableWindow(FALSE);
     checkPictures.SetCheck(BST_UNCHECKED);
+
+    checkVideos.EnableWindow(FALSE);
+    checkVideos.SetCheck(BST_UNCHECKED);
+
+    checkFiles.EnableWindow(FALSE);
+    checkFiles.SetCheck(BST_UNCHECKED);
+
     OnBnClickedSourceCheckBox();
 }
 
@@ -271,6 +305,12 @@ void CFullSync::OnBnClickedRefreshS2C() {
 
     if (isSourceEnabled(PICTURE_)) { 
         checkPictures.EnableWindow(TRUE);
+    }
+    if (isSourceEnabled(VIDEO_)) { 
+        checkVideos.EnableWindow(TRUE);
+    }
+    if (isSourceEnabled(FILES_)) { 
+        checkFiles.EnableWindow(TRUE);
     }
 }
 
@@ -281,7 +321,9 @@ bool CFullSync::isAtLeastOneSourceChecked() {
          (checkCalendar.GetCheck() == BST_CHECKED) ||
          (checkTasks.GetCheck()    == BST_CHECKED) || 
          (checkNotes.GetCheck()    == BST_CHECKED) ||
-         (checkPictures.GetCheck() == BST_CHECKED) ) {
+         (checkPictures.GetCheck() == BST_CHECKED) ||
+         (checkVideos.GetCheck()   == BST_CHECKED) ||
+         (checkFiles.GetCheck()    == BST_CHECKED) ) {
         return true;
     }
     else {
@@ -340,5 +382,15 @@ void CFullSync::adjustCheckboxes() {
     maxCx = offset1 + (totalWidth - x) - someSpace;
     cx = min(cx, maxCx);
     checkPictures.SetWindowPos(&CWnd::wndTop, x, y, cx, cy, SWP_SHOWWINDOW);
+    x = x + width;
+
+    maxCx = offset1 + (totalWidth - x) - someSpace;
+    cx = min(cx, maxCx);
+    checkVideos.SetWindowPos(&CWnd::wndTop, x, y, cx, cy, SWP_SHOWWINDOW);
+    x = x + width;
+
+    maxCx = offset1 + (totalWidth - x) - someSpace;
+    cx = min(cx, maxCx);
+    checkFiles.SetWindowPos(&CWnd::wndTop, x, y, cx, cy, SWP_SHOWWINDOW);
 }
 

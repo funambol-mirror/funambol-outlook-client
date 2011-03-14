@@ -80,6 +80,8 @@
 #define JOURNAL                            L"journal"
 #define NOTE                               L"note"
 #define PICTURE                            L"picture"
+#define VIDEO                              L"video"
+#define FILES                              L"files"
 #define POST                               L"post"
 #define DISTRIBUTION_LIST                  L"distribution list"
 
@@ -90,6 +92,8 @@
 #define JOURNAL_                           "journal"
 #define NOTE_                              "note"
 #define PICTURE_                           "picture"
+#define VIDEO_                             "video"
+#define FILES_                             "files"
 #define POST_                              "post"
 #define DISTRIBUTION_LIST_                 "distribution list"
 
@@ -232,7 +236,7 @@
 #define INFO_SYNC_COMPLETED                 "Syncronization process completed."
 #define INFO_SYNC_COMPLETED_ERRORS          "Syncronization process completed with errors (code = %d)."
 #define INFO_EXIT                           "Exiting from Outlook client."
-#define INFO_SYNC_ABORTING                  "Aborting synchronization session..."
+#define INFO_SYNC_ABORTING                  "Aborting synchronization session... (WARNING! deprecated method, use config.isToAbort)"
 #define INFO_SYNC_ABORTED_BY_USER           "Synchronization aborted by user."
 #define INFO_SYNC_ABORTED_BY_USER_SLOW      "Synchronization aborted by user to avoid full-sync of %ls."
 #define INFO_SCHED_TASK_CREATED             "Scheduler task created."
@@ -297,6 +301,7 @@
 #include "outlook/ClientAppointment.h"
 #include "OutlookConfig.h"
 #include "WindowsSyncSource.h"
+#include "WindowsSyncClient.h"
 
 #include <string>
 
@@ -307,6 +312,11 @@
 int  initializeClient   (bool isScheduled, bool justRead = false);
 int  initLog            (bool isScheduled);
 int  startSync          ();
+
+/// Starts the sync of a single source.
+/// Fires the syncsource_start and syncsource_end events to refresh the
+/// UI, before and after the sync process.
+int  synchronize        (WindowsSyncClient& winClient, WindowsSyncSource& source);
 int  closeClient        ();
 void closeOutlook       ();
 void checkAbortedSync   ();
@@ -409,6 +419,10 @@ ArrayList* getVNoteProperties();
  * Empty string in case of error.
  */
 __declspec(dllexport) StringBuffer getOutlookVersion();
+
+/// Filters SapiSyncManager errors at client level, in order to
+/// get a return code for the UI (to display popups...)
+int manageSapiError(const int code);
 
 /** @} */
 /** @endcond */

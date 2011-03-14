@@ -36,7 +36,7 @@
 
 #include "stdafx.h"
 #include "resource.h"
-#include "PicturesSettings.h"
+#include "VideosSettings.h"
 #include "MainSyncFrm.h"
 #include "ClientUtil.h"
 
@@ -54,7 +54,7 @@ static wstring defaultBrowseFolder;
 /**
  * Returns the resource ID of the sync-direction text to show, given the synctype.
  */
-static int getPicturesSyncTypeID(const char* syncType) {
+static int getVideosSyncTypeID(const char* syncType) {
 
     int ret = IDS_SYNCTYPE2;    // default
 
@@ -73,46 +73,46 @@ static int getPicturesSyncTypeID(const char* syncType) {
 }
 
 
-IMPLEMENT_DYNCREATE(CPicturesSettings, CDialog)
+IMPLEMENT_DYNCREATE(CVideosSettings, CDialog)
 
-CPicturesSettings::CPicturesSettings() : CDialog(CPicturesSettings::IDD) {
+CVideosSettings::CVideosSettings() : CDialog(CVideosSettings::IDD) {
 
-    ssconf = ((OutlookConfig*)getConfig())->getSyncSourceConfig(PICTURE_);
+    ssconf = ((OutlookConfig*)getConfig())->getSyncSourceConfig(VIDEO_);
     if (!ssconf) {
-        printLog("Config not found for source pictures!", LOG_ERROR);
+        printLog("Config not found for source videos!", LOG_ERROR);
     }
 }
 
-CPicturesSettings::~CPicturesSettings() {}
+CVideosSettings::~CVideosSettings() {}
 
-void CPicturesSettings::DoDataExchange(CDataExchange* pDX)
+void CVideosSettings::DoDataExchange(CDataExchange* pDX)
 {
     CDialog::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_PICTURES_COMBO_SYNCTYPE,  lstSyncType);
-    DDX_Control(pDX, IDC_PICTURES_EDIT_SYNCTYPE,   editSyncType);
-    DDX_Control(pDX, IDC_PICTURES_EDIT_FOLDER,     editFolder);
-    DDX_Control(pDX, IDC_PICTURES_BUT_SELECT,      butSelectFolder);
-    DDX_Control(pDX, IDC_PICTURES_GROUP_DIRECTION, groupDirection);
-    DDX_Control(pDX, IDC_PICTURES_GROUP_FOLDER,    groupFolder);
-    
+    DDX_Control(pDX, IDC_VIDEOS_COMBO_SYNCTYPE,  lstSyncType);
+    DDX_Control(pDX, IDC_VIDEOS_EDIT_SYNCTYPE,   editSyncType);
+    DDX_Control(pDX, IDC_VIDEOS_EDIT_FOLDER,     editFolder);
+    DDX_Control(pDX, IDC_VIDEOS_BUT_SELECT,      butSelectFolder);    
+    DDX_Control(pDX, IDC_VIDEOS_GROUP_DIRECTION, groupDirection);
+    DDX_Control(pDX, IDC_VIDEOS_GROUP_FOLDER,    groupFolder);
+   
 }
 
-BEGIN_MESSAGE_MAP(CPicturesSettings, CDialog)
-    ON_BN_CLICKED(IDC_PICTURES_OK,         &CPicturesSettings::OnBnClickedPicturesOk)
-    ON_BN_CLICKED(IDC_PICTURES_CANCEL,     &CPicturesSettings::OnBnClickedPicturesCancel)
-    ON_BN_CLICKED(IDC_PICTURES_BUT_SELECT, &CPicturesSettings::OnBnClickedPicturesButSelect)
-    ON_CBN_SELCHANGE(IDC_PICTURES_COMBO_SYNCTYPE, &CPicturesSettings::OnCbnSelchangePicturesComboSynctype)
+BEGIN_MESSAGE_MAP(CVideosSettings, CDialog)
+    ON_BN_CLICKED(IDC_VIDEOS_OK,         &CVideosSettings::OnBnClickedVideosOk)
+    ON_BN_CLICKED(IDC_VIDEOS_CANCEL,     &CVideosSettings::OnBnClickedVideosCancel)
+    ON_BN_CLICKED(IDC_VIDEOS_BUT_SELECT, &CVideosSettings::OnBnClickedVideosButSelect)
+    ON_CBN_SELCHANGE(IDC_VIDEOS_COMBO_SYNCTYPE, &CVideosSettings::OnCbnSelchangeVideosComboSynctype)
 END_MESSAGE_MAP()
 
 
 #ifdef _DEBUG
-void CPicturesSettings::AssertValid() const
+void CVideosSettings::AssertValid() const
 {
 	CDialog::AssertValid();
 }
 
 #ifndef _WIN32_WCE
-void CPicturesSettings::Dump(CDumpContext& dc) const
+void CVideosSettings::Dump(CDumpContext& dc) const
 {
 	CDialog::Dump(dc);
 }
@@ -121,13 +121,13 @@ void CPicturesSettings::Dump(CDumpContext& dc) const
 
 
 
-BOOL CPicturesSettings::OnInitDialog() {
+BOOL CVideosSettings::OnInitDialog() {
 
     if (!ssconf) return FALSE;
-    
+
     bool showAdvanced = true;
     CString s1;
-    s1.LoadString(IDS_PICTURES_DETAILS);
+    s1.LoadString(IDS_VIDEOS_DETAILS);
     SetWindowText(s1);
     CDialog::OnInitDialog();
 
@@ -135,38 +135,42 @@ BOOL CPicturesSettings::OnInitDialog() {
     editFolder.SetLimitText  (EDIT_TEXT_MAXLENGTH);    
 
     // Load the syncmodes in the editbox/dropdown
-    loadSyncModesBox(PICTURE_);
+    loadSyncModesBox(VIDEO_);
 
     // load string resources
-    s1.LoadString(IDS_SYNC_DIRECTION);      SetDlgItemText(IDC_PICTURES_GROUP_DIRECTION,    s1);
-    s1.LoadString(IDS_PICTURES_FOLDER);     SetDlgItemText(IDC_PICTURES_GROUP_FOLDER,       s1);
-    s1.LoadString(IDS_CURRENT);             SetDlgItemText(IDC_PICTURES_STATIC_FOLDER,      s1);
-    s1.LoadString(IDS_SELECT_FOLDER);       SetDlgItemText(IDC_PICTURES_BUT_SELECT,         s1);
-    s1.LoadString(IDS_OK);                  SetDlgItemText(IDC_PICTURES_OK,                 s1);
-    s1.LoadString(IDS_CANCEL);              SetDlgItemText(IDC_PICTURES_CANCEL,             s1);
-    
-    
+    s1.LoadString(IDS_SYNC_DIRECTION);      SetDlgItemText(IDC_VIDEOS_GROUP_DIRECTION,    s1);
+    s1.LoadString(IDS_VIDEOS_FOLDER);       SetDlgItemText(IDC_VIDEOS_GROUP_FOLDER,       s1);
+    s1.LoadString(IDS_CURRENT);             SetDlgItemText(IDC_VIDEOS_STATIC_FOLDER,      s1);
+    s1.LoadString(IDS_SELECT_FOLDER);       SetDlgItemText(IDC_VIDEOS_BUT_SELECT,         s1);
+    s1.LoadString(IDS_OK);                  SetDlgItemText(IDC_VIDEOS_OK,                 s1);
+    s1.LoadString(IDS_CANCEL);              SetDlgItemText(IDC_VIDEOS_CANCEL,             s1);
+
     // Sync type
     lstSyncType.SetCurSel(getSyncTypeIndex(ssconf->getSync()));
-    OnCbnSelchangePicturesComboSynctype();
+    OnCbnSelchangeVideosComboSynctype();
 
-    int id = getPicturesSyncTypeID(ssconf->getSync());
+    // Sync type
+    int id = getVideosSyncTypeID(ssconf->getSync());
+    
     s1.LoadString(id);
-    SetDlgItemText(IDC_PICTURES_EDIT_SYNCTYPE, s1);
+    SetDlgItemText(IDC_VIDEOS_EDIT_SYNCTYPE, s1);
 
-    // Pictures folder path
+    // Videos folder path
     StringBuffer path = ssconf->getFolderPath();
     if (path.empty()) {
-        // If empty, set the default path for pictures (shell folder)
-        path = getDefaultPicturesPath();
+        // If empty, set the default path for videos (shell folder)
+        path = getDefaultVideosPath();
         ssconf->setFolderPath(path.c_str());
     }
     WCHAR* wpath = toWideChar(path.c_str());
     s1 = wpath;
     delete [] wpath;
-    SetDlgItemText(IDC_PICTURES_EDIT_FOLDER, s1);    
+    SetDlgItemText(IDC_VIDEOS_EDIT_FOLDER, s1);
     
-    butSelectFolder.EnableWindow(FALSE);    
+    
+
+    butSelectFolder.EnableWindow(FALSE);
+
 
     // disable windows xp theme, otherwise any color setting for groupbox
     // will be overriden by the theme settings
@@ -174,14 +178,16 @@ BOOL CPicturesSettings::OnInitDialog() {
         PFNSETWINDOWTHEME pfnSetWindowTheme =
             (PFNSETWINDOWTHEME)GetProcAddress(((COutlookPluginApp*)AfxGetApp())->hLib, "SetWindowTheme");
         pfnSetWindowTheme (groupDirection.m_hWnd, L" ", L" ");
-        pfnSetWindowTheme (groupFolder.m_hWnd,    L" ", L" ");        
+        pfnSetWindowTheme (groupFolder.m_hWnd,    L" ", L" ");
+        
     }
+
     
     return FALSE;
 }
 
 
-void CPicturesSettings::OnBnClickedPicturesOk()
+void CVideosSettings::OnBnClickedVideosOk()
 {
     // OK Button
     if(saveSettings(false)){
@@ -189,30 +195,30 @@ void CPicturesSettings::OnBnClickedPicturesOk()
     }
 }
 
-void CPicturesSettings::OnBnClickedPicturesCancel()
+void CVideosSettings::OnBnClickedVideosCancel()
 {
     // will save when 'OK' is clicked on SyncSettings.
     CDialog::OnCancel();
 }
 
-bool CPicturesSettings::saveSettings(bool saveToDisk) {
+bool CVideosSettings::saveSettings(bool saveToDisk) {
 
     if (!ssconf) return FALSE;
 
-    CString picturesPath;
+    CString videosPath;
     CString s1;
     _bstr_t bst;
 
-    GetDlgItemText(IDC_PICTURES_EDIT_FOLDER, picturesPath);    
+    GetDlgItemText(IDC_VIDEOS_EDIT_FOLDER, videosPath);
 
     // Note: use 'toMultibyte' which uses charset UTF-8.
     //       (when writing to winreg, toWideChar is then called)
-    char* path = toMultibyte(picturesPath.GetBuffer());
+    char* path = toMultibyte(videosPath.GetBuffer());
     if (path) {
         ssconf->setFolderPath(path);
         delete [] path;
-    }
-   
+    }    
+
     // Never save to winreg, will save when 'OK' is clicked on SyncSettings.
     //if(saveToDisk)
     //    ((OutlookConfig*)getConfig())->save();
@@ -220,28 +226,26 @@ bool CPicturesSettings::saveSettings(bool saveToDisk) {
     if (lstSyncType.IsWindowVisible()) {
         ssconf->setSync(getSyncTypeName(lstSyncType.GetCurSel()));
     }
-
-
     return true;
 }
 
 
-void CPicturesSettings::OnBnClickedPicturesButSelect() {
+void CVideosSettings::OnBnClickedVideosButSelect() {
 
     if (!ssconf) return;
 
-    // Get the default browse folder to the current path of pictures
+    // Get the default browse folder to the current path of videos
     StringBuffer path = ssconf->getFolderPath();
     WCHAR* defaultPath = toWideChar(path.c_str());
 
     CString caption;
-    caption.LoadString(IDS_SELECT_PICTURES_FOLDER);
+    caption.LoadString(IDS_SELECT_VIDEOS_FOLDER);
 
     // Open the browse for folder window (modal)
     wstring newPath;
     if ( browseFolder(newPath, defaultPath, caption.GetBuffer(), GetSafeHwnd()) ) {
         // Update the UI label and save the new path
-        SetDlgItemText(IDC_PICTURES_EDIT_FOLDER, newPath.c_str());
+        SetDlgItemText(IDC_VIDEOS_EDIT_FOLDER, newPath.c_str());
         path.convert(newPath.c_str());
         ssconf->setFolderPath(path.c_str());
     }
@@ -259,7 +263,7 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPAR
     return 0;
 }
 
-bool CPicturesSettings::browseFolder(wstring& folderpath, const WCHAR* defaultFolder, const WCHAR* szCaption, const HWND hOwner) {
+bool CVideosSettings::browseFolder(wstring& folderpath, const WCHAR* defaultFolder, const WCHAR* szCaption, const HWND hOwner) {
 
     bool retVal = false;
 
@@ -299,15 +303,15 @@ bool CPicturesSettings::browseFolder(wstring& folderpath, const WCHAR* defaultFo
     return retVal;
 }
 
-void CPicturesSettings::loadSyncModesBox(const char* sourceName)
+void CVideosSettings::loadSyncModesBox(const char* sourceName)
 {
     OutlookConfig* config = getConfig();
     WindowsSyncSourceConfig* ssconf = config->getSyncSourceConfig(sourceName);
     if (!ssconf) return;
 
     // TODO: use a switch on sourceName when refactoring
-    int editBoxResourceID = IDC_PICTURES_EDIT_SYNCTYPE;
-    int comboBoxResourceID = IDC_PICTURES_COMBO_SYNCTYPE;
+    int editBoxResourceID = IDC_VIDEOS_EDIT_SYNCTYPE;
+    int comboBoxResourceID = IDC_VIDEOS_COMBO_SYNCTYPE;
 
     CEdit* editbox = (CEdit*)GetDlgItem(editBoxResourceID);
     CComboBox* combobox = (CComboBox*)GetDlgItem(comboBoxResourceID);
@@ -346,7 +350,7 @@ void CPicturesSettings::loadSyncModesBox(const char* sourceName)
     }
 }
 
-void CPicturesSettings::OnCbnSelchangePicturesComboSynctype()
+void CVideosSettings::OnCbnSelchangeVideosComboSynctype()
 {
     // Supported data format
     StringBuffer supportedData;
@@ -393,19 +397,19 @@ void CPicturesSettings::OnCbnSelchangePicturesComboSynctype()
     CString s1;
     switch (index) {
         case 0:
-            s1.LoadString(IDS_TWO_WAY_LABEL_PICT_SUMMARY);
+            s1.LoadString(IDS_TWO_WAY_LABEL_VIDEO_SUMMARY);
             s1.Append(suppData);
-            SetDlgItemText(IDC_PICTURES_SYNC_DIRECTION_LABEL, s1);
+            SetDlgItemText(IDC_VIDEOS_SYNC_DIRECTION_LABEL, s1);
             break;
         case 1:
-            s1.LoadString(IDS_DOWNLOAD_ONLY_LABEL_PICT_SUMMARY);        
+            s1.LoadString(IDS_DOWNLOAD_ONLY_LABEL_VIDEO_SUMMARY);        
             s1.Append(suppData);
-            SetDlgItemText(IDC_PICTURES_SYNC_DIRECTION_LABEL, s1);
+            SetDlgItemText(IDC_VIDEOS_SYNC_DIRECTION_LABEL, s1);
             break;
         case 2:
-            s1.LoadString(IDS_UPLOAD_ONLY_LABEL_PICT_SUMMARY);
+            s1.LoadString(IDS_UPLOAD_ONLY_LABEL_VIDEO_SUMMARY);
             s1.Append(suppData);
-            SetDlgItemText(IDC_PICTURES_SYNC_DIRECTION_LABEL, s1);
+            SetDlgItemText(IDC_VIDEOS_SYNC_DIRECTION_LABEL, s1);
             break;
     }
 }

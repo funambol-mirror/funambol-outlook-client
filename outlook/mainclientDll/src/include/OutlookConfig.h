@@ -111,7 +111,6 @@ private:
     char* workingDir;                           // The path of current working directory
     char* logDir;                               // The path of current log directory (under app data)
     bool  fullSync;                             // true if we are running a full sync (slow/refresh)
-    bool  abortSync;                            // set to true when we want to (soft) abort the current sync
     bool  upgraded;                             // Flag to specify that we have upgraded the config.
     int   oldSwv;                               // Value of old software version installed (used during upgrades).
     StringBuffer funambolSwv;                   // The Funambol product sw version (can be different in branded clients).
@@ -250,18 +249,20 @@ public:
     bool setSyncSourceConfig(WindowsSyncSourceConfig& wsc);
     bool addSyncSourceConfig(WindowsSyncSourceConfig& wsc);
 
+    // Proxy to the SyncManagerConfig methods.
+    void setAbortSync (bool v) { setToAbort(v);      }
+    bool getAbortSync()        { return isToAbort(); }
 
     // get/set of internal members
     void setWorkingDir   (const char* v);
     void setLogDir       (const char* v);
     void setFullSync     (const  bool v);
     void setScheduledSync(const  bool v);
-    void setAbortSync    (const  bool v);
     void setFunambolSwv  (const StringBuffer& v);
 
 
     const bool  getScheduledSync() const;
-    const bool  getAbortSync()     const;
+    
     _declspec(dllexport) const char* getWorkingDir()    const;
     _declspec(dllexport) const char* getLogDir()        const;
     _declspec(dllexport) const bool  getFullSync()      const;

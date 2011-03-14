@@ -1,3 +1,15 @@
+2011-03-14
+  - toccy: reintegrated branch US7480: media sync
+           * added pictures/videos/files sync 2-way (new media sync implementation, sapi based)
+           * reworked media sources settings panels
+           * fixed UI source state after client restart (last source state was lost)
+           * syncall now starts separate sync sessions for each source under sync.
+             This makes the source progress management easier and the UI messages clearer.
+           * improved cancel sync, it's now more responsive (http interface can be stopped)
+           * improved source/transport listeners for media sources, added progress events
+           * improved logging and sync report errors (WIN-x error codes)
+           * some minor UI fix
+
 2011-03-10
   - toccy: fixed bug 10289: Yearly all-day events are not updated on outlook 2010 and outlook 2007 SP2
            It is a patch for a MS Outlook issue on yearly recurring events, that are 
@@ -73,6 +85,17 @@
 
 2010-07-13
   - maria: Release 8.7.1.
+
+2010-07-28
+  - toccy: created branch "files_sync".
+           Added Files sync (like pictures sync, Server-to-Client only):
+           - main screen: fixed UI pane, cannot be hidden
+           - settings: source can be enabled/disabled, destination folder (default = user's documents dir), 
+             remote URI (default = "file")
+           - recover: only from server to client
+           Notes:
+           - Using VS2008 projects
+           - Pictures source is fixed on UI too (no dynamically hidden)
 
 2010-07-20
   - toccy: improved logging when error occurs saving a recurring event/task (print the list of all props)

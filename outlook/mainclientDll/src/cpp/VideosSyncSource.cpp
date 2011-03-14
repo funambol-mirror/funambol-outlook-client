@@ -41,7 +41,7 @@
 #include "syncml/core/TagNames.h"
 #include "base/util/ArrayListEnumeration.h"
 #include "customization.h"
-#include "PicturesSyncSource.h"
+#include "VideosSyncSource.h"
 #include "OutlookConfig.h"
 #include "winmaincpp.h"
 #include "utils.h"
@@ -69,12 +69,12 @@ static MediaSyncSourceParams getMediaParams()
 
     params.setUserAgent(config->getUserAgent());
 
-    // Set the filtering by size (exclude pics with size > MAX_IMAGE_SIZE)
-    params.setFilterBySize(MAX_IMAGE_SIZE);
+    // Set the filtering by size (exclude pics with size > MAX_VIDEO_SIZE)
+    params.setFilterBySize(MAX_VIDEO_SIZE);
 
     // Set the filtering by date (exclude pics modified BEFORE install timestamp)
     /*  -- (filtering by date not implemented yet) --
-    WindowsSyncSourceConfig* wssc = config->getSyncSourceConfig(PICTURE_);
+    WindowsSyncSourceConfig* wssc = config->getSyncSourceConfig(VIDEO_);
     if (wssc) {
         if (wssc->getIncludeOldItems() == false) {
             params.setFilterByDate(config->getInstallTimestamp());   // it's in UTC
@@ -100,27 +100,27 @@ static StringBuffer getCacheDir(const char* sourceName) {
     // Must check if the destination folder exists. If not, create it.
     int ret = createFolder(cacheDir.c_str());
     if (ret) {
-        LOG.error("Error in picture sync: cannot create cache folder '%s' (code %d)", cacheDir.c_str(), ret);
+        LOG.error("Error in video sync: cannot create cache folder '%s' (code %d)", cacheDir.c_str(), ret);
         return "/";
     }
 
-    LOG.debug("PictureSyncSource: cache dir is %s", cacheDir.c_str());
+    LOG.debug("VideoSyncSource: cache dir is %s", cacheDir.c_str());
     return cacheDir;
 }
 
 
-PicturesSyncSource::PicturesSyncSource(const WCHAR* name, WindowsSyncSourceConfig* wsc)
+VideosSyncSource::VideosSyncSource(const WCHAR* name, WindowsSyncSourceConfig* wsc)
                                       : MediaSyncSource(name, wsc->getCommonConfig(),
                                                         getCacheDir(wsc->getName()),    // fake the dir, to set the cache. It's then set in the constructor.
                                                         getMediaParams()),
-                                        picturesConfig(*wsc) {
+                                        videosConfig(*wsc) {
 
 
-    StringBuffer path = picturesConfig.getFolderPath();
+    StringBuffer path = videosConfig.getFolderPath();
     if (path.empty()) {
-        // If empty, set the default path for pictures (shell folder)
-        path = getDefaultPicturesPath();
-        picturesConfig.setFolderPath(path.c_str());
+        // If empty, set the default path for videos (shell folder)
+        path = getDefaultVideosPath();
+        videosConfig.setFolderPath(path.c_str());
     }
 
     // "folderPath" is the one read from config, stored in registry.
@@ -131,52 +131,52 @@ PicturesSyncSource::PicturesSyncSource(const WCHAR* name, WindowsSyncSourceConfi
 
 
 /// read-only access to configuration
-const WindowsSyncSourceConfig& PicturesSyncSource::getConfig() const {
-    return picturesConfig;
+const WindowsSyncSourceConfig& VideosSyncSource::getConfig() const {
+    return videosConfig;
 }
 
 /// read-write access to configuration
-WindowsSyncSourceConfig& PicturesSyncSource::getConfig() {
-    return picturesConfig;
+WindowsSyncSourceConfig& VideosSyncSource::getConfig() {
+    return videosConfig;
 }
 
 
-int PicturesSyncSource::beginSync() {
+int VideosSyncSource::beginSync() {
     checkAbortedSync();
 
     // From now we consider this source synced.
-    picturesConfig.setIsSynced(true);
+    videosConfig.setIsSynced(true);
 
     return MediaSyncSource::beginSync();
 }
 
-int PicturesSyncSource::endSync() {
+int VideosSyncSource::endSync() {
 
     int ret = MediaSyncSource::endSync();
 
     // Set end timestamp to config: here this source is finished.
-    picturesConfig.setEndTimestamp((unsigned long)time(NULL));
+    videosConfig.setEndTimestamp((unsigned long)time(NULL));
 
     return ret;
 }
 
 
-Enumeration* PicturesSyncSource::getAllItemList()
+Enumeration* VideosSyncSource::getAllItemList()
 {
     checkAbortedSync();
     return MediaSyncSource::getAllItemList();
 }
 
 
-int PicturesSyncSource::insertItem(SyncItem& item)
+int VideosSyncSource::insertItem(SyncItem& item)
 {
-    LOG.debug("PicturesSyncSource::insertItem");
+    LOG.debug("VideosSyncSource::insertItem");
     checkAbortedSync();
 
     // Must check if the destination folder exists. If not, create it.
     int ret = createFolder(dir);
     if (ret) {
-        LOG.error("Error adding picture from Server: cannot create destination folder '%s' (code %d)", dir, ret);
+        LOG.error("Error adding video from Server: cannot create destination folder '%s' (code %d)", dir, ret);
         return STC_COMMAND_FAILED;
     }
 
@@ -188,7 +188,7 @@ int PicturesSyncSource::insertItem(SyncItem& item)
         StringBuffer fullName = getCompleteName(dir.c_str(), item.getKey());
         StringBuffer luid = getLUIDFromPath(fullName);
 
-        LOG.debug("PicturesSyncSource::insertItem - LUID used for '%ls' is %s", item.getKey(), luid.c_str());
+        LOG.debug("VideosSyncSource::insertItem - LUID used for '%ls' is %s", item.getKey(), luid.c_str());
         WCHAR* wluid = toWideChar(luid.c_str());
         item.setKey(wluid);
         delete [] wluid;
@@ -197,15 +197,15 @@ int PicturesSyncSource::insertItem(SyncItem& item)
 }
 
 
-int PicturesSyncSource::modifyItem(SyncItem& item)
+int VideosSyncSource::modifyItem(SyncItem& item)
 {
-    LOG.debug("PicturesSyncSource::modifyItem");
+    LOG.debug("VideosSyncSource::modifyItem");
     checkAbortedSync();
 
     // Must check if the destination folder exists. If not, create it.
     int ret = createFolder(dir);
     if (ret) {
-        LOG.error("Error adding picture from Server: cannot create destination folder '%s' (code %d)", dir, ret);
+        LOG.error("Error adding video from Server: cannot create destination folder '%s' (code %d)", dir, ret);
         return STC_COMMAND_FAILED;
     }
 
@@ -218,7 +218,7 @@ int PicturesSyncSource::modifyItem(SyncItem& item)
 
     StringBuffer name = getFileNameFromPath(fullName);
 
-    LOG.debug("PicturesSyncSource::modifyItem - LUID '%s' is associated to %s", luid.c_str(), name.c_str());
+    LOG.debug("VideosSyncSource::modifyItem - LUID '%s' is associated to %s", luid.c_str(), name.c_str());
     WCHAR* wname = toWideChar(name.c_str());
     item.setKey(wname);     // only the file name is required
     delete [] wname;
@@ -232,18 +232,18 @@ int PicturesSyncSource::modifyItem(SyncItem& item)
 }
 
 
-int PicturesSyncSource::removeItem(SyncItem& item)
+int VideosSyncSource::removeItem(SyncItem& item)
 {
     checkAbortedSync();
 
     int ret = STC_ITEM_NOT_DELETED;
-    LOG.debug("PicturesSyncSource::removeItem -> pictures on Client cannot be deleted");
+    LOG.debug("VideosSyncSource::removeItem -> videos on Client cannot be deleted");
     return ret;
 }
 
-int PicturesSyncSource::removeAllItems()
+int VideosSyncSource::removeAllItems()
 {
-    LOG.info("Removing ALL pictures from folder: '%s'", dir.c_str());
+    LOG.info("Removing ALL videos from folder: '%s'", dir.c_str());
     checkAbortedSync();
 
     return MediaSyncSource::removeAllItems();
@@ -251,7 +251,7 @@ int PicturesSyncSource::removeAllItems()
 
 
 
-void PicturesSyncSource::getKeyAndSignature(SyncItem& item, KeyValuePair& kvp)
+void VideosSyncSource::getKeyAndSignature(SyncItem& item, KeyValuePair& kvp)
 {
     // FIX the item's key.
     // Incoming item: the key for the cache is the full path.
@@ -268,19 +268,16 @@ void PicturesSyncSource::getKeyAndSignature(SyncItem& item, KeyValuePair& kvp)
 }
 
 
-bool PicturesSyncSource::filterOutgoingItem(const StringBuffer& fullName, struct stat& st)
+bool VideosSyncSource::filterOutgoingItem(const StringBuffer& fullName, struct stat& st)
 {
-    // [removed] Skip images bigger than MAX_IMAGE_SIZE
-    // (it's done in MediaSyncSource)
-
 
     if (! S_ISDIR(st.st_mode) ) {
         // Skip non-image files
-        if ( !checkFileExtension(fullName, "jpg",  true) &&
-             !checkFileExtension(fullName, "jpeg", true) &&
-             !checkFileExtension(fullName, "gif",  true) &&
-             !checkFileExtension(fullName, "png",  true) ) {
-            // not an image file
+        if ( !checkFileExtension(fullName, "mp4",  true) &&
+             !checkFileExtension(fullName, "3gp",  true) &&
+             !checkFileExtension(fullName, "flv",  true) &&
+             !checkFileExtension(fullName, "rtsp", true) ) {
+            // not a video file
             return true;
         }
     }
