@@ -650,8 +650,7 @@ Function installDll
 FunctionEnd
 
 
-Function .onInit
-      !insertmacro INSTALLOPTIONS_EXTRACT "MediaHubPanel.ini"
+Function .onInit      
       Call CheckUserRights
       Call CheckAppInstalled
       Call CheckMicrosoftApp
