@@ -139,8 +139,7 @@ BOOL CFilesSettings::OnInitDialog() {
 
     // load string resources
     s1.LoadString(IDS_SYNC_DIRECTION);      SetDlgItemText(IDC_FILES_GROUP_DIRECTION,    s1);
-    s1.LoadString(IDS_FILES_FOLDER);     SetDlgItemText(IDC_FILES_GROUP_FOLDER,       s1);
-    s1.LoadString(IDS_CURRENT);             SetDlgItemText(IDC_FILES_STATIC_FOLDER,      s1);
+    s1.LoadString(IDS_FILES_FOLDER);        SetDlgItemText(IDC_FILES_GROUP_FOLDER,       s1);
     s1.LoadString(IDS_SELECT_FOLDER);       SetDlgItemText(IDC_FILES_BUT_SELECT,         s1);    
     s1.LoadString(IDS_OK);                  SetDlgItemText(IDC_FILES_OK,                 s1);
     s1.LoadString(IDS_CANCEL);              SetDlgItemText(IDC_FILES_CANCEL,             s1);
@@ -181,7 +180,7 @@ BOOL CFilesSettings::OnInitDialog() {
         pfnSetWindowTheme (groupFolder.m_hWnd,    L" ", L" ");
         
     }
-
+    GetDlgItem(IDC_FILES_OK)->SetFocus();
     
     return FALSE;
 }

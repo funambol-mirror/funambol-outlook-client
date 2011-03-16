@@ -52,6 +52,7 @@
 #include "comutil.h"
 #include "Popup.h"
 #include "UICustomization.h"
+#include "MediaHubSetting.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -95,6 +96,8 @@ BEGIN_MESSAGE_MAP(CMainSyncFrame, CFrameWnd)
     ON_MESSAGE(ID_MYMSG_SAPI_PROGRESS,          &CMainSyncFrame::OnMsgSapiProgress)
     ON_MESSAGE(ID_MYMSG_POPUP,                  &CMainSyncFrame::OnMsgPopup)
     ON_MESSAGE(ID_MYMSG_OK,                     &CMainSyncFrame::OnOKMsg)
+
+    ON_MESSAGE(ID_MYMSG_CHECK_MEDIA_HUB_FOLDER, &CMainSyncFrame::OnCheckMediaHubFolder)
 
 END_MESSAGE_MAP()
 
@@ -1790,3 +1793,24 @@ afx_msg LRESULT CMainSyncFrame::OnMsgSapiProgress(WPARAM wParam, LPARAM lParam) 
 
 }
 
+afx_msg LRESULT CMainSyncFrame::OnCheckMediaHubFolder(WPARAM wParam, LPARAM lParam) {
+
+    OutlookConfig* config = ((OutlookConfig*)getConfig());
+       
+    int ret = IDOK;
+    if (!isMediaHubFolderSet()) {                    
+        CMediaHubSetting mediaHubSetting;
+        ret = mediaHubSetting.DoModal();
+        if (ret == IDOK) {
+            config->saveSyncSourceConfig(PICTURE_);
+            config->saveSyncSourceConfig(VIDEO_);
+            config->saveSyncSourceConfig(FILES_);
+        }   else {
+            unsigned int failFlags= MB_OK | MB_ICONASTERISK | MB_SETFOREGROUND | MB_APPLMODAL;
+            CString s1;
+            s1.LoadString(IDS_MEDIA_HUB_ALERT_FOLDER_NOT_SET);
+            MessageBox(s1, WPROGRAM_NAME, failFlags);                        
+        }
+    }
+    return ret;
+}

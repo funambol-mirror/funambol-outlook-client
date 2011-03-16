@@ -1,3 +1,5 @@
+2011-03-16
+  - magi:  added dialog to let the user set the Media-Hub folder
 2011-03-14
   - toccy: reintegrated branch US7480: media sync
            * added pictures/videos/files sync 2-way (new media sync implementation, sapi based)

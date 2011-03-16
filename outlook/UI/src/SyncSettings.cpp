@@ -762,8 +762,22 @@ void CSyncSettings::OnBnClickedSyncButNotes()
     saveSyncTypeNotes = true;
 }
 
+bool isMediaHubSet() {
+
+    CMainSyncFrame syncFrame;
+    int res = syncFrame.OnCheckMediaHubFolder(0,0);
+    
+    if (res != IDOK) {
+        return false;
+    }
+    return true;
+}
+
 void CSyncSettings::OnBnClickedSyncButPictures()
 {
+    if (isMediaHubSet() == false) {
+        return;
+    }
     CPicturesSettings wndPictures;
     INT_PTR result = wndPictures.DoModal();
 
@@ -776,6 +790,9 @@ void CSyncSettings::OnBnClickedSyncButPictures()
 
 void CSyncSettings::OnBnClickedSyncButVideos()
 {
+    if (isMediaHubSet() == false) {
+        return;
+    }
     CVideosSettings wndVideos;
     INT_PTR result = wndVideos.DoModal();
 
@@ -788,6 +805,9 @@ void CSyncSettings::OnBnClickedSyncButVideos()
 
 void CSyncSettings::OnBnClickedSyncButFiles()
 {
+    if (isMediaHubSet() == false) {
+        return;
+    }
     CFilesSettings wndFiles;
     INT_PTR result = wndFiles.DoModal();
 

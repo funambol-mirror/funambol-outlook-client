@@ -140,7 +140,6 @@ BOOL CVideosSettings::OnInitDialog() {
     // load string resources
     s1.LoadString(IDS_SYNC_DIRECTION);      SetDlgItemText(IDC_VIDEOS_GROUP_DIRECTION,    s1);
     s1.LoadString(IDS_VIDEOS_FOLDER);       SetDlgItemText(IDC_VIDEOS_GROUP_FOLDER,       s1);
-    s1.LoadString(IDS_CURRENT);             SetDlgItemText(IDC_VIDEOS_STATIC_FOLDER,      s1);
     s1.LoadString(IDS_SELECT_FOLDER);       SetDlgItemText(IDC_VIDEOS_BUT_SELECT,         s1);
     s1.LoadString(IDS_OK);                  SetDlgItemText(IDC_VIDEOS_OK,                 s1);
     s1.LoadString(IDS_CANCEL);              SetDlgItemText(IDC_VIDEOS_CANCEL,             s1);
@@ -181,7 +180,7 @@ BOOL CVideosSettings::OnInitDialog() {
         pfnSetWindowTheme (groupFolder.m_hWnd,    L" ", L" ");
         
     }
-
+    GetDlgItem(IDC_VIDEOS_OK)->SetFocus();
     
     return FALSE;
 }

@@ -363,6 +363,21 @@ int startSync() {
         ret = ERR_CODE_NO_SOURCES;
         goto finally;
     }
+    
+    for (int i=0; i< sources.size(); i++) {
+        StringBuffer* name = (StringBuffer*)sources.get(i);
+        if (isMediaSource(name->c_str())) {            
+            // If media hub not set remove from the source to sync if in background  
+            if (isScheduledSync && !isMediaHubFolderSet()) {
+                sources.removeElementAt(i);
+                i--;
+                continue;
+            }
+            HWND dd = HwndFunctions::getWindowHandle();
+            ::SendMessage(dd, ID_MYMSG_CHECK_MEDIA_HUB_FOLDER, 0, 0);
+            goto finally;           
+        }        
+    }
 
     if (syncingPIM) {
         //

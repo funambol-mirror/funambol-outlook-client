@@ -59,10 +59,7 @@ using namespace Funambol;
 class WindowsSyncSourceConfig {
 
 private:
-
-    /// The full path of correspondent Outlook folder.
-    char* folderPath;
-
+    
     /// true if the correspondent Outlook folder will be synced with
     /// all subfolders included.
     bool  useSubfolders;
@@ -118,7 +115,7 @@ public:
     //
 
     // TODO: to be removed
-    _declspec(dllexport) const char*   getFolderPath()     const;
+    _declspec(dllexport) const char*   getFolderPath()    const ;
     _declspec(dllexport) bool          getUseSubfolders()  const;
 
     _declspec(dllexport)void setFolderPath    (const char*   v);

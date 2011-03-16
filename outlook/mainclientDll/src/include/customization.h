@@ -145,6 +145,9 @@
 #define UP_URL_RESOURCE                     "/sapi/profile/client?action=get-update-info"
 #define CLIENT_PLATFORM                     "outlook"
 
+// Media-Hub info.
+#define MEDIA_HUB_DEFAULT_FOLDER            "Media-Hub"     // name of the default folder to store picture/video/files
+
 
 #include "base/util/StringBuffer.h"
 

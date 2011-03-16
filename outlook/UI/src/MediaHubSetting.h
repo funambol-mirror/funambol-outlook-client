@@ -1,6 +1,6 @@
 /*
  * Funambol is a mobile platform developed by Funambol, Inc. 
- * Copyright (C) 2003 - 2007 Funambol, Inc.
+ * Copyright (C) 2003 - 2009 Funambol, Inc.
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by
@@ -32,59 +32,77 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by Funambol".
  */
-#include "customization.h"
-#ifndef INCL_HWND_FUNCTIONS
-#define INCL_HWND_FUNCTIONS
 
 /** @cond OLPLUGIN */
-/** @addtogroup ClientDLL */
+/** @addtogroup UI */
 /** @{ */
 
-/** @cond DEV */
-#define ID_MYMSG_SYNC_BEGIN           (WM_APP+1)
-#define ID_MYMSG_SYNC_END             (WM_APP+2)
-#define ID_MYMSG_SYNCSOURCE_BEGIN     (WM_APP+3)
-#define ID_MYMSG_SYNCSOURCE_END       (WM_APP+4)
-#define ID_MYMSG_SYNC_ITEM_SYNCED     (WM_APP+5)
-#define ID_MYMSG_SYNC_TOTALITEMS      (WM_APP+6)
-//#define ID_MYMSG_SYNC_TOTALSOURCES  (WM_APP+7)      not used
-#define ID_MYMSG_STARTSYNC_ENDED      (WM_APP+8)
-#define ID_MYMSG_REFRESH_STATUSBAR    (WM_APP+9)
-//#define ID_MYMSG_MODAL              (WM_APP+10)     not used
-//#define ID_MYMSG_SOURCE_STATE       (WM_APP+11)     obsolete
-#define ID_MYMSG_SYNC_STARTSYNC_BEGIN (WM_APP+12)
-#define ID_MYMSG_UNLOCK_BUTTONS       (WM_APP+13)
-#define ID_MYMSG_LOCK_BUTTONS         (WM_APP+14)
-#define ID_MYMSG_POPUP                (WM_APP+15)
-#define ID_MYMSG_OK                   (WM_APP+16)
-#define ID_MYMSG_CANCEL_SYNC          (WM_APP+17)
-#define ID_MYMSG_SYNC                 (WM_APP+18)
-#define ID_MYMSG_SAPI_PROGRESS        (WM_APP+19)
+#pragma once
+#include "winmaincpp.h"
+#include "afxwin.h"
+#include <string>
 
-#define ID_MYMSG_CHECK_MEDIA_HUB_FOLDER (WM_APP+20)
-
-
-/** @endcond */
-
-#define PLUGIN_UI_CLASSNAME         _T("FunambolApp")
-
-#include "windows.h"
 
 /**
- * Contains methods to find the UI window handle.
- * The hanndle is necessary to send messages to UI.
+ * Videos options window.
  */
-class HwndFunctions
-{
-public:
-	static HWND wnd;
+class CMediaHubSetting : public CDialog {
 
-    /// find funambol main window, if present
-	static int findFunambolWindow();
-	static void initHwnd();
-    static HWND getWindowHandle();
+	DECLARE_DYNCREATE(CMediaHubSetting)
+
+private:
+
+    /// The SyncSource configuration for videos
+    WindowsSyncSourceConfig* ssconf;
+
+    /**
+     * Opens the default Windows dialog to select a folder in the file system.
+     * @param folderpath    [IN-OUT] the user selected folder path, untouched if the user cancelled
+     * @param defaultFolder [OPTIONAL] the default folder to start browsing
+     * @param szCaption     [OPTIONAL] the caption of the dialog to display
+     * @param hOwner        [OPTIONAL] handle to the parent window. Set it in order to make the dialog modal
+     * @return              true if successful, false if cancelled or an error occurs
+     */
+    bool browseFolder(std::wstring& folderpath, 
+                      const WCHAR* defaultFolder = NULL, 
+                      const WCHAR* szCaption = NULL, 
+                      const HWND hOwner = NULL);
+   
+
+protected:
+
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+    virtual BOOL OnInitDialog();
+
+    DECLARE_MESSAGE_MAP()    
+    CEdit     editFolder;
+    CButton   butSelectFolder;    
+    CStatic   groupFolder;    
+
+public:
+
+	CMediaHubSetting();           
+	virtual ~CMediaHubSetting();
+
+	enum { IDD = IDD_MEDIA_HUB_SETTING };
+
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+#ifndef _WIN32_WCE
+	virtual void Dump(CDumpContext& dc) const;
+#endif
+#endif
+
+    bool saveSettings(bool);
+    afx_msg void OnBnClickedMediaHubOk();
+    afx_msg void OnBnClickedMediaHubCancel();
+    afx_msg void OnBnClickedMediaHubButSelect();
+    
+    afx_msg void OnBnClickedMediaHubButReset();
+
+    void setPathOfAllSources(StringBuffer path);
 };
 
 /** @} */
 /** @endcond */
-#endif
+

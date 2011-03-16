@@ -314,6 +314,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\MediaHubSetting.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\NotesSettings.cpp"
 				>
 			</File>
@@ -521,6 +525,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\MediaHubSetting.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\NotesSettings.h"
 				>
 			</File>
@@ -654,11 +662,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\res\files.ico"
+				RelativePath=".\res\files.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\res\files.ico"
+				RelativePath="..\src\res\files.ico"
 				>
 			</File>
 			<File
@@ -786,19 +794,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\res\videos.ico"
-				>
-			</File>
-			<File
 				RelativePath=".\res\videos.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\src\res\videos_grey.ico"
+				RelativePath="..\src\res\videos.ico"
 				>
 			</File>
 			<File
 				RelativePath=".\res\videos_grey.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\src\res\videos_grey.ico"
 				>
 			</File>
 		</Filter>

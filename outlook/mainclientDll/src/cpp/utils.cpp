@@ -395,6 +395,34 @@ StringBuffer getDefaultVideosPath() {
     return path;
 }
 
+StringBuffer getDefaultMyDocumentsPath() {
+
+    StringBuffer path;
+    WCHAR buf[MAX_PATH];
+
+    SHGetSpecialFolderPath(NULL, buf, CSIDL_MYDOCUMENTS, 0); 
+        
+    if (buf && wcslen(buf) > 0) {
+        path.convert(buf);
+    }
+    return path;
+}
+
+bool isMediaHubFolderSet() {
+    
+    OutlookConfig* config = OutlookConfig::getInstance();
+    StringBuffer fpath("");
+    if (config) {
+        fpath = config->getSyncSourceConfig(PICTURE_)->getCommonConfig()->getProperty(PROPERTY_FOLDER_PATH);
+    }
+    if (fpath.empty() == false) {
+        return true;
+    } 
+    return false;
+
+}
+
+
 /**
  * Reads a file from filesystem and write its content into a string.
  * @param filePath : the path of file to read

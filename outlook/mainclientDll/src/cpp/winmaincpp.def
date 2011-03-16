@@ -64,9 +64,10 @@ countSourceVisible
 getDefaultPicturesPath
 getDefaultFilesPath
 getDefaultVideosPath
+getDefaultMyDocumentsPath
 isSourceEnabled
 getOutlookVersion
-
+isMediaHubFolderSet
 ;
 ; update procedure
 ;

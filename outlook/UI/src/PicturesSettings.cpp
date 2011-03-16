@@ -140,7 +140,6 @@ BOOL CPicturesSettings::OnInitDialog() {
     // load string resources
     s1.LoadString(IDS_SYNC_DIRECTION);      SetDlgItemText(IDC_PICTURES_GROUP_DIRECTION,    s1);
     s1.LoadString(IDS_PICTURES_FOLDER);     SetDlgItemText(IDC_PICTURES_GROUP_FOLDER,       s1);
-    s1.LoadString(IDS_CURRENT);             SetDlgItemText(IDC_PICTURES_STATIC_FOLDER,      s1);
     s1.LoadString(IDS_SELECT_FOLDER);       SetDlgItemText(IDC_PICTURES_BUT_SELECT,         s1);
     s1.LoadString(IDS_OK);                  SetDlgItemText(IDC_PICTURES_OK,                 s1);
     s1.LoadString(IDS_CANCEL);              SetDlgItemText(IDC_PICTURES_CANCEL,             s1);
@@ -166,7 +165,8 @@ BOOL CPicturesSettings::OnInitDialog() {
     delete [] wpath;
     SetDlgItemText(IDC_PICTURES_EDIT_FOLDER, s1);    
     
-    butSelectFolder.EnableWindow(FALSE);    
+    butSelectFolder.EnableWindow(FALSE);   
+ 
 
     // disable windows xp theme, otherwise any color setting for groupbox
     // will be overriden by the theme settings
@@ -176,7 +176,8 @@ BOOL CPicturesSettings::OnInitDialog() {
         pfnSetWindowTheme (groupDirection.m_hWnd, L" ", L" ");
         pfnSetWindowTheme (groupFolder.m_hWnd,    L" ", L" ");        
     }
-    
+    GetDlgItem(IDC_PICTURES_OK)->SetFocus();
+
     return FALSE;
 }
 

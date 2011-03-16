@@ -70,7 +70,7 @@ private:
     bool lockedUI;
 
     /// The current number of panes displayed (4 or 5)
-    int panesCount;
+    int panesCount;    
 
     // Buffers for source panes status labels
     CString contactsStatusLabel;

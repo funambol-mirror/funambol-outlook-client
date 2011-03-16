@@ -70,6 +70,7 @@ static int getLastSourceState(const char* sourceName) {
     return ret;
 }
 
+void startCheckMediaFolderThread();
 
 CSyncForm::CSyncForm()
     : CFormView(CSyncForm::IDD)
@@ -85,6 +86,7 @@ CSyncForm::CSyncForm()
     lockedUI = false;
 
     panesCount = countSourceVisible();
+    
 }
 
 CSyncForm::~CSyncForm()
@@ -307,8 +309,39 @@ LRESULT CSyncForm::OnInitForm(WPARAM, LPARAM) {
             rectIcon.Height(), SWP_SHOWWINDOW);
     }
 
+
+
+    if (isSourceVisible(PICTURE) || isSourceVisible(VIDEO) || isSourceVisible(FILES)) {
+        startCheckMediaFolderThread();        
+    }
     return 0;
 }
+
+static DWORD WINAPI checkMediaFolderThread(LPVOID lpv) {
+    
+    for (int i = 0; i < 20; i++) {
+        Sleep(300);    
+        HWND dd = HwndFunctions::getWindowHandle();
+        if (dd == NULL) {
+            continue;
+        }
+        ::SendMessage(dd, ID_MYMSG_CHECK_MEDIA_HUB_FOLDER, 0, 0);    
+        break;
+    }
+    return 0;
+}
+
+void startCheckMediaFolderThread() {      
+    static bool internalCheckMediaHubFolder = false;
+    if (internalCheckMediaHubFolder == false) {
+        if ( !CreateThread(NULL, 0, checkMediaFolderThread, (LPVOID)NULL, 0, NULL) ) {
+            LOG.error("startCheckMediaFolderThread Error creating thread.");           
+        }
+    }
+    internalCheckMediaHubFolder = true;
+}
+
+
 
 void CSyncForm::showSyncControls( BOOL show )
 {

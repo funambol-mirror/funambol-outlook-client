@@ -120,6 +120,16 @@ StringBuffer getDefaultFilesPath();
  */
 StringBuffer getDefaultVideosPath();
 
+/**
+ * Returns the default path to store Media (My Documents)
+ * (shell folder 'My Documents' for this user)
+ */
+StringBuffer getDefaultMyDocumentsPath();
+/**
+ * Returns true if the media hub folder is set. false otherwise
+*/
+bool isMediaHubFolderSet();
+
 std::wstring readFromFile          (const std::wstring& filePath);
 int          writeToFile           (const std::wstring& content, const std::wstring& filePath, const WCHAR* mode = L"w");
 int          writeToFile           (const std::string&  content, const std::string&  filePath, const char*  mode = "w");

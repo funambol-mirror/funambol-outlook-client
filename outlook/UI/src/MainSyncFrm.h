@@ -66,10 +66,11 @@ DWORD WINAPI syncThreadKiller(LPVOID lpParam);
 class CMainSyncFrame : public CFrameWnd
 {
 
-protected:
-
+public:
     CMainSyncFrame();
     DECLARE_DYNCREATE(CMainSyncFrame)
+
+protected:
 
     HANDLE hSyncThread;
     DWORD dwThreadId;
@@ -175,6 +176,7 @@ public:
     // progress percentage. wparam is the total size. lparam is the partial upload or download
     afx_msg LRESULT OnMsgSapiProgress   (WPARAM , LPARAM);
     
+    afx_msg LRESULT OnCheckMediaHubFolder(WPARAM wParam, LPARAM lParam);
 
     afx_msg LRESULT CancelSync(WPARAM wParam, LPARAM lParam);
 
