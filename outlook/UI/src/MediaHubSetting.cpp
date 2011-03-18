@@ -97,12 +97,19 @@ void CMediaHubSetting::Dump(CDumpContext& dc) const
 
 
 StringBuffer getMediaHubDefault() {
-    StringBuffer path = getDefaultMyDocumentsPath();
+    StringBuffer path;
     path.append("\\"); 
-    path.append(MEDIA_HUB_DEFAULT_FOLDER);     
-    createFolder(path.c_str());
+    path.append(MEDIA_HUB_DEFAULT_FOLDER);         
     return path;
 }
+
+StringBuffer getFullMediaHubDefault() {
+    StringBuffer path = getDefaultMyDocumentsPath();
+    path.append("\\"); 
+    path.append(MEDIA_HUB_DEFAULT_FOLDER);         
+    return path;
+}
+
 
 BOOL CMediaHubSetting::OnInitDialog() {
 
@@ -130,9 +137,8 @@ BOOL CMediaHubSetting::OnInitDialog() {
     if (path.empty() == false) {
         return true;        
     }
-
-    // If empty, set the default path for videos (shell folder)
-    path = getMediaHubDefault();        
+    
+    path = getFullMediaHubDefault();        
     WCHAR* wpath = toWideChar(path.c_str());
     s1 = wpath;
     delete [] wpath;
@@ -148,6 +154,7 @@ BOOL CMediaHubSetting::OnInitDialog() {
     }   
 
     GetDlgItem(IDC_MEDIA_HUB_BUT_SELECT)->SetFocus();
+    GetDlgItem(IDC_MEDIA_HUB_BUT_RESET)->EnableWindow(FALSE);
 
     return FALSE;
 }
@@ -172,9 +179,10 @@ bool CMediaHubSetting::saveSettings(bool saveToDisk) {
     CString mediaPath;
     GetDlgItemText(IDC_MEDIA_HUB_EDIT_FOLDER, mediaPath);
     char* path = toMultibyte(mediaPath.GetBuffer());
-
+    
     if (path) {
         StringBuffer p(path);
+        createFolder(p.c_str());
         setPathOfAllSources(p);        
         delete [] path;
     }        
@@ -185,18 +193,37 @@ bool CMediaHubSetting::saveSettings(bool saveToDisk) {
 void CMediaHubSetting::OnBnClickedMediaHubButSelect() {
    
     // Get the default browse folder to the current path of videos       
-    CString defaultPath;
-    GetDlgItemText(IDC_MEDIA_HUB_EDIT_FOLDER, defaultPath);
+    CString path;
+    GetDlgItemText(IDC_MEDIA_HUB_EDIT_FOLDER, path);
     
+    WCHAR* t = toWideChar(getMediaHubDefault().c_str());
+    CString mediaHub = t;
+    CString mediaDir = path;
+    int found = mediaDir.Find(mediaHub);
+    if (found > -1) {
+        mediaDir.Truncate(found);
+    }
+
     CString caption;
     caption.LoadString(IDS_MEDIA_HUB_TITLE_PICKER);
     
     // Open the browse for folder window (modal)
     wstring newPath;
-    if ( browseFolder(newPath, defaultPath.GetBuffer(), caption.GetBuffer(), GetSafeHwnd()) ) {
+    if ( browseFolder(newPath, mediaDir.GetBuffer(), caption.GetBuffer(), GetSafeHwnd()) ) {
         // Update the UI label and save the new path
-        SetDlgItemText(IDC_MEDIA_HUB_EDIT_FOLDER, newPath.c_str());       
-    }    
+        newPath.append(t);
+        SetDlgItemText(IDC_MEDIA_HUB_EDIT_FOLDER, newPath.c_str());     
+
+        // check if the folder is different to the default one we enable the "reset" button
+        StringBuffer t; t.convert(newPath.c_str());
+        if (t != getFullMediaHubDefault()) {
+            GetDlgItem(IDC_MEDIA_HUB_BUT_RESET)->EnableWindow(TRUE);
+        } else {
+            GetDlgItem(IDC_MEDIA_HUB_BUT_RESET)->EnableWindow(FALSE);
+        }
+
+    }   
+    delete [] t;
 }
 
 /// Callback fuction for the 'browse for folder' window. Sets the default folder.
@@ -217,6 +244,7 @@ bool CMediaHubSetting::browseFolder(wstring& folderpath, const WCHAR* defaultFol
     memset(&bi, 0, sizeof(bi));
 
     bi.ulFlags   = BIF_USENEWUI | BIF_VALIDATE;
+    //bi.ulFlags   = BIF_NEWDIALOGSTYLE | BIF_VALIDATE;
     bi.hwndOwner = hOwner;
     bi.lpszTitle = szCaption;
 
@@ -252,11 +280,12 @@ bool CMediaHubSetting::browseFolder(wstring& folderpath, const WCHAR* defaultFol
 void CMediaHubSetting::OnBnClickedMediaHubButReset()
 {       
     // Get the default browse folder to the current path of videos
-    StringBuffer path = getMediaHubDefault();
+    StringBuffer path = getFullMediaHubDefault();
     WCHAR* defaultPath = toWideChar(path.c_str());
 
     SetDlgItemText(IDC_MEDIA_HUB_EDIT_FOLDER, defaultPath);      
     delete [] defaultPath;
+    GetDlgItem(IDC_MEDIA_HUB_BUT_RESET)->EnableWindow(FALSE);
 }
 
 

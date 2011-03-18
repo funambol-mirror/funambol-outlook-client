@@ -356,14 +356,6 @@ int startSync() {
         }
     }
 
-    // Exit if no sources to sync
-    if (sources.size() == 0) {
-        //safeMessageBox(MSGBOX_NO_SOURCES_TO_SYNC);
-        setError(ERR_CODE_NO_SOURCES, ERR_NO_SOURCES_TO_SYNC);
-        ret = ERR_CODE_NO_SOURCES;
-        goto finally;
-    }
-    
     for (int i=0; i< sources.size(); i++) {
         StringBuffer* name = (StringBuffer*)sources.get(i);
         if (isMediaSource(name->c_str())) {            
@@ -373,11 +365,22 @@ int startSync() {
                 i--;
                 continue;
             }
-            HWND dd = HwndFunctions::getWindowHandle();
-            ::SendMessage(dd, ID_MYMSG_CHECK_MEDIA_HUB_FOLDER, 0, 0);
-            goto finally;           
+            if (!isMediaHubFolderSet()) {
+                HWND dd = HwndFunctions::getWindowHandle();
+                ::SendMessage(dd, ID_MYMSG_CHECK_MEDIA_HUB_FOLDER, 0, 0);
+                goto finally;           
+            }
         }        
     }
+
+    // Exit if no sources to sync
+    if (sources.size() == 0) {
+        //safeMessageBox(MSGBOX_NO_SOURCES_TO_SYNC);
+        setError(ERR_CODE_NO_SOURCES, ERR_NO_SOURCES_TO_SYNC);
+        ret = ERR_CODE_NO_SOURCES;
+        goto finally;
+    }
+        
 
     if (syncingPIM) {
         //
