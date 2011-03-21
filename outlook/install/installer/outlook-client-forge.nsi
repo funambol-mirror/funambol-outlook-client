@@ -61,6 +61,23 @@
 !define PROPERTY_DESCRIPTION                    "Description"
 !define PROPERTY_FUNAMBOL_SWV                   "funambol_swv"
 
+;
+; MEDIAHUB properties
+;
+!define PROPERTY_MEDIAHUB                       "MediaHub"
+!define PROPERTY_MEDIAHUB_TITLE                 "MediaHub Location"
+!define PROPERTY_MEDIAHUB_DESCRIPTION           "Select the MediaHub Folder Location."
+!define PROPERTY_MEDIAHUB_TEXT                  "Pictures, videos and files stored in the MediaHub folder will be kept in sync with your online account."
+!define PROPERTY_MEDIAHUB_FOLDER                "MediaHub Folder"
+!define PROPERTY_MEDIAHUB_SELECT_FOLDER         "Choose a location for your MediaHub folder. A folder called 'MediaHub' will be created in the folder that you select."
+
+; the mediaHubPath is created in the root context registry. At the start, the value is copied into
+; the right spds\sources\picture, spds\sources\video and files and removed from the root context.
+; the PROPERTY_PICTURE_MEDIAHUB_KEY is used as check for the upgrade
+!define PROPERTY_MEDIAHUB_REG_KEY               "mediaHubPath"
+!define PROPERTY_PICTURE_MEDIAHUB_KEY           "spds\sources\picture"
+
+
 ; Before v.7.1.4 the product name was "Funambol Outlook Plug-in"
 ; We want to be able to upgrade the Client from versions < 7.1.4.
 !define OLD_PRODUCT_NAME                        "Funambol Outlook Plug-in"
@@ -70,10 +87,11 @@
 !define OLD_PLUGIN_UI_TITLE                     "Funambol Outlook Plug-in"
 
 
-
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
 !include "FileFunc.nsh"
+
+BrandingText "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 
 ; MUI Settings
 !define MUI_ABORTWARNING                        ; Show a message box with a warning when the user wants to close the installer.
@@ -85,17 +103,16 @@
 !define MUI_WELCOMEFINISHPAGE_BITMAP            "${PRODUCT_WELCOME_BMP}"
 !insertmacro MUI_PAGE_WELCOME
 
-;
-; Page to show a custom dialog form
-;
-;Page custom nsDialogsPage nsDialogsPageLeave
-
 ; License page
 !ifdef SHOW_LICENSE
     !define MUI_LICENSEPAGE_CHECKBOX
     !insertmacro MUI_PAGE_LICENSE                   "fileset\LICENSES\License.txt"
 !endif
 
+;
+; Page to show a custom dialog form
+;
+Page custom nsDialogsPage nsDialogsPageLeave
 
 ; Directory page, the first two define check if the install dir is correct
 !define MUI_DIRECTORYPAGE_VERIFYONLEAVE
@@ -109,8 +126,10 @@ var ICONS_GROUP
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME    "${PRODUCT_STARTMENU_REGVAL}"
 !insertmacro MUI_PAGE_STARTMENU Application $ICONS_GROUP
 
+
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
+
 
 ; Finish page
 !define MUI_FINISHPAGE_RUN
@@ -157,90 +176,103 @@ Var Label
 Var GroupBox
 Var DirRequest
 Var Button
-Var EDIT
 Var mediaHubFolderChoosen
+Var mediaHubFolder
+Var showMediaHubPanel
 
 Function nsDialogsPage
 
-        nsDialogs::Create 1018
-	Pop $Dialog
+        ${If} $showMediaHubPanel == "NO"
+		Abort ; exit and don't show anything
+	${EndIf}
 
-	${If} $Dialog == error
+        nsDialogs::Create 1018
+        Pop $Dialog
+
+        ${If} $Dialog == error
 		Abort
 	${EndIf}
 
         GetFunctionAddress $0 OnBack
 	nsDialogs::OnBack $0
 	
-        !insertmacro MUI_HEADER_TEXT "Choose Media Hub Location" "Choose the folder to use as media hub."
+        !insertmacro MUI_HEADER_TEXT "${PROPERTY_MEDIAHUB_TITLE}" "${PROPERTY_MEDIAHUB_DESCRIPTION}"
         
-        ${NSD_CreateLabel} 0 0 100% 25u "Select the folder to be used as repository in which share pictures, videos and files with your cloud account."
+        ${NSD_CreateLabel} 0 0 100% 25u "${PROPERTY_MEDIAHUB_TEXT}"
 	Pop $Label
 	
 	${If} $mediaHubFolderChoosen == ""
-	        StrCpy $mediaHubFolderChoosen "$DOCUMENTS\A-Media-Hub" ;"c:\tmp\A-Media-Hub"
+	        StrCpy $mediaHubFolderChoosen "$DOCUMENTS"
 	${EndIf}
 	
-	${NSD_CreateText} 0 82u 75% 13u $mediaHubFolderChoosen
+	${NSD_CreateText} 3% 83u 70% 15u "$mediaHubFolderChoosen\${PROPERTY_MEDIAHUB}"
 	Pop $DirRequest
+	${NSD_OnChange} $DirRequest nsDialogsPageTextChange
 
-	${NSD_CreateButton} 80% 82u 20% 13u "Browse..."
+	${NSD_CreateButton} 76% 83u 20% 15u "Browse..."
 	Pop $Button
 	GetFunctionAddress $0 OnClick
 	nsDialogs::OnClick $Button $0
 	
-        ${NSD_CreateGroupBox} 0 68u 100% 40u "Folder Media Hub"
+        ${NSD_CreateGroupBox} 0 69u 100% 40u "${PROPERTY_MEDIAHUB_FOLDER}"
 	Pop $GroupBox
  
         nsDialogs::Show
 
 FunctionEnd
 
+Function nsDialogsPageTextChange
+        ;basically avoid to edit the field manually
+        ${NSD_SetText} $DirRequest "$mediaHubFolderChoosen\${PROPERTY_MEDIAHUB}"
+
+FunctionEnd
+
 Function OnClick
 
 	Pop $0 # HWND
-        nsDialogs::SelectFolderDialog "Choose the folder to use as media hub." "c:\tmp\A-Media-Hub"
+        nsDialogs::SelectFolderDialog "${PROPERTY_MEDIAHUB_SELECT_FOLDER}" $mediaHubFolderChoosen
         Pop $R1
-	MessageBox MB_OK $R1
 	
-	${NSD_SetText} $DirRequest $R1
-        StrLen $R2 $R1                                                  
-        StrCpy $mediaHubFolderChoosen $R1 $R2 0
+	${If} $R1 == "error"
+	        Abort
+	${EndIf}
+	
+	StrCpy $mediaHubFolderChoosen $R1
+
+	${NSD_SetText} $DirRequest "$mediaHubFolderChoosen\${PROPERTY_MEDIAHUB}"
         
 FunctionEnd
 
 Function OnBack
 	${NSD_GetText} $DirRequest $0
-	StrCpy $mediaHubFolderChoosen $0
-	;MessageBox MB_OK "You typed:$\n$\n$0"
 FunctionEnd
 
 Function nsDialogsPageLeave
-
 	${NSD_GetText} $DirRequest $0
-	StrCpy $mediaHubFolderChoosen $0
-	MessageBox MB_OK "You typed:$\n$\n$mediaHubFolderChoosen"
-		
-	${DirState} "$mediaHubFolderChoosen" $R0
-       
+	StrCpy $mediaHubFolder $0
+FunctionEnd
+
+Function createMediaHubFolder
+
+        ${DirState} "$mediaHubFolder" $R0
         ${If} $R0 == -1
-		MessageBox MB_OK "Dir doesn't exists. Create?"
-		;GetFullPathName $R1 $mediaHubFolderChoosen
-		StrCpy $R1 $mediaHubFolderChoosen
-                MessageBox MB_OK  "Var $R1"
-                
-                CreateDirectory $mediaHubFolderChoosen"
-               
-                ${DirState} "$mediaHubFolderChoosen" $R1
+		StrCpy $R1 $mediaHubFolder
+                CreateDirectory "$mediaHubFolder"
+
+                ${DirState} "$mediaHubFolder" $R1
                 ${If} $R1 == -1
-                   MessageBox MB_ICONSTOP "Error creating the Media Hub Folder. Please check it and try again."
+                   MessageBox MB_ICONSTOP "Error creating the MediaHub Folder. Please check it and try again."
                    Abort
                 ${EndIf}
 
 	${EndIf}
-
-
+	
+	${If} $mediaHubFolder != ""
+ 	      WriteRegStr    HKCU  "${PLUGIN_REGKEY_CONTEXT}"  "${PROPERTY_MEDIAHUB_REG_KEY}" "$mediaHubFolder"
+	${EndIf}
+	
 FunctionEnd
+
 
 Function .OnInstSuccess
     ${UAC.Unload} ;Must call unload!
@@ -424,7 +456,9 @@ FunctionEnd
 ; Test if the application is already installed.
 ; If yes, manage the upgrade of the plugin.
 ;
+Var tmp
 Function CheckAppInstalled
+
 
        ; Check if the CUSTOMER name is the same of the one found on registry.
        ; In case of Funambol product, this value is empty.
@@ -496,6 +530,13 @@ Function CheckAppInstalled
        ; If the old installDir folder is the old default one, let's change it with the new naming.
        StrCmp $INSTDIR "$PROGRAMFILES\${OLD_INSTALLDIR_CONTEXT}" +1 +2
        StrCpy $INSTDIR "$PROGRAMFILES\${INSTALLDIR_CONTEXT}"
+       
+       
+       ReadRegStr $tmp  HKCU "${PLUGIN_REGKEY_CONTEXT}\${PROPERTY_PICTURE_MEDIAHUB_KEY}" "${PROPERTY_MEDIAHUB_REG_KEY}"    ; Check if the mediaHub for pictures has value
+       ${If} $tmp != ""
+             StrCpy $showMediaHubPanel "NO"
+       ${EndIf}
+       
        Goto done
 
 
@@ -506,6 +547,7 @@ Function CheckAppInstalled
                   IDCANCEL cancel
 
        StrCpy $R9 "uninstForUpgrade"     ; Cannot call now: user can cancel installation!
+       StrCpy $showMediaHubPanel "NO"
        Goto done
 
 
@@ -742,6 +784,9 @@ Section "MainSection" SEC01
 
       ; Write registry keys
       Call writeRegistry
+      
+      ; Create the MediaHub Folder previously set
+      Call createMediaHubFolder
       
       ; check if telephony location is correctly set
       Call checkTelephonyLocation

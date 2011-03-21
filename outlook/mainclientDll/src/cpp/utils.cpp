@@ -413,7 +413,7 @@ bool isMediaHubFolderSet() {
     OutlookConfig* config = OutlookConfig::getInstance();
     StringBuffer fpath("");
     if (config) {
-        fpath = config->getSyncSourceConfig(PICTURE_)->getCommonConfig()->getProperty(PROPERTY_FOLDER_PATH);
+        fpath = config->getSyncSourceConfig(PICTURE_)->getCommonConfig()->getProperty(PROPERTY_MEDIAHUB_PATH);
     }
     if (fpath.empty() == false) {
         return true;

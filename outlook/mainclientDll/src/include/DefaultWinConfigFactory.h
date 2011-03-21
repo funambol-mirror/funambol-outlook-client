@@ -78,6 +78,10 @@
 
 #define FILES_DEVINFO_SYNC_MODES        FILES_SYNC_MODES
 
+#define PICT_EXTENSION   ".jpg,.jpeg,.jpe,.gif,.png,.jfif,.jif,.bmp,.tiff,.tif"
+#define VIDEO_EXTENSION  ".wmv,.mp4,.mov,.3g2,.mpeg,.mpg,.mpe,.asf,.movie,.avi,.mpa,.mp2,.m4u,.m4v,.swf,.flv"
+#define FILE_EXTENSION   "!" PICT_EXTENSION "," VIDEO_EXTENSION
+
 /**
  * This class is a factory of default configurations.
  * It can be inherited to define client specific Config parameters.

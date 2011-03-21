@@ -1809,7 +1809,7 @@ afx_msg LRESULT CMainSyncFrame::OnCheckMediaHubFolder(WPARAM wParam, LPARAM lPar
             unsigned int failFlags= MB_OK | MB_ICONASTERISK | MB_SETFOREGROUND | MB_APPLMODAL;
             CString s1;
             s1.LoadString(IDS_MEDIA_HUB_ALERT_FOLDER_NOT_SET);
-            MessageBox(s1, WPROGRAM_NAME, failFlags);                        
+            //MessageBox(s1, WPROGRAM_NAME, failFlags);                        
         }
     }
     return ret;

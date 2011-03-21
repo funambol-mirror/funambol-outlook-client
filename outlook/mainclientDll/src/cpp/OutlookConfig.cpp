@@ -1083,10 +1083,35 @@ void OutlookConfig::createDefaultConfig() {
     }
     char* logPath = toMultibyte(wlogPath);
     setLogDir(logPath);
+    
+    // set the sapi mediaHub path in the right source config and delete the temp node
+    char* mediaHubPath = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_MEDIAHUB_PATH, HKEY_CURRENT_USER);
+    if (mediaHubPath  && strcmp(mediaHubPath, "") != 0) {
+        SyncSourceConfig* sc = DMTClientConfig::getSyncSourceConfig(PICTURE_);
+        sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
+        sc = DMTClientConfig::getSyncSourceConfig(VIDEO_);
+        sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
+        sc = DMTClientConfig::getSyncSourceConfig(FILES_);
+        sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
 
-    if (installPath) delete [] installPath;
-    if (logPath)     delete [] logPath;
-    if (wlogPath)    delete [] wlogPath;
+        ManagementNode* n = NULL;
+        DMTree* d = DMTreeFactory::getDMTree(PLUGIN_ROOT_CONTEXT);
+        if (d) {
+            n = d->readManagementNode(PLUGIN_ROOT_CONTEXT);
+            if (n) {
+                n->deleteProperty(PROPERTY_MEDIAHUB_PATH);
+                delete n;
+                delete d;
+            }
+        }
+    }
+    
+
+    if (installPath)  delete [] installPath;
+    if (logPath)      delete [] logPath;
+    if (wlogPath)     delete [] wlogPath;
+    if (mediaHubPath) delete [] mediaHubPath;
+
 }
 
 
@@ -1295,17 +1320,7 @@ void OutlookConfig::upgradeConfig() {
                     }
                 }
             }
-        }
-
-        // Files source added.
-        if (!addWindowsSyncSourceConfig(FILES)) {
-            LOG.error("upgradeConfig - error adding the config for %s source", FILES_);
-        }
-
-        // VIdeos source added.
-        if (!addWindowsSyncSourceConfig(VIDEO)) {
-            LOG.error("upgradeConfig - error adding the config for %s source", VIDEO_);
-        }
+        }       
     }
 
 
@@ -1342,7 +1357,62 @@ void OutlookConfig::upgradeConfig() {
             delete d;
         }
     }
+    
+    // Old version < 10.0.0
+    if (oldFunambolSwv < 100000) {
+        
 
+        // update pictures parameters
+        SyncSourceConfig* sc = DMTClientConfig::getSyncSourceConfig(PICTURE_);
+        if (sc) {
+            sc->setType             ("image/*");      
+            sc->setSupportedTypes   ("application/*");      
+            sc->setIsEnabled        (PICTURE_SOURCE_ENABLED);
+            sc->setProperty         (PROPERTY_USE_SAPI, "1");
+            sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP, "0");
+            sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
+            sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
+            sc->setProperty         (PROPERTY_EXTENSION, PICT_EXTENSION);
+            sc->setProperty         (PROPERTY_MEDIAHUB_PATH, "");  
+        }
+        safeAddSourceVisible(PICTURE_);
+
+         // Files source added.
+        if (!addWindowsSyncSourceConfig(FILES)) {
+            LOG.error("upgradeConfig - error adding the config for %s source", FILES_);
+        }
+        safeAddSourceVisible(VIDEO_);
+
+        // VIdeos source added.
+        if (!addWindowsSyncSourceConfig(VIDEO)) {
+            LOG.error("upgradeConfig - error adding the config for %s source", VIDEO_);
+        }
+        safeAddSourceVisible(FILES_);
+
+        // set the sapi mediaHub path in the right source config and delete the temp node
+        char* mediaHubPath = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_MEDIAHUB_PATH, HKEY_CURRENT_USER);
+        if (mediaHubPath  && strcmp(mediaHubPath, "") != 0) {
+            SyncSourceConfig* sc = DMTClientConfig::getSyncSourceConfig(PICTURE_);
+            sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
+            sc = DMTClientConfig::getSyncSourceConfig(VIDEO_);
+            sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
+            sc = DMTClientConfig::getSyncSourceConfig(FILES_);
+            sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
+
+            ManagementNode* n = NULL;
+            DMTree* d = DMTreeFactory::getDMTree(PLUGIN_ROOT_CONTEXT);
+            if (d) {
+                n = d->readManagementNode(PLUGIN_ROOT_CONTEXT);
+                if (n) {
+                    n->deleteProperty(PROPERTY_MEDIAHUB_PATH);
+                    delete n;
+                    delete d;
+                }
+            }
+        }
+        if (mediaHubPath) { delete [] mediaHubPath; }
+
+    }
 }
 
 

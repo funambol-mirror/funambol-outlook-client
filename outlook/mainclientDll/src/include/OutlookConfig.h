@@ -54,7 +54,9 @@
 /// Client specific properties 
 /// (see spdm/costants.h for common props)
 #define PROPERTY_USE_SUBFOLDERS                 "useSubfolders"
-#define PROPERTY_FOLDER_PATH                    "folderPath"
+#define PROPERTY_FOLDER_PATH                    "folderPath" 
+#define PROPERTY_MEDIAHUB_PATH                  "mediaHubPath" 
+
 #define PROPERTY_SCHEDULED_SYNC                 "isScheduled"
 #define PROPERTY_SOURCE_ORDER                   "sourceOrder"
 

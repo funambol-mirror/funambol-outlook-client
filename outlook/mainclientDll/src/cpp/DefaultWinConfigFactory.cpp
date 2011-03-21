@@ -43,11 +43,6 @@
 #include "sapi/SapiSyncSource.h"
 #include "sapi/FileSapiSyncSource.h"
 
-#define PICT_EXTENSION   ".jpg,.jpeg,.jpe,.gif,.png,.jfif,.jif,.bmp,.tiff,.tif"
-#define VIDEO_EXTENSION  ".wmv,.mp4,.mov,.3g2,.mpeg,.mpg,.mpe,.asf,.movie,.avi,.mpa,.mp2,.m4u,.m4v,.swf,.flv"
-#define FILE_EXTENSION   "!" PICT_EXTENSION "," VIDEO_EXTENSION
-
-
 using namespace std;
 
 
@@ -194,7 +189,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
 
     // SAPI
     else if (wname == PICTURE) {
-        sc->setSync             (SYNC_MODE_TWO_WAY);
+        sc->setSync             (DEFAULT_PICTURES_SYNC_MODE);
         sc->setSyncModes        (PICTURES_DEVINFO_SYNC_MODES);
         sc->setURI              (DLLCustomization::sourcePicturesUri);
         sc->setType             ("image/*");      
@@ -208,10 +203,10 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
         sc->setProperty         (PROPERTY_EXTENSION, PICT_EXTENSION);
-        sc->setProperty         (PROPERTY_FOLDER_PATH, "c:/temp/A-Media-Hub");  
+        sc->setProperty         (PROPERTY_MEDIAHUB_PATH, "");  
     }
     else if (wname == VIDEO){
-        sc->setSync             (SYNC_MODE_TWO_WAY);
+        sc->setSync             (DEFAULT_VIDEOS_SYNC_MODE);
         sc->setSyncModes        (VIDEOS_DEVINFO_SYNC_MODES);
         sc->setURI              (DLLCustomization::sourceVideosUri);
         sc->setType             ("video/*");      
@@ -224,7 +219,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
         sc->setProperty         (PROPERTY_EXTENSION, VIDEO_EXTENSION);
-        sc->setProperty         (PROPERTY_FOLDER_PATH, "c:/temp/A-Media-Hub");  
+        sc->setProperty         (PROPERTY_MEDIAHUB_PATH, "");  
     }
     else if (wname == FILES){
         sc->setSync             (DEFAULT_FILES_SYNC_MODE);
@@ -240,7 +235,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
         sc->setProperty         (PROPERTY_EXTENSION, FILE_EXTENSION);
-        sc->setProperty         (PROPERTY_FOLDER_PATH, "c:/temp/A-Media-Hub");  
+        sc->setProperty         (PROPERTY_MEDIAHUB_PATH, "");  
     }
 
     if (name) delete [] name;

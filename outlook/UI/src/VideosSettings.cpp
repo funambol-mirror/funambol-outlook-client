@@ -158,8 +158,10 @@ BOOL CVideosSettings::OnInitDialog() {
     StringBuffer path = ssconf->getFolderPath();
     if (path.empty()) {
         // If empty, set the default path for videos (shell folder)
-        path = getDefaultVideosPath();
-        ssconf->setFolderPath(path.c_str());
+        path = getDefaultMyDocumentsPath();
+        path.append("\\");
+        path.append(MEDIA_HUB_DEFAULT_FOLDER);        
+        ssconf->getCommonConfig()->setProperty(PROPERTY_MEDIAHUB_PATH, path.c_str());
     }
     WCHAR* wpath = toWideChar(path.c_str());
     s1 = wpath;
@@ -214,7 +216,7 @@ bool CVideosSettings::saveSettings(bool saveToDisk) {
     //       (when writing to winreg, toWideChar is then called)
     char* path = toMultibyte(videosPath.GetBuffer());
     if (path) {
-        ssconf->setFolderPath(path);
+        ssconf->getCommonConfig()->setProperty(PROPERTY_MEDIAHUB_PATH, path);
         delete [] path;
     }    
 
@@ -234,7 +236,7 @@ void CVideosSettings::OnBnClickedVideosButSelect() {
     if (!ssconf) return;
 
     // Get the default browse folder to the current path of videos
-    StringBuffer path = ssconf->getFolderPath();
+    StringBuffer path = ssconf->getCommonConfig()->getProperty(PROPERTY_MEDIAHUB_PATH);
     WCHAR* defaultPath = toWideChar(path.c_str());
 
     CString caption;
@@ -246,7 +248,7 @@ void CVideosSettings::OnBnClickedVideosButSelect() {
         // Update the UI label and save the new path
         SetDlgItemText(IDC_VIDEOS_EDIT_FOLDER, newPath.c_str());
         path.convert(newPath.c_str());
-        ssconf->setFolderPath(path.c_str());
+        ssconf->getCommonConfig()->setProperty(PROPERTY_MEDIAHUB_PATH, path.c_str());
     }
 
     delete [] defaultPath;

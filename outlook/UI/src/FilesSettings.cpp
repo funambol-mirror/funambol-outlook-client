@@ -154,11 +154,15 @@ BOOL CFilesSettings::OnInitDialog() {
     SetDlgItemText(IDC_FILES_EDIT_SYNCTYPE, s1);
 
     // Files folder path
-    StringBuffer path = ssconf->getFolderPath();
+    StringBuffer path = ssconf->getCommonConfig()->getProperty(PROPERTY_MEDIAHUB_PATH);
+    
     if (path.empty()) {
         // If empty, set the default path for files (shell folder)
-        path = getDefaultFilesPath();
-        ssconf->setFolderPath(path.c_str());
+       // If empty, set the default path for pictures (shell folder)
+        path = getDefaultMyDocumentsPath();
+        path.append("\\");
+        path.append(MEDIA_HUB_DEFAULT_FOLDER);        
+        ssconf->getCommonConfig()->setProperty(PROPERTY_MEDIAHUB_PATH, path.c_str());
     }
     WCHAR* wpath = toWideChar(path.c_str());
     s1 = wpath;
@@ -215,8 +219,9 @@ bool CFilesSettings::saveSettings(bool saveToDisk) {
     //       (when writing to winreg, toWideChar is then called)
     char* path = toMultibyte(filesPath.GetBuffer());
     if (path) {
-        ssconf->setFolderPath(path);
-        delete [] path;    }    
+        ssconf->getCommonConfig()->setProperty(PROPERTY_MEDIAHUB_PATH, path);
+        delete [] path;    
+    }    
 
     // Never save to winreg, will save when 'OK' is clicked on SyncSettings.
     //if(saveToDisk)
@@ -233,7 +238,7 @@ void CFilesSettings::OnBnClickedFilesButSelect() {
     if (!ssconf) return;
 
     // Get the default browse folder to the current path of files
-    StringBuffer path = ssconf->getFolderPath();
+    StringBuffer path = ssconf->getCommonConfig()->getProperty(PROPERTY_MEDIAHUB_PATH);
     WCHAR* defaultPath = toWideChar(path.c_str());
 
     CString caption;
@@ -245,7 +250,7 @@ void CFilesSettings::OnBnClickedFilesButSelect() {
         // Update the UI label and save the new path
         SetDlgItemText(IDC_FILES_EDIT_FOLDER, newPath.c_str());
         path.convert(newPath.c_str());
-        ssconf->setFolderPath(path.c_str());
+        ssconf->getCommonConfig()->setProperty(PROPERTY_MEDIAHUB_PATH, path.c_str());
     }
 
     delete [] defaultPath;

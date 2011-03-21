@@ -154,11 +154,14 @@ BOOL CPicturesSettings::OnInitDialog() {
     SetDlgItemText(IDC_PICTURES_EDIT_SYNCTYPE, s1);
 
     // Pictures folder path
-    StringBuffer path = ssconf->getFolderPath();
+    
+    StringBuffer path = ssconf->getCommonConfig()->getProperty(PROPERTY_MEDIAHUB_PATH);
     if (path.empty()) {
         // If empty, set the default path for pictures (shell folder)
-        path = getDefaultPicturesPath();
-        ssconf->setFolderPath(path.c_str());
+        path = getDefaultMyDocumentsPath();
+        path.append("\\");
+        path.append(MEDIA_HUB_DEFAULT_FOLDER);        
+        ssconf->getCommonConfig()->setProperty(PROPERTY_MEDIAHUB_PATH, path.c_str());
     }
     WCHAR* wpath = toWideChar(path.c_str());
     s1 = wpath;
@@ -210,7 +213,7 @@ bool CPicturesSettings::saveSettings(bool saveToDisk) {
     //       (when writing to winreg, toWideChar is then called)
     char* path = toMultibyte(picturesPath.GetBuffer());
     if (path) {
-        ssconf->setFolderPath(path);
+        ssconf->getCommonConfig()->setProperty(PROPERTY_MEDIAHUB_PATH, path);
         delete [] path;
     }
    
@@ -232,7 +235,7 @@ void CPicturesSettings::OnBnClickedPicturesButSelect() {
     if (!ssconf) return;
 
     // Get the default browse folder to the current path of pictures
-    StringBuffer path = ssconf->getFolderPath();
+    StringBuffer path = ssconf->getCommonConfig()->getProperty(PROPERTY_MEDIAHUB_PATH);
     WCHAR* defaultPath = toWideChar(path.c_str());
 
     CString caption;
@@ -244,7 +247,7 @@ void CPicturesSettings::OnBnClickedPicturesButSelect() {
         // Update the UI label and save the new path
         SetDlgItemText(IDC_PICTURES_EDIT_FOLDER, newPath.c_str());
         path.convert(newPath.c_str());
-        ssconf->setFolderPath(path.c_str());
+        ssconf->getCommonConfig()->setProperty(PROPERTY_MEDIAHUB_PATH, path.c_str());
     }
 
     delete [] defaultPath;
