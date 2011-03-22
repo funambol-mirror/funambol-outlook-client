@@ -1594,7 +1594,7 @@ int OutlookConfig::setUniqueDevID() {
  * @return               the property value (new allocated buffer) - 
  *                       if key not found, returns an empty string.
  */
-char* OutlookConfig::readPropertyValue(const char* context, const char* propertyName, HKEY rootKey) {
+char* OutlookConfig::readPropertyValue(const char* contextA, const char* propertyNameA, HKEY rootKey) {
     
     DWORD res = 0;  	
     long  err = 0;
@@ -1603,11 +1603,14 @@ char* OutlookConfig::readPropertyValue(const char* context, const char* property
     char* ret = NULL;
 
     // Need to convert all '/' into '\'.
-    char* fullContext = new char[strlen(context) + 10];
-    sprintf(fullContext, "%s/%s", "Software", context);
-    toWindows(fullContext);
+    char* fullContextA = new char[strlen(contextA) + 10];
+    sprintf(fullContextA, "%s/%s", "Software", contextA);
+    toWindows(fullContextA);
 
-    RegCreateKeyExA(
+    WCHAR* fullContext = toWideChar(fullContextA);
+    WCHAR* propertyName = toWideChar(propertyNameA);
+
+    RegCreateKeyEx(
             rootKey,
             fullContext,
             0,
@@ -1620,12 +1623,12 @@ char* OutlookConfig::readPropertyValue(const char* context, const char* property
             );
 
     if (key == 0) {
-        setErrorF(ERR_INVALID_CONTEXT, ERR_INVALID_REG_PATH, fullContext);
+        setErrorF(ERR_INVALID_CONTEXT, ERR_INVALID_REG_PATH, fullContextA);
         goto finally;
     }
 
     // Get value length
-    err = RegQueryValueExA(
+    err = RegQueryValueEx(
             key,
             propertyName,
             NULL,
@@ -1636,9 +1639,9 @@ char* OutlookConfig::readPropertyValue(const char* context, const char* property
 
     if (err == ERROR_SUCCESS) {
 		if (dim > 0) {
-            char* buf = new char[dim + 1];
+            TCHAR* buf = new TCHAR[dim + 1];
 
-			err = RegQueryValueExA(
+			err = RegQueryValueEx(
 					key,
 					propertyName,
 					NULL,
@@ -1647,7 +1650,7 @@ char* OutlookConfig::readPropertyValue(const char* context, const char* property
 					&dim 
                     );
             if (err == ERROR_SUCCESS) {
-                ret = stringdup(buf);
+                ret = toMultibyte(buf);                
             }
             delete [] buf;
 		}
@@ -1661,6 +1664,12 @@ finally:
     }
     if (fullContext) {
         delete [] fullContext;
+    }
+    if (fullContextA) {
+        delete [] fullContextA;
+    }
+    if (propertyName) {
+        delete [] propertyName;
     }
     if (key != 0) {
         RegCloseKey(key);
