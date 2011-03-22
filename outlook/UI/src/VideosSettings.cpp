@@ -155,7 +155,7 @@ BOOL CVideosSettings::OnInitDialog() {
     SetDlgItemText(IDC_VIDEOS_EDIT_SYNCTYPE, s1);
 
     // Videos folder path
-    StringBuffer path = ssconf->getFolderPath();
+    StringBuffer path = ssconf->getCommonConfig()->getProperty(PROPERTY_MEDIAHUB_PATH);
     if (path.empty()) {
         // If empty, set the default path for videos (shell folder)
         path = getDefaultMyDocumentsPath();
