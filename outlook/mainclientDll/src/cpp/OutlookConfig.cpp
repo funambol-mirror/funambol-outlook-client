@@ -47,7 +47,6 @@
 
 #include "outlook/ClientApplication.h"
 #include "outlook/ClientException.h"
-
 #include "base/adapter/PlatformAdapter.h"
 
 #include "UpdateManager.h"
@@ -592,25 +591,16 @@ void OutlookConfig::saveWinSourceConfig(unsigned int i) {
         char buf[512];
 
         // Specific props:
-        node->setPropertyValue(PROPERTY_USE_SUBFOLDERS,    (winSourceConfigs[i].getUseSubfolders () ? "1" : "0"));    
-        node->setPropertyValue(PROPERTY_FOLDER_PATH,        winSourceConfigs[i].getFolderPath    ());
+        if (isPIMSource(winSourceConfigs[i].getName())) {
+            // Only PIM!
+            node->setPropertyValue(PROPERTY_USE_SUBFOLDERS,(winSourceConfigs[i].getUseSubfolders () ? "1" : "0"));    
+            node->setPropertyValue(PROPERTY_FOLDER_PATH,    winSourceConfigs[i].getFolderPath());
+        }
+        
         timestampToAnchor(winSourceConfigs[i].getEndTimestamp(), buf); 
         node->setPropertyValue(PROPERTY_SYNC_END,           buf);
-/*
-        // Common props:
-        node->setPropertyValue(PROPERTY_SOURCE_NAME,        winSourceConfigs[i].getName          ());    
-        node->setPropertyValue(PROPERTY_SOURCE_URI,         winSourceConfigs[i].getURI           ());
-        node->setPropertyValue(PROPERTY_SOURCE_TYPE,        winSourceConfigs[i].getType          ());
-        node->setPropertyValue(PROPERTY_SOURCE_VERSION,     winSourceConfigs[i].getVersion       ());
-        node->setPropertyValue(PROPERTY_SOURCE_SYNC_MODES,  winSourceConfigs[i].getSyncModes     ());
-        node->setPropertyValue(PROPERTY_SOURCE_ENCODING,    winSourceConfigs[i].getEncoding      ());    
-        node->setPropertyValue(PROPERTY_SOURCE_SUPP_TYPES,  winSourceConfigs[i].getSupportedTypes());
-        node->setPropertyValue(PROPERTY_SOURCE_ENCRYPTION,  winSourceConfigs[i].getEncryption    ());
-        node->setPropertyValue(PROPERTY_SOURCE_ENABLED,     winSourceConfigs[i].isEnabled() ? "1" : "0");
 
-        timestampToAnchor(winSourceConfigs[i].getLast(), buf); 
-        node->setPropertyValue(PROPERTY_SOURCE_LAST_SYNC, buf);
-*/        
+        // common source params
         DMTClientConfig::saveSourceConfig(i, *nodeUpper);
 
 
@@ -675,6 +665,27 @@ finally:
     if (node)  delete node;
     return;
 }
+
+void OutlookConfig::deletePropertyValue(const char* context, const char* name) {
+
+    if (!context || !name) {
+        return;
+    }
+
+    ManagementNode* node = NULL;
+    DMTree* dmt = DMTreeFactory::getDMTree(PLUGIN_ROOT_CONTEXT);
+    if (!dmt) goto finally;
+
+    node = dmt->readManagementNode(context);
+    if (!node) goto finally;
+
+    node->deleteProperty(name);
+
+finally:
+    if (dmt)   delete dmt;
+    if (node)  delete node;
+}
+
 
 
 void OutlookConfig::saveBeginSync() {
@@ -1173,21 +1184,6 @@ void OutlookConfig::initializeVersionsAndUserAgent() {
 void OutlookConfig::upgradeConfig() {
     
     initializeVersionsAndUserAgent();
-    //// Backup old Swv and save the new one.
-    //oldSwv = getBuildNumberFromVersion(getClientConfig().getSwv());
-    //const char* newSwv = readCurrentSwv();
-    //getClientConfig().setSwv(newSwv);
-
-    //// Backup old Funambol product Swv and save the new one.
-    //oldFunambolSwv = getBuildNumberFromVersion(getFunambolSwv().c_str());
-    //StringBuffer funambolNewSwv = readFunambolSwv(HKEY_LOCAL_MACHINE);
-    //setFunambolSwv(funambolNewSwv);
-
-
-    //// Set the new User Agent = "Funambol Outlook Sync Client v. x.y.z"
-    //char* userAgent = new char[strlen(PROGRAM_NAME) + strlen(newSwv) + 5];
-    //sprintf(userAgent, "%s v. %s", PROGRAM_NAME, newSwv);
-    //accessConfig.setUserAgent(userAgent);
 
     // Old version < 7.1.1: add default filtering to events.
     if (oldFunambolSwv < 70101) {
@@ -1308,8 +1304,7 @@ void OutlookConfig::upgradeConfig() {
             ssc = getSyncSourceConfig(i);
             if (ssc) {
                 const char* name = ssc->getName();
-                if (!strcmp(name, CONTACT_) || !strcmp(name, APPOINTMENT_) ||
-                    !strcmp(name, TASK_)    || !strcmp(name, NOTE_)) {
+                if (isPIMSource(name)) {
                     const char* modeInUse = ssc->getSync();
                     if (!strcmp(modeInUse, "one-way-client") ||                 // that's the old style syncmode
                         !strcmp(modeInUse, "one-way-server") ||                 // that's the old style syncmode
@@ -1321,6 +1316,68 @@ void OutlookConfig::upgradeConfig() {
                 }
             }
         }       
+    }
+    
+    // Old version < 10.0.0
+    if (oldFunambolSwv < 100000) {
+        
+        // Update pictures parameters: 
+        //   - keep syncmode (1-way-from-server), isEnabled, endTstamp (for UI state)
+        //   - reset last (now it's used for uploads!)
+        //   - add new SAPI params
+        //   - remove obsolete keys (folderPath, useSubfolders)
+        SyncSourceConfig* sc = DMTClientConfig::getSyncSourceConfig(PICTURE_);
+        if (sc) {
+            sc->setLast             (0);
+            sc->setSyncModes        (PICTURES_DEVINFO_SYNC_MODES);
+            sc->setType             ("image/*");      
+            sc->setSupportedTypes   ("application/*");      
+            sc->setProperty         (PROPERTY_USE_SAPI,                     "1");
+            sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP,     "0");
+            sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
+            sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
+            sc->setProperty         (PROPERTY_EXTENSION,                    PICT_EXTENSION);
+            sc->setProperty         (PROPERTY_MEDIAHUB_PATH,                "");
+            sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE,          SAPI_LOCAL_QUOTA_STORAGE);
+            sc->removeProperty      (PROPERTY_FOLDER_PATH);
+            sc->removeProperty      (PROPERTY_USE_SUBFOLDERS);
+        }
+        StringBuffer path(PLUGIN_ROOT_CONTEXT CONTEXT_SPDS_SOURCES "/" PICTURE_);
+        deletePropertyValue(path.c_str(), PROPERTY_FOLDER_PATH);
+        deletePropertyValue(path.c_str(), PROPERTY_USE_SUBFOLDERS);
+
+        safeAddSourceVisible(PICTURE_);
+
+        // Videos source added.
+        if (!addWindowsSyncSourceConfig(VIDEO)) {
+            LOG.error("upgradeConfig - error adding the config for %s source", VIDEO_);
+        }
+        safeAddSourceVisible(VIDEO_);
+
+         // Files source added.
+        if (!addWindowsSyncSourceConfig(FILES)) {
+            LOG.error("upgradeConfig - error adding the config for %s source", FILES_);
+        }
+        safeAddSourceVisible(FILES_);
+
+        // SapiConfig added.
+        SapiConfig* sapiConfig = DefaultWinConfigFactory::getSapiConfig();
+        setSapiConfig(*sapiConfig);
+        delete sapiConfig;
+
+        // set the sapi mediaHub path in the right source config and delete the temp node
+        char* mediaHubPath = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_MEDIAHUB_PATH, HKEY_CURRENT_USER);
+        if (mediaHubPath  && strcmp(mediaHubPath, "") != 0) {
+            SyncSourceConfig* sc = DMTClientConfig::getSyncSourceConfig(PICTURE_);
+            sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
+            sc = DMTClientConfig::getSyncSourceConfig(VIDEO_);
+            sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
+            sc = DMTClientConfig::getSyncSourceConfig(FILES_);
+            sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
+
+            deletePropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_MEDIAHUB_PATH);
+        }
+        if (mediaHubPath) { delete [] mediaHubPath; }
     }
 
 
@@ -1354,64 +1411,8 @@ void OutlookConfig::upgradeConfig() {
         if (n) {
             n->deletePropertyNode(CONTEXT_UPDATER);
             delete n;
-            delete d;
         }
-    }
-    
-    // Old version < 10.0.0
-    if (oldFunambolSwv < 100000) {
-        
-
-        // update pictures parameters
-        SyncSourceConfig* sc = DMTClientConfig::getSyncSourceConfig(PICTURE_);
-        if (sc) {
-            sc->setType             ("image/*");      
-            sc->setSupportedTypes   ("application/*");      
-            sc->setIsEnabled        (PICTURE_SOURCE_ENABLED);
-            sc->setProperty         (PROPERTY_USE_SAPI, "1");
-            sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP, "0");
-            sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
-            sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
-            sc->setProperty         (PROPERTY_EXTENSION, PICT_EXTENSION);
-            sc->setProperty         (PROPERTY_MEDIAHUB_PATH, "");  
-        }
-        safeAddSourceVisible(PICTURE_);
-
-         // Files source added.
-        if (!addWindowsSyncSourceConfig(FILES)) {
-            LOG.error("upgradeConfig - error adding the config for %s source", FILES_);
-        }
-        safeAddSourceVisible(VIDEO_);
-
-        // VIdeos source added.
-        if (!addWindowsSyncSourceConfig(VIDEO)) {
-            LOG.error("upgradeConfig - error adding the config for %s source", VIDEO_);
-        }
-        safeAddSourceVisible(FILES_);
-
-        // set the sapi mediaHub path in the right source config and delete the temp node
-        char* mediaHubPath = readPropertyValue(PLUGIN_ROOT_CONTEXT, PROPERTY_MEDIAHUB_PATH, HKEY_CURRENT_USER);
-        if (mediaHubPath  && strcmp(mediaHubPath, "") != 0) {
-            SyncSourceConfig* sc = DMTClientConfig::getSyncSourceConfig(PICTURE_);
-            sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
-            sc = DMTClientConfig::getSyncSourceConfig(VIDEO_);
-            sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
-            sc = DMTClientConfig::getSyncSourceConfig(FILES_);
-            sc->setProperty(PROPERTY_MEDIAHUB_PATH, mediaHubPath);
-
-            ManagementNode* n = NULL;
-            DMTree* d = DMTreeFactory::getDMTree(PLUGIN_ROOT_CONTEXT);
-            if (d) {
-                n = d->readManagementNode(PLUGIN_ROOT_CONTEXT);
-                if (n) {
-                    n->deleteProperty(PROPERTY_MEDIAHUB_PATH);
-                    delete n;
-                    delete d;
-                }
-            }
-        }
-        if (mediaHubPath) { delete [] mediaHubPath; }
-
+        delete d;
     }
 }
 

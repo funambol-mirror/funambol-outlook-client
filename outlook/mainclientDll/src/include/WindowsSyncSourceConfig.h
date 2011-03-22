@@ -62,7 +62,8 @@ private:
     
     /// true if the correspondent Outlook folder will be synced with
     /// all subfolders included.
-    bool  useSubfolders;
+    /// DEPRECATED: using custom property (see CustomConfig)
+    //bool  useSubfolders;
 
     /// 'true' if the source has been synced (TODO: use the SOURCE_STATE).
     bool isSynced;

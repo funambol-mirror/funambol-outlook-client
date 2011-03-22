@@ -42,6 +42,7 @@
 
 #include "sapi/SapiSyncSource.h"
 #include "sapi/FileSapiSyncSource.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -122,12 +123,12 @@ SapiConfig* DefaultWinConfigFactory::getSapiConfig() {
 
     SapiConfig* c = new SapiConfig();
 
-    c->setRequestTimeout        (30);       // 30 sec
-    c->setResponseTimeout       (30);       // 30 sec
-    c->setUploadChunkSize       (30000);    // 30 KByte
-    c->setDownloadChunkSize     (30000);    // 30 KByte
-    c->setMaxRetriesOnError     (2);        // retry 2 times if network error
-    c->setSleepTimeOnRetry      (500);      // wait 500 millisec before retry
+    c->setRequestTimeout        (SAPI_HTTP_REQUEST_TIMEOUT);      // 30 sec
+    c->setResponseTimeout       (SAPI_HTTP_RESPONSE_TIMEOUT);     // 30 sec
+    c->setUploadChunkSize       (SAPI_HTTP_UPLOAD_CHUNK_SIZE);    // 30 KByte
+    c->setDownloadChunkSize     (SAPI_HTTP_DOWNLOAD_CHUNK_SIZE);  // 30 KByte
+    c->setMaxRetriesOnError     (SAPI_MAX_RETRY_ON_ERROR);        // retry 2 times if network error
+    c->setSleepTimeOnRetry      (SAPI_SLEEP_TIME_ON_RETRY);       // wait 500 millisec before retry
 
     return c;
 }
@@ -199,14 +200,13 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
         sc->setSupportedTypes   ("application/*");
         sc->setIsEnabled        (PICTURE_SOURCE_ENABLED);
-        
-        sc->setProperty         (PROPERTY_USE_SAPI, "1");
-        sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP, "0");
+        sc->setBoolProperty     (PROPERTY_USE_SAPI,                     true);
+        sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP,     "0");
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
-        sc->setProperty         (PROPERTY_EXTENSION, PICT_EXTENSION);
-        sc->setProperty         (PROPERTY_MEDIAHUB_PATH, "");  
-        sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE, "98%");
+        sc->setProperty         (PROPERTY_EXTENSION,                     PICT_EXTENSION);
+        sc->setProperty         (PROPERTY_MEDIAHUB_PATH,                 "");  
+        sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE,           SAPI_LOCAL_QUOTA_STORAGE);
     }
     else if (wname == VIDEO){
         sc->setSync             (DEFAULT_VIDEOS_SYNC_MODE);
@@ -217,13 +217,13 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
         sc->setSupportedTypes   ("application/*");
         sc->setIsEnabled        (VIDEO_SOURCE_ENABLED);        
-        sc->setProperty         (PROPERTY_USE_SAPI, "1");
-        sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP, "0");
+        sc->setBoolProperty     (PROPERTY_USE_SAPI,                     true);
+        sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP,     "0");
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
-        sc->setProperty         (PROPERTY_EXTENSION, VIDEO_EXTENSION);
-        sc->setProperty         (PROPERTY_MEDIAHUB_PATH, "");  
-        sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE, "98%");
+        sc->setProperty         (PROPERTY_EXTENSION,                    VIDEO_EXTENSION);
+        sc->setProperty         (PROPERTY_MEDIAHUB_PATH,                "");  
+        sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE,          SAPI_LOCAL_QUOTA_STORAGE);
     }
     else if (wname == FILES){
         sc->setSync             (DEFAULT_FILES_SYNC_MODE);
@@ -234,13 +234,13 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setEncoding         ("bin");                                 // not really used, as it's detected from each item received
         sc->setSupportedTypes   ("application/*");
         sc->setIsEnabled        (FILE_SOURCE_ENABLED);        
-        sc->setProperty         (PROPERTY_USE_SAPI, "1");
-        sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP, "0");
+        sc->setBoolProperty     (PROPERTY_USE_SAPI,                     true);
+        sc->setProperty         (PROPERTY_DOWNLOAD_LAST_TIME_STAMP,     "0");
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_CLIENT, -1);
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
-        sc->setProperty         (PROPERTY_EXTENSION, FILE_EXTENSION);
-        sc->setProperty         (PROPERTY_MEDIAHUB_PATH, "");  
-        sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE, "98%");
+        sc->setProperty         (PROPERTY_EXTENSION,                    FILE_EXTENSION);
+        sc->setProperty         (PROPERTY_MEDIAHUB_PATH,                "");  
+        sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE,          SAPI_LOCAL_QUOTA_STORAGE);
     }
 
     if (name) delete [] name;
@@ -254,9 +254,15 @@ WindowsSyncSourceConfig* DefaultWinConfigFactory::getWinSyncSourceConfig(const w
 
     WindowsSyncSourceConfig* wsc = new WindowsSyncSourceConfig(sc);
 
-    wsc->setUseSubfolders       (DLLCustomization::defaultUseSubfolders);
-    wsc->setFolderPath          ("");
-    wsc->setEndTimestamp        (0);
+    StringBuffer name;
+    name.convert(wname.c_str());
+    if (isPIMSource(name.c_str())) {
+        // Only PIM!
+        wsc->setUseSubfolders(DLLCustomization::defaultUseSubfolders);
+        wsc->setFolderPath("");
+    }
+
+    wsc->setEndTimestamp(0);
 
     // Date filtering, set defaults.
     if (wname == APPOINTMENT) {

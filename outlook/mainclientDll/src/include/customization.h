@@ -94,10 +94,22 @@
 #define MAX_LOG_SIZE                        3000000                     /**< 3 MB          */
 #define MAX_SYNCML_MSG_SIZE                 125000                      /**< [bytes], the max syncML message size. default = 125KB */
 #define RESPONSE_TIMEOUT                    900                         /**< [seconds], the HTTP timeout on Server response. default = 15 minutes */
+
+// SAPI media props
 #define DYNAMICALLY_SHOW_PICTURES           0                           /**< if 1, will automatically show/hide the pictures panel, at the end of sync */
-#define MAX_IMAGE_SIZE                      0                           /**< max size of pictures to upload [KBytes]. 0 means unlimited. */
-#define MAX_VIDEO_SIZE                      0                           /**< max size of videos to upload [KBytes]. 0 means unlimited. */
-#define MAX_FILE_SIZE                       0                           /**< max size of files to upload [KBytes]. 0 means unlimited. */
+#define SAPI_LOCAL_QUOTA_STORAGE            "98%"                       /**< the max local storage for all media sources */
+#define SAPI_HTTP_REQUEST_TIMEOUT           30                          /**< 30 sec    */
+#define SAPI_HTTP_RESPONSE_TIMEOUT          30                          /**< 30 sec    */
+#define SAPI_HTTP_UPLOAD_CHUNK_SIZE         30000                       /**< 30 KByte  */
+#define SAPI_HTTP_DOWNLOAD_CHUNK_SIZE       30000                       /**< 30 KByte  */
+#define SAPI_MAX_RETRY_ON_ERROR             2                           /**< 2 retries */
+#define SAPI_SLEEP_TIME_ON_RETRY            500                         /**< 0.5 sec   */
+#define SAPI_MAX_PICTURE_SIZE               0                           /**< max size of pictures [KBytes]. 0 means unlimited. */
+#define SAPI_MAX_VIDEO_SIZE                 0                           /**< max size of videos   [KBytes]. 0 means unlimited. */
+#define SAPI_MAX_FILE_SIZE                  0                           /**< max size of files    [KBytes]. 0 means unlimited. */
+#define PICT_EXTENSION                      ".jpg,.jpeg,.jpe,.gif,.png,.jfif,.jif,.bmp,.tiff,.tif"
+#define VIDEO_EXTENSION                     ".wmv,.mp4,.mov,.3g2,.mpeg,.mpg,.mpe,.asf,.movie,.avi,.mpa,.mp2,.m4u,.m4v,.swf,.flv"
+#define FILE_EXTENSION                      "!" PICT_EXTENSION "," VIDEO_EXTENSION
 
 #define SOURCE_ORDER_IN_REGISTRY            "contact,appointment,task,note,picture,video,files"
 

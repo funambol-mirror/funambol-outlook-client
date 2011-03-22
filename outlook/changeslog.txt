@@ -1,3 +1,8 @@
+2011-03-22
+  - toccy: fixed upgrade procedure
+           removed WindowsSyncSourceConfig internal params, now proxy methods to CustomConfig stringmap
+           added sapi params to customization.h
+
 2011-03-21
   - toccy: reintegrated branch US7483: online and local quota full
            - added 2 new source states in case of online quota exceeded and local storage full

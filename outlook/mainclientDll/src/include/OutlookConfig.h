@@ -182,6 +182,13 @@ private:
     void savePropertyValue(const StringBuffer& context, const StringBuffer& name, const StringBuffer& value);
 
     /**
+     * Used to delete a generic property from config (win registry, under HKCU node).
+     * @param context  the full context (i.e. "Software/Funambol/OutlookClient/spds/syncml/DevDetail")
+     * @param name     the property name
+     */
+    void deletePropertyValue(const char* context, const char* propertyName);
+
+    /**
     * The parameters related to the update procedure
     */
     UpdaterConfig updaterConfig;
@@ -312,7 +319,7 @@ public:
     void saveBeginSync();
 
     /// Save the Funambol sw version to config ("_root_/syncML/devDetail/funambol_swv" key)
-    void OutlookConfig::saveFunambolSwv();
+    void saveFunambolSwv();
     
     /// Save only "sync" properties of each source, to win registry.
     void saveSyncModes();

@@ -70,9 +70,6 @@ SyncSourceConfig* WindowsSyncSourceConfig::getCommonConfig() {
     return s;
 }
 
-//
-// Internal properties
-//
 _declspec(dllexport) const char* WindowsSyncSourceConfig::getFolderPath() const  {        
     return s->getProperty(PROPERTY_FOLDER_PATH);    
 }
@@ -81,10 +78,15 @@ void WindowsSyncSourceConfig::setFolderPath(const char* v) {
 }
 
 _declspec(dllexport) bool WindowsSyncSourceConfig::getUseSubfolders() const {
-    return useSubfolders;
+    bool err;
+    bool ret = s->getBoolProperty(PROPERTY_USE_SUBFOLDERS, &err);
+    if (err) {
+        ret = false;
+    }
+    return ret;
 }
 void WindowsSyncSourceConfig::setUseSubfolders(bool v) {
-    useSubfolders = v;
+    s->setBoolProperty(PROPERTY_USE_SUBFOLDERS, v);
 }
 
 
@@ -111,9 +113,7 @@ WindowsSyncSourceConfig::WindowsSyncSourceConfig(const WindowsSyncSourceConfig& 
     // WARNING! pointer to the same object!
     s = wsc.s;
 
-    setUseSubfolders (wsc.getUseSubfolders ()); 
-    setEndTimestamp  (wsc.getEndTimestamp  ());
-    setIsSynced      (wsc.getIsSynced      ());
+    setIsSynced(wsc.getIsSynced());
 	populateCTCap();
 }
 
@@ -127,12 +127,9 @@ WindowsSyncSourceConfig& WindowsSyncSourceConfig::operator = (const WindowsSyncS
 
     // WARNING! pointer to the same object!
     s = wsc.s;
-    
-    setUseSubfolders (wsc.getUseSubfolders ()); 
-    setEndTimestamp  (wsc.getEndTimestamp  ());
-    setIsSynced      (wsc.getIsSynced      ());
 
-    
+    setIsSynced(wsc.getIsSynced());
+
     dateFilter = ((WindowsSyncSourceConfig&)wsc).getDateFilter();
 	
 	populateCTCap();
@@ -167,7 +164,6 @@ bool WindowsSyncSourceConfig::getIsRefreshMode() const {
 void WindowsSyncSourceConfig::initialize() {
 
     s               = NULL;
-    useSubfolders   = false;
     isSynced        = false;
 }
 

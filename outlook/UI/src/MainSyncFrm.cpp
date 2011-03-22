@@ -505,6 +505,7 @@ void CMainSyncFrame::showSettingsWindow(const int paneToDisplay){
 
     CSingleDocTemplate* docSettings = ((COutlookPluginApp*)AfxGetApp())->docSettings;
 
+    // please... why?
     getConfig()->read();
 
     pDoc = docSettings->CreateNewDocument();
