@@ -57,16 +57,11 @@ IMPLEMENT_DYNCREATE(CSyncForm, CFormView)
 
 static int getLastSourceState(const char* sourceName) {
 
-    int ret = SYNCSOURCE_STATE_OK;
     WindowsSyncSourceConfig* ssc = getConfig()->getSyncSourceConfig(sourceName);
-    if (!ssc) return ret;
+    if (!ssc) return SYNCSOURCE_STATE_OK;
 
     int error = ssc->getCommonConfig()->getLastSourceError(); 
-
-    if      (error == 0) { ret = SYNCSOURCE_STATE_OK; }
-    else if (error == 2) { ret = SYNCSOURCE_STATE_CANCELED; }
-    else                 { ret = SYNCSOURCE_STATE_NOT_SYNCED; }  // means "source error"
-
+    int ret = manageWinErrors(error);
     return ret;
 }
 
@@ -864,7 +859,7 @@ void CSyncForm::refreshSource( int sourceId )
 
 
         // check if the last sync failed
-        if( syncSourceContactState == SYNCSOURCE_STATE_NOT_SYNCED){
+        if( syncSourceContactState == SYNCSOURCE_STATE_FAILED){
             s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
             iconStatusContacts.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
             paneContacts.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
@@ -933,7 +928,7 @@ void CSyncForm::refreshSource( int sourceId )
         }
 
         // check if the last sync failed
-        if(syncSourceCalendarState == SYNCSOURCE_STATE_NOT_SYNCED){
+        if(syncSourceCalendarState == SYNCSOURCE_STATE_FAILED){
             s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
             iconStatusCalendar.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
             paneCalendar.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
@@ -1000,7 +995,7 @@ void CSyncForm::refreshSource( int sourceId )
         }
 
         // check if the last sync failed
-        if(syncSourceTaskState == SYNCSOURCE_STATE_NOT_SYNCED){
+        if(syncSourceTaskState == SYNCSOURCE_STATE_FAILED){
             s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
             iconStatusTasks.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
             paneTasks.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
@@ -1064,7 +1059,7 @@ void CSyncForm::refreshSource( int sourceId )
         lastSyncNotes = getConfig()->getSyncSourceConfig(NOTE_)->getEndTimestamp();
 
         // check if the last sync failed
-        if(syncSourceNoteState == SYNCSOURCE_STATE_NOT_SYNCED){
+        if(syncSourceNoteState == SYNCSOURCE_STATE_FAILED){
             s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
             iconStatusNotes.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
             paneNotes.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
@@ -1144,25 +1139,38 @@ void CSyncForm::refreshSource( int sourceId )
             lastSyncPictures = config->getEndTimestamp();
         }
 
-        // check if the last sync failed
-        if (syncSourcePictureState == SYNCSOURCE_STATE_NOT_SYNCED){
-            s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
+        // set the warning icon
+        if (syncSourcePictureState != SYNCSOURCE_STATE_OK) {
             iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
             panePictures.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
         }
-        // check if the last sync failed
-        else if (syncSourcePictureState == SYNCSOURCE_STATE_CANCELED){
-            s1.LoadString(IDS_MAIN_LAST_SYNC_CANCELED);
-            iconStatusPictures.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
-            panePictures.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
-        }
-        else if (lastSyncPictures == 0) {
-            s1.LoadString(IDS_NOT_SYNCHRONIZED); 
-        }
-        else {
-            CTime timeSyncPictures(lastSyncPictures);
-            s1.LoadString(IDS_SYNCHRONIZED); s1+= " ";
-            s1 += timeSyncPictures.Format(LAST_SYNC_TIME_FORMAT);
+
+        // update the UI source status
+        switch (syncSourcePictureState) {
+            case SYNCSOURCE_STATE_OK:
+                if (lastSyncPictures == 0) {
+                    s1.LoadString(IDS_NOT_SYNCHRONIZED); 
+                } else {
+                    CTime timeSyncPictures(lastSyncPictures);
+                    s1.LoadString(IDS_SYNCHRONIZED); s1+= " ";
+                    s1 += timeSyncPictures.Format(LAST_SYNC_TIME_FORMAT);
+                }
+                break;
+            case SYNCSOURCE_STATE_FAILED:
+                s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
+                break;
+            case SYNCSOURCE_STATE_CANCELED:
+                s1.LoadString(IDS_MAIN_LAST_SYNC_CANCELED);
+                break;
+            case SYNCSOURCE_STATE_QUOTA_EXCEEDED:
+                s1.LoadString(IDS_STATUS_QUOTA_EXCEEDED);
+                break;
+            case SYNCSOURCE_STATE_STORAGE_FULL:
+                s1.LoadString(IDS_STATUS_STORAGE_FULL);
+                break;
+            default:
+                s1 = "";
+                break;
         }
         changePicturesStatus(s1);
         SetDlgItemText(IDC_MAIN_STATIC_PICTURES, picturesLabel);    // Set directly here, pane could be disabled
@@ -1217,25 +1225,38 @@ void CSyncForm::refreshSource( int sourceId )
             lastSyncVideos = config->getEndTimestamp();
         }
 
-        // check if the last sync failed
-        if (syncSourceVideoState == SYNCSOURCE_STATE_NOT_SYNCED){
-            s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
+        // set the warning icon
+        if (syncSourceVideoState != SYNCSOURCE_STATE_OK) {
             iconStatusVideos.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
             paneVideos.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
         }
-        // check if the last sync failed
-        else if (syncSourceVideoState == SYNCSOURCE_STATE_CANCELED){
-            s1.LoadString(IDS_MAIN_LAST_SYNC_CANCELED);
-            iconStatusVideos.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
-            paneVideos.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
-        }
-        else if (lastSyncVideos == 0) {
-            s1.LoadString(IDS_NOT_SYNCHRONIZED); 
-        }
-        else {
-            CTime timeSyncVideos(lastSyncVideos);
-            s1.LoadString(IDS_SYNCHRONIZED); s1+= " ";
-            s1 += timeSyncVideos.Format(LAST_SYNC_TIME_FORMAT);
+
+        // update the UI source status
+        switch (syncSourceVideoState) {
+            case SYNCSOURCE_STATE_OK:
+                if (lastSyncVideos == 0) {
+                    s1.LoadString(IDS_NOT_SYNCHRONIZED); 
+                } else {
+                    CTime timeSyncVideos(lastSyncVideos);
+                    s1.LoadString(IDS_SYNCHRONIZED); s1+= " ";
+                    s1 += timeSyncVideos.Format(LAST_SYNC_TIME_FORMAT);
+                }
+                break;
+            case SYNCSOURCE_STATE_FAILED:
+                s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
+                break;
+            case SYNCSOURCE_STATE_CANCELED:
+                s1.LoadString(IDS_MAIN_LAST_SYNC_CANCELED);
+                break;
+            case SYNCSOURCE_STATE_QUOTA_EXCEEDED:
+                s1.LoadString(IDS_STATUS_QUOTA_EXCEEDED);
+                break;
+            case SYNCSOURCE_STATE_STORAGE_FULL:
+                s1.LoadString(IDS_STATUS_STORAGE_FULL);
+                break;
+            default:
+                s1 = "";
+                break;
         }
         changeVideosStatus(s1);
         SetDlgItemText(IDC_MAIN_STATIC_VIDEOS, videosLabel);    // Set directly here, pane could be disabled
@@ -1288,25 +1309,38 @@ void CSyncForm::refreshSource( int sourceId )
             lastSyncFiles = config->getEndTimestamp();
         }
 
-        // check if the last sync failed
-        if (syncSourceFileState == SYNCSOURCE_STATE_NOT_SYNCED){
-            s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
+        // set the warning icon
+        if (syncSourceFileState != SYNCSOURCE_STATE_OK) {
             iconStatusFiles.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
             paneFiles.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
         }
-        // check if the last sync failed
-        else if (syncSourceFileState == SYNCSOURCE_STATE_CANCELED){
-            s1.LoadString(IDS_MAIN_LAST_SYNC_CANCELED);
-            iconStatusFiles.SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT)));
-            paneFiles.hPrevStatusIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ALERT));
-        }
-        else if (lastSyncFiles == 0) {
-            s1.LoadString(IDS_NOT_SYNCHRONIZED); 
-        }
-        else {
-            CTime timeSyncFiles(lastSyncFiles);
-            s1.LoadString(IDS_SYNCHRONIZED); s1+= " ";
-            s1 += timeSyncFiles.Format(LAST_SYNC_TIME_FORMAT);
+
+        // update the UI source status
+        switch (syncSourceFileState) {
+            case SYNCSOURCE_STATE_OK:
+                if (lastSyncFiles == 0) {
+                    s1.LoadString(IDS_NOT_SYNCHRONIZED); 
+                } else {
+                    CTime timeSyncFiles(lastSyncFiles);
+                    s1.LoadString(IDS_SYNCHRONIZED); s1+= " ";
+                    s1 += timeSyncFiles.Format(LAST_SYNC_TIME_FORMAT);
+                }
+                break;
+            case SYNCSOURCE_STATE_FAILED:
+                s1.LoadString(IDS_MAIN_LAST_SYNC_FAILED);
+                break;
+            case SYNCSOURCE_STATE_CANCELED:
+                s1.LoadString(IDS_MAIN_LAST_SYNC_CANCELED);
+                break;
+            case SYNCSOURCE_STATE_QUOTA_EXCEEDED:
+                s1.LoadString(IDS_STATUS_QUOTA_EXCEEDED);
+                break;
+            case SYNCSOURCE_STATE_STORAGE_FULL:
+                s1.LoadString(IDS_STATUS_STORAGE_FULL);
+                break;
+            default:
+                s1 = "";
+                break;
         }
         changeFilesStatus(s1);
         SetDlgItemText(IDC_MAIN_STATIC_FILES, filesLabel);    // Set directly here, pane could be disabled

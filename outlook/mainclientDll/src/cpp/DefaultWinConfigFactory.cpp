@@ -126,6 +126,8 @@ SapiConfig* DefaultWinConfigFactory::getSapiConfig() {
     c->setResponseTimeout       (30);       // 30 sec
     c->setUploadChunkSize       (30000);    // 30 KByte
     c->setDownloadChunkSize     (30000);    // 30 KByte
+    c->setMaxRetriesOnError     (2);        // retry 2 times if network error
+    c->setSleepTimeOnRetry      (500);      // wait 500 millisec before retry
 
     return c;
 }
@@ -204,6 +206,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
         sc->setProperty         (PROPERTY_EXTENSION, PICT_EXTENSION);
         sc->setProperty         (PROPERTY_MEDIAHUB_PATH, "");  
+        sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE, "98%");
     }
     else if (wname == VIDEO){
         sc->setSync             (DEFAULT_VIDEOS_SYNC_MODE);
@@ -220,6 +223,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
         sc->setProperty         (PROPERTY_EXTENSION, VIDEO_EXTENSION);
         sc->setProperty         (PROPERTY_MEDIAHUB_PATH, "");  
+        sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE, "98%");
     }
     else if (wname == FILES){
         sc->setSync             (DEFAULT_FILES_SYNC_MODE);
@@ -236,6 +240,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setIntProperty      (PROPERTY_SYNC_ITEM_NUMBER_FROM_SERVER, -1);
         sc->setProperty         (PROPERTY_EXTENSION, FILE_EXTENSION);
         sc->setProperty         (PROPERTY_MEDIAHUB_PATH, "");  
+        sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE, "98%");
     }
 
     if (name) delete [] name;

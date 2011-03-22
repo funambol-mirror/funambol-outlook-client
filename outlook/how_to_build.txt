@@ -37,7 +37,7 @@ How to build the Funambol Outlook Sync Client
         http://www.java2s.com/Code/Jar/cocoon-2.1.10/Downloadantcontrib06jar.htm
       * Copy the jar file under the folder "<ant-installation-dir>\lib" 
 
-    - NSIS (Nullsoft Scriptable Install System), version 2.40 or higher
+    - NSIS (Nullsoft Scriptable Install System), version 2.46 or higher
       Can be downloaded from: http://nsis.sourceforge.net
    
     - Doxygen (http://www.stack.nl/~dimitri/doxygen/download.html) 

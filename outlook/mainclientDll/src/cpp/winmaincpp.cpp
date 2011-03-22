@@ -84,7 +84,7 @@ bool isScheduledSync = false;
 bool resetLog        = false;
 void launchSyncClient();
 
-int synchronizeSapi(SapiSyncSource& sapiSource);
+int synchronizeSapi(SapiSyncSource& sapiSource, SyncReport& report);
 
 /**
  * Returns a pointer to the OutlookConfig object (singleton).
@@ -310,7 +310,7 @@ int startSync() {
         setErrorF(getLastErrorCode(), ERR_THREAD_PRIORITY, code, msg);
         delete [] msg;
         LOG.error(getLastErrorMsg());
-        return 1;
+        return WIN_ERR_GENERIC;
     }
 
     //
@@ -356,6 +356,14 @@ int startSync() {
         }
     }
 
+    // Exit if no sources to sync
+    if (sources.size() == 0) {
+        //safeMessageBox(MSGBOX_NO_SOURCES_TO_SYNC);
+        setError(WIN_ERR_NO_SOURCES, ERR_NO_SOURCES_TO_SYNC);
+        ret = WIN_ERR_NO_SOURCES;
+        goto finally;
+    }
+    
     for (int i=0; i< sources.size(); i++) {
         StringBuffer* name = (StringBuffer*)sources.get(i);
         if (isMediaSource(name->c_str())) {            
@@ -370,17 +378,8 @@ int startSync() {
                 ::SendMessage(dd, ID_MYMSG_CHECK_MEDIA_HUB_FOLDER, 0, 0);
                 goto finally;           
             }
-        }        
+        }
     }
-
-    // Exit if no sources to sync
-    if (sources.size() == 0) {
-        //safeMessageBox(MSGBOX_NO_SOURCES_TO_SYNC);
-        setError(ERR_CODE_NO_SOURCES, ERR_NO_SOURCES_TO_SYNC);
-        ret = ERR_CODE_NO_SOURCES;
-        goto finally;
-    }
-        
 
     if (syncingPIM) {
         //
@@ -448,6 +447,7 @@ int startSync() {
     // --------------------------------------------------
     // Kick off the sync: one source at time
     for (int i=0; i< sources.size(); i++) {
+        int res = 0;    // it's the sync result for this source
         StringBuffer* name = (StringBuffer*)sources.get(i);
         if (!name) continue;
 
@@ -459,7 +459,7 @@ int startSync() {
         {
             // --- Media source ---
             FileSapiSyncSource source(*ssconfig, ssReport, 0);
-            ret |= synchronizeSapi(source);
+            res = synchronizeSapi(source, report);
 
             report.addSyncSourceReport(source.getReport());
         }
@@ -469,15 +469,15 @@ int startSync() {
             wname = *name;
             WindowsSyncSource source(wname.c_str(), wssconfig);
             WindowsSyncClient winClient(source);
-            ret |= synchronize(winClient, source);
+            res = synchronize(winClient, source);
 
             report.addSyncSourceReport(*source.getReport());
         }
 
-        if (ret) {
-            // Update the sync report
+        if (res) {
+            // Update the sync report (global error for all syncs!)
             SyncSourceReport* ssr = report.getSyncSourceReport(name->c_str());
-            report.setLastErrorCode(ssr->getLastErrorCode());
+            report.setLastErrorCode(res);
             report.setLastErrorMsg (ssr->getLastErrorMsg());
             report.setLastErrorType(ERROR_TYPE_WINDOWS_CLIENT);
             LOG.error("Sync of %s completed with error %s%d: %s", name->c_str(), ssr->getLastErrorType(),
@@ -487,23 +487,36 @@ int startSync() {
         }
 
         // for these codes, we stop all the queued syncs
-        if (ret == 401  || ret == 407 ||        // authentication error
-            ret == 2001 || ret == 2060) {       // host/server name is wrong
+        if (res == WIN_ERR_INVALID_CREDENTIALS || 
+            res == WIN_ERR_PROXY_AUTH_REQUIRED ||  
+            res == WIN_ERR_WRONG_HOST_NAME) { 
             break;
         }
     }
     // --------------------------------------------------
 
-
 finally:
+
+    // This is the global error, for all sources.
+    // It is used to show popups in case of error!
+    ret = report.getLastErrorCode();
 
     endSync();
 
+    // Sync was canceled: fix the return code to avoid popups
     if (ret && config->getAbortSync()) {
-        // Sync was canceled: fix the return code to avoid msgbox
-        ret = 2;
+        ret = WIN_ERR_SYNC_CANCELED;
         report.setLastErrorCode(ret);
         report.setLastErrorMsg("Sync canceled by the user");
+    }
+
+    // Don't want to bother the user with a popup for these errors 
+    // if it's an automatic sync
+    if (isScheduledSync) {
+        if ( ret == WIN_ERR_SERVER_QUOTA_EXCEEDED || 
+             ret == WIN_ERR_LOCAL_STORAGE_FULL ) {
+            ret = 0;
+        }
     }
 
     // set the last global error
@@ -516,10 +529,9 @@ finally:
     LOG.info("\n%s", reportMsg.c_str());
 
     // check for updates (skip in case of network error / sync aborted)
-    if (ret != 2    && 
-        ret != 2050 && 
-        ret != 2001 && 
-        ret != 2060) {
+    if (ret != WIN_ERR_SYNC_CANCELED  && 
+        ret != WIN_ERR_NETWORK_ERROR  && 
+        ret != WIN_ERR_WRONG_HOST_NAME) {
         if (checkUpdate()) {
             updateProcedure(HwndFunctions::getWindowHandle(), false);
         }
@@ -533,7 +545,7 @@ finally:
 }
 
 
-int synchronizeSapi(SapiSyncSource& sapiSource) {
+int synchronizeSapi(SapiSyncSource& sapiSource, SyncReport& report) {
 
     int ret = 0;
     SyncMode syncMode = syncModeCode(sapiSource.getConfig().getSync());
@@ -542,10 +554,9 @@ int synchronizeSapi(SapiSyncSource& sapiSource) {
     StringBuffer name = sapiSource.getConfig().getName();
     int sourceID = syncSourceNameToIndex(name);
     if (!sourceID) {
-        return -1;
+        return WIN_ERR_GENERIC;
     }
 
-    //LOG.debug("\n********** Start sync for source '%s' **********", name.c_str());
     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_BEGIN, NULL, (LPARAM)sourceID);
 
     // ---------------------------------------------
@@ -556,19 +567,47 @@ int synchronizeSapi(SapiSyncSource& sapiSource) {
         goto finally;
     }
 
-    if (syncMode == SYNC_TWO_WAY || syncMode == SYNC_ONE_WAY_FROM_CLIENT) {
-        ret = sapiManager.upload();
-        config->saveSyncSourceConfig(name.c_str());
+    // UPLOAD
+    if (syncMode == SYNC_TWO_WAY || 
+        syncMode == SYNC_ONE_WAY_FROM_CLIENT) {
+        if (report.getLastErrorCode() != WIN_ERR_SERVER_QUOTA_EXCEEDED) {
+            ret = sapiManager.upload();
+            config->saveSyncSourceConfig(name.c_str());
+        } else {
+            sapiSource.getReport().setState(SOURCE_ERROR);
+            sapiSource.getReport().setLastErrorCode(ESSMServerQuotaExceeded);
+            sapiSource.getReport().setLastErrorType(ERROR_TYPE_SAPI_SYNC_MANAGER);
+            sapiSource.getReport().setLastErrorMsg("Upload skipped: quota exceeded for a previous source");
+            LOG.info("%s", sapiSource.getReport().getLastErrorMsg());
+        }
+    }
+    if (ret == ESSMCanceled || 
+        ret == ESSMNetworkError || 
+        ret == ESSMAuthenticationError) {
+        goto finally;
     }
 
-    if (syncMode == SYNC_TWO_WAY || syncMode == SYNC_ONE_WAY_FROM_SERVER) {
-        ret = sapiManager.download();
-        config->saveSyncSourceConfig(name.c_str());
+    // DOWNLOAD
+    if (syncMode == SYNC_TWO_WAY || 
+        syncMode == SYNC_ONE_WAY_FROM_SERVER) {
+        if (report.getLastErrorCode() != WIN_ERR_LOCAL_STORAGE_FULL) {
+            ret = sapiManager.download();
+            config->saveSyncSourceConfig(name.c_str());
+        } else {
+            sapiSource.getReport().setState(SOURCE_ERROR);
+            sapiSource.getReport().setLastErrorType(ERROR_TYPE_SAPI_SYNC_MANAGER);
+            sapiSource.getReport().setLastErrorCode(ESSMClientQuotaExceeded);
+            sapiSource.getReport().setLastErrorMsg("Download skipped: local storage full for a previous source");
+            LOG.info("%s", sapiSource.getReport().getLastErrorMsg());
+        }
+    }
+    if (ret == ESSMCanceled || 
+        ret == ESSMNetworkError || 
+        ret == ESSMAuthenticationError) {
+        goto finally;
     }
 
-    if (ret != ESSMCanceled && ret != ESSMNetworkError) {
-        ret = sapiManager.endSync();
-    }
+    ret = sapiManager.endSync();
     // ---------------------------------------------
 
 finally:
@@ -600,12 +639,9 @@ finally:
     }
 
     // Fire the SOURCE_STATE message to the UI, to tell the state of sources synced
-    LPARAM sourceState = SYNCSOURCE_STATE_NOT_SYNCED;
-    if (ret == 0) {
-        sourceState = SYNCSOURCE_STATE_OK;
-    } 
-    else if (config->getAbortSync()) {
-        sourceState = SYNCSOURCE_STATE_CANCELED;
+    LPARAM sourceState = ret;
+    if (config->getAbortSync()) {
+        sourceState = WIN_ERR_SYNC_CANCELED;
     }
     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNCSOURCE_END, (WPARAM)sourceID, sourceState);
 
@@ -660,15 +696,15 @@ int synchronize(WindowsSyncClient& winClient, WindowsSyncSource& source) {
 
 
     // Fire the SOURCE_STATE message to the UI, to tell the state of sources synced
-    LPARAM sourceState = SYNCSOURCE_STATE_NOT_SYNCED;
+    LPARAM sourceState = ret;
     SyncSourceReport* ssReport = source.getReport();
     if (ssReport) {
         if ((ssReport->getState() != SOURCE_ERROR) && source.getConfig().getIsSynced()) {
-            sourceState = SYNCSOURCE_STATE_OK;
+            sourceState = WIN_ERR_NONE;
         }
     }
     if (config->getAbortSync()) {
-        sourceState = SYNCSOURCE_STATE_CANCELED;
+        sourceState = WIN_ERR_SYNC_CANCELED;
     }
 
     // Finally: unlock buttons
@@ -884,15 +920,15 @@ void softTerminateSync() {
 int hardTerminateSync(HANDLE hSyncThread) {
 
     // (code 4 = thread terminated)
-    if (!TerminateThread(hSyncThread, 4)) {
+    if (!TerminateThread(hSyncThread, WIN_ERR_THREAD_TERMINATED)) {
         char* msg = readSystemErrorMsg();
-        setErrorF(4, ERR_THREAD_NOT_TERMINATED, msg);
+        setErrorF(WIN_ERR_THREAD_TERMINATED, ERR_THREAD_NOT_TERMINATED, msg);
         LOG.error(getLastErrorMsg());
         delete [] msg;
         return 1;
     }
 
-    setErrorF(2, INFO_SYNC_ABORTED_BY_USER);    // code 2 = sync aborted by the user
+    setErrorF(WIN_ERR_SYNC_CANCELED, INFO_SYNC_ABORTED_BY_USER);
     LOG.info(getLastErrorMsg());
     LOG.debug(DBG_THREAD_TERMINATED);
     return 0;
@@ -927,6 +963,7 @@ int exitSyncThread(int code) {
 
 
 /**
+ * --- DEPRECATED: cohoperative stop is implemented ---
  * Check if synchronization session has been intentionally aborted.
  * A flag 'abortSync' inside OutlookConfig singleton object is used to
  * indicate that the user wants to abort the sync.
@@ -948,7 +985,7 @@ void checkAbortedSync() {
         setErrorF(getLastErrorCode(), INFO_SYNC_ABORTED_BY_USER);
         LOG.info(getLastErrorMsg());
         config->setAbortSync(false);
-        throwSyncException(getLastErrorMsg(), 2);
+        throwSyncException(getLastErrorMsg(), WIN_ERR_SYNC_CANCELED);
     }
 }
 
@@ -1402,22 +1439,28 @@ int manageSapiError(const int code) {
     switch (error) {
         case ESSMSuccess:
         {
-            return 0;       // OK
+            return WIN_ERR_NONE;                    // 0: OK
         }
         case ESSMCanceled:
         {
-            return 2;       // Sync aborted by the user
+            return WIN_ERR_SYNC_CANCELED;           // 2: Sync aborted by the user
         }
         case ESSMNetworkError:
         {
-            return 2050;    // Network error
+            return WIN_ERR_NETWORK_ERROR;           // 2050
         }
         case ESSMAuthenticationError:
         {
-            return 401;     // Invalid credentials
+            return WIN_ERR_INVALID_CREDENTIALS;     // 401
         }
-        case ESSMServerQuotaExceeded:       // TODO: manage quota
-        case ESSMClientQuotaExceeded:       // TODO: manage quota
+        case ESSMServerQuotaExceeded:
+        {
+            return WIN_ERR_SERVER_QUOTA_EXCEEDED;   // 8
+        }
+        case ESSMClientQuotaExceeded:
+        {
+            return WIN_ERR_LOCAL_STORAGE_FULL;      // 9
+        }
         case ESSMSourceNotSupported:
         case ESSMConfigError:
         case ESSMBeginSyncError:
@@ -1428,7 +1471,7 @@ int manageSapiError(const int code) {
         case ESSMSapiError:
         default:
         {
-            return 1;       // generic error
+            return WIN_ERR_GENERIC;                 // 1: generic error
         }
     }
 }

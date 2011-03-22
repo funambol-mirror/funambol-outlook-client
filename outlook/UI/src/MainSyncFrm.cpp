@@ -402,14 +402,14 @@ DWORD WINAPI syncThread(LPVOID lpParam) {
         CStringA s1 = "Unexpected STL exception: ";
         s1.Append(e.what());
         printLog(s1.GetBuffer(), LOG_ERROR);
-        ret = 7;
+        ret = WIN_ERR_UNEXPECTED_STL_EXCEPTION;        // code 7
     }
     catch(...) {
         // Catch other unexpected exceptions.
         CStringA s1;
         s1.LoadString(IDS_UNEXPECTED_EXCEPTION);
         printLog(s1.GetBuffer(), LOG_ERROR);
-        ret = 6;            // code 6 = unexpected exception
+        ret = WIN_ERR_UNEXPECTED_EXCEPTION;            // code 6
     }
 
 
@@ -1077,25 +1077,25 @@ LRESULT CMainSyncFrame::OnMsgStartsyncEnded(WPARAM wParam, LPARAM lParam) {
         exitCode == 6 ||
         exitCode == 7) {
         if (!getConfig()->getSyncSourceConfig(CONTACT_)->isEnabled()) {
-            mainForm->syncSourceContactState = SYNCSOURCE_STATE_NOT_SYNCED;
+            mainForm->syncSourceContactState = SYNCSOURCE_STATE_FAILED;
         }
         if (!getConfig()->getSyncSourceConfig(APPOINTMENT_)->isEnabled()) {
-            mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_NOT_SYNCED;
+            mainForm->syncSourceCalendarState = SYNCSOURCE_STATE_FAILED;
         }
         if (!getConfig()->getSyncSourceConfig(TASK_)->isEnabled()) {
-            mainForm->syncSourceTaskState = SYNCSOURCE_STATE_NOT_SYNCED;
+            mainForm->syncSourceTaskState = SYNCSOURCE_STATE_FAILED;
         }
         if (!getConfig()->getSyncSourceConfig(NOTE_)->isEnabled()) {
-            mainForm->syncSourceNoteState = SYNCSOURCE_STATE_NOT_SYNCED;
+            mainForm->syncSourceNoteState = SYNCSOURCE_STATE_FAILED;
         }
         if (!getConfig()->getSyncSourceConfig(PICTURE_)->isEnabled()) {
-            mainForm->syncSourcePictureState = SYNCSOURCE_STATE_NOT_SYNCED;
+            mainForm->syncSourcePictureState = SYNCSOURCE_STATE_FAILED;
         }
         if (!getConfig()->getSyncSourceConfig(VIDEO_)->isEnabled()) {
-            mainForm->syncSourceVideoState = SYNCSOURCE_STATE_NOT_SYNCED;
+            mainForm->syncSourceVideoState = SYNCSOURCE_STATE_FAILED;
         }
         if (!getConfig()->getSyncSourceConfig(FILES_)->isEnabled()) {
-            mainForm->syncSourceFileState = SYNCSOURCE_STATE_NOT_SYNCED;
+            mainForm->syncSourceFileState = SYNCSOURCE_STATE_FAILED;
         }
     }
     else if (exitCode == 5) {
@@ -1522,8 +1522,11 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceEnd(WPARAM wParam, LPARAM lParam) {
     CString s1;
     s1.LoadString(IDS_DONE);
 
+    // translates the sync return code into a source state to update UI.
+    int sourceState = manageWinErrors(lParam);
+
     int iconStatusID = IDI_ALERT;
-    if (lParam == SYNCSOURCE_STATE_OK) {
+    if (sourceState == SYNCSOURCE_STATE_OK) {
         iconStatusID = IDI_OK;
     }
     HICON iconStatus = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(iconStatusID));
@@ -1531,7 +1534,7 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceEnd(WPARAM wParam, LPARAM lParam) {
     if (wParam == SYNCSOURCE_CONTACTS) {
         mainForm->iconStatusContacts.SetIcon(NULL);
         mainForm->iconStatusContacts.StopAnim();
-        mainForm->syncSourceContactState = lParam;
+        mainForm->syncSourceContactState = sourceState;
         mainForm->changeContactsStatus(s1);
         mainForm->iconStatusContacts.SetIcon(iconStatus);
         mainForm->paneContacts.SetBitmap(hBmpLight);
@@ -1540,7 +1543,7 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceEnd(WPARAM wParam, LPARAM lParam) {
     else if (wParam == SYNCSOURCE_CALENDAR) {
         mainForm->iconStatusCalendar.SetIcon(NULL);
         mainForm->iconStatusCalendar.StopAnim();
-        mainForm->syncSourceCalendarState = lParam;
+        mainForm->syncSourceCalendarState = sourceState;
         mainForm->changeCalendarStatus(s1);
         mainForm->iconStatusCalendar.SetIcon(iconStatus);
         mainForm->paneCalendar.SetBitmap(hBmpLight);
@@ -1549,7 +1552,7 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceEnd(WPARAM wParam, LPARAM lParam) {
     else if (wParam == SYNCSOURCE_TASKS) {
         mainForm->iconStatusTasks.SetIcon(NULL);
         mainForm->iconStatusTasks.StopAnim();
-        mainForm->syncSourceTaskState = lParam;
+        mainForm->syncSourceTaskState = sourceState;
         mainForm->changeTasksStatus(s1);
         mainForm->iconStatusTasks.SetIcon(iconStatus);
         mainForm->paneTasks.SetBitmap(hBmpLight);
@@ -1558,7 +1561,7 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceEnd(WPARAM wParam, LPARAM lParam) {
     else if (wParam == SYNCSOURCE_NOTES) {
         mainForm->iconStatusNotes.SetIcon(NULL);
         mainForm->iconStatusNotes.StopAnim();
-        mainForm->syncSourceNoteState = lParam;
+        mainForm->syncSourceNoteState = sourceState;
         mainForm->changeNotesStatus(s1);
         mainForm->iconStatusNotes.SetIcon(iconStatus);
         mainForm->paneNotes.SetBitmap(hBmpLight);
@@ -1567,7 +1570,7 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceEnd(WPARAM wParam, LPARAM lParam) {
     else if (wParam == SYNCSOURCE_PICTURES) {
         mainForm->iconStatusPictures.SetIcon(NULL);
         mainForm->iconStatusPictures.StopAnim();
-        mainForm->syncSourcePictureState = lParam;
+        mainForm->syncSourcePictureState = sourceState;
         mainForm->changePicturesStatus(s1);
         mainForm->iconStatusPictures.SetIcon(iconStatus);
         mainForm->panePictures.SetBitmap(hBmpLight);
@@ -1576,7 +1579,7 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceEnd(WPARAM wParam, LPARAM lParam) {
     else if (wParam == SYNCSOURCE_VIDEOS) {
         mainForm->iconStatusVideos.SetIcon(NULL);
         mainForm->iconStatusVideos.StopAnim();
-        mainForm->syncSourceVideoState = lParam;
+        mainForm->syncSourceVideoState = sourceState;
         mainForm->changeVideosStatus(s1);
         mainForm->iconStatusVideos.SetIcon(iconStatus);
         mainForm->paneVideos.SetBitmap(hBmpLight);
@@ -1585,7 +1588,7 @@ LRESULT CMainSyncFrame::OnMsgSyncSourceEnd(WPARAM wParam, LPARAM lParam) {
    else if (wParam == SYNCSOURCE_FILES) {
         mainForm->iconStatusFiles.SetIcon(NULL);
         mainForm->iconStatusFiles.StopAnim();
-        mainForm->syncSourceFileState = lParam;
+        mainForm->syncSourceFileState = sourceState;
         mainForm->changeFilesStatus(s1);
         mainForm->iconStatusFiles.SetIcon(iconStatus);
         mainForm->paneFiles.SetBitmap(hBmpLight);

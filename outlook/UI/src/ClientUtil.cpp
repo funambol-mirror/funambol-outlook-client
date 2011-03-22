@@ -113,103 +113,104 @@ void manageSyncErrorMsg(long code) {
 
     switch(code) {
 
-        // No error: out
-        case 0: {
+        case WIN_ERR_NONE: {                            // 0: No error
             return;
         }
-        // Generic error -> see log.
-        case 1: {
+        case WIN_ERR_GENERIC: {                         // 1: Generic error -> see log.
             s1.LoadString(IDS_ERROR_SYNC_NOT_COMPLETED);
             break;
         }
-        // Aborted by user (soft termination) -> no msgbox
-        case 2: {
+        case WIN_ERR_SYNC_CANCELED: {                   // 2: Aborted -> no msgbox
             return;
         }
-        
-        case 3:     // Outlook fatal exception              -> force exit the plugin!
-        case 4:     // Thread terminated (hard termination) -> force exit the plugin!
+        case WIN_ERR_FATAL_OL_EXCEPTION:                // 3 -> force exit the plugin!
+        case WIN_ERR_THREAD_TERMINATED:                 // 4 -> force exit the plugin!
         {
             s1.LoadString(IDS_ERROR_SYNC_TERMINATED);
             wsafeMessageBox(s1.GetBuffer());
             exit(1);
         }
-
-        // Aborted by user to avoid full-sync -> no msgbox
-        case 5: {
+        case WIN_ERR_FULL_SYNC_CANCELED: {              // 5 -> deprecated, no msgbox
             return;
         }
-
-        case 6:     // Unexpected exception.
-        case 7:     // Unexpected STL exception.
+        case WIN_ERR_UNEXPECTED_EXCEPTION:              // 6
+        case WIN_ERR_UNEXPECTED_STL_EXCEPTION:          // 7
         {
             s1.LoadString(IDS_UNEXPECTED_EXCEPTION);
             break;
         }
-
-
-        case -10:
-            s1.LoadString(IDS_CODE_NOSOURCE_10); break;             // *** OBSOLETE? ***
-        case -6:
-            s1.LoadString(IDS_CODE_SYNC_STOPPED);break;             // *** OBSOLETE? ***
-
-        case ERR_CODE_FOLDER_PATH_MATCH:
-            s1.LoadString(IDS_CODE_FOLDER_PATH_NOT_FOUND);
+        case WIN_ERR_SERVER_QUOTA_EXCEEDED:             // 8: Server quota exceeded
+        {
+            s1.LoadString(IDS_MEDIA_QUOTA_EXCEEDED);
             break;
-
-        case 402:
-            s1.LoadString(IDS_CODE_AUTH_EXPIRED_402); break;
-        case 403:
-            s1.LoadString(IDS_CODE_FORBIDDEN_403);    break;
-
-        case 404:       // Remote name of some source is wrong
-            s1.LoadString(IDS_CODE_NOTFOUND_404); break;
-        case 407:
-        case 401:
-            s1.LoadString(IDS_CODE_INVALID_CREDENTIALS_401); break;
-
-        case 417:       // Retry later
-            s1.LoadString(IDS_CODE_SERVER_BUSY); break;
-        case 503:       // Service unavailable (another sync in progress)
-            s1.LoadString(IDS_CODE_SERVER_BUSY_SYNC); break;
-
-        case 2001:      // Host name is wrong
-        case 2060:      // Server path is wrong
-            s1.LoadString(IDS_CODE_ERROR_CONNECT_2001); break;
-        case 2061:      // Server timeout
-            s1.LoadString(IDS_ERR_SERVER_TIMOUT); break;
-
-        case 2002:
-            s1.LoadString(IDS_CODE_ERROR_READING_CONTENT_2002); break;
-        case 2003:
-            s1.LoadString(IDS_CODE_SERVER_NOT_FOUND_2003); break;
-        case 2005:
-            s1.LoadString(IDS_CODE_INTERNET_CONNECTION_MISSING_2005); break;
-        case 2007:
-        case 2029:
-        case 2050:
-            s1.LoadString(IDS_CODE_NETWORK_ERROR_2007); break;
-        case 2052:
-            s1.LoadString(IDS_CODE_SERVER_ERROR_2052); break;
-
-        case ERR_CODE_DROPPED_ITEMS:         // Dropped items on Client
+        }
+        case WIN_ERR_LOCAL_STORAGE_FULL:                // 9: Local storage full
+        {
+            s1.LoadString(IDS_MEDIA_STORAGE_FULL);
+            break;
+        }
+        case WIN_ERR_DROPPED_ITEMS:                     // 10: Dropped items on Client
         {
             s1.LoadString(IDS_CODE_DROPPED_ITEMS); 
             break;
         }
-        case ERR_CODE_DROPPED_ITEMS_SERVER:  // Dropped items on Server
+        case WIN_ERR_DROPPED_ITEMS_SERVER:              // 11: Dropped items on Server
         {
             s1.LoadString(IDS_CODE_DROPPED_ITEMS_SERVER); 
             break;
         }
-
-        case ERR_CODE_NO_SOURCES:           // No sources to sync
+        case WIN_ERR_NO_SOURCES:                        // 12: No sources to sync
         {
             s1.LoadString(IDS_CODE_NO_SOURCES); 
             break;
         }
 
-        default: break;
+        case WIN_ERR_INVALID_CREDENTIALS:               // 401
+        case WIN_ERR_PROXY_AUTH_REQUIRED:               // 407
+        {
+            s1.LoadString(IDS_CODE_INVALID_CREDENTIALS_401);
+            break;
+        }
+        case WIN_ERR_REMOTE_NAME_NOT_FOUND:             // 404
+        {
+            s1.LoadString(IDS_CODE_NOTFOUND_404); 
+            break;
+        }
+        case WIN_ERR_WRONG_HOST_NAME:                   // 2001
+        case WIN_ERR_NETWORK_ERROR:                     // 2050
+        {
+            s1.LoadString(IDS_CODE_NETWORK_ERROR_2007); 
+            break;
+        }
+
+
+        //
+        // following are obsolete?
+        //
+        case 402:
+            s1.LoadString(IDS_CODE_AUTH_EXPIRED_402); 
+            break;
+        case 403:
+            s1.LoadString(IDS_CODE_FORBIDDEN_403);    
+            break;
+        case 417:       // Retry later
+            s1.LoadString(IDS_CODE_SERVER_BUSY); 
+            break;
+
+        case 2061:      // Server timeout
+            s1.LoadString(IDS_ERR_SERVER_TIMOUT); 
+            break;
+        case 2007:
+        case 2029:
+        case 2060:      // Server path is wrong
+            s1.LoadString(IDS_CODE_NETWORK_ERROR_2007); 
+            break;
+        case 2052:
+            s1.LoadString(IDS_CODE_SERVER_ERROR_2052); 
+            break;
+
+        default: 
+            break;
     }
 
     //
@@ -220,6 +221,30 @@ void manageSyncErrorMsg(long code) {
     }
     wsafeMessageBox(s1.GetBuffer());
 
+}
+
+
+int manageWinErrors(const int winErrorCode) {
+
+    int sourceState;
+    switch (winErrorCode) {
+        case 0:
+            sourceState = SYNCSOURCE_STATE_OK;
+            break;
+        case 2:
+            sourceState = SYNCSOURCE_STATE_CANCELED;
+            break;
+        case WIN_ERR_SERVER_QUOTA_EXCEEDED:
+            sourceState = SYNCSOURCE_STATE_QUOTA_EXCEEDED;
+            break;
+        case WIN_ERR_LOCAL_STORAGE_FULL:
+            sourceState = SYNCSOURCE_STATE_STORAGE_FULL;
+            break;
+        default:
+            sourceState = SYNCSOURCE_STATE_FAILED;
+            break;
+    }
+    return sourceState;
 }
 
 

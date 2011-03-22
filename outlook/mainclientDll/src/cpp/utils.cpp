@@ -1021,9 +1021,9 @@ void printReport(SyncReport* sr, SyncSource** sources) {
                 }
                 if (!sr->getLastErrorCode()) {
                     // This will prompt a warning msg on the UI.
-                    //lastErrorCode = ERR_CODE_DROPPED_ITEMS;
-                    setError(ERR_CODE_DROPPED_ITEMS, "");
-                    sr->setLastErrorCode(ERR_CODE_DROPPED_ITEMS);
+                    //lastErrorCode = WIN_ERR_DROPPED_ITEMS;
+                    setError(WIN_ERR_DROPPED_ITEMS, "");
+                    sr->setLastErrorCode(WIN_ERR_DROPPED_ITEMS);
                 }
             }
             // Some items dropped on server
@@ -1035,9 +1035,9 @@ void printReport(SyncReport* sr, SyncSource** sources) {
                 }
                 if (!sr->getLastErrorCode()) {
                     // This will prompt a warning msg on the UI.
-                    //lastErrorCode = ERR_CODE_DROPPED_ITEMS_SERVER;
-                    setError(ERR_CODE_DROPPED_ITEMS_SERVER, "");
-                    sr->setLastErrorCode(ERR_CODE_DROPPED_ITEMS_SERVER);
+                    //lastErrorCode = WIN_ERR_DROPPED_ITEMS_SERVER;
+                    setError(WIN_ERR_DROPPED_ITEMS_SERVER, "");
+                    sr->setLastErrorCode(WIN_ERR_DROPPED_ITEMS_SERVER);
                 }
             }
             // Everything OK!

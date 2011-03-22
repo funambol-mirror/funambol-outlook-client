@@ -74,6 +74,12 @@ DateFilter::RelativeLowerDate getDateFilterValue(const int index);
 
 void manageSyncErrorMsg(long code);
 
+/**
+ * Transforms the WIN-x error code, returned by the DLL, into
+ * a source state to update the UI (SYNCSOURCE_STATE_X).
+ */
+int manageWinErrors(const int winErrorCode);
+
 CPoint getRelativePosition(CWnd* wnd, CWnd* parentWnd);
 
 /**

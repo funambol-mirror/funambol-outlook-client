@@ -33,7 +33,7 @@
  * the words "Powered by Funambol".
  */
 
-#include "SettingsHelper.h"
+
 #include "stdafx.h"
 #include "resource.h"
 #include "winmaincpp.h"

@@ -1,5 +1,14 @@
+2011-03-21
+  - toccy: reintegrated branch US7483: online and local quota full
+           - added 2 new source states in case of online quota exceeded and local storage full
+           - reworked windows error codes
+  - toccy: added sapi retry mechanism config params (retry 2 times, sleep time 0.5 sec)
+           fixed syncItem Listeners in case of retry uploads
+
 2011-03-16
-  - magi:  added dialog to let the user set the Media-Hub folder
+  - magi:  updated trunk version to 10.0.0
+           added dialog to let the user set the Media-Hub folder
+  
 2011-03-14
   - toccy: reintegrated branch US7480: media sync
            * added pictures/videos/files sync 2-way (new media sync implementation, sapi based)

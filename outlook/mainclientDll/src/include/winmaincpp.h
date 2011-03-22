@@ -104,13 +104,36 @@
 /// Default folder of items in Outlook (replaced by correct path)
 #define DEFAULT_FOLDER                     L"DEFAULT_FOLDER"
 
+//
+// Possible source states (UI labels for each source).
+//
 #define SYNCSOURCE_STATE_OK                 1
-#define SYNCSOURCE_STATE_NOT_SYNCED         2
+#define SYNCSOURCE_STATE_FAILED             2
 #define SYNCSOURCE_STATE_CANCELED           3
+#define SYNCSOURCE_STATE_QUOTA_EXCEEDED     4
+#define SYNCSOURCE_STATE_STORAGE_FULL       5
 
-#define ERR_CODE_DROPPED_ITEMS              2100
-#define ERR_CODE_DROPPED_ITEMS_SERVER       2101
-#define ERR_CODE_NO_SOURCES                 2102
+//
+// Windows client error codes returned for a sync session.
+//
+#define WIN_ERR_NONE                        0
+#define WIN_ERR_GENERIC                     1
+#define WIN_ERR_SYNC_CANCELED               2
+#define WIN_ERR_FATAL_OL_EXCEPTION          3
+#define WIN_ERR_THREAD_TERMINATED           4
+#define WIN_ERR_FULL_SYNC_CANCELED          5   // deprecated
+#define WIN_ERR_UNEXPECTED_EXCEPTION        6
+#define WIN_ERR_UNEXPECTED_STL_EXCEPTION    7
+#define WIN_ERR_SERVER_QUOTA_EXCEEDED       8
+#define WIN_ERR_LOCAL_STORAGE_FULL          9
+#define WIN_ERR_DROPPED_ITEMS               10
+#define WIN_ERR_DROPPED_ITEMS_SERVER        11
+#define WIN_ERR_NO_SOURCES                  12
+#define WIN_ERR_INVALID_CREDENTIALS         401
+#define WIN_ERR_REMOTE_NAME_NOT_FOUND       404
+#define WIN_ERR_PROXY_AUTH_REQUIRED         407
+#define WIN_ERR_WRONG_HOST_NAME             2001
+#define WIN_ERR_NETWORK_ERROR               2050
 
 /** @endcond */
 

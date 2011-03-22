@@ -41,6 +41,7 @@
 /** @{ */
 
 #include "event/SyncItemListener.h"
+#include "base/util/WString.h"
 
 using namespace Funambol;
 
@@ -48,6 +49,9 @@ using namespace Funambol;
  * Listener for SyncItem events.
  */
 class OutlookSyncItemListener : public SyncItemListener {
+
+public:
+    OutlookSyncItemListener();
 
 	void itemAddedByServer  (SyncItemEvent &event);
 	void itemDeletedByServer(SyncItemEvent &event);
@@ -62,10 +66,10 @@ class OutlookSyncItemListener : public SyncItemListener {
     void itemUploaded(SyncItemEvent& event);
     void itemDownloading(SyncItemEvent& event);
     void itemDownloaded(SyncItemEvent& event);
-    void itemUploadingProgress(SyncItemEvent& event);
-    void itemDownloadingProgress(SyncItemEvent& event);
 
-
+private:
+    WString uploadingItemKey;
+    WString downloadingItemKey;
 };
 
 /** @} */

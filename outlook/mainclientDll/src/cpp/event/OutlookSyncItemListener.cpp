@@ -43,6 +43,12 @@
    wParam = -1 -> sending items
    wParam = 1  -> receiving items 
  */
+
+OutlookSyncItemListener::OutlookSyncItemListener() : 
+                                 uploadingItemKey(TEXT("")), 
+                                 downloadingItemKey(TEXT("")) {
+}
+
 void OutlookSyncItemListener::itemAddedByServer(SyncItemEvent &event) {
     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM) 1 , (LPARAM) syncSourceNameToIndex(event.getSourceName()));
 }
@@ -108,23 +114,31 @@ void OutlookSyncItemListener::itemDeletedByClient(SyncItemEvent &event) {
 
 // Media sync listeners
 void OutlookSyncItemListener::itemUploading(SyncItemEvent& event) {
-     int sourceID = syncSourceNameToIndex(event.getSourceName());
-     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM)-1, (LPARAM)sourceID);
+    int sourceID = syncSourceNameToIndex(event.getSourceName());
+
+    // in case of retry, the item's key is the same (no need to update UI)
+    if (uploadingItemKey != event.getItemKey()) {
+        SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM)-1, (LPARAM)sourceID);
+        uploadingItemKey = event.getItemKey();
+    }
 }
+
 void OutlookSyncItemListener::itemUploaded(SyncItemEvent& event) {
+    uploadingItemKey = TEXT("");
     LOG.debug("end upload");
 }
+
 void OutlookSyncItemListener::itemDownloading(SyncItemEvent& event) {
-     int sourceID = syncSourceNameToIndex(event.getSourceName());
-     SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM)1, (LPARAM)sourceID);
-    
+    int sourceID = syncSourceNameToIndex(event.getSourceName());
+
+    // in case of retry, the item's key is the same (no need to update UI)
+    if (downloadingItemKey != event.getItemKey()) {
+        SendMessage(HwndFunctions::getWindowHandle(), ID_MYMSG_SYNC_ITEM_SYNCED, (WPARAM)1, (LPARAM)sourceID);
+        downloadingItemKey = event.getItemKey();
+    }
 }
+
 void OutlookSyncItemListener::itemDownloaded(SyncItemEvent& event) {
-    LOG.debug("downloaded %d", event.getData());
-}
-void OutlookSyncItemListener::itemUploadingProgress(SyncItemEvent& event) {
-    LOG.debug("uploading progress: %d", event.getData());
-}
-void OutlookSyncItemListener::itemDownloadingProgress(SyncItemEvent& event) {
-    LOG.debug("downloading progress: %d", event.getData());
+    downloadingItemKey = TEXT("");
+    LOG.debug("end download");
 }

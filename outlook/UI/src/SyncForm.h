@@ -151,7 +151,7 @@ public:
     CCustomPane paneVideos;
     CCustomPane paneFiles;
 
-    // sync source states {SYNCSOURCE_STATE_OK, SYNCSOURCE_STATE_NOT_SYNCED, SYNCSOURCE_STATE_CANCELED}
+    // sync source states {SYNCSOURCE_STATE_OK, ...)
     // defined in winmaincpp.h        
     int syncSourceContactState;
     int syncSourceCalendarState;
