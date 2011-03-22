@@ -340,7 +340,7 @@ wstring formatDate(StringBuffer& date) {
     wchar_t formatDate[80];
     int found = 0;
     SYSTEMTIME timeDest;
-    swscanf(wdate, L"%4d%2d%2d", &timeDest.wYear, &timeDest.wMonth, &timeDest.wDay);
+    swscanf_s(wdate, L"%4d%2d%2d", &timeDest.wYear, &timeDest.wMonth, &timeDest.wDay);
     
     GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SLONGDATE, data, 80);
 
@@ -359,13 +359,13 @@ wstring formatDate(StringBuffer& date) {
     return dd;
 }
 
-StringBuffer ConvertToChar(const CString &s)
+StringBuffer ConvertToChar(CString &s)
 {
-    int nSize = s.GetLength();
-    char *pAnsiString = new char[nSize+1];
-    memset(pAnsiString,0,nSize+1);
-    wcstombs(pAnsiString, s, nSize+1);
-    StringBuffer r(pAnsiString);
-    delete [] pAnsiString;
-    return r;
+    StringBuffer ret("");
+    char* buf = toMultibyte(s.GetBuffer());
+    if (buf) {
+        ret = buf;
+    }
+    delete [] buf;
+    return ret;
 }

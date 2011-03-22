@@ -363,11 +363,11 @@ int startSync() {
         ret = WIN_ERR_NO_SOURCES;
         goto finally;
     }
-    
+
     for (int i=0; i< sources.size(); i++) {
         StringBuffer* name = (StringBuffer*)sources.get(i);
-        if (isMediaSource(name->c_str())) {            
-            // If media hub not set remove from the source to sync if in background  
+        if (isMediaSource(name->c_str())) {
+            // If media hub not set remove from the source to sync if in background
             if (isScheduledSync && !isMediaHubFolderSet()) {
                 sources.removeElementAt(i);
                 i--;
@@ -376,7 +376,7 @@ int startSync() {
             if (!isMediaHubFolderSet()) {
                 HWND dd = HwndFunctions::getWindowHandle();
                 ::SendMessage(dd, ID_MYMSG_CHECK_MEDIA_HUB_FOLDER, 0, 0);
-                goto finally;           
+                goto finally;
             }
         }
     }
@@ -487,9 +487,9 @@ int startSync() {
         }
 
         // for these codes, we stop all the queued syncs
-        if (res == WIN_ERR_INVALID_CREDENTIALS || 
-            res == WIN_ERR_PROXY_AUTH_REQUIRED ||  
-            res == WIN_ERR_WRONG_HOST_NAME) { 
+        if (res == WIN_ERR_INVALID_CREDENTIALS ||
+            res == WIN_ERR_PROXY_AUTH_REQUIRED ||
+            res == WIN_ERR_WRONG_HOST_NAME) {
             break;
         }
     }
@@ -510,10 +510,10 @@ finally:
         report.setLastErrorMsg("Sync canceled by the user");
     }
 
-    // Don't want to bother the user with a popup for these errors 
+    // Don't want to bother the user with a popup for these errors
     // if it's an automatic sync
     if (isScheduledSync) {
-        if ( ret == WIN_ERR_SERVER_QUOTA_EXCEEDED || 
+        if ( ret == WIN_ERR_SERVER_QUOTA_EXCEEDED ||
              ret == WIN_ERR_LOCAL_STORAGE_FULL ) {
             ret = 0;
         }
@@ -529,8 +529,8 @@ finally:
     LOG.info("\n%s", reportMsg.c_str());
 
     // check for updates (skip in case of network error / sync aborted)
-    if (ret != WIN_ERR_SYNC_CANCELED  && 
-        ret != WIN_ERR_NETWORK_ERROR  && 
+    if (ret != WIN_ERR_SYNC_CANCELED  &&
+        ret != WIN_ERR_NETWORK_ERROR  &&
         ret != WIN_ERR_WRONG_HOST_NAME) {
         if (checkUpdate()) {
             updateProcedure(HwndFunctions::getWindowHandle(), false);
@@ -568,7 +568,7 @@ int synchronizeSapi(SapiSyncSource& sapiSource, SyncReport& report) {
     }
 
     // UPLOAD
-    if (syncMode == SYNC_TWO_WAY || 
+    if (syncMode == SYNC_TWO_WAY ||
         syncMode == SYNC_ONE_WAY_FROM_CLIENT) {
         if (report.getLastErrorCode() != WIN_ERR_SERVER_QUOTA_EXCEEDED) {
             ret = sapiManager.upload();
@@ -581,14 +581,14 @@ int synchronizeSapi(SapiSyncSource& sapiSource, SyncReport& report) {
             LOG.info("%s", sapiSource.getReport().getLastErrorMsg());
         }
     }
-    if (ret == ESSMCanceled || 
-        ret == ESSMNetworkError || 
+    if (ret == ESSMCanceled ||
+        ret == ESSMNetworkError ||
         ret == ESSMAuthenticationError) {
         goto finally;
     }
 
     // DOWNLOAD
-    if (syncMode == SYNC_TWO_WAY || 
+    if (syncMode == SYNC_TWO_WAY ||
         syncMode == SYNC_ONE_WAY_FROM_SERVER) {
         if (report.getLastErrorCode() != WIN_ERR_LOCAL_STORAGE_FULL) {
             ret = sapiManager.download();
@@ -601,8 +601,8 @@ int synchronizeSapi(SapiSyncSource& sapiSource, SyncReport& report) {
             LOG.info("%s", sapiSource.getReport().getLastErrorMsg());
         }
     }
-    if (ret == ESSMCanceled || 
-        ret == ESSMNetworkError || 
+    if (ret == ESSMCanceled ||
+        ret == ESSMNetworkError ||
         ret == ESSMAuthenticationError) {
         goto finally;
     }
@@ -1274,6 +1274,22 @@ void upgradePlugin(const int oldVersion, const int oldFunambolVersion) {
         string oldLogPath = config->getLogDir();
         oldLogPath += "\\outlook-client-log.txt";
         remove(oldLogPath.c_str());
+    }
+
+    // Old version < 10.0.0: clean pictures map and cache files
+    if (oldFunambolVersion < 100000) {
+
+        StringBuffer configDir = PlatformAdapter::getConfigFolder();
+        removeFileInDir(configDir.c_str(), "picture.map");
+        removeFileInDir(configDir.c_str(), "picture.map.jour");
+
+        StringBuffer cacheDir = configDir;
+        if (!cacheDir.endsWith("\\") && !cacheDir.endsWith("/")) {
+            cacheDir += "/";
+        }
+        cacheDir.append("item_cache");      // #define CACHE_FOLDER, as defined in v9
+        removeFileInDir(cacheDir.c_str(), "picture.dat");
+        removeFileInDir(cacheDir.c_str(), "picture.dat.jour");
     }
 
     return;

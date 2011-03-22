@@ -739,7 +739,8 @@ _declspec(dllexport) WindowsSyncSourceConfig* OutlookConfig::getSyncSourceConfig
         }
     }
 
-    return FALSE;
+    LOG.debug("warning! configuration not found for source %s: return NULL.", name);
+    return NULL;
 }
 
 /**

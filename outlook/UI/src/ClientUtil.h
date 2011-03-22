@@ -90,7 +90,7 @@ CPoint getMainWindowSize();
 
 wstring formatDate(Funambol::StringBuffer& date);
 
-Funambol::StringBuffer ConvertToChar(const CString &s);
+Funambol::StringBuffer ConvertToChar(CString &s);
 
 /** @} */
 /** @endcond */
