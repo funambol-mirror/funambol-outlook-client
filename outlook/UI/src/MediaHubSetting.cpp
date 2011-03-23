@@ -211,6 +211,9 @@ void CMediaHubSetting::OnBnClickedMediaHubButSelect() {
     wstring newPath;
     if ( browseFolder(newPath, mediaDir.GetBuffer(), caption.GetBuffer(), GetSafeHwnd()) ) {
         // Update the UI label and save the new path
+        if (newPath.find_last_of(L"\\") == newPath.length() -1) {
+            newPath = newPath.substr(0, newPath.length() -1);
+        }
         newPath.append(t);
         SetDlgItemText(IDC_MEDIA_HUB_EDIT_FOLDER, newPath.c_str());     
 

@@ -238,6 +238,16 @@ Function OnClick
 	${EndIf}
 	
 	StrCpy $mediaHubFolderChoosen $R1
+	
+	StrLen $R2 $mediaHubFolderChoosen             ; remove the \ at the end
+	;MessageBox MB_ICONSTOP "$R2"
+	IntOp  $R3  $R2 - 1
+	;MessageBox MB_ICONSTOP "$R3"
+	StrCpy $R2 $mediaHubFolderChoosen "" $R3
+	;MessageBox MB_ICONSTOP "$R2"
+        ${If} $R2 == "\"
+              StrCpy $mediaHubFolderChoosen $R1  -1
+	${EndIf}
 
 	${NSD_SetText} $DirRequest "$mediaHubFolderChoosen\${PROPERTY_MEDIAHUB}"
         
