@@ -108,8 +108,8 @@
 #define SAPI_MAX_VIDEO_SIZE                 0                           /**< max size of videos   [KBytes]. 0 means unlimited. */
 #define SAPI_MAX_FILE_SIZE                  0                           /**< max size of files    [KBytes]. 0 means unlimited. */
 #define PICT_EXTENSION                      ".jpg,.jpeg,.jpe,.gif,.png,.jfif,.jif,.bmp,.tiff,.tif"
-#define VIDEO_EXTENSION                     ".wmv,.mp4,.mov,.3g2,.mpeg,.mpg,.mpe,.asf,.movie,.avi,.mpa,.mp2,.m4u,.m4v,.swf,.flv"
-#define FILE_EXTENSION                      "!" PICT_EXTENSION "," VIDEO_EXTENSION
+#define VIDEO_EXTENSION                     ".wmv,.mp4,.mov,.3g2,.3gp,.mpeg,.mpg,.mpe,.asf,.movie,.avi,.mpa,.mp2,.m4u,.m4v,.swf,.flv"
+#define FILE_EXTENSION                      "!" PICT_EXTENSION "," VIDEO_EXTENSION  /**< everything else */
 
 #define SOURCE_ORDER_IN_REGISTRY            "contact,appointment,task,note,picture,video,files"
 
