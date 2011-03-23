@@ -104,6 +104,7 @@
 #define SAPI_HTTP_DOWNLOAD_CHUNK_SIZE       30000                       /**< 30 KByte  */
 #define SAPI_MAX_RETRY_ON_ERROR             2                           /**< 2 retries */
 #define SAPI_SLEEP_TIME_ON_RETRY            500                         /**< 0.5 sec   */
+#define SAPI_MIN_DATA_SIZE_ON_RETRY         10000                       /**< 10 KBytes */
 #define SAPI_MAX_PICTURE_SIZE               0                           /**< max size of pictures [KBytes]. 0 means unlimited. */
 #define SAPI_MAX_VIDEO_SIZE                 0                           /**< max size of videos   [KBytes]. 0 means unlimited. */
 #define SAPI_MAX_FILE_SIZE                  0                           /**< max size of files    [KBytes]. 0 means unlimited. */

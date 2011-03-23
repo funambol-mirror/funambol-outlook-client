@@ -129,6 +129,7 @@ SapiConfig* DefaultWinConfigFactory::getSapiConfig() {
     c->setDownloadChunkSize     (SAPI_HTTP_DOWNLOAD_CHUNK_SIZE);  // 30 KByte
     c->setMaxRetriesOnError     (SAPI_MAX_RETRY_ON_ERROR);        // retry 2 times if network error
     c->setSleepTimeOnRetry      (SAPI_SLEEP_TIME_ON_RETRY);       // wait 500 millisec before retry
+    c->setMinDataSizeOnRetry    (SAPI_MIN_DATA_SIZE_ON_RETRY);    // 10 KBytes
 
     return c;
 }
