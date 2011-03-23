@@ -259,7 +259,7 @@
 #define INFO_SYNC_COMPLETED                 "Syncronization process completed."
 #define INFO_SYNC_COMPLETED_ERRORS          "Syncronization process completed with errors (code = %d)."
 #define INFO_EXIT                           "Exiting from Outlook client."
-#define INFO_SYNC_ABORTING                  "Aborting synchronization session... (WARNING! deprecated method, use config.isToAbort)"
+#define INFO_SYNC_ABORTING                  "Aborting synchronization session..."
 #define INFO_SYNC_ABORTED_BY_USER           "Synchronization aborted by user."
 #define INFO_SYNC_ABORTED_BY_USER_SLOW      "Synchronization aborted by user to avoid full-sync of %ls."
 #define INFO_SCHED_TASK_CREATED             "Scheduler task created."

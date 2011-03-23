@@ -1373,13 +1373,13 @@ void WindowsSyncSource::pushAllItemsToList(ClientFolder* folder, itemKeyList& li
     if (itemsCount == 0) {
         return;
     }
-        if (LOG.getLevel() >= LOG_LEVEL_DEBUG) {
-            LOG.debug("Reading item: \"%ls\"", getSafeItemName(item).c_str());
-        }
 
     itemKeyList existingItems;
 
     item = folder->getFirstItem();
+    if (LOG.getLevel() >= LOG_LEVEL_DEBUG) {
+        LOG.debug("Reading item: \"%ls\"", getSafeItemName(item).c_str());
+    }
     // Item could be NULL if type not correct! -> ignore it.
     if (item != NULL && filterClientItem(item, DateFilter::DIR_OUT)) {
         existingItems.push_back(item->getID());
@@ -1391,7 +1391,14 @@ void WindowsSyncSource::pushAllItemsToList(ClientFolder* folder, itemKeyList& li
     }
 
     for (int i = 1; i < itemsCount; i++) {
+        // Check aborted once every 30
+        if ((i % 30) == 0) {
+            checkAbortedSync();
+        }
         item = folder->getNextItem();
+        if (LOG.getLevel() >= LOG_LEVEL_DEBUG) {
+            LOG.debug("Reading item: \"%ls\"", getSafeItemName(item).c_str());
+        }
         // Item could be NULL if type not correct! -> ignore it.
         if (item != NULL && filterClientItem(item, DateFilter::DIR_OUT)) {
             existingItems.push_back(item->getID());
@@ -1416,10 +1423,11 @@ void WindowsSyncSource::pushAllItemsToList(ClientFolder* folder, itemKeyList& li
                 int current = listItems.size();
                 if (normalizeExceptions(item, listItems, listItemsPaths))
                 {
-                    char temp[500];
-                    char * subject = toMultibyte(item->getProperty(L"Subject").c_str());
-                    sprintf(temp, "Unable to normalize appointment: %s.  Please check this event", subject);
-                    throwClientException(temp,0,0,true);
+                    StringBuffer subject;
+                    subject.convert(item->getProperty(L"Subject").c_str());
+                    StringBuffer temp;
+                    temp.sprintf("Unable to normalize appointment: %s.  Please check this event", subject.c_str());
+                    throwClientException(temp.c_str(), 0, 0, true);
                 }
             }
 
