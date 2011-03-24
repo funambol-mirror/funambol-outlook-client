@@ -1340,6 +1340,7 @@ void OutlookConfig::upgradeConfig() {
             sc->setProperty         (PROPERTY_EXTENSION,                    PICT_EXTENSION);
             sc->setProperty         (PROPERTY_MEDIAHUB_PATH,                "");
             sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE,          SAPI_LOCAL_QUOTA_STORAGE);
+            sc->setIntProperty      (PROPERTY_SYNC_ITEM_MAX_SIZE,           SAPI_MAX_PICTURE_SIZE);
             sc->removeProperty      (PROPERTY_FOLDER_PATH);
             sc->removeProperty      (PROPERTY_USE_SUBFOLDERS);
         }

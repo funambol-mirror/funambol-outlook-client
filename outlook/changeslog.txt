@@ -1,3 +1,6 @@
+2011-03-24
+  - toccy: added item max size for media sources (0 = unlimited for pictures and files, 100 MB for videos)
+
 2011-03-22
   - toccy: fixed upgrade procedure
            removed WindowsSyncSourceConfig internal params, now proxy methods to CustomConfig stringmap

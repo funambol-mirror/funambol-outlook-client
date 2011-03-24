@@ -208,6 +208,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setProperty         (PROPERTY_EXTENSION,                     PICT_EXTENSION);
         sc->setProperty         (PROPERTY_MEDIAHUB_PATH,                 "");  
         sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE,           SAPI_LOCAL_QUOTA_STORAGE);
+        sc->setIntProperty      (PROPERTY_SYNC_ITEM_MAX_SIZE,           SAPI_MAX_PICTURE_SIZE);   // 0 = unlimited
     }
     else if (wname == VIDEO){
         sc->setSync             (DEFAULT_VIDEOS_SYNC_MODE);
@@ -225,6 +226,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setProperty         (PROPERTY_EXTENSION,                    VIDEO_EXTENSION);
         sc->setProperty         (PROPERTY_MEDIAHUB_PATH,                "");  
         sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE,          SAPI_LOCAL_QUOTA_STORAGE);
+        sc->setIntProperty      (PROPERTY_SYNC_ITEM_MAX_SIZE,           SAPI_MAX_VIDEO_SIZE);   // 100 MB
     }
     else if (wname == FILES){
         sc->setSync             (DEFAULT_FILES_SYNC_MODE);
@@ -242,6 +244,7 @@ SyncSourceConfig* DefaultWinConfigFactory::getSyncSourceConfig(const wstring& wn
         sc->setProperty         (PROPERTY_EXTENSION,                    FILE_EXTENSION);
         sc->setProperty         (PROPERTY_MEDIAHUB_PATH,                "");  
         sc->setProperty         (PROPERTY_LOCAL_QUOTA_STORAGE,          SAPI_LOCAL_QUOTA_STORAGE);
+        sc->setIntProperty      (PROPERTY_SYNC_ITEM_MAX_SIZE,           SAPI_MAX_FILE_SIZE);   // 0 = unlimited
     }
 
     if (name) delete [] name;
