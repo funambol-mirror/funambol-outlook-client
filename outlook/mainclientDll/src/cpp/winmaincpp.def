@@ -68,6 +68,7 @@ getDefaultMyDocumentsPath
 isSourceEnabled
 getOutlookVersion
 isMediaHubFolderSet
+isWindowsXP
 ;
 ; update procedure
 ;

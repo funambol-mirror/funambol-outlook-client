@@ -53,6 +53,7 @@
 #include "Popup.h"
 #include "UICustomization.h"
 #include "MediaHubSetting.h"
+#include <Shlwapi.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -1816,5 +1817,58 @@ afx_msg LRESULT CMainSyncFrame::OnCheckMediaHubFolder(WPARAM wParam, LPARAM lPar
             //MessageBox(s1, WPROGRAM_NAME, failFlags);                        
         }
     }
+    if (config) {
+        StringBuffer fpath = config->getSyncSourceConfig(PICTURE_)->getCommonConfig()->getProperty(PROPERTY_MEDIAHUB_PATH);
+        const char* installPath = config->getWorkingDir();
+        createMediaHubDesktopIniFile(fpath.c_str(), installPath);        
+    }
     return ret;
+}
+
+BOOL CMainSyncFrame::createMediaHubDesktopIniFile(const char* folderPath, const char* installPath) {
+    
+    if (isWindowsXP()) {
+        return TRUE;
+    }
+
+    WCHAR* tmp = toWideChar(folderPath);
+    BOOL ret = PathMakeSystemFolder(tmp);
+    if (ret != 0) {
+        // create the file
+        StringBuffer file(folderPath);        
+        file.append("\\");
+        file.append("Desktop.ini");
+        WCHAR* wfile = toWideChar(file.c_str());
+
+        // create the IconFile path
+        StringBuffer icoName(installPath);             
+        icoName.append("\\images\\");
+        icoName.append(MEDIA_HUB_DEFAULT_ICO);
+
+        // populate the infoTip
+        CString s1; s1.LoadString(IDS_MEDIA_HUB_DESKTOPINI_TIP);
+        StringBuffer tip = ConvertToChar(s1);
+         
+        FILE* f = fileOpen(file.c_str(), "w+");
+        if (f) {
+            StringBuffer s;
+            s = "[.ShellClassInfo]\r\n";
+            s.append("IconFile=");
+            s.append(icoName);
+            s.append("\r\n"); 
+            s.append("IconIndex=0\r\n");
+            s.append("InfoTip=");
+            s.append(tip);
+
+            fwrite(s.c_str(), 1, s.length(), f);
+            fclose(f);
+            SetFileAttributes(wfile, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
+            
+        }      
+        delete [] wfile;  
+    }
+    delete [] tmp;
+    
+    return ret;
+    
 }

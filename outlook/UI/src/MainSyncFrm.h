@@ -177,6 +177,7 @@ public:
     afx_msg LRESULT OnMsgSapiProgress   (WPARAM , LPARAM);
     
     afx_msg LRESULT OnCheckMediaHubFolder(WPARAM wParam, LPARAM lParam);
+    BOOL createMediaHubDesktopIniFile(const char* folderPath, const char* installPath);
 
     afx_msg LRESULT CancelSync(WPARAM wParam, LPARAM lParam);
 

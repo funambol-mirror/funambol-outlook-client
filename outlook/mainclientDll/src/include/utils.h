@@ -171,6 +171,7 @@ int countSourceVisible();
  */
 bool isSourceEnabled(const char* sourceName);
 
+bool isWindowsXP();
 
 /**
  * Is the given status code an error status code? Error codes are the ones

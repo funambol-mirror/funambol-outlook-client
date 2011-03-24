@@ -861,6 +861,7 @@ Section Uninstall
      ; Delete recursively empty folders created on install.
      RMDir /r "$INSTDIR"
      StrCpy $R4 "$INSTDIR"
+     
   loop1:
      Push "$R4"
      Call un.GetLastStrPart
@@ -941,8 +942,10 @@ Function un.RemoveUserData
      ReadINIStr $R2 "$PLUGINSDIR\removeData.ini" "Field 1" "State"
      IntCmp $R2 0 done
      
-     Call un.deleteUsersRegistry
+     ; TODO: currently it deletes just the one of the current user, not all of them
+     Call un.deleteUsersMediaHubDesktopIni
      Call un.deleteUsersFiles
+     Call un.deleteUsersRegistry
      
      ; Delete scheduled task for all users.
      ; Tasks have the name: "Funambol Outlook Plug-in - <Username>.job"
@@ -1116,6 +1119,15 @@ Function un.deleteUsersFiles
   done:
 FunctionEnd
 
+Function un.deleteUsersMediaHubDesktopIni
+
+     ; remove the desktop.ini file in the mediaHub dir if exists. Currently Just the one of the current user.
+     ; TODO: all the users
+     ReadRegStr $tmp  HKCU "${PLUGIN_REGKEY_CONTEXT}\${PROPERTY_PICTURE_MEDIAHUB_KEY}" "${PROPERTY_MEDIAHUB_REG_KEY}"    ; Check if the mediaHub for pictures has value
+     ${If} $tmp != ""
+         Delete "$tmp\Desktop.ini"
+     ${EndIf}
+FunctionEnd
 
 ;
 ; Checks if there is at least one Telephony Location defined in the system.

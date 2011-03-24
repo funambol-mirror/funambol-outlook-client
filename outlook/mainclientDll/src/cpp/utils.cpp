@@ -1218,3 +1218,13 @@ long variantTimeToTimeStamp(const double vTime) {
     return (long)mktime(&t);
 }
 
+bool isWindowsXP() {
+
+    OSVERSIONINFO osvi;    
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+    GetVersionEx(&osvi);
+
+    return osvi.dwMajorVersion < 6; // is xp o 2003. if >= 6 is vista or 7      
+}

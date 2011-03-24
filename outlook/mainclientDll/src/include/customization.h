@@ -112,6 +112,11 @@
 #define VIDEO_EXTENSION                     ".wmv,.mp4,.mov,.3g2,.3gp,.mpeg,.mpg,.mpe,.asf,.movie,.avi,.mpa,.mp2,.m4u,.m4v,.swf,.flv"
 #define FILE_EXTENSION                      "!" PICT_EXTENSION "," VIDEO_EXTENSION  /**< everything else */
 
+// MediaHub info.
+#define MEDIA_HUB_DEFAULT_FOLDER            "MediaHub"     // name of the default folder to store picture/video/files
+#define MEDIA_HUB_DEFAULT_ICO               "MediaHubFolder.ico"     // name of the default ico to put in the Desktop.ini
+
+
 #define SOURCE_ORDER_IN_REGISTRY            "contact,appointment,task,note,picture,video,files"
 
 // set if the sources are enabled/disabled (meaning they can be enabled by settings)
@@ -157,10 +162,6 @@
 // Auto-update feature
 #define UP_URL_RESOURCE                     "/sapi/profile/client?action=get-update-info"
 #define CLIENT_PLATFORM                     "outlook"
-
-// Media-Hub info.
-#define MEDIA_HUB_DEFAULT_FOLDER            "MediaHub"     // name of the default folder to store picture/video/files
-
 
 #include "base/util/StringBuffer.h"
 
