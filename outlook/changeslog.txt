@@ -1,6 +1,8 @@
 2011-03-24
   - toccy: added item max size for media sources (0 = unlimited for pictures and files, 100 MB for videos)
-
+  - magi : improved NSIS installation file adding custom dialog to select the MediaHub folder.
+           updated uninstalled to remove properly the Desktop.ini file for all users.
+           added custom ico to the MediaHub folder
 2011-03-22
   - toccy: fixed upgrade procedure
            removed WindowsSyncSourceConfig internal params, now proxy methods to CustomConfig stringmap
