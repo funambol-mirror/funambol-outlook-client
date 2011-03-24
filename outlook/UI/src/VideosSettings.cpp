@@ -382,7 +382,7 @@ void CVideosSettings::OnCbnSelchangeVideosComboSynctype()
         }
         supportedData.replaceAll(",.",", ");
         supportedData.replaceAll(".","");    
-        
+        supportedData.append(".");
     }
    
     CString suppData = supportedData;

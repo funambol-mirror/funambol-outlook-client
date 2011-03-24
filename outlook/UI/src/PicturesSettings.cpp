@@ -380,8 +380,8 @@ void CPicturesSettings::OnCbnSelchangePicturesComboSynctype()
             supportedData.replace(",.", and.c_str(), val);
         }
         supportedData.replaceAll(",.",", ");
-        supportedData.replaceAll(".","");    
-        
+        supportedData.replaceAll(".","");  
+        supportedData.append(".");
     }
    
     CString suppData = supportedData;
