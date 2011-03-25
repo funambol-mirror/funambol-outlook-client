@@ -37,13 +37,12 @@
 #include "base/Log.h"
 #include "base/util/utils.h"
 #include "base/memTracker.h"
+#include "http/HttpConnection.h"
 
 #include "winmaincpp.h"
 #include "WindowsSyncSource.h"
-#include "PicturesSyncSource.h"
-#include "VideosSyncSource.h"
-#include "WinFileSyncSource.h"
 #include "WindowsSyncClient.h"
+#include "client/FileSyncSource.h"
 #include "utils.h"
 #include "HwndFunctions.h"
 
