@@ -1,3 +1,6 @@
+2011-03-25
+  - toccy: updated all client UI icons with better graphics
+
 2011-03-24
   - toccy: added item max size for media sources (0 = unlimited for pictures and files, 100 MB for videos)
   - magi : improved NSIS installation file adding custom dialog to select the MediaHub folder.
