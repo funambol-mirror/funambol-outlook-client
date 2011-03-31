@@ -107,7 +107,7 @@
 #define SAPI_MIN_DATA_SIZE_ON_RETRY         10000                       /**< 10 KBytes */
 #define SAPI_MAX_PICTURE_SIZE               0                           /**< max size of pictures [bytes]. 0 means unlimited. */
 #define SAPI_MAX_VIDEO_SIZE                 100 * 1024 * 1024           /**< max size of videos   [bytes]. 100 MB. */
-#define SAPI_MAX_FILE_SIZE                  100 * 1024 * 1024           /**< max size of files    [bytes]. 0 means unlimited. */
+#define SAPI_MAX_FILE_SIZE                  25  * 1024 * 1024           /**< max size of files    [bytes].  25 MB. */
 #define PICT_EXTENSION                      ".jpg,.jpeg,.jpe,.gif,.png,.jfif,.jif,.bmp,.tiff,.tif"
 #define VIDEO_EXTENSION                     ".wmv,.mp4,.mov,.3g2,.3gp,.mpeg,.mpg,.mpe,.asf,.movie,.avi,.mpa,.mp2,.m4u,.m4v,.swf,.flv"
 #define FILE_EXTENSION                      "!," PICT_EXTENSION "," VIDEO_EXTENSION  /**< everything else */
