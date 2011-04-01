@@ -112,6 +112,8 @@
 #define SYNCSOURCE_STATE_CANCELED           3
 #define SYNCSOURCE_STATE_QUOTA_EXCEEDED     4
 #define SYNCSOURCE_STATE_STORAGE_FULL       5
+#define SYNCSOURCE_STATE_NOT_SUPPORTED      6   // server doesn't support the (sapi) source or sapi not present (comed)
+
 
 //
 // Windows client error codes returned for a sync session.
@@ -129,6 +131,7 @@
 #define WIN_ERR_DROPPED_ITEMS               10
 #define WIN_ERR_DROPPED_ITEMS_SERVER        11
 #define WIN_ERR_NO_SOURCES                  12
+#define WIN_ERR_SAPI_NOT_SUPPORTED          13
 #define WIN_ERR_INVALID_CREDENTIALS         401
 #define WIN_ERR_REMOTE_NAME_NOT_FOUND       404
 #define WIN_ERR_PROXY_AUTH_REQUIRED         407

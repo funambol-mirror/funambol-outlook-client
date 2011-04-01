@@ -151,6 +151,10 @@ BOOL CFullSync::OnInitDialog() {
         // checkNotes.ShowWindow(SW_HIDE);
         checkNotes.EnableWindow(FALSE);
     }
+    //checkPictures.ShowWindow(SW_HIDE);
+    //checkVideos.ShowWindow(SW_HIDE);
+    //checkFiles.ShowWindow(SW_HIDE);
+    
     if (!isSourceVisible(PICTURE)) {
         checkPictures.ShowWindow(SW_HIDE);
     }
@@ -160,7 +164,7 @@ BOOL CFullSync::OnInitDialog() {
     if (!isSourceVisible(FILES)) {
         checkFiles.ShowWindow(SW_HIDE);
     }
-
+    
     GetDlgItem(IDOK)->EnableWindow(FALSE);
 
     // disable windows xp theme, otherwise any color setting for groupbox
@@ -214,7 +218,9 @@ void CFullSync::OnBnClickedOk() {
 
     getConfig()->read();
     const char* fullSyncMode = getFullSyncTypeName(pos);
-
+    
+    ((CMainSyncFrame*)AfxGetMainWnd())->backupSyncModeSettings();
+    
     // enable the checked sources, disable the unchecked ones
     if(checkContacts.GetCheck() == BST_CHECKED) {
         getConfig()->getSyncSourceConfig(CONTACT_)->setSync(fullSyncMode);
@@ -265,7 +271,7 @@ void CFullSync::OnBnClickedOk() {
         getConfig()->getSyncSourceConfig(FILES_)->setIsEnabled(false);
     }
 
-    getConfig()->setFullSync(true);
+    //getConfig()->setFullSync(true);
 
     ((CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1))->refreshSources();
     ((CMainSyncFrame*)AfxGetMainWnd())->StartSync();
@@ -335,7 +341,15 @@ bool CFullSync::isAtLeastOneSourceChecked() {
 void CFullSync::adjustCheckboxes() {
 
     int numSources = countSourceVisible();
-
+    if (isSourceEnabled(PICTURE_)) {
+        numSources--;
+    }
+    if (isSourceEnabled(VIDEO_)) {
+        numSources--;
+    }
+    if (isSourceEnabled(FILES_)) {
+        numSources--;
+    }
     // currently we consider at least 4 sources
     if (numSources < 4) {
         numSources = 4;

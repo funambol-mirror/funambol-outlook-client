@@ -1753,7 +1753,7 @@ afx_msg LRESULT CMainSyncFrame::OnMsgSapiProgress(WPARAM wParam, LPARAM lParam) 
     // if here, wParam = 0 and progressStarted = true
 
     partialCompleted += lParam;
-    int percentage = (int)((double)partialCompleted * (double)100 / (double)itemTotalSize);
+    int percentage = (int)((double)partialCompleted / (double)itemTotalSize * (double)100);
     if (percentage > 100) {
         percentage = 100;
     }

@@ -136,7 +136,7 @@
 #define NOTES_SYNC_MODES                    SYNC_MODE_TWO_WAY
 #define PICTURES_SYNC_MODES                 SYNC_MODE_TWO_WAY "," SYNC_MODE_ONE_WAY_FROM_CLIENT "," SYNC_MODE_ONE_WAY_FROM_SERVER
 #define VIDEOS_SYNC_MODES                   SYNC_MODE_TWO_WAY "," SYNC_MODE_ONE_WAY_FROM_CLIENT "," SYNC_MODE_ONE_WAY_FROM_SERVER
-#define FILES_SYNC_MODES                    SYNC_MODE_TWO_WAY "," SYNC_MODE_ONE_WAY_FROM_CLIENT "," SYNC_MODE_ONE_WAY_FROM_SERVER
+#define FILES_SYNC_MODES                    SYNC_MODE_TWO_WAY
 
 // Default sync mode for each source.
 // It MUST be one of the values specified in the list of available sync modes above.

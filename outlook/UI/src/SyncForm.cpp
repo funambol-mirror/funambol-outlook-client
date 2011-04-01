@@ -1168,6 +1168,9 @@ void CSyncForm::refreshSource( int sourceId )
             case SYNCSOURCE_STATE_STORAGE_FULL:
                 s1.LoadString(IDS_STATUS_STORAGE_FULL);
                 break;
+            case SYNCSOURCE_STATE_NOT_SUPPORTED:
+                s1.LoadString(IDS_SOURCE_NOT_SUPPORTED_BY_SERVER);
+                break;                
             default:
                 s1 = "";
                 break;
@@ -1254,6 +1257,9 @@ void CSyncForm::refreshSource( int sourceId )
             case SYNCSOURCE_STATE_STORAGE_FULL:
                 s1.LoadString(IDS_STATUS_STORAGE_FULL);
                 break;
+            case SYNCSOURCE_STATE_NOT_SUPPORTED:
+                s1.LoadString(IDS_SOURCE_NOT_SUPPORTED_BY_SERVER);
+                break;
             default:
                 s1 = "";
                 break;
@@ -1338,6 +1344,9 @@ void CSyncForm::refreshSource( int sourceId )
             case SYNCSOURCE_STATE_STORAGE_FULL:
                 s1.LoadString(IDS_STATUS_STORAGE_FULL);
                 break;
+            case SYNCSOURCE_STATE_NOT_SUPPORTED:
+                s1.LoadString(IDS_SOURCE_NOT_SUPPORTED_BY_SERVER);
+                break;            
             default:
                 s1 = "";
                 break;

@@ -169,6 +169,71 @@ void CAccountSettings::OnBnClickedAccountButOk()
     }
 }
 
+void CAccountSettings::resetMediaSourcesParameters() {    
+    
+    OutlookConfig* config = (OutlookConfig*)getConfig();
+    SyncSourceConfig* ssc = NULL;
+    long lastSourceStatus = 0;   
+    
+    CSyncForm* mainForm = (CSyncForm*)((CMainSyncFrame*)AfxGetMainWnd())->wndSplitter.GetPane(0,1);
+    /*
+    CDocument* pDoc            = NULL;
+    CConfigFrame* pConfigFrame = NULL;
+    CSingleDocTemplate* docSettings = ((COutlookPluginApp*)AfxGetApp())->docSettings;
+    pDoc = docSettings->CreateNewDocument();
+
+    if (pDoc != NULL) {
+        pConfigFrame = (CConfigFrame*)docSettings->CreateNewFrame(pDoc, NULL);
+        if (pConfigFrame != NULL) {            
+            // If document initialization fails
+            if (!pDoc->OnNewDocument())
+            {
+                pConfigFrame->DestroyWindow();
+                pConfigFrame = NULL;
+            }
+            //else
+            //{
+            //    docSettings->InitialUpdateFrame(pConfigFrame, pDoc, TRUE);
+            //}
+        }
+    }
+    */
+    for (int i = 0; i < 3; i++) {
+        StringBuffer sourceName;
+        switch (i) {
+            case 0:
+                sourceName = PICTURE_;
+                 mainForm->syncSourcePictureState = SYNCSOURCE_STATE_OK;
+                 mainForm->iconStatusPictures.SetIcon(NULL);
+                 
+                break;
+            case 1:
+                sourceName = VIDEO_;
+                 mainForm->syncSourceVideoState   = SYNCSOURCE_STATE_OK;
+                 mainForm->iconStatusVideos.SetIcon(NULL);
+                break;
+            case 2:
+                sourceName = FILES_;
+                mainForm->syncSourceFileState     = SYNCSOURCE_STATE_OK;
+                mainForm->iconStatusFiles.SetIcon(NULL);
+                break;
+        }
+
+        if ((ssc = config->getSyncSourceConfig(sourceName.c_str())->getCommonConfig()) != NULL) {
+            lastSourceStatus = ssc->getLastSourceError();
+            if (lastSourceStatus == WIN_ERR_SAPI_NOT_SUPPORTED) {
+                ssc->setLastSourceError(0);
+                ssc->setBeginSyncTime(0);
+                ssc->setEndSyncTime(0);
+                ssc->setLast(0);
+                ssc->setProperty(PROPERTY_DOWNLOAD_LAST_TIME_STAMP, "0");     
+               
+            }
+        }
+
+    }
+
+}
 
 bool CAccountSettings::saveSettings(bool saveToDisk)
 {
@@ -206,6 +271,7 @@ bool CAccountSettings::saveSettings(bool saveToDisk)
         // reset the updater info if changing the URL...
         if (strcmp(tmp, conf->getAccessConfig().getSyncURL()) != 0) {
             conf->getUpdaterConfig().createDefaultConfig();
+            resetMediaSourcesParameters();
         }
         conf->getAccessConfig().setSyncURL(tmp);
         delete [] tmp;

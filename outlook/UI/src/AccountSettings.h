@@ -72,6 +72,7 @@ public:
     CStatic groupServer;
 
     bool saveSettings(bool saveToDisk);   
+    void resetMediaSourcesParameters();
 
     afx_msg void OnBnClickedAccountButCancel();
     afx_msg void OnBnClickedAccountButOk();

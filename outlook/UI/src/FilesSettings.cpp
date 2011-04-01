@@ -149,9 +149,9 @@ BOOL CFilesSettings::OnInitDialog() {
     OnCbnSelchangeFilesComboSynctype();
 
     // Sync type
-    int id = getFilesSyncTypeID(ssconf->getSync());
-    s1.LoadString(id);
-    SetDlgItemText(IDC_FILES_EDIT_SYNCTYPE, s1);
+    //int id = getFilesSyncTypeID(ssconf->getSync());
+    //s1.LoadString(id);
+    //SetDlgItemText(IDC_FILES_EDIT_SYNCTYPE, s1);
 
     // Files folder path
     StringBuffer path = ssconf->getCommonConfig()->getProperty(PROPERTY_MEDIAHUB_PATH);
@@ -349,6 +349,7 @@ void CFilesSettings::loadSyncModesBox(const char* sourceName)
         // Only 1 syncmode available: use the editbox
         editbox->ShowWindow(SW_SHOW);
         combobox->ShowWindow(SW_HIDE);
+        s1.Insert(0, L" "); // just add a space to avoid to be too close to the border
         SetDlgItemText(editBoxResourceID, s1);
     }
 }

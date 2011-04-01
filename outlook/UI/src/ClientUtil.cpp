@@ -122,7 +122,7 @@ void manageSyncErrorMsg(long code) {
         }
         case WIN_ERR_SYNC_CANCELED: {                   // 2: Aborted -> no msgbox
             return;
-        }
+        }        
         case WIN_ERR_FATAL_OL_EXCEPTION:                // 3 -> force exit the plugin!
         case WIN_ERR_THREAD_TERMINATED:                 // 4 -> force exit the plugin!
         {
@@ -164,7 +164,9 @@ void manageSyncErrorMsg(long code) {
             s1.LoadString(IDS_CODE_NO_SOURCES); 
             break;
         }
-
+        case WIN_ERR_SAPI_NOT_SUPPORTED: {              // 13: Source (sapi) not supported
+            return;
+        }
         case WIN_ERR_INVALID_CREDENTIALS:               // 401
         case WIN_ERR_PROXY_AUTH_REQUIRED:               // 407
         {
@@ -239,6 +241,9 @@ int manageWinErrors(const int winErrorCode) {
             break;
         case WIN_ERR_LOCAL_STORAGE_FULL:
             sourceState = SYNCSOURCE_STATE_STORAGE_FULL;
+            break;
+        case WIN_ERR_SAPI_NOT_SUPPORTED:
+            sourceState = SYNCSOURCE_STATE_NOT_SUPPORTED;
             break;
         default:
             sourceState = SYNCSOURCE_STATE_FAILED;
