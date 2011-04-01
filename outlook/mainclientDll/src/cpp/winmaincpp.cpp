@@ -457,7 +457,7 @@ int startSync() {
         if (isMediaSource(name->c_str()))
         {
             // --- Media source ---
-            FileSapiSyncSource source(*ssconfig, ssReport, 0);
+            FileSapiSyncSource source(*ssconfig, ssReport, 0, 0);
             res = synchronizeSapi(source, report);
 
             report.addSyncSourceReport(source.getReport());
@@ -1476,6 +1476,12 @@ int manageSapiError(const int code) {
         {
             return WIN_ERR_LOCAL_STORAGE_FULL;      // 9
         }
+        /*
+        case ESSMSapiNotSupported:
+        {
+            return WIN_ERR_SAPI_NOT_SUPPORTED;      // 13
+        }
+        */
         case ESSMSourceNotSupported:
         case ESSMConfigError:
         case ESSMBeginSyncError:
