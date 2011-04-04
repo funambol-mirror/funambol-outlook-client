@@ -1240,11 +1240,26 @@ ArrayList* getVCardProperties(){
 
 	p->setPropName("FN");
     props->add(*p);
-    
+
+    // new ctcaps...
+
     p->setPropName("TEL");
-    pp->setParamName("VOICE");
-    pparams.add(*pp);
-    pp->setParamName("WORK");
+    pp->setParamName("TYPE");
+    valenums.add(StringBuffer("VOICE,WORK"));
+    valenums.add(StringBuffer("WORK,FAX"));
+    valenums.add(StringBuffer("CAR,VOICE"));
+    valenums.add(StringBuffer("WORK,PREF"));
+    valenums.add(StringBuffer("HOME,FAX"));
+    valenums.add(StringBuffer("VOICE,HOME"));
+    valenums.add(StringBuffer("PREF,VOICE"));
+    valenums.add(StringBuffer("CELL"));
+    valenums.add(StringBuffer("PAGER"));
+    valenums.add(StringBuffer("FAX"));
+    valenums.add(StringBuffer("VOICE"));
+    valenums.add(StringBuffer("X-FUNAMBOL-TELEX"));
+    valenums.add(StringBuffer("X-FUNAMBOL-RADIO"));
+    valenums.add(StringBuffer("X-FUNAMBOL-CALLBACK"));    
+    pp->setValEnums(&valenums);
     pparams.add(*pp);
     p->setPropParams(&pparams);
     props->add(*p);
@@ -1254,153 +1269,7 @@ ArrayList* getVCardProperties(){
     delete pp; pp = NULL;
     p = new Property();
     pp = new PropParam();
-
-	p->setPropName("TEL");
-    pp->setParamName("WORK");
-    pparams.add(*pp);
-    pp->setParamName("FAX");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-	
-	pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-	p->setPropName("TEL");
-    pp->setParamName("CAR");
-    pparams.add(*pp);
-    pp->setParamName("VOICE");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-	
-	p->setPropName("TEL");
-    pp->setParamName("WORK");
-    pparams.add(*pp);
-    pp->setParamName("PREF");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();   
-   
-	p->setPropName("TEL");
-    pp->setParamName("HOME");
-    pparams.add(*pp);
-    pp->setParamName("FAX");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-    p->setPropName("TEL");
-    pp->setParamName("VOICE");
-    pparams.add(*pp);
-    pp->setParamName("HOME");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-	p->setPropName("TEL");
-    pp->setParamName("PREF");
-    pparams.add(*pp);
-    pp->setParamName("VOICE");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-	p->setPropName("TEL");
-    pp->setParamName("CELL");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-	p->setPropName("TEL");
-    pp->setParamName("X-FUNAMBOL-TELEX");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-	
-	p->setPropName("TEL");
-    pp->setParamName("PAGER");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-	p->setPropName("TEL");
-    pp->setParamName("FAX");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-	p->setPropName("TEL");
-    pp->setParamName("VOICE");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-
+    valenums.clear();
 
     p->setPropName("CATEGORIES");
     props->add(*p);
@@ -1415,50 +1284,13 @@ ArrayList* getVCardProperties(){
     props->add(*p);
 
     //p->setPropName("X-FUNAMBOL-CUSTOMERID");
-    //props->add(*p);
-
-    p->setPropName("EMAIL");
-    pp->setParamName("INTERNET");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-    p->setPropName("EMAIL");
-    pp->setParamName("INTERNET");
-    pparams.add(*pp);
-    pp->setParamName("HOME");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-    p->setPropName("EMAIL");
-    pp->setParamName("INTERNET");
-    pparams.add(*pp);
-    pp->setParamName("WORK");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
+    //props->add(*p);    
 
     p->setPropName("ADR");
-    pp->setParamName("HOME");
+    pp->setParamName("TYPE");
+    valenums.add(StringBuffer("HOME"));
+    valenums.add(StringBuffer("WORK"));
+	pp->setValEnums(&valenums);
     pparams.add(*pp);
     p->setPropParams(&pparams);
     props->add(*p);
@@ -1468,21 +1300,12 @@ ArrayList* getVCardProperties(){
     delete pp; pp = NULL;
     p = new Property();
     pp = new PropParam();
-	
-	p->setPropName("ADR");
-    pp->setParamName("WORK");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
+    valenums.clear();
 
     p->setPropName("URL");
-    pp->setParamName("HOME");
+    pp->setParamName("TYPE");
+    valenums.add(StringBuffer("HOME"));
+    pp->setValEnums(&valenums);
     pparams.add(*pp);
     p->setPropParams(&pparams);
     props->add(*p);
@@ -1492,13 +1315,15 @@ ArrayList* getVCardProperties(){
     delete pp; pp = NULL;
     p = new Property();
     pp = new PropParam();
+    valenums.clear();
 
     p->setPropName("EMAIL");
-    pp->setParamName("INTERNET");
-    pparams.add(*pp);
-    pp->setParamName("HOME");
-    pparams.add(*pp);
-    pp->setParamName("X-FUNAMBOL-INSTANTMESSENGER");
+    pp->setParamName("TYPE");
+    valenums.add(StringBuffer("INTERNET"));    
+    valenums.add(StringBuffer("INTERNET,HOME"));
+    valenums.add(StringBuffer("INTERNET,WORK"));
+    valenums.add(StringBuffer("INTERNET,HOME,X-FUNAMBOL-INSTANTMESSENGER"));
+    pp->setValEnums(&valenums);    
     pparams.add(*pp);
     p->setPropParams(&pparams);
     props->add(*p);
@@ -1508,6 +1333,7 @@ ArrayList* getVCardProperties(){
     delete pp; pp = NULL;
     p = new Property();
     pp = new PropParam();
+    valenums.clear();
 
     p->setPropName("TITLE");
     props->add(*p);
@@ -1520,45 +1346,15 @@ ArrayList* getVCardProperties(){
     
     p->setPropName("NICKNAME");
     props->add(*p);
-
-    p->setPropName("ADR");
-    props->add(*p);    
-
+    
     p->setPropName("PHOTO");
     props->add(*p);
 
 	p->setPropName("PRIORITY");
     props->add(*p);
 
-    p->setPropName("TEL");
-    pp->setParamName("X-FUNAMBOL-RADIO");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
-	p->setPropName("TEL");
-    pp->setParamName("X-FUNAMBOL-CALLBACK");
-    pparams.add(*pp);
-    p->setPropParams(&pparams);
-    props->add(*p);
-
-    pparams.clear();
-    delete p; p = NULL;
-    delete pp; pp = NULL;
-    p = new Property();
-    pp = new PropParam();
-
     p->setPropName("X-SPOUSE");
-    props->add(*p);
-
-    p->setPropName("URL");
-    props->add(*p);
+    props->add(*p);   
 	
 	p->setPropName("X-FUNAMBOL-BILLINGINFO");
     props->add(*p);

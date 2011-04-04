@@ -67,6 +67,10 @@
 
 #include "syncml\core\Property.h"
 #include "syncml\core\PropParam.h"
+#include "syncml\core\CTCap.h"
+#include "syncml\formatter\Formatter.h"
+
+
 #include <string>
 #include "test/helper.h"
 
@@ -525,5 +529,134 @@ BEGIN_TEST(WinContactPhotoIsTheSame)
 
     delete item;
     
+}
+
+END_TEST
+
+BEGIN_TEST(CTCapTest)
+{
+    StringBuffer ctcapTest;       
+        
+        
+    ctcapTest.append("<CTCap><CTType>text/x-vcard</CTType>\n");
+    ctcapTest.append("<VerCT>2.1</VerCT>\n");
+    ctcapTest.append("<Property><PropName>BEGIN</PropName>\n");
+    ctcapTest.append("<ValEnum>VCARD</ValEnum>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>END</PropName>\n");
+    ctcapTest.append("<ValEnum>VCARD</ValEnum>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>VERSION</PropName>\n");
+    ctcapTest.append("<ValEnum>2.1</ValEnum>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>CLASS</PropName>\n");
+    ctcapTest.append("<ValEnum>PUBLIC</ValEnum>\n");
+    ctcapTest.append("<ValEnum>PRIVATE</ValEnum>\n");
+    ctcapTest.append("<ValEnum>CONFIDENTIAL</ValEnum>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-ANNIVERSARY</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>BDAY</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>NOTE</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>FN</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>TEL</PropName>\n");
+    ctcapTest.append("<PropParam><ParamName>TYPE</ParamName>\n");
+    ctcapTest.append("<ValEnum>VOICE,WORK</ValEnum>\n");
+    ctcapTest.append("<ValEnum>WORK,FAX</ValEnum>\n");
+    ctcapTest.append("<ValEnum>CAR,VOICE</ValEnum>\n");
+    ctcapTest.append("<ValEnum>WORK,PREF</ValEnum>\n");
+    ctcapTest.append("<ValEnum>HOME,FAX</ValEnum>\n");
+    ctcapTest.append("<ValEnum>VOICE,HOME</ValEnum>\n");
+    ctcapTest.append("<ValEnum>PREF,VOICE</ValEnum>\n");
+    ctcapTest.append("<ValEnum>CELL</ValEnum>\n");
+    ctcapTest.append("<ValEnum>PAGER</ValEnum>\n");
+    ctcapTest.append("<ValEnum>FAX</ValEnum>\n");
+    ctcapTest.append("<ValEnum>VOICE</ValEnum>\n");
+    ctcapTest.append("<ValEnum>X-FUNAMBOL-TELEX</ValEnum>\n");
+    ctcapTest.append("<ValEnum>X-FUNAMBOL-RADIO</ValEnum>\n");
+    ctcapTest.append("<ValEnum>X-FUNAMBOL-CALLBACK</ValEnum>\n");
+    ctcapTest.append("</PropParam>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>CATEGORIES</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-CHILDREN</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>ORG</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>ROLE</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>ADR</PropName>\n");
+    ctcapTest.append("<PropParam><ParamName>TYPE</ParamName>\n");
+    ctcapTest.append("<ValEnum>HOME</ValEnum>\n");
+    ctcapTest.append("<ValEnum>WORK</ValEnum>\n");
+    ctcapTest.append("</PropParam>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>URL</PropName>\n");
+    ctcapTest.append("<PropParam><ParamName>TYPE</ParamName>\n");
+    ctcapTest.append("<ValEnum>HOME</ValEnum>\n");
+    ctcapTest.append("</PropParam>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>EMAIL</PropName>\n");
+    ctcapTest.append("<PropParam><ParamName>TYPE</ParamName>\n");
+    ctcapTest.append("<ValEnum>INTERNET</ValEnum>\n");
+    ctcapTest.append("<ValEnum>INTERNET,HOME</ValEnum>\n");
+    ctcapTest.append("<ValEnum>INTERNET,WORK</ValEnum>\n");
+    ctcapTest.append("<ValEnum>INTERNET,HOME,X-FUNAMBOL-INSTANTMESSENGER</ValEnum>\n");
+    ctcapTest.append("</PropParam>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>TITLE</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>N</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-MANAGER</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>NICKNAME</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>PHOTO</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>PRIORITY</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-SPOUSE</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-BILLINGINFO</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-COMPANIES</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-FOLDER</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-GENDER</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-HOBBIES</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-INITIALS</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-LANGUAGES</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-MILEAGE</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-SUBJECT</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-ORGANIZATIONALID</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-YOMICOMPANYNAME</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-YOMIFIRSTNAME</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("<Property><PropName>X-FUNAMBOL-YOMILASTNAME</PropName>\n");
+    ctcapTest.append("</Property>\n");
+    ctcapTest.append("</CTCap>\n");
+    ArrayList* list = getVCardProperties();
+    // CTCap* cap = new CTCap(list, "text/x-vcard", "2.1");
+    CTCap* cap = new CTCap("text/x-vcard", "2.1", false, *list);
+    
+    Formatter formatter; 
+    StringBuffer* s = formatter.getCTCap(cap);
+
+    WIN_ASSERT_STRING_EQUAL(ctcapTest.c_str(), s->c_str(), L"Ctcap different");
+    //printf("%s", s->c_str());
+    int c = 0;
 }
 END_TEST

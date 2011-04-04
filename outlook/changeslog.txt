@@ -1,3 +1,5 @@
+2011-04-04
+  - magi:  Fixed CTCap format as for SyncML specification
 2011-04-01
   - magi:  Added backward compatibility support. Removed one-way from client / to server           
 2011-03-25
