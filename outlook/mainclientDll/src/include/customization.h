@@ -110,7 +110,7 @@
 #define SAPI_MAX_FILE_SIZE                  25  * 1024 * 1024           /**< max size of files    [bytes].  25 MB. */
 #define PICT_EXTENSION                      ".jpg,.jpeg,.jpe,.gif,.png,.jfif,.jif,.bmp,.tiff,.tif"
 #define VIDEO_EXTENSION                     ".wmv,.mp4,.mov,.3g2,.3gp,.mpeg,.mpg,.mpe,.asf,.movie,.avi,.mpa,.mp2,.m4u,.m4v,.swf,.flv"
-#define FILE_EXTENSION                      "!," PICT_EXTENSION "," VIDEO_EXTENSION  /**< everything else */
+#define FILE_EXTENSION                      "!," PICT_EXTENSION "," VIDEO_EXTENSION  ",.tmp"  /**< everything else */
 
 // MediaHub info.
 #define MEDIA_HUB_DEFAULT_FOLDER            "MediaHub"     // name of the default folder to store picture/video/files
